@@ -1,0 +1,105 @@
+.profile-page {
+  .full-height-row {
+    height: 100%;
+
+    .card-col {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      @media (max-width: 768px) {
+        margin-bottom: 24px;
+      }
+    }
+  }
+
+  .profile-card, .detail-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+
+    .ant-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+    }
+  }
+
+  .profile-title, .detail-title {
+    margin-bottom: 24px;
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  /* 左侧卡片样式 */
+  .avatar-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+
+    .avatar-upload {
+      position: relative;
+      cursor: pointer;
+
+      .avatar-upload-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        border-radius: 50%;
+        transition: opacity 0.3s;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .profile-summary {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .nickname-section {
+      margin-bottom: 32px;
+    }
+  }
+
+  /* 右侧卡片样式 */
+  .detail-card {
+    .ant-form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-form-item {
+      margin-bottom: 16px;
+
+      .ant-form-item-label {
+        font-weight: 500;
+      }
+    }
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    height: auto;
+
+    .full-height-row {
+      height: auto;
+    }
+  }
+}

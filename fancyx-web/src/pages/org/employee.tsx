@@ -1,0 +1,112 @@
+﻿import Permission from '@/components/Permission';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, message, Popconfirm, Space, Tag } from 'antd';
+import React, { useRef } from 'react';
+import { deleteEmployee, getEmployeeList, type EmployeeListDto } from '@/api/organization/employee';
+import SmartTable from '@/components/SmartTable';
+import EmployeeForm, { type EmployeeModalRef } from '@/pages/org/components/EmployeeForm.tsx';
+import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
+
+const EmployeeList: React.FC = () => {
+  const tableRef = useRef<SmartTableRef>(null);
+  const modalRef = useRef<EmployeeModalRef>(null);
+  const columns: SmartTableColumnType[] = [
+    {
+      title: '员工姓名',
+      dataIndex: 'name',
+    },
+    {
+      title: '工号',
+      dataIndex: 'code',
+    },
+    {
+      title: '性别',
+      dataIndex: 'sex',
+      render: (text: number) => {
+        if (text === 1) return '男';
+        return '女';
+      },
+    },
+    {
+      title: '电话',
+      dataIndex: 'phone',
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      render: (text: number) => {
+        if (text === 1) return <Tag color="green">正常</Tag>;
+        return <Tag color="red">离职</Tag>;
+      },
+    },
+    {
+      title: '操作',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_: any, record: EmployeeListDto) => [
+        <Space>
+          <Permission permissions={'Org.Employee.Update'}>
+            <a
+              key="edit"
+              onClick={() => {
+                modalRef?.current?.openModal(record);
+              }}
+            >
+              编辑
+            </a>
+          </Permission>
+          <Permission permissions={'Org.Employee.Delete'}>
+            <Popconfirm
+              key="delete"
+              title="确定删除吗？"
+              description="删除后无法撤销"
+              onConfirm={() => {
+                deleteEmployee(record.id!).then(() => {
+                  message.success('删除成功');
+                  tableRef.current?.reload();
+                });
+              }}
+            >
+              <a>删除</a>
+            </Popconfirm>
+          </Permission>
+        </Space>,
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <SmartTable
+        columns={columns}
+        rowKey="id"
+        ref={tableRef}
+        request={async (params) => {
+          const { data } = await getEmployeeList(params);
+          return data;
+        }}
+        searchItems={[
+          <Form.Item label="关键词" name="keyword">
+            <Input placeholder="请输入姓名/手机号/工号" />
+          </Form.Item>,
+        ]}
+        toolbar={
+          <Button
+            color="primary"
+            variant="solid"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              modalRef?.current?.openModal();
+            }}
+          >
+            新增
+          </Button>
+        }
+      />
+      {/* 新增/编辑员工弹窗 */}
+      <EmployeeForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
+    </>
+  );
+};
+
+export default EmployeeList;

@@ -1,0 +1,3 @@
+INSERT INTO "sys_user_role" ("id", "user_id", "role_id", "tenant_id") VALUES ('683cc8f7-ba08-3990-009e-23375861fdc5', '683cc901-ba08-3990-009e-23392649a8a4', '683cc8d0-ba08-3990-009e-233317cce095', '');
+INSERT INTO "sys_user_role" ("id", "user_id", "role_id", "tenant_id") VALUES ('3a172a37-55d5-ee9b-dc92-e07386eadc7c', '3a172a37-55d5-ee9b-dc92-e07386eadc7c', '3a172369-28a4-e37e-b78a-8c3eaec17359', NULL);
+INSERT INTO "sys_user_role" ("id", "user_id", "role_id", "tenant_id") VALUES ('3a172a37-55d5-ee9b-dc92-e07386eadc7a', '3a172a37-55d5-ee9b-dc92-e07386eadc7c', '683cc8d0-ba08-3990-009e-233317cce095', NULL);

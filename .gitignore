@@ -1,0 +1,5 @@
+**/bin/**
+**/obj/**
+**/Fancyx.Admin/Logs/**
+**/.vs/**
+/fancyx-server/TemplateEngineHost/vs

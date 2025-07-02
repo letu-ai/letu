@@ -1,0 +1,145 @@
+$primary-color: #7E57C2;
+$hover-color: #9575CD;
+$active-color: #673AB7;
+$bg-color: #F5F3FF;
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fafafa;
+  padding: 24px;
+
+  .login-card {
+    width: 900px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    .ant-card-body {
+      padding: 0;
+      height: 500px;
+    }
+  }
+
+  .login-layout {
+    display: flex;
+    height: 100%;
+  }
+
+  .login-bg-side {
+    width: 50%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+
+    .bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(126, 87, 194, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: white;
+
+      h2 {
+        font-size: 28px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      p {
+        font-size: 16px;
+        opacity: 0.9;
+        text-align: center;
+      }
+    }
+  }
+
+  .login-form-side {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+
+    .form-container {
+      width: 80%;
+      max-width: 320px;
+
+      .form-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: $primary-color;
+        font-size: 22px;
+      }
+
+      .ant-input-affix-wrapper {
+        padding: 12px 15px;
+        border-radius: 8px;
+      }
+
+      .ant-input-prefix {
+        color: rgba(0, 0, 0, 0.25);
+      }
+
+      .ant-btn-primary {
+        height: 48px;
+        font-size: 16px;
+        border-radius: 8px;
+        background: $primary-color;
+        border-color: $primary-color;
+
+        &:hover {
+          background: $hover-color;
+          border-color: $hover-color;
+        }
+
+        &:active {
+          background: $active-color;
+          border-color: $active-color;
+        }
+      }
+
+      .other-login {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+
+        .ant-btn {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .login-card {
+      width: 100%;
+      height: auto;
+
+      .ant-card-body {
+        height: auto;
+      }
+    }
+
+    .login-bg-side {
+      display: none;
+    }
+
+    .login-form-side {
+      width: 100%;
+      padding: 40px 20px;
+
+      .form-container {
+        width: 100%;
+      }
+    }
+  }
+}
