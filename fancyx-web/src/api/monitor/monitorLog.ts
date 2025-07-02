@@ -7,7 +7,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  */
 export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
   return httpClient.get<ApiAccessLogQueryDto, AppResponse<PagedResult<ApiAccessLogListDto[]>>>(
-    '/api/OnlineUser/GetOnlineUserList',
+    '/api/MonitorLog/ApiAccessLogList',
     {
       params: dto,
     },
@@ -20,7 +20,7 @@ export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
  */
 export function getExceptionLogList(dto: ExceptionLogQueryDto) {
   return httpClient.get<ExceptionLogQueryDto, AppResponse<PagedResult<ExceptionLogListDto[]>>>(
-    '/api/OnlineUser/ExceptionLogList',
+    '/api/MonitorLog/ExceptionLogList',
     {
       params: dto,
     },
