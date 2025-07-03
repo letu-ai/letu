@@ -16,5 +16,9 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        public DateTime CreationTime { get; set; }
+
+        public bool IsEnabled { get; set; }
     }
 }

@@ -114,6 +114,7 @@ namespace Fancyx.Admin.Service.System
             }
             entity.RoleName = dto.RoleName;
             entity.Remark = dto.Remark;
+            entity.IsEnabled = dto.IsEnabled;
             await _roleRepository.UpdateAsync(entity);
             return true;
         }

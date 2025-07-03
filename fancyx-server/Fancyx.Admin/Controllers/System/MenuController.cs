@@ -3,6 +3,7 @@ using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Core.Attributes;
 using Fancyx.Logger;
 using Fancyx.Shared.Consts;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -80,10 +81,10 @@ namespace Fancyx.Admin.Controllers.System
         /// </summary>
         /// <returns></returns>
         [HttpGet("menuOptions")]
-        public async Task<AppResponse<List<MenuOptionTreeDto>>> GetMenuOptionsAsync(bool onlyMenu)
+        public async Task<AppResponse<Dictionary<string, object>>> GetMenuOptionsAsync(bool onlyMenu)
         {
-            var data = await _menuService.GetMenuOptionsAsync(onlyMenu);
-            return Result.Data(data);
+            var (keys, tree) = await _menuService.GetMenuOptionsAsync(onlyMenu);
+            return Result.Data(new Dictionary<string, object> { ["keys"] = keys, ["tree"] = tree });
         }
     }
 }

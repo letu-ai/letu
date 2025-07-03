@@ -32,7 +32,7 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const fetchMenuOptions = () => {
     getMenuOptions(true).then((res) => {
       if (res.data) {
-        setTreeData(res.data);
+        setTreeData(res.data.tree);
       }
     });
   };
@@ -114,6 +114,10 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             allowClear
             treeDefaultExpandAll
             treeData={treeData}
+            fieldNames={{
+              label: 'title',
+              value: 'key',
+            }}
           />
         </Form.Item>
         <Form.Item label="菜单名称" name="title" rules={[{ required: true }]}>

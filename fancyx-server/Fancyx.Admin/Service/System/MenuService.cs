@@ -5,6 +5,7 @@ using Fancyx.Admin.SharedService;
 using Fancyx.Core.Helpers;
 using Fancyx.Repository;
 using Fancyx.Shared.Enums;
+
 using FreeSql;
 
 namespace Fancyx.Admin.Service.System
@@ -86,9 +87,10 @@ namespace Fancyx.Admin.Service.System
             return topMap;
         }
 
-        public async Task<List<MenuOptionTreeDto>> GetMenuOptionsAsync(bool onlyMenu)
+        public async Task<(string[] keys, List<MenuOptionTreeDto> tree)> GetMenuOptionsAsync(bool onlyMenu)
         {
             var all = await _menuRepository.WhereIf(onlyMenu, x => x.MenuType == MenuType.Folder || x.MenuType == MenuType.Menu).ToListAsync();
+            var keys = all.Select(x => x.Id.ToString()).ToArray();
             var top = all.Where(x => !x.ParentId.HasValue || x.ParentId == Guid.Empty && x.MenuType == MenuType.Menu)
                 .OrderBy(x => x.Sort).ToList();
             var topMap = new List<MenuOptionTreeDto>();
@@ -97,10 +99,9 @@ namespace Fancyx.Admin.Service.System
                 topMap.Add(new MenuOptionTreeDto
                 {
                     Key = item.Id.ToString(),
-                    Label = item.Title,
-                    Value = item.Id.ToString(),
+                    Title = item.Title,
                     Children = getChildren(item.Id),
-                    Extra = new { Type = (int)item.MenuType }
+                    MenuType = (int)item.MenuType
                 });
             }
 
@@ -114,16 +115,15 @@ namespace Fancyx.Admin.Service.System
                     childrenMap.Add(new MenuOptionTreeDto
                     {
                         Key = item.Id.ToString(),
-                        Label = item.Title,
-                        Value = item.Id.ToString(),
+                        Title = item.Title,
                         Children = getChildren(item.Id),
-                        Extra = new { Type = (int)item.MenuType }
+                        MenuType = (int)item.MenuType
                     });
                 }
                 return childrenMap;
             }
 
-            return topMap;
+            return (keys, topMap);
         }
 
         public async Task<bool> UpdateMenuAsync(MenuDto dto)

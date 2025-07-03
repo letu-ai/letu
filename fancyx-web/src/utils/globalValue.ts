@@ -15,3 +15,7 @@ export const Patterns = {
 export const DictType = {
   PositionLevel: 'positionLevel',
 };
+
+export const PermissionConstant = {
+  SuperAdmin: '系统管理员',
+};

@@ -38,6 +38,6 @@ namespace Fancyx.Admin.IService.System
         /// </summary>
         /// <param name="onlyMenu">true:只要目录+菜单</param>
         /// <returns></returns>
-        Task<List<MenuOptionTreeDto>> GetMenuOptionsAsync(bool onlyMenu);
+        Task<(string[] keys, List<MenuOptionTreeDto> tree)> GetMenuOptionsAsync(bool onlyMenu);
     }
 }

@@ -68,7 +68,7 @@ namespace Fancyx.Admin.SharedService
             }
 
             var roleIds = await _userRoleRepository.Where(x => x.UserId == userId).ToListAsync(x => x.RoleId);
-            var roles = await _roleRepository.Where(x => roleIds.Contains(x.Id)).ToListAsync();
+            var roles = await _roleRepository.Where(x => roleIds.Contains(x.Id) && x.IsEnabled).ToListAsync();
             var isSuperAdmin = roles.Any(r => r.RoleName == AdminConsts.SuperAdminRole);
             var menuIds = await _roleMenuRepository.Where(x => roleIds.Contains(x.RoleId)).ToListAsync(x => x.MenuId);
             var menus = await _menuRepository.Select.Where(x => menuIds.Contains(x.Id) || isSuperAdmin).ToListAsync(x => new { x.Permission, x.Id });

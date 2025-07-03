@@ -76,12 +76,15 @@ export interface RoleDto {
   id?: string | null;
   roleName: string;
   remark?: string | null;
+  isEnabled: boolean;
 }
 
 export interface RoleListDto {
   id: string;
   roleName: string;
   remark: string | null;
+  isEnabled: boolean;
+  creationTime: string;
 }
 
 export interface RoleQueryDto extends PageSearch {

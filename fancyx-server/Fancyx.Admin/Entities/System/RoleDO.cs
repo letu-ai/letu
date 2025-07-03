@@ -51,5 +51,11 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
         public string? TenantId { get; set; }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        [Column(IsNullable = false)]
+        public bool IsEnabled { get; set; } = false;
     }
 }

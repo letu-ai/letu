@@ -27,6 +27,19 @@
   display: flex;
 }
 
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
 .space-between {
   justify-content: space-between;
 }
@@ -64,6 +77,13 @@
 @for $i from 1 through 100 {
   .ml-#{$i} {
     margin-left: #{$i}px;
+  }
+}
+
+/** 右侧间距1-100px */
+@for $i from 1 through 100 {
+  .mr-#{$i} {
+    margin-right: #{$i}px;
   }
 }
 

@@ -13,6 +13,7 @@ import UserEditForm, { type ModalRef } from '@/pages/system/components/UserForm.
 import AssignRoleForm, { type AssignRoleFormRef } from '@/pages/system/components/AssignRoleForm.tsx';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
+import ResetUserPwdForm, { type ResetUserPwdFormRef } from '@/pages/system/components/ResetUserPwdForm.tsx';
 
 const { confirm } = Modal;
 const UserTable = () => {
@@ -20,6 +21,7 @@ const UserTable = () => {
   const { message } = useApp();
   const userEditModalRef = useRef<ModalRef>(null);
   const assignRoleRef = useRef<AssignRoleFormRef>(null);
+  const resetUserPwdFormRef = useRef<ResetUserPwdFormRef>(null);
   const columns: SmartTableColumnType[] = [
     {
       key: 'index',
@@ -68,7 +70,15 @@ const UserTable = () => {
           <Button
             type="link"
             onClick={() => {
-              assignRoleRef?.current?.openModal(record.id);
+              resetUserPwdFormRef?.current?.openModal(record);
+            }}
+          >
+            重置密码
+          </Button>
+          <Button
+            type="link"
+            onClick={() => {
+              assignRoleRef?.current?.openModal(record);
             }}
           >
             分配角色
@@ -132,6 +142,8 @@ const UserTable = () => {
       <UserEditForm ref={userEditModalRef} refresh={() => tableRef?.current?.reload()} />
       {/* 分配角色弹窗 */}
       <AssignRoleForm ref={assignRoleRef} />
+      {/* 重置密码弹窗 */}
+      <ResetUserPwdForm ref={resetUserPwdFormRef} />
     </>
   );
 };

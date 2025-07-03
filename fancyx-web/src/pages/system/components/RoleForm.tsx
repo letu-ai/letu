@@ -1,4 +1,4 @@
-import { Form, Input, message, Modal } from 'antd';
+import { Form, Input, message, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { addRole, type RoleDto, updateRole } from '@/api/system/role';
 import type { AppResponse } from '@/types/api';
@@ -28,6 +28,7 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     } else {
       setRow(null);
       form.resetFields();
+      form.setFieldValue('isEnabled', true);
     }
   };
 
@@ -79,8 +80,11 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         <Form.Item label="角色名" name="roleName" rules={[{ required: true }]}>
           <Input placeholder="请输入角色名" />
         </Form.Item>
+        <Form.Item label="状态" name="isEnabled" rules={[{ required: true, message: '请选择角色状态' }]}>
+          <Switch />
+        </Form.Item>
         <Form.Item label="备注" name="remark">
-          <Input placeholder="请输入备注" />
+          <Input placeholder="请输入备注" allowClear />
         </Form.Item>
       </Form>
     </Modal>

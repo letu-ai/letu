@@ -40,7 +40,7 @@ export function deleteMenu(ids: string[]) {
  * @param onlyMenu
  */
 export function getMenuOptions(onlyMenu: boolean) {
-  return httpClient.get<number, AppResponse<MenuOptionTreeDto[]>>('/api/menu/menuOptions?onlyMenu=' + onlyMenu);
+  return httpClient.get<number, AppResponse<MenuOptionResultDto>>('/api/menu/menuOptions?onlyMenu=' + onlyMenu);
 }
 
 export interface MenuDto {
@@ -62,11 +62,16 @@ export interface MenuQueryDto {
   path?: string | null;
 }
 
+export interface MenuOptionResultDto {
+  keys: string[];
+  tree: MenuOptionTreeDto[];
+}
+
 export interface MenuOptionTreeDto {
   key: string;
-  label?: string;
-  value?: string;
+  title?: string;
   extra?: never;
+  children?: MenuOptionTreeDto[];
 }
 
 export interface MenuListDto {
