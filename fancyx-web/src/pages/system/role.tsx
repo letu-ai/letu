@@ -1,6 +1,6 @@
 import { Space, Form, Input, Button, Modal, message, Tag } from 'antd';
 import { useRef } from 'react';
-import { PlusOutlined, ExclamationCircleFilled } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleFilled, EditOutlined, HddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { deleteRole, getRoleList, type RoleListDto } from '@/api/system/role';
 import RoleForm, { type ModalRef } from '@/pages/system/components/RoleForm.tsx';
 import AssignMenuForm, { type AssignMenuModalRef } from '@/pages/system/components/AssignMenuForm.tsx';
@@ -45,13 +45,13 @@ const Role = () => {
         if (record.roleName === PermissionConstant.SuperAdmin) return <></>;
         return (
           <Space>
-            <Button type="link" onClick={() => rowEdit(record)}>
+            <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
               编辑
             </Button>
-            <Button type="link" onClick={() => openAssignModal(record)}>
+            <Button type="link" icon={<HddOutlined />} onClick={() => openAssignModal(record)}>
               菜单权限
             </Button>
-            <Button type="link" danger onClick={() => rowDelete(record.id)}>
+            <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
               删除
             </Button>
           </Space>

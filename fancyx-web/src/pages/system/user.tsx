@@ -1,6 +1,6 @@
 import { Button, Modal, Switch, Image, Space, Form, Input } from 'antd';
 import { useRef } from 'react';
-import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined } from '@ant-design/icons';
 import useApp from 'antd/es/app/useApp';
 import {
   deleteUser,
@@ -14,6 +14,7 @@ import AssignRoleForm, { type AssignRoleFormRef } from '@/pages/system/component
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import ResetUserPwdForm, { type ResetUserPwdFormRef } from '@/pages/system/components/ResetUserPwdForm.tsx';
+import ProIcon from '@/components/ProIcon';
 
 const { confirm } = Modal;
 const UserTable = () => {
@@ -69,6 +70,7 @@ const UserTable = () => {
         <Space>
           <Button
             type="link"
+            icon={<KeyOutlined />}
             onClick={() => {
               resetUserPwdFormRef?.current?.openModal(record);
             }}
@@ -81,9 +83,10 @@ const UserTable = () => {
               assignRoleRef?.current?.openModal(record);
             }}
           >
+            <ProIcon icon="iconify:simple-line-icons:check" />
             分配角色
           </Button>
-          <Button type="link" danger onClick={() => rowDelete(record.id)}>
+          <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
             删除
           </Button>
         </Space>

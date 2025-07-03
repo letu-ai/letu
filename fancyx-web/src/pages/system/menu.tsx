@@ -1,6 +1,6 @@
 import { Space, Form, Input, Button, Modal, message, Switch, Tag } from 'antd';
 import { useRef } from 'react';
-import { PlusOutlined, ExclamationCircleFilled, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleFilled, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import MenuForm, { type ModalRef } from '@/pages/system/components/MenuForm.tsx';
 import { deleteMenu, getMenuList, type MenuListDto } from '@/api/system/menu.ts';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
@@ -56,10 +56,10 @@ const MenuTable = () => {
       fixed: 'right',
       render: (_: any, record: MenuListDto) => (
         <Space>
-          <Button type="link" onClick={() => rowEdit(record)}>
+          <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
             编辑
           </Button>
-          <Button type="link" danger onClick={() => dataDelete([record.id])}>
+          <Button type="link" icon={<DeleteOutlined />} danger onClick={() => dataDelete([record.id])}>
             删除
           </Button>
         </Space>

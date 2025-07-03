@@ -6,13 +6,14 @@ import {
   type DictTypeResultDto,
   deleteDictTypes,
 } from '@/api/system/dictType';
-import { DeleteOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal, Popconfirm, Space, Switch } from 'antd';
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
 import DictTypeForm, { type ModalRef } from '@/pages/system/components/DictTypeForm.tsx';
+import ProIcon from '@/components/ProIcon';
 
 const { confirm } = Modal;
 
@@ -51,23 +52,27 @@ const DictList: React.FC = () => {
       render: (_: any, record: DictTypeResultDto) => [
         <Space>
           <Permission permissions={'Sys.DictType.Add'}>
-            <a
+            <Button
+              type="link"
+              icon={<ProIcon icon="iconify:mi:database" />}
               key="data"
               onClick={() => {
                 navigate(`/system/dictItem/${record.dictType}`);
               }}
             >
               数据
-            </a>
+            </Button>
           </Permission>
-          <a
+          <Button
+            type="link"
+            icon={<EditOutlined />}
             key="edit"
             onClick={() => {
               modalRef?.current?.openModal(record as DictTypeDto);
             }}
           >
             编辑
-          </a>
+          </Button>
           <Permission permissions={'Sys.DictType.Delete'}>
             <Popconfirm
               key="delete"
@@ -80,7 +85,9 @@ const DictList: React.FC = () => {
                 });
               }}
             >
-              <a>删除</a>
+              <Button type="link" danger icon={<DeleteOutlined />}>
+                删除
+              </Button>
             </Popconfirm>
           </Permission>
         </Space>,

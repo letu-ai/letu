@@ -1,11 +1,13 @@
 ﻿import { getOnlineUsers, onlineUserLogout, type OnlineUserResultDto } from '@/api/monitor/onlineUser';
-import { Form, Input, message } from 'antd';
-import React from 'react';
+import { Button, Form, Input, message } from 'antd';
+import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import SmartTable from '@/components/SmartTable';
-import type { SmartTableColumnType } from '@/components/SmartTable/type.ts';
+import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
+import ProIcon from '@/components/ProIcon';
 
 const OnlineUserList: React.FC = () => {
+  const tableRef = useRef<SmartTableRef>(null);
   const columns: SmartTableColumnType[] = [
     {
       title: '账号',
@@ -33,17 +35,19 @@ const OnlineUserList: React.FC = () => {
       render: (_: any, record: OnlineUserResultDto) => {
         return (
           <Permission permissions={'Monitor.Logout'}>
-            <a
+            <Button
+              type="link"
+              icon={<ProIcon icon="iconify:hugeicons:logout-04" />}
               key="logout"
               onClick={() => {
                 onlineUserLogout(record.userId + ':' + record.sessionId).then(() => {
                   message.success('注销成功');
-                  //actionRef.current?.reload()
+                  tableRef.current?.reload();
                 });
               }}
             >
               注销
-            </a>
+            </Button>
           </Permission>
         );
       },
@@ -53,6 +57,7 @@ const OnlineUserList: React.FC = () => {
   return (
     <>
       <SmartTable
+        ref={tableRef}
         columns={columns}
         rowKey="id"
         request={async (params) => {
