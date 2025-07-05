@@ -73,6 +73,8 @@ namespace Fancyx.Repository
 
         public override void Configure(ApplicationInitializationContext context)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
         }
     }
 }

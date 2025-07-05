@@ -100,7 +100,7 @@ namespace Fancyx.Admin.Service.Organization
                     IdNo = e.IdNo,
                     FrontIdNoUrl = e.FrontIdNoUrl,
                     BackIdNoUrl = e.BackIdNoUrl,
-                    BirthDay = e.BirthDay,
+                    Birthday = e.Birthday,
                     Address = e.Address,
                     Email = e.Email,
                     InTime = e.InTime,

@@ -1,5 +1,5 @@
 ﻿import { deletePosition, getPositionList } from '@/api/organization/position';
-import { PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
@@ -50,14 +50,16 @@ const Position: React.FC = () => {
       render: (_: any, record: PositionListDto) => [
         <Space>
           <Permission permissions={'Org.Position.Update'}>
-            <a
+            <Button
+              type="link"
+              icon={<EditOutlined />}
               key="edit"
               onClick={() => {
                 rowEdit(record);
               }}
             >
               编辑
-            </a>
+            </Button>
           </Permission>
           <Permission permissions={'Org.Position.Delete'}>
             <Popconfirm
@@ -68,7 +70,9 @@ const Position: React.FC = () => {
                 rowDelete(record.id);
               }}
             >
-              <a>删除</a>
+              <Button type="link" icon={<DeleteOutlined />} danger>
+                删除
+              </Button>
             </Popconfirm>
           </Permission>
         </Space>,

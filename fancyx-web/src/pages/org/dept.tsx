@@ -1,6 +1,6 @@
 ﻿import { deleteDept, getDeptList, type DeptListDto } from '@/api/organization/dept';
-import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Modal } from 'antd';
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, message, Modal, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import DeptForm, { type DeptModalRef } from '@/pages/org/components/DeptForm.tsx';
@@ -36,21 +36,27 @@ const DepartmentList: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
-      render: (_: any, record: DeptListDto) => [
-        <Permission permissions={'Org.Dept.Update'}>
-          <a
-            key="edit"
-            onClick={() => {
-              rowEdit(record);
-            }}
-          >
-            编辑
-          </a>
-        </Permission>,
-        <Permission permissions={'Org.Dept.Delete'}>
-          <Button type="link" danger onClick={() => rowDelete(record.id)}></Button>
-        </Permission>,
-      ],
+      render: (_: any, record: DeptListDto) => (
+        <Space>
+          <Permission permissions={'Org.Dept.Update'}>
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              key="edit"
+              onClick={() => {
+                rowEdit(record);
+              }}
+            >
+              编辑
+            </Button>
+          </Permission>
+          <Permission permissions={'Org.Dept.Delete'}>
+            <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
+              删除
+            </Button>
+          </Permission>
+        </Space>
+      ),
     },
   ];
 

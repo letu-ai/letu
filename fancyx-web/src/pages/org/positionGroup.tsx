@@ -1,6 +1,6 @@
 ﻿import Permission from '@/components/Permission';
 import { deletePositionGroup, getPositionGroupList, type PositionGroupListDto } from '@/api/organization/positionGroup';
-import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import PositionGroupForm, { type ModalRef } from '@/pages/org/components/PositionGroupForm.tsx';
@@ -32,14 +32,16 @@ const PositionGroupList: React.FC = () => {
       render: (_: any, record: PositionGroupListDto) => [
         <Space>
           <Permission permissions={'Org.PositionGroup.Update'}>
-            <a
+            <Button
+              type="link"
+              icon={<EditOutlined />}
               key="edit"
               onClick={() => {
                 rowEdit(record);
               }}
             >
               编辑
-            </a>
+            </Button>
           </Permission>
           <Permission permissions={'Org.PositionGroup.Delete'}>
             <Popconfirm
@@ -50,7 +52,9 @@ const PositionGroupList: React.FC = () => {
                 rowDelete(record.id);
               }}
             >
-              <a>删除</a>
+              <Button type="link" danger icon={<DeleteOutlined />}>
+                删除
+              </Button>
             </Popconfirm>
           </Permission>
         </Space>,

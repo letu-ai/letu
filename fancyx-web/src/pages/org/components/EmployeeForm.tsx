@@ -93,8 +93,12 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
   };
   const onFinish = (values: EmployeeDto) => {
     const isEdit = !!row?.id;
+    let params = values;
+    if (!isEdit) {
+      params = { ...params, isAddUser: isAddUser };
+    }
 
-    execute(values, isEdit ? updateEmployee : addEmployee, isEdit ? '编辑成功' : '新增成功');
+    execute(params, isEdit ? updateEmployee : addEmployee, isEdit ? '编辑成功' : '新增成功');
   };
   const pwdPatternValidateItem = {
     pattern: Patterns.LoginPassword,
@@ -178,12 +182,12 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
         </Row>
         <Row>
           <Col span={12}>
-            <Form.Item label="身份证号" name="sex">
+            <Form.Item label="身份证号" name="idNo">
               <Input placeholder="请输入身份证号" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="生日" name="birthDay">
+            <Form.Item label="生日" name="birthday">
               <Input placeholder="输入身份证号后自动填入" disabled />
             </Form.Item>
           </Col>

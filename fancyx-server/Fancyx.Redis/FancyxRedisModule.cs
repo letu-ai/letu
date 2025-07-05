@@ -1,7 +1,5 @@
 ﻿using Fancyx.Core.AutoInject;
 using FreeRedis;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RedLockNet.SERedis.Configuration;

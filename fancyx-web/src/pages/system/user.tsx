@@ -15,6 +15,7 @@ import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import ResetUserPwdForm, { type ResetUserPwdFormRef } from '@/pages/system/components/ResetUserPwdForm.tsx';
 import ProIcon from '@/components/ProIcon';
+import { useApplication } from '@/components/Application';
 
 const { confirm } = Modal;
 const UserTable = () => {
@@ -23,6 +24,7 @@ const UserTable = () => {
   const userEditModalRef = useRef<ModalRef>(null);
   const assignRoleRef = useRef<AssignRoleFormRef>(null);
   const resetUserPwdFormRef = useRef<ResetUserPwdFormRef>(null);
+  const { ossDomain } = useApplication();
   const columns: SmartTableColumnType[] = [
     {
       key: 'index',
@@ -32,7 +34,7 @@ const UserTable = () => {
       title: '头像',
       dataIndex: 'avatar',
       render: (text: string) => {
-        return <Image width={50} src={text} />;
+        return <Image width={50} src={ossDomain + text} />;
       },
     },
     {

@@ -1,5 +1,6 @@
-using Fancyx.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
+
+using Fancyx.Shared.Enums;
 
 namespace Fancyx.Admin.IService.Organization.Dtos
 {
@@ -48,8 +49,7 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// <summary>
         /// 生日
         /// </summary>
-        [Required]
-        public DateTime BirthDay { get; set; }
+        public DateTime? Birthday { get; set; }
 
         /// <summary>
         /// 现住址

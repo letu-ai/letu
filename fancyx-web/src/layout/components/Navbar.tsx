@@ -9,6 +9,7 @@ import { clearTabs, open } from '@/store/tabStore.ts';
 import { useMemo, useRef } from 'react';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import SearchModal, { type SearchModalRef } from '@/layout/components/SearchModal.tsx';
+import { useApplication } from '@/components/Application';
 
 function Navbar() {
   const collapsed = useSelector(selectCollapsed);
@@ -31,6 +32,7 @@ function Navbar() {
       icon: <LogoutOutlined />,
     },
   ];
+  const { ossDomain } = useApplication();
   const sizeItems = [
     {
       key: 'large',
@@ -105,7 +107,7 @@ function Navbar() {
             >
               <Button type="text" className="navbar-btn">
                 {UserStore.userInfo?.avatar ? (
-                  <Avatar size={28} src={UserStore.userInfo?.avatar} alt="头像" />
+                  <Avatar size={28} src={ossDomain + UserStore.userInfo?.avatar} alt="头像" />
                 ) : (
                   <Avatar size={28} icon={<UserOutlined />} />
                 )}

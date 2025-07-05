@@ -1,5 +1,5 @@
 ﻿import Permission from '@/components/Permission';
-import { PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
 import { deleteEmployee, getEmployeeList, type EmployeeListDto } from '@/api/organization/employee';
@@ -43,17 +43,19 @@ const EmployeeList: React.FC = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_: any, record: EmployeeListDto) => [
+      render: (_: any, record: EmployeeListDto) => (
         <Space>
           <Permission permissions={'Org.Employee.Update'}>
-            <a
+            <Button
+              type="link"
+              icon={<EditOutlined />}
               key="edit"
               onClick={() => {
                 modalRef?.current?.openModal(record);
               }}
             >
               编辑
-            </a>
+            </Button>
           </Permission>
           <Permission permissions={'Org.Employee.Delete'}>
             <Popconfirm
@@ -67,11 +69,13 @@ const EmployeeList: React.FC = () => {
                 });
               }}
             >
-              <a>删除</a>
+              <Button type="link" danger icon={<DeleteOutlined />}>
+                删除
+              </Button>
             </Popconfirm>
           </Permission>
-        </Space>,
-      ],
+        </Space>
+      ),
     },
   ];
 

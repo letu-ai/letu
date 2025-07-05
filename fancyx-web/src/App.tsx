@@ -1,7 +1,7 @@
 import { useRoutes } from 'react-router-dom';
 import { routes } from '@/router';
 import zhCN from 'antd/locale/zh_CN';
-import { ConfigProvider, App as AntdApp, Spin, theme } from 'antd';
+import { ConfigProvider, Spin, theme } from 'antd';
 import { Suspense } from 'react';
 import { generateDynamicRoutes } from './router/dynamic';
 import UserStore from './store/userStore';
@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { selectSize } from '@/store/themeStore.ts';
 import { AuthProvider } from '@/components/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Application from "@/components/Application";
 
 // 清爽紫色主题配置
 const defaultTheme = {
@@ -84,11 +85,11 @@ function App() {
     <>
       <AuthProvider>
         <ConfigProvider locale={zhCN} componentSize={size} theme={defaultTheme}>
-          <AntdApp>
+          <Application>
             <QueryClientProvider client={queryClient}>
               <Suspense fallback={fallback}>{useRoutes(renderRoutes)}</Suspense>
             </QueryClientProvider>
-          </AntdApp>
+          </Application>
         </ConfigProvider>
       </AuthProvider>
     </>

@@ -69,8 +69,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// <summary>
         /// 生日
         /// </summary>
-        [Column(IsNullable = false)]
-        public DateTime BirthDay { get; set; }
+        public DateTime? Birthday { get; set; }
 
         /// <summary>
         /// 现住址

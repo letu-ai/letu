@@ -60,7 +60,7 @@ export interface EmployeeDto {
   idNo: string;
   frontIdNoUrl?: string | null;
   backIdNoUrl?: string | null;
-  birthDay: string;
+  birthday: string;
   address?: string | null;
   email?: string | null;
   inTime?: string | null;
@@ -68,6 +68,7 @@ export interface EmployeeDto {
   userId: string;
   deptId: string;
   positionId: string;
+  isAddUser?: boolean;
 }
 
 export interface EmployeeQueryDto extends PageSearch {
@@ -84,7 +85,7 @@ export interface EmployeeListDto {
   idNo: string;
   frontIdNoUrl: string | null;
   backIdNoUrl: string | null;
-  birthDay: string;
+  birthday: string;
   address: string | null;
   email: string | null;
   inTime: string | null;
