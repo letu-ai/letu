@@ -40,7 +40,7 @@ export function deleteEmployee(id: string) {
  * @param dto
  */
 export function bindUser(dto: EmployeeBindUserDto) {
-  return httpClient.post<AppResponse<boolean>>('/api/employee/bind', dto);
+  return httpClient.post<AppResponse<boolean>>('/api/employee/bindUser', dto);
 }
 
 /**
@@ -98,11 +98,11 @@ export interface EmployeeListDto {
 }
 
 export interface EmployeeBindUserDto {
-  userId: string;
+  userId?: string;
   employeeId: string;
 }
 
 export interface EmployeeInfoDto extends EmployeeListDto {
-  userName: string | null;
-  nickName: string | null;
+  userName?: string | null;
+  nickName?: string | null;
 }

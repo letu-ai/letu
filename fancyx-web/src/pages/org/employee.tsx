@@ -1,15 +1,17 @@
 ﻿import Permission from '@/components/Permission';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
 import { deleteEmployee, getEmployeeList, type EmployeeListDto } from '@/api/organization/employee';
 import SmartTable from '@/components/SmartTable';
 import EmployeeForm, { type EmployeeModalRef } from '@/pages/org/components/EmployeeForm.tsx';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
+import BindUserForm, { type BindUserFormRef } from '@/pages/org/components/BindUserForm.tsx';
 
 const EmployeeList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<EmployeeModalRef>(null);
+  const bindUserModalRef = useRef<BindUserFormRef>(null);
   const columns: SmartTableColumnType[] = [
     {
       title: '员工姓名',
@@ -42,7 +44,8 @@ const EmployeeList: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
-      valueType: 'option',
+      fixed: 'right',
+      width: 210,
       render: (_: any, record: EmployeeListDto) => (
         <Space>
           <Permission permissions={'Org.Employee.Update'}>
@@ -57,6 +60,15 @@ const EmployeeList: React.FC = () => {
               编辑
             </Button>
           </Permission>
+          <Button
+            type="link"
+            icon={<UserAddOutlined />}
+            onClick={() => {
+              bindUserModalRef?.current?.openModal(record);
+            }}
+          >
+            绑定用户
+          </Button>
           <Permission permissions={'Org.Employee.Delete'}>
             <Popconfirm
               key="delete"
@@ -109,6 +121,8 @@ const EmployeeList: React.FC = () => {
       />
       {/* 新增/编辑员工弹窗 */}
       <EmployeeForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
+      {/* 绑定用户弹窗 */}
+      <BindUserForm ref={bindUserModalRef} />
     </>
   );
 };

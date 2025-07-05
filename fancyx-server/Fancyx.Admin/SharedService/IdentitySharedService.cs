@@ -262,7 +262,7 @@ namespace Fancyx.Admin.SharedService
             if (permission.RoleIds == null || permission.RoleIds.Length == 0) return data;
 
             var roles = await _roleRepository.Select.Where(x => permission.RoleIds != null && permission.RoleIds.Contains(x.Id)).ToListAsync();
-            var employee = await _employeeRepository.Where(x => x.UserId == uid).FirstAsync();
+            var employee = await _employeeRepository.Where(x => x.UserId == uid && x.DeptId.HasValue).FirstAsync();
             foreach (var role in roles)
             {
                 if (role.PowerDataType == 0)
@@ -284,21 +284,21 @@ namespace Fancyx.Admin.SharedService
                 {
                     if (employee != null)
                     {
-                        data.DeptIds.Add(employee.DeptId);
+                        data.DeptIds.Add(employee.DeptId!.Value);
                     }
                 }
                 else if (role.PowerDataType == 4)
                 {
                     if (employee != null)
                     {
-                        data.DeptIds.Add(employee.DeptId);
+                        data.DeptIds.Add(employee.DeptId!.Value);
                         data.EmployeeIds.Add(employee.Id);
                     }
                 }
 
                 if (role.PowerDataType != 4)
                 {
-                    data.EmployeeIds.AddRange([.. await _employeeRepository.Where(x => data.DeptIds != null && data.DeptIds.Contains(x.DeptId)).ToListAsync(x => x.Id)]);
+                    data.EmployeeIds.AddRange([.. await _employeeRepository.Where(x => data.DeptIds != null && data.DeptIds.Contains(x.DeptId!.Value)).ToListAsync(x => x.Id)]);
                 }
             }
 

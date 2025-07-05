@@ -3,6 +3,7 @@ using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Core.Attributes;
 using Fancyx.Logger;
 using Fancyx.Shared.Consts;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -111,6 +112,18 @@ namespace Fancyx.Admin.Controllers.System
         {
             await _userService.ResetUserPasswordAsync(dto);
             return Result.Ok();
+        }
+
+        /// <summary>
+        /// 用户简单信息查询
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        [HttpGet("simpleUserInfos")]
+        public async Task<AppResponse<List<UserSimpleInfoDto>>> GetUserSimpleInfosAsync(string? keyword)
+        {
+            var data = await _userService.GetUserSimpleInfosAsync(keyword);
+            return Result.Data(data);
         }
     }
 }

@@ -132,5 +132,13 @@ namespace Fancyx.Admin.Service.System
             LogRecordContext.PutVariable("id", user.Id);
             LogRecordContext.PutVariable("userName", user.UserName);
         }
+
+        public Task<List<UserSimpleInfoDto>> GetUserSimpleInfosAsync(string? keyword)
+        {
+            return _userRepository.Where(x => x.IsEnabled)
+                .WhereIf(!string.IsNullOrEmpty(keyword), x => x.UserName.Contains(keyword!) || x.NickName.Contains(keyword!))
+                .OrderBy(x => x.NickName)
+                .ToListAsync<UserSimpleInfoDto>();
+        }
     }
 }

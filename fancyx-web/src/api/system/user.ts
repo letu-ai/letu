@@ -57,6 +57,18 @@ export function resetUserPwd(dto: ResetUserPwdDto) {
   return httpClient.put<string, AppResponse<boolean>>('/api/user/resetPwd', dto);
 }
 
+/**
+ * 用户简单信息查询
+ * @param keyword 账号/昵称
+ */
+export function getUserSimpleInfos(keyword?: string) {
+  return httpClient.get<string, AppResponse<UserSimpleInfoDto[]>>('/api/user/simpleUserInfos', {
+    params: {
+      keyword,
+    },
+  });
+}
+
 export interface UserDto {
   id?: string | null;
   userName: string;
@@ -88,4 +100,10 @@ export interface AssignRoleDto {
 export interface ResetUserPwdDto {
   userId: string;
   password: string;
+}
+
+export interface UserSimpleInfoDto {
+  id: string;
+  userName: string;
+  nickName: string;
 }

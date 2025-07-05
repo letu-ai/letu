@@ -1,8 +1,9 @@
-import { Form, Input, Radio, message, Modal, Row, Col, DatePicker, TreeSelect, Checkbox, Tooltip } from 'antd';
+import { Form, Input, Radio, message, Modal, Row, Col, DatePicker, TreeSelect, Checkbox, Tooltip, Tag } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import {
   addEmployee,
   type EmployeeDto,
+  type EmployeeInfoDto,
   type EmployeeListDto,
   getEmployeeInfo,
   updateEmployee,
@@ -24,7 +25,7 @@ export interface EmployeeModalRef {
 const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
-  const [row, setRow] = useState<EmployeeDto | null>();
+  const [row, setRow] = useState<EmployeeInfoDto | null>();
   const [employeeStatus, setEmployeeStatus] = useState<number>();
   const [deptData, setDeptData] = useState<DeptListDto[]>([]);
   const [positionData, setPositionData] = useState<AppOptionTree[]>([]);
@@ -243,34 +244,47 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
             </Form.Item>
           </Col>
         </Row>
-        <Row>
-          <Col span={12}>
-            <Form.Item
-              label={
-                <span>
-                  添加用户{' '}
-                  <Tooltip title="勾选后，会以手机号作为账号添加用户">
-                    <InfoCircleOutlined className="icon-info" />
-                  </Tooltip>
-                </span>
-              }
-              name="isAddUser"
-            >
-              <Checkbox
-                onChange={(v) => {
-                  setIsAddUser(v.target.checked);
-                }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            {isAddUser && (
-              <Form.Item label="用户密码" name="userPassword" rules={[{ required: true }, pwdPatternValidateItem]}>
-                <Input.Password placeholder="请输入用户密码" />
+        {!row || !row?.id ? (
+          <Row>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span>
+                    添加用户{' '}
+                    <Tooltip title="勾选后，会以手机号作为账号添加新的用户数据">
+                      <InfoCircleOutlined className="icon-info" />
+                    </Tooltip>
+                  </span>
+                }
+                name="isAddUser"
+              >
+                <Checkbox
+                  checked={isAddUser}
+                  onChange={(v) => {
+                    setIsAddUser(v.target.checked);
+                  }}
+                />
               </Form.Item>
-            )}
-          </Col>
-        </Row>
+            </Col>
+            <Col span={12}>
+              {isAddUser && (
+                <Form.Item label="用户密码" name="userPassword" rules={[{ required: true }, pwdPatternValidateItem]}>
+                  <Input.Password placeholder="请输入用户密码" />
+                </Form.Item>
+              )}
+            </Col>
+          </Row>
+        ) : (
+          row?.userName && (
+            <Row>
+              <Col span={24}>
+                <Form.Item label="已绑定用户">
+                  <Tag color="magenta">账号：{row?.userName}</Tag>
+                </Form.Item>
+              </Col>
+            </Row>
+          )
+        )}
       </Form>
     </Modal>
   );

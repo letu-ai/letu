@@ -5,7 +5,7 @@ import { deleteRole, getRoleList, type RoleListDto } from '@/api/system/role';
 import RoleForm, { type ModalRef } from '@/pages/system/components/RoleForm.tsx';
 import AssignMenuForm, { type AssignMenuModalRef } from '@/pages/system/components/AssignMenuForm.tsx';
 import SmartTable from '@/components/SmartTable';
-import type { SmartTableRef } from '@/components/SmartTable/type.ts';
+import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import { PermissionConstant } from '@/utils/globalValue.ts';
 
 const { confirm } = Modal;
@@ -13,7 +13,7 @@ const Role = () => {
   const modalRef = useRef<ModalRef>(null);
   const assignMenuForRef = useRef<AssignMenuModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
-  const columns = [
+  const columns: SmartTableColumnType[] = [
     {
       title: '角色名',
       dataIndex: 'roleName',
@@ -41,6 +41,8 @@ const Role = () => {
     {
       title: '操作',
       key: 'action',
+      width: 210,
+      fixed: 'right',
       render: (_: any, record: RoleListDto) => {
         if (record.roleName === PermissionConstant.SuperAdmin) return <></>;
         return (

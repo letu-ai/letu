@@ -48,9 +48,20 @@ const DictList: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
+      width: 210,
       fixed: 'right',
       render: (_: any, record: DictTypeResultDto) => [
         <Space>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            key="edit"
+            onClick={() => {
+              modalRef?.current?.openModal(record as DictTypeDto);
+            }}
+          >
+            编辑
+          </Button>
           <Permission permissions={'Sys.DictType.Add'}>
             <Button
               type="link"
@@ -63,16 +74,6 @@ const DictList: React.FC = () => {
               数据
             </Button>
           </Permission>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            key="edit"
-            onClick={() => {
-              modalRef?.current?.openModal(record as DictTypeDto);
-            }}
-          >
-            编辑
-          </Button>
           <Permission permissions={'Sys.DictType.Delete'}>
             <Popconfirm
               key="delete"

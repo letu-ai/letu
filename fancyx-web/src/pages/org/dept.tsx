@@ -36,6 +36,8 @@ const DepartmentList: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
+      width: 140,
+      fixed: 'right',
       render: (_: any, record: DeptListDto) => (
         <Space>
           <Permission permissions={'Org.Dept.Update'}>

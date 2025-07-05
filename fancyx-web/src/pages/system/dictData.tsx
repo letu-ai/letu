@@ -1,6 +1,6 @@
 ﻿import Permission from '@/components/Permission';
 import { deleteDictData, getDictDataList, type DictDataDto, type DictDataListDto } from '@/api/system/dictData';
-import { PlusOutlined } from '@ant-design/icons';
+import { CopyOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Popconfirm, Space, Switch } from 'antd';
 import React, { useRef } from 'react';
 import { useParams } from 'react-router-dom';
@@ -43,22 +43,28 @@ const DictDataList: React.FC = () => {
     },
     {
       title: '操作',
+      width: 210,
+      fixed: 'right',
       dataIndex: 'option',
       render: (_: any, record: DictDataListDto) => [
         <Space>
           <Permission permissions={'Sys.DictData.Update'}>
-            <a
+            <Button
+              type="link"
+              icon={<EditOutlined />}
               key="edit"
               onClick={() => {
                 modalRef?.current?.openModal(record);
               }}
             >
               编辑
-            </a>
+            </Button>
           </Permission>
           <Permission permissions={'Sys.DictData.Add'}>
-            <a
+            <Button
               key="copy"
+              type="link"
+              icon={<CopyOutlined />}
               onClick={() => {
                 const row = record as DictDataDto;
                 row.id = undefined;
@@ -66,7 +72,7 @@ const DictDataList: React.FC = () => {
               }}
             >
               复制
-            </a>
+            </Button>
           </Permission>
           <Permission permissions={'Sys.DictData.Delete'}>
             <Popconfirm
@@ -80,7 +86,9 @@ const DictDataList: React.FC = () => {
                 });
               }}
             >
-              <a>删除</a>
+              <Button type="link" danger icon={<DeleteOutlined />}>
+                删除
+              </Button>
             </Popconfirm>
           </Permission>
         </Space>,

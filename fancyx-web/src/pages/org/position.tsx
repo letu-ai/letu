@@ -47,6 +47,8 @@ const Position: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
+      width: 140,
+      fixed: 'right',
       render: (_: any, record: PositionListDto) => [
         <Space>
           <Permission permissions={'Org.Position.Update'}>

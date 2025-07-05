@@ -94,12 +94,12 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// <summary>
         /// 部门ID
         /// </summary>
-        public Guid DeptId { get; set; }
+        public Guid? DeptId { get; set; }
 
         /// <summary>
         /// 职位ID
         /// </summary>
-        public Guid PositionId { get; set; }
+        public Guid? PositionId { get; set; }
 
         /// <summary>
         /// 是否同时添加用户

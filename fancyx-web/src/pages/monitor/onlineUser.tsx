@@ -32,6 +32,8 @@ const OnlineUserList: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
+      width: 80,
+      fixed: 'right',
       render: (_: any, record: OnlineUserResultDto) => {
         return (
           <Permission permissions={'Monitor.Logout'}>

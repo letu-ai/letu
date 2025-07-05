@@ -53,6 +53,7 @@ const MenuTable = () => {
     {
       title: '操作',
       key: 'action',
+      width: 140,
       fixed: 'right',
       render: (_: any, record: MenuListDto) => (
         <Space>

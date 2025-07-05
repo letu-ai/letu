@@ -107,14 +107,12 @@ namespace Fancyx.Admin.Entities.Organization
         /// <summary>
         /// 部门ID
         /// </summary>
-        [Column(IsNullable = false)]
-        public Guid DeptId { get; set; }
+        public Guid? DeptId { get; set; }
 
         /// <summary>
         /// 职位ID
         /// </summary>
-        [Column(IsNullable = false)]
-        public Guid PositionId { get; set; }
+        public Guid? PositionId { get; set; }
 
         /// <summary>
         /// 租户ID

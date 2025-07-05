@@ -53,5 +53,12 @@ namespace Fancyx.Admin.IService.System
         /// <param name="dto"></param>
         /// <returns></returns>
         Task ResetUserPasswordAsync(ResetUserPwdDto dto);
+
+        /// <summary>
+        /// 用户简单信息查询
+        /// </summary>
+        /// <param name="keyword">账号/昵称</param>
+        /// <returns></returns>
+        Task<List<UserSimpleInfoDto>> GetUserSimpleInfosAsync(string? keyword);
     }
 }

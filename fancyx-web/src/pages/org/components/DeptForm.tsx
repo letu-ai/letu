@@ -118,7 +118,7 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
         </Form.Item>
         <Form.Item label="部门状态" name="status" rules={[{ required: true }]}>
           <Switch
-            value={form.getFieldValue('status') === 1}
+            value={row?.status === 1}
             unCheckedChildren="停用"
             checkedChildren="正常"
             onChange={(val) => {

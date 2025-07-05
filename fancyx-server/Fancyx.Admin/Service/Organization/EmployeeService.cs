@@ -1,4 +1,5 @@
 using AutoMapper;
+
 using Fancyx.Admin.Entities.Organization;
 using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.IService.Organization;
@@ -159,7 +160,7 @@ namespace Fancyx.Admin.Service.Organization
             if (employee.UserId.HasValue)
             {
                 var user = await _userRepository.OneAsync(x => x.Id == employee.UserId.Value);
-                if(user != null)
+                if (user != null)
                 {
                     result.UserName = user.UserName;
                     result.NickName = user.NickName;
