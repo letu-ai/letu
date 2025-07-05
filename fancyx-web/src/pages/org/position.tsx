@@ -49,7 +49,7 @@ const Position: React.FC = () => {
       dataIndex: 'option',
       width: 140,
       fixed: 'right',
-      render: (_: any, record: PositionListDto) => [
+      render: (_: any, record: PositionListDto) => (
         <Space>
           <Permission permissions={'Org.Position.Update'}>
             <Button
@@ -77,8 +77,8 @@ const Position: React.FC = () => {
               </Button>
             </Popconfirm>
           </Permission>
-        </Space>,
-      ],
+        </Space>
+      ),
     },
   ];
 

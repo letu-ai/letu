@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Fancyx.Admin.IService.Organization.Dtos
 {
     public class PositionGroupListDto
@@ -32,6 +34,10 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// </summary>
         public int Sort { get; set; }
 
-        public List<PositionGroupListDto>? Children { get; set; }
+        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        public List<PositionGroupListDto>? Rawchildren { get; set; }
+
+        public List<PositionGroupListDto>? Children => Rawchildren != null && Rawchildren.Count > 0 ? Rawchildren : null;
     }
 }

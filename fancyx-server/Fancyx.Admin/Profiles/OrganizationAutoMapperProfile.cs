@@ -13,7 +13,8 @@ namespace Fancyx.Admin.Profiles
             CreateMap<DeptDto, DeptDO>();
             CreateMap<DeptDO, DeptListDto>();
             CreateMap<PositionGroupDto, PositionGroupDO>();
-            CreateMap<PositionGroupDO, PositionGroupListDto>();
+            CreateMap<PositionGroupDO, PositionGroupListDto>()
+                .ForMember(d => d.Rawchildren, o => o.MapFrom(s => s.Children));
             CreateMap<PositionDO, PositionListDto>();
             CreateMap<PositionDto, PositionDO>();
             CreateMap<EmployeeDO, EmployeeInfoDto>();

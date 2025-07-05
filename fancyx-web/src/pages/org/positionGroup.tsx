@@ -31,13 +31,12 @@ const PositionGroupList: React.FC = () => {
       dataIndex: 'option',
       width: 140,
       fixed: 'right',
-      render: (_: any, record: PositionGroupListDto) => [
+      render: (_: any, record: PositionGroupListDto) => (
         <Space>
           <Permission permissions={'Org.PositionGroup.Update'}>
             <Button
               type="link"
               icon={<EditOutlined />}
-              key="edit"
               onClick={() => {
                 rowEdit(record);
               }}
@@ -47,7 +46,6 @@ const PositionGroupList: React.FC = () => {
           </Permission>
           <Permission permissions={'Org.PositionGroup.Delete'}>
             <Popconfirm
-              key="delete"
               title="确定删除吗？"
               description="删除后无法撤销"
               onConfirm={() => {
@@ -59,11 +57,10 @@ const PositionGroupList: React.FC = () => {
               </Button>
             </Popconfirm>
           </Permission>
-        </Space>,
-      ],
+        </Space>
+      ),
     },
   ];
-
   const handleOpenModal = () => {
     if (modalRef.current) {
       modalRef.current.openModal();

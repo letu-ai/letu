@@ -172,23 +172,27 @@ const HomePage = () => {
                 }
                 className="dashboard-card"
               >
-                <Timeline mode="left">
-                  {changelog.map((log, index) => (
-                    <Timeline.Item key={index} color="#7E57C2">
-                      <div className="changelog-item">
-                        <Space>
-                          <Text strong>{log.version}</Text>
-                          <Text type="secondary">{log.date}</Text>
-                        </Space>
-                        <ul className="changelog-list">
-                          {log.items.map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </Timeline.Item>
-                  ))}
-                </Timeline>
+                <Timeline
+                  mode="left"
+                  items={changelog.map((log, index) => {
+                    return {
+                      color: '#7E57C2',
+                      children: (
+                        <div className="changelog-item" key={index}>
+                          <Space>
+                            <Text strong>{log.version}</Text>
+                            <Text type="secondary">{log.date}</Text>
+                          </Space>
+                          <ul className="changelog-list">
+                            {log.items.map((item, i) => (
+                              <li key={i}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ),
+                    };
+                  })}
+                />
               </Card>
             </Col>
 

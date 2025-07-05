@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { selectSize } from '@/store/themeStore.ts';
 import { AuthProvider } from '@/components/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Application from "@/components/Application";
+import Application from '@/components/Application';
 
 // 清爽紫色主题配置
 const defaultTheme = {
@@ -31,11 +31,11 @@ const defaultTheme = {
       headerBg: '#FFFFFF',
     },
     Menu: {
-      colorItemBg: '#FFFFFF',
-      colorItemText: '#4A4A4A',
-      colorItemBgSelected: '#EDE7F6',
-      colorItemTextSelected: '#7E57C2',
-      colorItemBgHover: '#F5F3FF',
+      itemBg: '#FFFFFF',
+      itemColor: '#4A4A4A',
+      itemSelectedBg: '#EDE7F6',
+      itemSelectedColor: '#7E57C2',
+      itemHoverBg: '#F5F3FF',
       itemBorderRadius: 8,
     },
     Button: {
