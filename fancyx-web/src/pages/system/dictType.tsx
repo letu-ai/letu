@@ -50,7 +50,7 @@ const DictList: React.FC = () => {
       dataIndex: 'option',
       width: 210,
       fixed: 'right',
-      render: (_: any, record: DictTypeResultDto) => [
+      render: (_: any, record: DictTypeResultDto) => (
         <Space>
           <Button
             type="link"
@@ -91,8 +91,8 @@ const DictList: React.FC = () => {
               </Button>
             </Popconfirm>
           </Permission>
-        </Space>,
-      ],
+        </Space>
+      ),
     },
   ];
 

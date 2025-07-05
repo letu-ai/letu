@@ -1,4 +1,4 @@
-import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider } from 'antd';
+import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider, Image } from 'antd';
 import {
   GithubOutlined,
   BookOutlined,
@@ -10,6 +10,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import './index.scss';
+import AliPay from '@/assets/alipay.jpg';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -17,39 +18,36 @@ const HomePage = () => {
   // 更新日志数据
   const changelog = [
     {
-      version: 'v2.1.0',
-      date: '2023-07-20',
-      items: ['新增数据导出功能', '优化移动端适配体验', '修复权限管理模块的若干问题'],
+      date: '2025-07-05',
+      items: ['增加员工绑定用户', '样式调整', '消除React警告'],
     },
     {
-      version: 'v2.0.3',
-      date: '2023-06-28',
-      items: ['重构通知中心模块', '增加多语言支持', '优化系统性能，提升响应速度'],
-    },
-    {
-      version: 'v2.0.0',
-      date: '2023-06-10',
-      items: ['全新UI设计上线', '重构核心业务逻辑', '增加API文档中心'],
+      date: '2025-07-02',
+      items: ['系统雏形', '建立仓库，代码开源'],
     },
   ];
 
   // 技术栈数据
   const techStack = [
-    { name: 'React', icon: <CodeOutlined /> },
-    { name: 'Ant Design', icon: <CodeOutlined /> },
-    { name: 'Node.js', icon: <CodeOutlined /> },
-    { name: 'Express', icon: <CodeOutlined /> },
-    { name: 'MongoDB', icon: <CodeOutlined /> },
-    { name: 'Webpack', icon: <CodeOutlined /> },
-    { name: 'Sass/SCSS', icon: <CodeOutlined /> },
-    { name: 'Git', icon: <CodeOutlined /> },
+    { name: '.NET Core' },
+    { name: 'PostgreSQL' },
+    { name: 'FreeSql' },
+    { name: 'Aop' },
+    { name: 'Redis' },
+    { name: 'EventBus' },
+    { name: 'AutoMapper' },
+    { name: 'Serilog' },
+    { name: 'React' },
+    { name: 'Ant Design' },
+    { name: 'Vite' },
+    { name: 'Sass/SCSS' },
   ];
 
   // 仓库地址
   const repoLinks = [
-    { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/your-repo' },
-    { name: 'Gitee', icon: <GithubOutlined />, url: 'https://gitee.com/your-repo' },
-    { name: '文档', icon: <BookOutlined />, url: 'https://docs.your-project.com' },
+    { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/fancyxnet/fancyx-admin' },
+    { name: 'Gitee', icon: <GithubOutlined />, url: 'https://gitee.com/fancyxnet/fancyx-admin' },
+    { name: '文档', icon: <BookOutlined />, url: 'https://crackerwork.com' },
   ];
 
   return (
@@ -73,17 +71,18 @@ const HomePage = () => {
                 className="dashboard-card"
               >
                 <Paragraph>
-                  本项目是一个基于React和Ant Design的开源管理系统，旨在为企业提供高效、美观的后台管理解决方案。
-                  系统采用现代化的技术栈，具有良好的扩展性和可维护性，支持快速定制开发。
+                  风汐管理系统，使用.NET9+React18构建的RBAC通用权限管理系统（支持按钮权限+数据权限），支持多租户功能，简单易上手，不使用任何三方Admin框架，完全作者独立开发；旨在为个人、企业提供高效、美观的后台管理解决方案，为.NET+React后台方案添砖加瓦，
+                  系统采用最新最稳定的技术栈，具有良好的扩展性和可维护性，支持快速定制开发。
                 </Paragraph>
                 <Paragraph>
-                  <Text strong>核心价值：</Text>
+                  <Text strong>核心特点：</Text>
                   <ul className="project-features">
+                    <li>支持多租户</li>
+                    <li>按钮级别权限控制</li>
                     <li>简洁高效的用户界面</li>
                     <li>模块化的系统架构</li>
                     <li>完善的权限管理体系</li>
-                    <li>丰富的组件库支持</li>
-                    <li>响应式布局设计</li>
+                    <li>可读性高代码结构</li>
                   </ul>
                 </Paragraph>
 
@@ -108,19 +107,19 @@ const HomePage = () => {
                     <Tooltip title="Stars">
                       <Space>
                         <StarOutlined />
-                        <Text strong>1.2k</Text>
+                        <Text strong>2</Text>
                       </Space>
                     </Tooltip>
                     <Tooltip title="Forks">
                       <Space>
                         <ForkOutlined />
-                        <Text strong>324</Text>
+                        <Text strong>0</Text>
                       </Space>
                     </Tooltip>
                     <Tooltip title="Watchers">
                       <Space>
                         <EyeOutlined />
-                        <Text strong>86</Text>
+                        <Text strong>1</Text>
                       </Space>
                     </Tooltip>
                   </div>
@@ -143,13 +142,15 @@ const HomePage = () => {
               >
                 <div className="tech-stack">
                   {techStack.map((tech, index) => (
-                    <Tag key={index} icon={tech.icon} className="tech-tag">
+                    <Tag key={index} className="tech-tag">
                       {tech.name}
                     </Tag>
                   ))}
                 </div>
                 <Paragraph type="secondary" style={{ marginTop: 16 }}>
-                  前端基于React和Ant Design构建，后端使用Node.js和Express，数据库采用MongoDB，构建工具使用Webpack。
+                  前端基于React和Ant Design在Vite下构建，后端使用.NETCore
+                  WebAPI，数据库默认使用PostgreSQL（支持MySQL,SQLServer,Oracle等多种数据库）；
+                  后端实现了服务自动注册、服务属性注入、模块化动态加载、Aop拦截特性特色功能，并且系统记录了API访问日志、异常日志、业务日志、登录日志。
                 </Paragraph>
               </Card>
             </Col>
@@ -180,8 +181,7 @@ const HomePage = () => {
                       children: (
                         <div className="changelog-item" key={index}>
                           <Space>
-                            <Text strong>{log.version}</Text>
-                            <Text type="secondary">{log.date}</Text>
+                            <Text strong>{log.date}</Text>
                           </Space>
                           <ul className="changelog-list">
                             {log.items.map((item, i) => (
@@ -203,7 +203,7 @@ const HomePage = () => {
                   <Space>
                     <GiftOutlined />
                     <Title level={5} style={{ margin: 0 }}>
-                      支持我们
+                      支持作者
                     </Title>
                   </Space>
                 }
@@ -212,15 +212,15 @@ const HomePage = () => {
                 <div className="donation-container">
                   <div className="qrcode-placeholder">
                     <div className="qrcode-icon">
-                      <GiftOutlined />
+                      <Image src={AliPay} />
                     </div>
                   </div>
                   <div className="donation-text">
                     <Paragraph type="secondary" style={{ textAlign: 'center' }}>
-                      如果您觉得这个项目对您有帮助，欢迎打赏支持开发团队
+                      请使用支付宝扫一扫
                     </Paragraph>
                     <Paragraph style={{ textAlign: 'center' }}>
-                      <Text strong>扫描二维码支持我们</Text>
+                      <Text strong>如果您觉得这个项目对您有帮助，就请作者喝杯咖啡吧！</Text>
                     </Paragraph>
                   </div>
                 </div>

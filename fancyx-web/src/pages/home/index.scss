@@ -131,17 +131,13 @@
       width: 160px;
       height: 160px;
       background: rgba(126, 87, 194, 0.05);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 16px;
-      border: 1px dashed rgba(126, 87, 194, 0.3);
 
       .qrcode-icon {
         font-size: 48px;
-        color: #7E57C2;
-        opacity: 0.5;
       }
     }
   }

@@ -46,7 +46,7 @@ const DictDataList: React.FC = () => {
       width: 210,
       fixed: 'right',
       dataIndex: 'option',
-      render: (_: any, record: DictDataListDto) => [
+      render: (_: any, record: DictDataListDto) => (
         <Space>
           <Permission permissions={'Sys.DictData.Update'}>
             <Button
@@ -91,8 +91,8 @@ const DictDataList: React.FC = () => {
               </Button>
             </Popconfirm>
           </Permission>
-        </Space>,
-      ],
+        </Space>
+      ),
     },
   ];
   const urlParams = useParams();
