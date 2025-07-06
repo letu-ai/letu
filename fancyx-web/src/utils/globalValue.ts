@@ -19,3 +19,7 @@ export const DictType = {
 export const PermissionConstant = {
   SuperAdmin: '系统管理员',
 };
+
+export const StaticRoutes = {
+  Login: '/auth/login',
+};

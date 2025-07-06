@@ -13,13 +13,8 @@ namespace Fancyx.Admin.IService.Account.Dtos
         public string? UserName { get; set; }
 
         /// <summary>
-        /// 权限
+        /// 当前会话ID
         /// </summary>
-        public string[]? Auths { get; set; }
-
-        /// <summary>
-        /// 角色
-        /// </summary>
-        public string[]? Roles { get; set; }
+        public string? SessionId { get; set; }
     }
 }

@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import type { FrontendMenu } from '@/api/auth';
 
 export type TokenInfo = {
+  sessionId: string;
   accessToken: string;
   refreshToken: string;
   expiredTime: Date;

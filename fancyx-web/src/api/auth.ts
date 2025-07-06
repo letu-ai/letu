@@ -60,10 +60,9 @@ interface TokenResultDto {
 }
 
 interface LoginResultDto extends TokenResultDto {
+  sessionId: string;
   userId: string;
   userName: string;
-  auth?: string;
-  roles?: string;
 }
 
 export interface PersonalInfoDto {

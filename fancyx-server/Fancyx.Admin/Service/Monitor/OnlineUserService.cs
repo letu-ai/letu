@@ -4,9 +4,12 @@ using Fancyx.Admin.IService.Monitor.Dtos;
 using Fancyx.Repository;
 using Fancyx.Shared.Consts;
 using Fancyx.Shared.Keys;
+
 using FreeRedis;
 
 using FreeSql;
+
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Fancyx.Admin.Service.Monitor
 {
@@ -15,12 +18,14 @@ namespace Fancyx.Admin.Service.Monitor
         private readonly IRepository<LoginLogDO> _loginLogRepository;
         private readonly IRedisClient _redisDb;
         private readonly IRepository<UserDO> _userRepository;
+        private readonly IMemoryCache _memoryCache;
 
-        public OnlineUserService(IRepository<LoginLogDO> loginLogRepository, IRedisClient redisDb, IRepository<UserDO> userRepository)
+        public OnlineUserService(IRepository<LoginLogDO> loginLogRepository, IRedisClient redisDb, IRepository<UserDO> userRepository, IMemoryCache memoryCache)
         {
             _loginLogRepository = loginLogRepository;
             _redisDb = redisDb;
             _userRepository = userRepository;
+            _memoryCache = memoryCache;
         }
 
         public async Task<PagedResult<OnlineUserResultDto>> GetOnlineUserListAsync(OnlineUserSearchDto dto)
@@ -68,6 +73,7 @@ namespace Fancyx.Admin.Service.Monitor
         {
             //移除访问token
             await _redisDb.DelAsync(SystemCacheKey.AccessToken(key));
+            _memoryCache.Remove(SystemCacheKey.AccessToken(key));
             //移除刷新token
             await _redisDb.DelAsync(SystemCacheKey.RefreshToken(key));
         }

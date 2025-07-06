@@ -10,6 +10,7 @@ import { useMemo, useRef } from 'react';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import SearchModal, { type SearchModalRef } from '@/layout/components/SearchModal.tsx';
 import { useApplication } from '@/components/Application';
+import { StaticRoutes } from '@/utils/globalValue.ts';
 
 function Navbar() {
   const collapsed = useSelector(selectCollapsed);
@@ -61,7 +62,7 @@ function Navbar() {
       signOut().then(() => {
         UserStore.logout();
         dispatch(clearTabs());
-        navigate('/auth/login');
+        navigate(StaticRoutes.Login);
       });
     } else if (key === 'profile') {
       navigate('/profile');

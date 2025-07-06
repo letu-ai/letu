@@ -1,17 +1,34 @@
 ﻿import { getOnlineUsers, onlineUserLogout, type OnlineUserResultDto } from '@/api/monitor/onlineUser';
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, Tag } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import ProIcon from '@/components/ProIcon';
+import { useAuthProvider } from '@/components/AuthProvider';
+import useApp from 'antd/es/app/useApp';
 
 const OnlineUserList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
+  const { tokenInfo } = useAuthProvider();
+  const { message } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '账号',
       dataIndex: 'userName',
+      render: (userName: string, record: OnlineUserResultDto) => {
+        if (tokenInfo && tokenInfo.sessionId === record.sessionId) {
+          return (
+            <div>
+              {userName}
+              <Tag color="magenta" className="ml-5">
+                当前会话
+              </Tag>
+            </div>
+          );
+        }
+        return userName;
+      },
     },
     {
       title: 'IP',
@@ -40,7 +57,6 @@ const OnlineUserList: React.FC = () => {
             <Button
               type="link"
               icon={<ProIcon icon="iconify:hugeicons:logout-04" />}
-              key="logout"
               onClick={() => {
                 onlineUserLogout(record.userId + ':' + record.sessionId).then(() => {
                   message.success('注销成功');
@@ -61,7 +77,7 @@ const OnlineUserList: React.FC = () => {
       <SmartTable
         ref={tableRef}
         columns={columns}
-        rowKey="id"
+        rowKey="sessionId"
         request={async (params) => {
           const { data } = await getOnlineUsers(params);
           return data;

@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import UserStore from '@/store/userStore';
-import { ErrorCode } from '@/utils/globalValue.ts';
+import { ErrorCode, StaticRoutes } from '@/utils/globalValue.ts';
 import { message } from 'antd';
 
 class HttpClient {
@@ -37,12 +37,14 @@ class HttpClient {
       },
       (error) => {
         let msg = '异常错误，请联系管理员';
+        let jumpLogin = false;
         if (error.code === 'ERR_NETWORK') {
           msg = '网络错误，请联系管理员';
         } else if (error.response) {
           switch (error.response.status) {
             case 401:
               msg = '身份信息过期，请重新登录';
+              jumpLogin = true;
               break;
             case 404:
               msg = '请求接口不存在';
@@ -52,7 +54,11 @@ class HttpClient {
               break;
           }
         }
-        message.error(msg);
+        message.error(msg, 1, () => {
+          if (jumpLogin) {
+            window.location.href = StaticRoutes.Login;
+          }
+        });
         return Promise.reject(error);
       },
     );

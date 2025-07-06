@@ -163,8 +163,7 @@ namespace Fancyx.Admin.Service.Account
                 var permission = await _identitySharedService.GetUserPermissionAsync(user.Id);
                 rs.UserId = user.Id;
                 rs.UserName = dto.UserName;
-                rs.Auths = permission.Auths;
-                rs.Roles = permission.Roles;
+                rs.SessionId = sessionId;
 
                 return rs;
             }

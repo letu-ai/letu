@@ -5,10 +5,11 @@ import NotFound from '@/pages/error/notFound';
 import Home from '@/pages/home';
 import Profile from '@/pages/auth/profile.tsx';
 import Authorize from '@/components/Authorize';
+import { StaticRoutes } from '@/utils/globalValue.ts';
 
 const routes: RouteObject[] = [
   {
-    path: '/auth/login',
+    path: StaticRoutes.Login,
     element: <Login />,
   },
   {
