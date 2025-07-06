@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectCollapsed, toggleCollapsed } from '@/store/themeStore.ts';
 import { useMediaQuery } from 'react-responsive';
 import { useEffect } from 'react';
+import ErrorFallback from '@/components/ErrorFallback';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const { Content, Sider } = Layout;
 
@@ -31,7 +33,9 @@ function Index() {
       <Layout>
         <Navbar />
         <Tab />
-        <Content>{curOutlet}</Content>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Content>{curOutlet}</Content>
+        </ErrorBoundary>
         <FloatButton.BackTop />
       </Layout>
     </Layout>

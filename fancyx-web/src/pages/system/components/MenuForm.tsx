@@ -87,7 +87,7 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
 
   return (
     <Modal
-      title={row?.id ? '编辑功能' : '新增功能'}
+      title={row?.id ? '编辑菜单' : '新增菜单'}
       open={isOpenModal}
       onCancel={onCancel}
       onOk={onOk}
