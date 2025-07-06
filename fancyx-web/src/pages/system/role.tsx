@@ -1,4 +1,4 @@
-import { Space, Form, Input, Button, Modal, message, Tag } from 'antd';
+import { Space, Form, Input, Button, Tag } from 'antd';
 import { useRef } from 'react';
 import { PlusOutlined, ExclamationCircleFilled, EditOutlined, HddOutlined, DeleteOutlined } from '@ant-design/icons';
 import { deleteRole, getRoleList, type RoleListDto } from '@/api/system/role';
@@ -7,12 +7,13 @@ import AssignMenuForm, { type AssignMenuModalRef } from '@/pages/system/componen
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import { PermissionConstant } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
-const { confirm } = Modal;
 const Role = () => {
   const modalRef = useRef<ModalRef>(null);
   const assignMenuForRef = useRef<AssignMenuModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
+  const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '角色名',
@@ -73,7 +74,7 @@ const Role = () => {
   };
 
   const rowDelete = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确认删除？',
       icon: <ExclamationCircleFilled />,
       onOk() {

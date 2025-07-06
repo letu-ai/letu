@@ -1,4 +1,4 @@
-import { Button, Modal, Switch, Image, Space, Form, Input } from 'antd';
+import { Button, Switch, Image, Space, Form, Input } from 'antd';
 import { useRef } from 'react';
 import { DeleteOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined } from '@ant-design/icons';
 import useApp from 'antd/es/app/useApp';
@@ -17,10 +17,9 @@ import ResetUserPwdForm, { type ResetUserPwdFormRef } from '@/pages/system/compo
 import ProIcon from '@/components/ProIcon';
 import { useApplication } from '@/components/Application';
 
-const { confirm } = Modal;
 const UserTable = () => {
   const tableRef = useRef<SmartTableRef>(null);
-  const { message } = useApp();
+  const { message, modal } = useApp();
   const userEditModalRef = useRef<ModalRef>(null);
   const assignRoleRef = useRef<AssignRoleFormRef>(null);
   const resetUserPwdFormRef = useRef<ResetUserPwdFormRef>(null);
@@ -99,7 +98,7 @@ const UserTable = () => {
   ];
 
   const rowDelete = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确认删除？',
       icon: <ExclamationCircleFilled />,
       onOk() {

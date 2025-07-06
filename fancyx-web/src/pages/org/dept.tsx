@@ -1,17 +1,17 @@
 ﻿import { deleteDept, getDeptList, type DeptListDto } from '@/api/organization/dept';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Modal, Space } from 'antd';
+import { Button, Form, Input, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import DeptForm, { type DeptModalRef } from '@/pages/org/components/DeptForm.tsx';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
-
-const { confirm } = Modal;
+import useApp from 'antd/es/app/useApp';
 
 const DepartmentList: React.FC = () => {
   const modalRef = useRef<DeptModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
+  const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '部门名称',
@@ -63,7 +63,7 @@ const DepartmentList: React.FC = () => {
   ];
 
   const rowDelete = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确认删除？',
       icon: <ExclamationCircleFilled />,
       onOk() {

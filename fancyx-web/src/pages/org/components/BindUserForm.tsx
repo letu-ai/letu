@@ -1,20 +1,23 @@
-import { Form, message, Modal, Select } from 'antd';
+import { Form, Modal, Select } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { bindUser, type EmployeeBindUserDto, type EmployeeListDto } from '@/api/organization/employee.ts';
 import { getUserSimpleInfos } from '@/api/system/user.ts';
+import useApp from 'antd/es/app/useApp';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface ModalProps {}
+interface ModalProps {
+  refresh: () => void;
+}
 
 export interface BindUserFormRef {
   openModal: (row: EmployeeListDto) => void; // 定义 ref 的类型
 }
 
-const BindUserForm = forwardRef<BindUserFormRef, ModalProps>((_, ref) => {
+const BindUserForm = forwardRef<BindUserFormRef, ModalProps>((props, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [currentRow, setCurrentRow] = useState<EmployeeListDto>();
   const [userOptions, setUserOptions] = useState<{ label: string; value: string }[]>();
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,
@@ -59,6 +62,7 @@ const BindUserForm = forwardRef<BindUserFormRef, ModalProps>((_, ref) => {
   const onFinish = (values: EmployeeBindUserDto) => {
     bindUser({ ...values, employeeId: currentRow!.id }).then(() => {
       message.success('绑定成功');
+      props?.refresh();
       setIsOpenModal(false);
       form.resetFields();
     });

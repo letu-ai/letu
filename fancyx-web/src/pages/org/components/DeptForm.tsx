@@ -1,7 +1,8 @@
-import { Form, Input, InputNumber, message, Modal, Switch, TreeSelect } from 'antd';
+import { Form, Input, InputNumber, Modal, Switch, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { addDept, getDeptList, type DeptDto, type DeptListDto, updateDept } from '@/api/organization/dept';
 import type { AppResponse } from '@/types/api';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -16,6 +17,7 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
   const [form] = Form.useForm();
   const [row, setRow] = useState<DeptDto | null>();
   const [treeData, setTreeData] = useState<DeptListDto[]>([]);
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

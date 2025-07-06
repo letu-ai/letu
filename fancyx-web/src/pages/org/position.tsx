@@ -1,6 +1,6 @@
 ﻿import { deletePosition, getPositionList } from '@/api/organization/position';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Popconfirm, Space } from 'antd';
+import { Button, Form, Input, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import type { PositionListDto } from '@/api/organization/position';
@@ -9,10 +9,12 @@ import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SysDict from '@/components/SysDict';
 import { DictType } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
 const Position: React.FC = () => {
   const modalRef = useRef<PositionModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
+  const { message } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '职位名称',

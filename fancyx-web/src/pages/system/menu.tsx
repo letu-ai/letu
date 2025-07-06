@@ -1,4 +1,4 @@
-import { Space, Form, Input, Button, Modal, message, Switch, Tag } from 'antd';
+import { Space, Form, Input, Button, Switch, Tag } from 'antd';
 import { useRef } from 'react';
 import { PlusOutlined, ExclamationCircleFilled, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import MenuForm, { type ModalRef } from '@/pages/system/components/MenuForm.tsx';
@@ -6,11 +6,12 @@ import { deleteMenu, getMenuList, type MenuListDto } from '@/api/system/menu.ts'
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
 import { MenuType } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
-const { confirm } = Modal;
 const MenuTable = () => {
   const modalRef = useRef<ModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
+  const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '菜单名称',
@@ -74,7 +75,7 @@ const MenuTable = () => {
     }
   };
   const dataDelete = (ids: string[]) => {
-    confirm({
+    modal.confirm({
       title: '确认删除？',
       icon: <ExclamationCircleFilled />,
       onOk() {
@@ -95,7 +96,7 @@ const MenuTable = () => {
       message.warning('请选择一条数据进行操作');
       return;
     }
-    confirm({
+    modal.confirm({
       title: `确认删除选中的${ids!.length}条数据？`,
       icon: <ExclamationCircleFilled />,
       onOk() {

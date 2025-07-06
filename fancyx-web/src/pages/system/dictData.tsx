@@ -1,16 +1,18 @@
 ﻿import Permission from '@/components/Permission';
 import { deleteDictData, getDictDataList, type DictDataDto, type DictDataListDto } from '@/api/system/dictData';
 import { CopyOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Popconfirm, Space, Switch } from 'antd';
+import { Button, Form, Input, Popconfirm, Space, Switch } from 'antd';
 import React, { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import DictDataForm, { type ModalRef } from '@/pages/system/components/DictDataForm.tsx';
 import SmartTable from '@/components/SmartTable';
+import useApp from 'antd/es/app/useApp';
 
 const DictDataList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<ModalRef>(null);
+  const { message } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '字典标签',

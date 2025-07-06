@@ -1,7 +1,8 @@
-import { Form, Input, message, Modal, Switch } from 'antd';
+import { Form, Input, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { addRole, type RoleDto, updateRole } from '@/api/system/role';
 import type { AppResponse } from '@/types/api';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -15,6 +16,7 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [row, setRow] = useState<RoleDto | null>();
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

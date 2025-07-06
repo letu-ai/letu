@@ -1,7 +1,8 @@
-import { Form, Input, message, Modal } from 'antd';
+import { Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { resetUserPwd, type ResetUserPwdDto, type UserListDto } from '@/api/system/user.ts';
 import { Patterns } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ModalProps {}
@@ -14,6 +15,7 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [currentRow, setCurrentRow] = useState<UserListDto>();
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

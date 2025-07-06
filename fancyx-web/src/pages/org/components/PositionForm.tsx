@@ -1,10 +1,11 @@
-import { Form, Input, message, Modal, Switch, TreeSelect } from 'antd';
+import { Form, Input, Modal, Switch, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { addPosition, type PositionDto, type PositionListDto, updatePosition } from '@/api/organization/position.ts';
 import type { AppResponse } from '@/types/api';
 import { getPositionGroupList, type PositionGroupListDto } from '@/api/organization/positionGroup.ts';
 import SysDict from '@/components/SysDict';
 import { DictType } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -20,6 +21,7 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
   const [row, setRow] = useState<PositionDto | null>();
   const [treeData, setTreeData] = useState<PositionGroupListDto[]>([]);
   const [positionLevel, setPositionLevel] = useState<number>(0);
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

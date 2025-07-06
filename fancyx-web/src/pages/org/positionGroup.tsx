@@ -1,18 +1,17 @@
 ﻿import Permission from '@/components/Permission';
 import { deletePositionGroup, getPositionGroupList, type PositionGroupListDto } from '@/api/organization/positionGroup';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Modal, Popconfirm, Space } from 'antd';
+import { Button, Form, Input, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import PositionGroupForm, { type ModalRef } from '@/pages/org/components/PositionGroupForm.tsx';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
-
-const { confirm } = Modal;
+import useApp from 'antd/es/app/useApp';
 
 const PositionGroupList: React.FC = () => {
   const modalRef = useRef<ModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
-
+  const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '职位分组名称',
@@ -68,7 +67,7 @@ const PositionGroupList: React.FC = () => {
   };
 
   const rowDelete = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确认删除？',
       icon: <ExclamationCircleFilled />,
       onOk() {

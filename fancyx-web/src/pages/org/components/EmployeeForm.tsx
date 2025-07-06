@@ -1,4 +1,4 @@
-import { Form, Input, Radio, message, Modal, Row, Col, DatePicker, TreeSelect, Checkbox, Tooltip, Tag } from 'antd';
+import { Form, Input, Radio, Modal, Row, Col, DatePicker, TreeSelect, Checkbox, Tooltip, Tag } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import {
   addEmployee,
@@ -13,6 +13,7 @@ import { type DeptListDto, getDeptList } from '@/api/organization/dept.ts';
 import { getPositionOptions } from '@/api/organization/position.ts';
 import { Patterns } from '@/utils/globalValue.ts';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -31,6 +32,7 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
   const [positionData, setPositionData] = useState<AppOptionTree[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAddUser, setIsAddUser] = useState(false);
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

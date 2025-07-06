@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, message, Modal, Radio, Switch, TreeSelect } from 'antd';
+import { Form, Input, InputNumber, Modal, Radio, Switch, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import type { AppResponse } from '@/types/api';
 import {
@@ -10,6 +10,7 @@ import {
   updateMenu,
 } from '@/api/system/menu';
 import { MenuType } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -25,6 +26,7 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const [row, setRow] = useState<MenuListDto | null>();
   const [treeData, setTreeData] = useState<MenuOptionTreeDto[]>([]);
   const [menuType, setMenuType] = useState<number>(1);
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

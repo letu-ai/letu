@@ -1,7 +1,8 @@
-import { Form, Input, message, Modal, Radio } from 'antd';
+import { Form, Input, Modal, Radio } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { addUser, type UserDto } from '@/api/system/user.ts';
 import { Patterns } from '@/utils/globalValue.ts';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void; // 定义 props 的类型
@@ -14,6 +15,7 @@ export interface ModalRef {
 const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

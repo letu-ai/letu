@@ -7,20 +7,20 @@ import {
   deleteDictTypes,
 } from '@/api/system/dictType';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Modal, Popconfirm, Space, Switch } from 'antd';
+import { Button, Form, Input, Popconfirm, Space, Switch } from 'antd';
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
 import DictTypeForm, { type ModalRef } from '@/pages/system/components/DictTypeForm.tsx';
 import ProIcon from '@/components/ProIcon';
-
-const { confirm } = Modal;
+import useApp from 'antd/es/app/useApp';
 
 const DictList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<ModalRef>(null);
   const navigate = useNavigate();
+  const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '字典名称',
@@ -102,7 +102,7 @@ const DictList: React.FC = () => {
       message.warning('请选择一条数据进行操作');
       return;
     }
-    confirm({
+    modal.confirm({
       title: `确认删除选中的${ids!.length}条数据？`,
       icon: <ExclamationCircleFilled />,
       onOk() {

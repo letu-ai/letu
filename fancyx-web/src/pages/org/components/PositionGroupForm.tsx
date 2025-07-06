@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, message, Modal, TreeSelect } from 'antd';
+import { Form, Input, InputNumber, Modal, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import {
   addPositionGroup,
@@ -8,6 +8,7 @@ import {
   updatePositionGroup,
 } from '@/api/organization/positionGroup';
 import type { AppResponse } from '@/types/api';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -22,6 +23,7 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const [form] = Form.useForm();
   const [row, setRow] = useState<PositionGroupDto | null>();
   const [treeData, setTreeData] = useState<PositionGroupListDto[]>([]);
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

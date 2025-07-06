@@ -1,7 +1,8 @@
-import { Card, Divider, Form, message, Modal, Switch, Tag, Tree } from 'antd';
+import { Card, Divider, Form, Modal, Switch, Tag, Tree } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { assignMenu, type AssignMenuDto, getRoleMenuIds, type RoleListDto } from '@/api/system/role.ts';
 import { getMenuOptions, type MenuOptionTreeDto } from '@/api/system/menu.ts';
+import useApp from 'antd/es/app/useApp';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ModalProps {}
@@ -18,6 +19,7 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
   const [roleMenuIds, setRoleMenuIds] = useState<string[] | null>();
   const [allKeys, setAllKeys] = useState<string[]>();
   const [expandKeys, setExpandKeys] = useState<string[]>();
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,

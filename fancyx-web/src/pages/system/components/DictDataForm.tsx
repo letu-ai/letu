@@ -1,8 +1,9 @@
-import { Form, Input, InputNumber, message, Modal, Switch } from 'antd';
+import { Form, Input, InputNumber, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import type { AppResponse } from '@/types/api';
 import { addDictData, type DictDataDto, updateDictData } from '@/api/system/dictData.ts';
 import { useParams } from 'react-router-dom';
+import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
   refresh?: () => void;
@@ -17,6 +18,7 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const [form] = Form.useForm();
   const [row, setRow] = useState<DictDataDto | null>();
   const urlParams = useParams();
+  const { message } = useApp();
 
   useImperativeHandle(ref, () => ({
     openModal,
