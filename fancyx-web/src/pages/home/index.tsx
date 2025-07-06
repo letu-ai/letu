@@ -81,7 +81,6 @@ const HomePage = () => {
                     <li>按钮级别权限控制</li>
                     <li>简洁高效的用户界面</li>
                     <li>模块化的系统架构</li>
-                    <li>完善的权限管理体系</li>
                     <li>可读性高代码结构</li>
                   </ul>
                 </Paragraph>

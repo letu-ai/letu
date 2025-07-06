@@ -38,13 +38,13 @@ const UserTable = () => {
       },
     },
     {
-      title: '昵称',
-      dataIndex: 'nickName',
-    },
-    {
       title: '账号',
       dataIndex: 'userName',
       key: 'userName',
+    },
+    {
+      title: '昵称',
+      dataIndex: 'nickName',
     },
     {
       title: '性别',

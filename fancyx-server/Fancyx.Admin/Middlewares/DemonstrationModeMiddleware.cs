@@ -38,9 +38,9 @@
         }
 
         /// <summary>
-        /// 是否忽略http
+        /// 是否忽略请求
         /// </summary>
-        /// <param name="method"></param>
+        /// <param name="method">请求方法</param>
         /// <returns></returns>
         private bool IsIgnoreHttpMethod(string method) => method == "get" || method == "option";
     }
