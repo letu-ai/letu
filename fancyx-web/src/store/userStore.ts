@@ -39,6 +39,22 @@ const UserStore = {
     localStorage.setItem(USER_TOKEN_KEY, JSON.stringify(token));
   },
 
+  /**
+   * 刷新token
+   * @param accessToken
+   * @param refreshToken
+   * @param expiredTime
+   */
+  refreshToken(accessToken: string, refreshToken: string, expiredTime: Date) {
+    const tokenInfo = this.token;
+    if (tokenInfo) {
+      tokenInfo.accessToken = accessToken;
+      tokenInfo.refreshToken = refreshToken;
+      tokenInfo.expiredTime = expiredTime;
+      this.setToken(tokenInfo);
+    }
+  },
+
   get token(): TokenInfo | null {
     const item = localStorage.getItem(USER_TOKEN_KEY);
     if (item) {

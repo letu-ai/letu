@@ -2,9 +2,13 @@ import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import UserStore from '@/store/userStore';
 import { ErrorCode, StaticRoutes } from '@/utils/globalValue.ts';
 import { message } from 'antd';
+import dayjs from 'dayjs';
+import { refreshToken } from '@/api/auth.ts';
 
 class HttpClient {
   private readonly instance: AxiosInstance;
+  allowAnonymous: string[] = ['/api/account/login']; //允许匿名访问接口
+  refreshTokenApiPath: string = '/api/account/refreshToken'; //刷新token接口
 
   constructor(config?: AxiosRequestConfig) {
     this.instance = axios.create(config);
@@ -12,10 +16,32 @@ class HttpClient {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        // 可以在这里添加token等
+        if (config.url && this.allowAnonymous.includes(config.url)) {
+          return config;
+        }
+        //添加token
         const token = UserStore.token?.accessToken;
-        if (token) {
+        const expired = UserStore.token?.expiredTime;
+        const now = new Date();
+        if (token && expired && dayjs(expired).isAfter(now)) {
           config.headers.Authorization = `Bearer ${token}`;
+          //过期时间小于10分钟进行刷新token
+          if (dayjs(expired).subtract(10, 'minute').isBefore(now)) {
+            //如果当前是刷新token接口就不调用，避免循环调用
+            const refreshTokenValue = UserStore.token?.refreshToken;
+            if ((!config.url || config.url.indexOf(this.refreshTokenApiPath) === -1) && refreshTokenValue) {
+              refreshToken(refreshTokenValue).then((refreshTokenRes) => {
+                if (refreshTokenRes.data) {
+                  const refreshTokenData = refreshTokenRes.data;
+                  UserStore.refreshToken(
+                    refreshTokenData.accessToken,
+                    refreshTokenData.refreshToken,
+                    refreshTokenData.expiredTime,
+                  );
+                }
+              });
+            }
+          }
         }
         return config;
       },

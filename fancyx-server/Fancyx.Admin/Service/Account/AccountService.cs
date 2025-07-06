@@ -53,14 +53,15 @@ namespace Fancyx.Admin.Service.Account
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="userName"></param>
+        /// <param name="sessionId"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private async Task<(TokenResultDto tokenRes, string sessionId)> GenerateTokenAsync(Guid userId, string userName)
+        private async Task<(TokenResultDto tokenRes, string sessionId)> GenerateTokenAsync(Guid userId, string userName, string? sessionId = null)
         {
             var time = DateTime.Now;
 
             var refreshToken = Guid.NewGuid().ToString("N").ToLower();
-            var sessionId = SnowflakeHelper.Instance.NextId().ToString();
+            sessionId ??= SnowflakeHelper.Instance.NextId().ToString();
             var claims = new List<Claim> {
                 new(ClaimTypes.NameIdentifier, userId.ToString()),
                 new(ClaimTypes.Name, userName),
@@ -116,7 +117,7 @@ namespace Fancyx.Admin.Service.Account
             var existRefreshToken = await _redisDb.GetAsync<string>(key);
             if (!refreshToken.Equals(existRefreshToken)) throw new BusinessException(message: "刷新token不正确");
 
-            return (await GenerateTokenAsync(_currentUser.Id!.Value, _currentUser.UserName!)).tokenRes;
+            return (await GenerateTokenAsync(_currentUser.Id!.Value, _currentUser.UserName!, sessionId)).tokenRes;
         }
 
         public async Task<UserAuthInfoDto> GetUserAuthInfoAsync()
