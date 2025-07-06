@@ -29,7 +29,7 @@ namespace Fancyx.Admin.Service.System
             }
             if (dto.ParentId.HasValue)
             {
-                var parentMenu = await _menuRepository.Where(x => x.ParentId == dto.ParentId).FirstAsync();
+                var parentMenu = await _menuRepository.Where(x => x.Id == dto.ParentId).FirstAsync();
                 if (parentMenu.MenuType == MenuType.Button)
                 {
                     throw new BusinessException(message: "菜单父级不能是按钮");

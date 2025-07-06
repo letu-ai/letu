@@ -7,6 +7,7 @@ import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTabl
 import SmartTable from '@/components/SmartTable';
 import { MenuType } from '@/utils/globalValue.ts';
 import useApp from 'antd/es/app/useApp';
+import Permission from '@/components/Permission';
 
 const MenuTable = () => {
   const modalRef = useRef<ModalRef>(null);
@@ -58,12 +59,16 @@ const MenuTable = () => {
       fixed: 'right',
       render: (_: any, record: MenuListDto) => (
         <Space>
-          <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
-            编辑
-          </Button>
-          <Button type="link" icon={<DeleteOutlined />} danger onClick={() => dataDelete([record.id])}>
-            删除
-          </Button>
+          <Permission permissions={'Sys.Menu.Update'}>
+            <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
+              编辑
+            </Button>
+          </Permission>
+          <Permission permissions={'Sys.Menu.Delete'}>
+            <Button type="link" icon={<DeleteOutlined />} danger onClick={() => dataDelete([record.id])}>
+              删除
+            </Button>
+          </Permission>
         </Space>
       ),
     },
@@ -132,12 +137,16 @@ const MenuTable = () => {
         ]}
         toolbar={
           <Space size="middle">
-            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-              新增
-            </Button>
-            <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={batchDelete}>
-              删除
-            </Button>
+            <Permission permissions={'Sys.Menu.Add'}>
+              <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+                新增
+              </Button>
+            </Permission>
+            <Permission permissions={'Sys.Menu.Delete'}>
+              <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={batchDelete}>
+                删除
+              </Button>
+            </Permission>
           </Space>
         }
       />

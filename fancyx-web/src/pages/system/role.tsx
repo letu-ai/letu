@@ -8,6 +8,7 @@ import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import { PermissionConstant } from '@/utils/globalValue.ts';
 import useApp from 'antd/es/app/useApp';
+import Permission from '@/components/Permission';
 
 const Role = () => {
   const modalRef = useRef<ModalRef>(null);
@@ -48,15 +49,21 @@ const Role = () => {
         if (record.roleName === PermissionConstant.SuperAdmin) return <></>;
         return (
           <Space>
-            <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
-              编辑
-            </Button>
-            <Button type="link" icon={<HddOutlined />} onClick={() => openAssignModal(record)}>
-              菜单权限
-            </Button>
-            <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
-              删除
-            </Button>
+            <Permission permissions={'Sys.Role.Update'}>
+              <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
+                编辑
+              </Button>
+            </Permission>
+            <Permission permissions={'Sys.Role.AssignMenu'}>
+              <Button type="link" icon={<HddOutlined />} onClick={() => openAssignModal(record)}>
+                菜单权限
+              </Button>
+            </Permission>
+            <Permission permissions={'Sys.Role.Delete'}>
+              <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
+                删除
+              </Button>
+            </Permission>
           </Space>
         );
       },
@@ -105,9 +112,11 @@ const Role = () => {
           </Form.Item>
         }
         toolbar={
-          <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-            新增
-          </Button>
+          <Permission permissions={'Sys.Role.Add'}>
+            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+              新增
+            </Button>
+          </Permission>
         }
       />
       {/* 角色新增/编辑弹窗 */}

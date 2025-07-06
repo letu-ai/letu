@@ -101,9 +101,11 @@ const PositionGroupList: React.FC = () => {
           </Form.Item>
         }
         toolbar={
-          <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-            新增
-          </Button>
+          <Permission permissions={'Org.PositionGroup.Add'}>
+            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+              新增
+            </Button>
+          </Permission>
         }
       />
       {/* 职位分组新增/编辑弹窗 */}

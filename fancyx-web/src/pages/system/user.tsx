@@ -16,6 +16,7 @@ import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTabl
 import ResetUserPwdForm, { type ResetUserPwdFormRef } from '@/pages/system/components/ResetUserPwdForm.tsx';
 import ProIcon from '@/components/ProIcon';
 import { useApplication } from '@/components/Application';
+import Permission from '@/components/Permission';
 
 const UserTable = () => {
   const tableRef = useRef<SmartTableRef>(null);
@@ -71,27 +72,33 @@ const UserTable = () => {
       fixed: 'right',
       render: (_: any, record: UserListDto) => (
         <Space>
-          <Button
-            type="link"
-            icon={<KeyOutlined />}
-            onClick={() => {
-              resetUserPwdFormRef?.current?.openModal(record);
-            }}
-          >
-            重置密码
-          </Button>
-          <Button
-            type="link"
-            onClick={() => {
-              assignRoleRef?.current?.openModal(record);
-            }}
-          >
-            <ProIcon icon="iconify:simple-line-icons:check" />
-            分配角色
-          </Button>
-          <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
-            删除
-          </Button>
+          <Permission permissions={'Sys.User.ResetPwd'}>
+            <Button
+              type="link"
+              icon={<KeyOutlined />}
+              onClick={() => {
+                resetUserPwdFormRef?.current?.openModal(record);
+              }}
+            >
+              重置密码
+            </Button>
+          </Permission>
+          <Permission permissions={'Sys.User.AssignRole'}>
+            <Button
+              type="link"
+              onClick={() => {
+                assignRoleRef?.current?.openModal(record);
+              }}
+            >
+              <ProIcon icon="iconify:simple-line-icons:check" />
+              分配角色
+            </Button>
+          </Permission>
+          <Permission permissions={'Sys.User.Delete'}>
+            <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
+              删除
+            </Button>
+          </Permission>
         </Space>
       ),
     },
@@ -132,16 +139,18 @@ const UserTable = () => {
           </Form.Item>
         }
         toolbar={
-          <Button
-            color="primary"
-            variant="solid"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              userEditModalRef?.current?.openModal();
-            }}
-          >
-            新增
-          </Button>
+          <Permission permissions={'Sys.User.Add'}>
+            <Button
+              color="primary"
+              variant="solid"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                userEditModalRef?.current?.openModal();
+              }}
+            >
+              新增
+            </Button>
+          </Permission>
         }
       />
       {/* 新增/编辑弹窗 */}

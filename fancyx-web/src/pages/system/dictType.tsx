@@ -52,17 +52,19 @@ const DictList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: DictTypeResultDto) => (
         <Space>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            key="edit"
-            onClick={() => {
-              modalRef?.current?.openModal(record as DictTypeDto);
-            }}
-          >
-            编辑
-          </Button>
-          <Permission permissions={'Sys.DictType.Add'}>
+          <Permission permissions={'Sys.DictType.Update'}>
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              key="edit"
+              onClick={() => {
+                modalRef?.current?.openModal(record as DictTypeDto);
+              }}
+            >
+              编辑
+            </Button>
+          </Permission>
+          <Permission permissions={'Sys.DictData.List'}>
             <Button
               type="link"
               icon={<ProIcon icon="iconify:mi:database" />}
@@ -146,9 +148,11 @@ const DictList: React.FC = () => {
                 <PlusOutlined /> 新增
               </Button>
             </Permission>
-            <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={batchDelete}>
-              删除
-            </Button>
+            <Permission permissions={'Sys.DictType.Delete'}>
+              <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={batchDelete}>
+                删除
+              </Button>
+            </Permission>
           </Space>
         }
       />

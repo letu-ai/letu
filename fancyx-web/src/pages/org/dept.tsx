@@ -105,9 +105,11 @@ const DepartmentList: React.FC = () => {
           </>
         }
         toolbar={
-          <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-            新增
-          </Button>
+          <Permission permissions={'Org.Dept.Add'}>
+            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+              新增
+            </Button>
+          </Permission>
         }
       />
       {/* 部门新增/编辑弹窗 */}

@@ -11,6 +11,7 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import SearchModal, { type SearchModalRef } from '@/layout/components/SearchModal.tsx';
 import { useApplication } from '@/components/Application';
 import { StaticRoutes } from '@/utils/globalValue.ts';
+import { useAuthProvider } from '@/components/AuthProvider';
 
 function Navbar() {
   const collapsed = useSelector(selectCollapsed);
@@ -18,6 +19,7 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const searchModalRef = useRef<SearchModalRef>(null);
+  const { clearToken } = useAuthProvider();
   const userItems: MenuProps['items'] = [
     {
       key: 'profile',
@@ -60,6 +62,7 @@ function Navbar() {
   const onClick = ({ key }: { key: string }) => {
     if (key === 'logout') {
       signOut().then(() => {
+        if (clearToken) clearToken();
         UserStore.logout();
         dispatch(clearTabs());
         navigate(StaticRoutes.Login);

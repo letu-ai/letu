@@ -62,7 +62,7 @@ const DictDataList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.DictData.Add'}>
+          <Permission permissions={'Sys.DictData.Update'}>
             <Button
               key="copy"
               type="link"

@@ -127,9 +127,11 @@ const Position: React.FC = () => {
           </Form.Item>,
         ]}
         toolbar={
-          <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-            新增
-          </Button>
+          <Permission permissions={'Org.Position.Add'}>
+            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+              新增
+            </Button>
+          </Permission>
         }
       />
       {/* 职位新增/编辑弹窗 */}

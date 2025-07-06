@@ -5,6 +5,7 @@ import './style/profile.scss';
 import UserStore from '@/store/userStore.ts';
 import { type PersonalInfoDto, updateInfo, updatePwd, type UserPwdDto } from '@/api/auth.ts';
 import { Patterns } from '@/utils/globalValue.ts';
+import { useApplication } from '@/components/Application';
 
 const { Title } = Typography;
 
@@ -15,6 +16,7 @@ const ProfilePage = () => {
   const [avatar, setAvatar] = useState(userAvatar);
   const [activeKey, setActiveKey] = useState<string>('baseInfo');
   const [loading, setLoading] = useState<boolean>(false);
+  const { ossDomain } = useApplication();
 
   useEffect(() => {
     baseInfoForm.setFieldValue('nickName', nickName);
@@ -85,7 +87,7 @@ const ProfilePage = () => {
           <Card className="profile-card">
             <div className="avatar-section">
               <div className="avatar-upload">
-                <Avatar size={128} src={avatar} icon={<UserOutlined />} />
+                <Avatar size={128} src={ossDomain + avatar} icon={<UserOutlined />} />
                 <Upload
                   name="avatar"
                   showUploadList={false}

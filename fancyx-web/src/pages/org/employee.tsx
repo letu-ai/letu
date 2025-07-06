@@ -62,15 +62,17 @@ const EmployeeList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Button
-            type="link"
-            icon={<UserAddOutlined />}
-            onClick={() => {
-              bindUserModalRef?.current?.openModal(record);
-            }}
-          >
-            绑定用户
-          </Button>
+          <Permission permissions={'Org.Employee.BindUser'}>
+            <Button
+              type="link"
+              icon={<UserAddOutlined />}
+              onClick={() => {
+                bindUserModalRef?.current?.openModal(record);
+              }}
+            >
+              绑定用户
+            </Button>
+          </Permission>
           <Permission permissions={'Org.Employee.Delete'}>
             <Popconfirm
               key="delete"
@@ -109,16 +111,18 @@ const EmployeeList: React.FC = () => {
           </Form.Item>,
         ]}
         toolbar={
-          <Button
-            color="primary"
-            variant="solid"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              modalRef?.current?.openModal();
-            }}
-          >
-            新增
-          </Button>
+          <Permission permissions={'Org.Employee.Add'}>
+            <Button
+              color="primary"
+              variant="solid"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                modalRef?.current?.openModal();
+              }}
+            >
+              新增
+            </Button>
+          </Permission>
         }
       />
       {/* 新增/编辑员工弹窗 */}

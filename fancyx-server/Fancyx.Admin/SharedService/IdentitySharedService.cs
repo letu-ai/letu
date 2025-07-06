@@ -14,6 +14,7 @@ using System.Text;
 using Fancyx.Shared.Keys;
 using Microsoft.Extensions.Caching.Memory;
 using Fancyx.Repository;
+using Fancyx.Shared.Enums;
 
 namespace Fancyx.Admin.SharedService
 {
@@ -71,7 +72,7 @@ namespace Fancyx.Admin.SharedService
             var roles = await _roleRepository.Where(x => roleIds.Contains(x.Id) && x.IsEnabled).ToListAsync();
             var isSuperAdmin = roles.Any(r => r.RoleName == AdminConsts.SuperAdminRole);
             var menuIds = await _roleMenuRepository.Where(x => roleIds.Contains(x.RoleId)).ToListAsync(x => x.MenuId);
-            var menus = await _menuRepository.Select.Where(x => menuIds.Contains(x.Id) || isSuperAdmin).ToListAsync(x => new { x.Permission, x.Id });
+            var menus = await _menuRepository.Select.Where(x => menuIds.Contains(x.Id) || isSuperAdmin).ToListAsync(x => new { x.Permission, x.Id, x.MenuType });
             if (isSuperAdmin)
             {
                 menuIds = menus.Select(x => x.Id).ToList();
@@ -80,7 +81,7 @@ namespace Fancyx.Admin.SharedService
             {
                 UserId = userId,
                 Roles = roles.Select(c => c.RoleName).ToArray(),
-                Auths = menus.Where(c => !string.IsNullOrEmpty(c.Permission)).Select(c => c.Permission!).Distinct().ToArray(),
+                Auths = menus.Where(c => !string.IsNullOrEmpty(c.Permission) && c.MenuType == MenuType.Button).Select(c => c.Permission!).Distinct().ToArray(),
                 RoleIds = [.. roleIds],
                 MenuIds = [.. menuIds],
                 IsSuperAdmin = isSuperAdmin
