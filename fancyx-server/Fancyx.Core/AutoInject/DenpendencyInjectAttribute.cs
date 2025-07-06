@@ -1,7 +1,8 @@
 ﻿namespace Fancyx.Core.AutoInject
 {
     /// <summary>
-    /// 自动注入，标记此特性的类会被自动注册到依赖注入容器中
+    /// 自动注入，标记此特性的类会被自动注册到依赖注入容器中 <br/>
+    /// 如果AsSelf为false且Interfaces为空，则不会注册
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public sealed class DenpendencyInjectAttribute : Attribute

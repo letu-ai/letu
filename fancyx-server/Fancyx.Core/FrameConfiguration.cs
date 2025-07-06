@@ -168,6 +168,7 @@ namespace Fancyx.Core
             {
                 foreach (var moduleType in dependsOnAttribute.DependedModuleTypes)
                 {
+                    if (moduleType.Equals(curModuleType)) continue; //避免循环依赖
                     ModuleBase? subModule = (ModuleBase?)Activator.CreateInstance(moduleType);
                     if (subModule == null) continue;
 
@@ -176,8 +177,15 @@ namespace Fancyx.Core
             }
 
             if (modules.ContainsKey(curModuleType)) return;
-            Interlocked.Increment(ref sort);
-            modules.TryAdd(curModuleType, (module, sort));
+            if (module.Order >= 0)
+            {
+                modules.TryAdd(curModuleType, (module, module.Order));
+            }
+            else
+            {
+                Interlocked.Increment(ref sort);
+                modules.TryAdd(curModuleType, (module, sort));
+            }
             module.ConfigureServices(context);
         }
 
@@ -245,6 +253,7 @@ namespace Fancyx.Core
                 {
                     var attr = attrType.GetCustomAttribute<DenpendencyInjectAttribute>();
                     if (attr == null) continue;
+                    if (!attr.AsSelf && (attr.Interfaces == null || attr.Interfaces.Length <= 0)) continue;
                     RegisterType(attrType, attr.Way, attr.AsSelf, attr.Interfaces);
                 }
             }
