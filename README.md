@@ -19,8 +19,8 @@
 
 ## 在线预览
 
-在线文档： https://doc.crackerwork.com <br/>
-预览地址： https://crackerwork.com <br/>
+在线文档： https://doc.crackerwork.cn <br/>
+预览地址： https://crackerwork.cn <br/>
 预览账号： admin/123qwe*
 
 > 注意：预览是演示模式，屏蔽了非GET请求
