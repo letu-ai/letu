@@ -48,5 +48,13 @@ namespace Fancyx.Admin.Controllers.Oss
                 return NotFound();
             }
         }
+
+        [HttpDelete]
+        public async Task<AppResponse<bool>> DeleteAsync([FromQuery] string key)
+        {
+            IObjectStorageService objectStorageService = _objectStorageFactory.GetService(StorageType.Local);
+            await objectStorageService.DeleteAsync(key);
+            return Result.Ok();
+        }
     }
 }
