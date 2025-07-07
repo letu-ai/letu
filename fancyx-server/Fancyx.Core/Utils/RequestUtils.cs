@@ -45,7 +45,7 @@ namespace Fancyx.Core.Utils
         public static string? ResolveBrowser(string? userAgent)
         {
             var parser = UAParser.Parser.GetDefault().Parse(userAgent);
-            return parser.UA.Family;
+            return parser.String;
         }
 
         public static string? ResolveAddress(string? ip)
