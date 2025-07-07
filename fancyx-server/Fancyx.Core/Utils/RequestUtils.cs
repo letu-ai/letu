@@ -53,7 +53,7 @@ namespace Fancyx.Core.Utils
             if (string.IsNullOrWhiteSpace(ip) || !IsValidIP(ip)) return null;
 
             //拿到地址示例：中国|0|重庆|重庆市|移动
-            var address = ResolveAddress(new Searcher(CachePolicy.Content, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ip2region.xdb")).Search(ip!));
+            var address = new Searcher(CachePolicy.Content, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ip2region.xdb")).Search(ip!);
             if (string.IsNullOrWhiteSpace(address)) return string.Empty;
             if (address.Contains("0|0|0"))
             {
