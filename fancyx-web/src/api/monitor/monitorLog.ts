@@ -27,6 +27,14 @@ export function getExceptionLogList(dto: ExceptionLogQueryDto) {
   );
 }
 
+/**
+ * 标记异常日志已处理
+ * @param exceptionId
+ */
+export function handleException(exceptionId: string) {
+  return httpClient.post<string, AppResponse<boolean>>('/api/MonitorLog/HandleException?exceptionId=' + exceptionId);
+}
+
 export interface ApiAccessLogQueryDto extends PageSearch {
   userName?: string;
   path?: string;
@@ -67,6 +75,7 @@ export interface ExceptionLogListDto {
   isHandled: boolean;
   handledTime: string | null;
   handledBy: string | null;
+  creationTime: string;
 }
 
 export interface ExceptionLogQueryDto extends PageSearch {

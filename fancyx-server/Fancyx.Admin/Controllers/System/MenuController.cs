@@ -57,6 +57,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpPut("update")]
         [HasPermission("Sys.Menu.Update")]
+        [ApiAccessLog(operateName: "修改菜单", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> UpdateMenuAsync([FromBody] MenuDto dto)
         {
             await _menuService.UpdateMenuAsync(dto);
@@ -70,6 +71,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpDelete("delete")]
         [HasPermission("Sys.Menu.Delete")]
+        [ApiAccessLog(operateName: "删除菜单", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteMenusAsync([FromBody] Guid[] ids)
         {
             await _menuService.DeleteMenusAsync(ids);

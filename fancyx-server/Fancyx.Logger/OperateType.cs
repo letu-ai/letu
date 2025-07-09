@@ -2,7 +2,7 @@
 {
     public enum OperateType
     {
-        CREATE = 1,
+        Create = 1,
         Query = 2,
         Update = 3,
         Delete = 4,

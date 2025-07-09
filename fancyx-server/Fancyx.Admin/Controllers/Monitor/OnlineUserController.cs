@@ -1,6 +1,8 @@
 ﻿using Fancyx.Admin.IService.Monitor;
 using Fancyx.Admin.IService.Monitor.Dtos;
 using Fancyx.Core.Attributes;
+using Fancyx.Logger;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +27,7 @@ namespace Fancyx.Admin.Controllers.Monitor
         /// <returns></returns>
         [HttpGet]
         [HasPermission("Monitor.OnlineUser")]
+        [ApiAccessLog(operateName: "在线用户列表", operateType: [OperateType.Query])]
         public async Task<AppResponse<PagedResult<OnlineUserResultDto>>> GetOnlineUserListAsync([FromQuery] OnlineUserSearchDto dto)
         {
             var data = await onlineUserService.GetOnlineUserListAsync(dto);
@@ -32,12 +35,13 @@ namespace Fancyx.Admin.Controllers.Monitor
         }
 
         /// <summary>
-        /// 注销当前会话
+        /// 注销用户会话
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         [HttpPost]
         [HasPermission("Monitor.Logout")]
+        [ApiAccessLog(operateName: "注销用户会话", operateType: [OperateType.Delete])]
         public async Task<AppResponse<bool>> LogoutAsync(string key)
         {
             await onlineUserService.LogoutAsync(key);

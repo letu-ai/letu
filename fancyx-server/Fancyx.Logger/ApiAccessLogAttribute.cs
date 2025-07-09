@@ -85,7 +85,7 @@ namespace Fancyx.Logger
                     var now = DateTime.Now;
                     apiAccessLogMsg.ResponseTime = now;
                     apiAccessLogMsg.Duration = (long)Math.Round(now.Subtract(apiAccessLogMsg.RequestTime).TotalMilliseconds);
-                    apiAccessLogMsg.ResponseBody = JsonConvert.SerializeObject(context.Result);
+                    apiAccessLogMsg.ResponseBody = StringUtils.CutOff(JsonConvert.SerializeObject(context.Result), 500);
                     await PushAsync(context.HttpContext, apiAccessLogMsg);
                 }
             }

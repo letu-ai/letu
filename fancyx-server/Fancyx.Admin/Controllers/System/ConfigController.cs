@@ -1,7 +1,9 @@
 ﻿using Fancyx.Admin.IService.System;
 using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Core.Attributes;
+using Fancyx.Logger;
 using Fancyx.Shared.Consts;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -39,6 +41,7 @@ namespace Fancyx.Admin.Controllers.System
 
         [HttpPut("Update")]
         [HasPermission("Sys.Config.Update")]
+        [ApiAccessLog(operateName: "修改配置", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> UpdateConfigAsync(ConfigDto dto)
         {
             await _configService.UpdateConfigAsync(dto);
@@ -47,6 +50,7 @@ namespace Fancyx.Admin.Controllers.System
 
         [HttpDelete("Delete/{id}")]
         [HasPermission("Sys.Config.Delete")]
+        [ApiAccessLog(operateName: "删除配置", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteConfigAsync(Guid id)
         {
             await _configService.DeleteConfigAsync(id);

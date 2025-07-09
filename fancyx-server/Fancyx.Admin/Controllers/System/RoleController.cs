@@ -1,7 +1,9 @@
 using Fancyx.Admin.IService.System;
 using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Core.Attributes;
+using Fancyx.Logger;
 using Fancyx.Shared.Consts;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -54,6 +56,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpPut("update")]
         [HasPermission("Sys.Role.Update")]
+        [ApiAccessLog(operateName: "修改角色", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> UpdateRoleAsync([FromBody] RoleDto dto)
         {
             await _roleService.UpdateRoleAsync(dto);
@@ -67,6 +70,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpDelete("delete/{id:Guid}")]
         [HasPermission("Sys.Role.Delete")]
+        [ApiAccessLog(operateName: "删除角色", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteRoleAsync(Guid id)
         {
             await _roleService.DeleteRoleAsync(id);
@@ -80,6 +84,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpPost("assignMenu")]
         [HasPermission("Sys.Role.AssignMenu")]
+        [ApiAccessLog(operateName: "分配菜单权限", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> AssignMenuAsync([FromBody] AssignMenuDto dto)
         {
             await _roleService.AssignMenuAsync(dto);
@@ -110,12 +115,13 @@ namespace Fancyx.Admin.Controllers.System
         }
 
         /// <summary>
-        /// 分配数据
+        /// 分配数据权限
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("assignData")]
         [HasPermission("Sys.Role.AssignData")]
+        [ApiAccessLog(operateName: "分配数据权限", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> AssignDataAsync([FromBody] AssignDataDto dto)
         {
             await _roleService.AssignDataAsync(dto);

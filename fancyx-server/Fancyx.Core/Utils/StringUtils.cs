@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -6,7 +7,29 @@ namespace Fancyx.Core.Utils
 {
     public static partial class StringUtils
     {
-        public static bool IgnoreCaseEquals(string? value1, string? value2, bool ignoreCase = false)
+        /// <summary>
+        /// 截断字符串
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="maxLength"></param>
+        /// <returns></returns>
+        public static string? CutOff(string? str, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(str)) return str;
+            if (str.Length > maxLength)
+            {
+                return str.Substring(0, maxLength);
+            }
+            return str;
+        }
+
+        /// <summary>
+        /// 忽略大小写比较字符串值
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <returns></returns>
+        public static bool IgnoreCaseEquals(string? value1, string? value2)
         {
             return string.Equals(value1, value2, StringComparison.OrdinalIgnoreCase);
         }
@@ -101,6 +124,7 @@ namespace Fancyx.Core.Utils
 
         [GeneratedRegex(@"<input.*?/>", RegexOptions.IgnoreCase, "zh-CN")]
         private static partial Regex InputRegex();
+
         [GeneratedRegex(@"<style.*?>.*?</style.*?>", RegexOptions.IgnoreCase | RegexOptions.Singleline, "zh-CN")]
         private static partial Regex StyleRegex();
 

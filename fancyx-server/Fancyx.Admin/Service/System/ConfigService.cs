@@ -2,7 +2,9 @@
 using Fancyx.Admin.IService.System;
 using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Admin.SharedService;
+using Fancyx.Logger;
 using Fancyx.Repository;
+using Fancyx.Shared.Consts;
 
 namespace Fancyx.Admin.Service.System
 {
@@ -64,6 +66,7 @@ namespace Fancyx.Admin.Service.System
             }
         }
 
+        [AsyncLogRecord(LogRecordConsts.SysConfig, LogRecordConsts.SysConfigUpdateContent, "{{id}}", LogRecordConsts.SysConfigUpdateContent)]
         public async Task UpdateConfigAsync(ConfigDto dto)
         {
             var entity = _configRepository.Select.Where(x => x.Id == dto.Id).ToOne();
@@ -91,6 +94,9 @@ namespace Fancyx.Admin.Service.System
             {
                 _configSharedService.ClearGroupCache(entity.GroupKey);
             }
+
+            LogRecordContext.PutVariable("id", entity.Id);
+            LogRecordContext.PutVariable("after", entity);
         }
     }
 }

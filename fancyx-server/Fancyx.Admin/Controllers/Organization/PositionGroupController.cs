@@ -1,7 +1,9 @@
 using Fancyx.Admin.IService.Organization;
 using Fancyx.Admin.IService.Organization.Dtos;
 using Fancyx.Core.Attributes;
+using Fancyx.Logger;
 using Fancyx.Shared.Consts;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -67,6 +69,7 @@ namespace Fancyx.Admin.Controllers.Organization
         /// <returns></returns>
         [HttpDelete("delete/{id:guid}")]
         [HasPermission("Org.PositionGroup.Delete")]
+        [ApiAccessLog(operateName: "删除职位分组", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeletePositionGroupAsync(Guid id)
         {
             await _positionGroupService.DeletePositionGroupAsync(id);

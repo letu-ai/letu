@@ -30,6 +30,7 @@ namespace Fancyx.Admin.Controllers.System
         [HttpPost("add")]
         [HasPermission("Sys.User.Add")]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
+        [ApiAccessLog(operateName: "新增用户", operateType: [OperateType.Create], reponseEnable: true)]
         public async Task<AppResponse<bool>> AddUserAsync([FromBody] UserDto dto)
         {
             await _userService.AddUserAsync(dto);
@@ -43,7 +44,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpGet("list")]
         [HasPermission("Sys.User.List")]
-        [ApiAccessLog(operateName: "用户分页列表", reponseEnable: true)]
+        [ApiAccessLog(operateName: "用户分页列表")]
         public async Task<AppResponse<PagedResult<UserListDto>>> GetUserListAsync([FromQuery] UserQueryDto dto)
         {
             var data = await _userService.GetUserListAsync(dto);
@@ -70,6 +71,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpPost("assignRole")]
         [HasPermission("Sys.User.AssignRole")]
+        [ApiAccessLog(operateName: "分配角色", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> AssignRoleAsync([FromBody] AssignRoleDto dto)
         {
             await _userService.AssignRoleAsync(dto);
@@ -83,6 +85,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpPut("changeEnabled/{id:Guid}")]
         [HasPermission("Sys.User.SwitchEnabledStatus")]
+        [ApiAccessLog(operateName: "切换用户启用状态", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> SwitchUserEnabledStatusAsync(Guid id)
         {
             await _userService.SwitchUserEnabledStatusAsync(id);
@@ -108,6 +111,7 @@ namespace Fancyx.Admin.Controllers.System
         /// <returns></returns>
         [HttpPut("resetPwd")]
         [HasPermission("Sys.User.ResetPwd")]
+        [ApiAccessLog(operateName: "重置用户密码", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> ResetUserPasswordAsync([FromBody] ResetUserPwdDto dto)
         {
             await _userService.ResetUserPasswordAsync(dto);

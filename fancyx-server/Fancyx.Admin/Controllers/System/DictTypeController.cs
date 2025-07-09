@@ -1,7 +1,9 @@
 ﻿using Fancyx.Admin.IService.System;
 using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Core.Attributes;
+using Fancyx.Logger;
 using Fancyx.Shared.Interfaces;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,6 +67,7 @@ public class DictTypeController : ControllerBase
     /// <returns></returns>
     [HttpDelete("{dictType}")]
     [HasPermission("Sys.DictType.Delete")]
+    [ApiAccessLog(operateName: "删除字典类型", operateType: [OperateType.Delete], reponseEnable: true)]
     public async Task<AppResponse<bool>> DeleteDictTypeAsync(string dictType)
     {
         await _dictTypeService.DeleteDictTypeAsync(dictType);
@@ -90,6 +93,7 @@ public class DictTypeController : ControllerBase
     /// <returns></returns>
     [HttpDelete]
     [HasPermission("Sys.DictType.Delete")]
+    [ApiAccessLog(operateName: "批量删除字典类型", operateType: [OperateType.Delete], reponseEnable: true)]
     public async Task<AppResponse<bool>> DeleteDictTypesAsync([FromBody] Guid[] ids)
     {
         await _dictTypeService.DeleteDictTypesAsync(ids);

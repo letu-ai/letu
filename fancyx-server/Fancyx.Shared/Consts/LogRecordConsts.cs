@@ -9,5 +9,15 @@
         public const string SysDictType = "系统字典";
         public const string SysDictAddSubType = "新增字典";
         public const string SysDictAddContent = "新增字典{{dict.Name}}";
+
+        public const string SysDictData = "系统字典数据";
+        public const string SysDictDataUpdateSubType = "编辑字典数据";
+        public const string SysDictDataUpdateContent = "编辑后：值={{after.Value}},启用={{after.IsEnabled}}";
+        public const string SysDictDataDeleteSubType = "删除字典数据";
+        public const string SysDictDataDeleteContent = "删除了{{ids}}数据";
+        
+        public const string SysConfig = "配置管理";
+        public const string SysConfigUpdateSubType = "编辑配置";
+        public const string SysConfigUpdateContent = "编辑后：键={{after.Key}}，值={{after.Value}}，组={{after.GroupKey}}";
     }
 }

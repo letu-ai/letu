@@ -44,5 +44,18 @@ namespace Fancyx.Admin.Controllers.Monitor
             var data = await _monitorLogService.GetExceptionLogListAsync(dto);
             return Result.Data(data);
         }
+
+        /// <summary>
+        /// 标记异常已处理
+        /// </summary>
+        /// <param name="exceptionId">异常日志ID</param>
+        /// <returns></returns>
+        [HttpPost("HandleException")]
+        [HasPermission("Monitor.ExceptionLog.HandleException")]
+        public async Task<AppResponse<bool>> HandleExceptionAsync(Guid exceptionId)
+        {
+            await _monitorLogService.HandleExceptionAsync(exceptionId);
+            return Result.Ok();
+        }
     }
 }

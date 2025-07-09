@@ -77,5 +77,10 @@ namespace Fancyx.Admin.IService.Monitor.Dtos
         /// 处理人
         /// </summary>
         public string? HandledBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreationTime { get; set; }
     }
 }

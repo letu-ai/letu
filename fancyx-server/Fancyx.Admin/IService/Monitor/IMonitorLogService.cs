@@ -17,5 +17,12 @@ namespace Fancyx.Admin.IService.Monitor
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<PagedResult<ExceptionLogListDto>> GetExceptionLogListAsync(ExceptionLogQueryDto dto);
+
+        /// <summary>
+        /// 标记异常已处理
+        /// </summary>
+        /// <param name="exceptionId">异常日志ID</param>
+        /// <returns></returns>
+        Task HandleExceptionAsync(Guid exceptionId);
     }
 }
