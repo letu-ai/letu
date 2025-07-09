@@ -1,4 +1,4 @@
-import { Card, Form, Input, Button, Checkbox, ConfigProvider } from 'antd';
+import { Card, Form, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import './style/login.scss';
 import { type LoginDto } from '@/api/auth.ts';
@@ -25,15 +25,8 @@ const LoginPage = () => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: '#7E57C2',
-          borderRadius: 8,
-        },
-      }}
-    >
-      <div className="login-container">
+    <div className="login-container">
+      <div className="login-container-main">
         <Card className="login-card" variant="borderless">
           <div className="login-layout">
             {/* 左侧背景图 */}
@@ -74,8 +67,15 @@ const LoginPage = () => {
             </div>
           </div>
         </Card>
+
+        <div className="login-footer">
+          Copyright © {new Date().getFullYear()} 风汐（fancyxnet@gmail.com） |
+          <a href="http://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px' }}>
+            湘ICP备2024047029号-1
+          </a>
+        </div>
       </div>
-    </ConfigProvider>
+    </div>
   );
 };
 
