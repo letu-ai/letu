@@ -34,7 +34,7 @@
             var requestPath = context.Request.Path.Value?.ToLower();
             var isWhite = !string.IsNullOrWhiteSpace(requestPath) && (requestPath.Contains("account/login") || requestPath.Contains("account/signout"));
 
-            return isEnabled && !IsIgnoreHttpMethod(httpMethod) && !isWhite ? Result.Fail("演示模式，不允许操作") : Result.Ok();
+            return isEnabled && !IsIgnoreHttpMethod(httpMethod) && !isWhite ? Result.Fail("演示模式（appsettings中有配置可关闭此模式），不允许操作") : Result.Ok();
         }
 
         /// <summary>
