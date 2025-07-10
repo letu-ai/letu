@@ -5,15 +5,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import UserStore from '@/store/userStore.ts';
 import { selectCollapsed, selectSize, setSize, toggleCollapsed } from '@/store/themeStore.ts';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearTabs, open } from '@/store/tabStore.ts';
+import { open } from '@/store/tabStore.ts';
 import { useMemo, useRef } from 'react';
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { ClearOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import SearchModal, { type SearchModalRef } from '@/layout/components/SearchModal.tsx';
 import { useApplication } from '@/components/Application';
 import { StaticRoutes } from '@/utils/globalValue.ts';
 import { useAuthProvider } from '@/components/AuthProvider';
+import { observer } from 'mobx-react-lite';
 
-function Navbar() {
+const Navbar = observer(() => {
   const collapsed = useSelector(selectCollapsed);
   const size = useSelector(selectSize);
   const dispatch = useDispatch();
@@ -27,6 +28,11 @@ function Navbar() {
       icon: <UserOutlined />,
     },
     {
+      key: 'clearCache',
+      label: '清除缓存',
+      icon: <ClearOutlined />,
+    },
+    {
       type: 'divider',
     },
     {
@@ -36,6 +42,7 @@ function Navbar() {
     },
   ];
   const { ossDomain } = useApplication();
+  const { refreshUserAuthInfo } = useAuthProvider();
   const sizeItems = [
     {
       key: 'large',
@@ -62,14 +69,16 @@ function Navbar() {
   const onClick = ({ key }: { key: string }) => {
     if (key === 'logout') {
       signOut().then(() => {
-        if (clearToken) clearToken();
-        UserStore.logout();
-        dispatch(clearTabs());
+        clearToken();
         navigate(StaticRoutes.Login);
       });
     } else if (key === 'profile') {
       navigate('/profile');
       dispatch(open('/profile'));
+    } else if (key === 'clearCache') {
+      refreshUserAuthInfo?.()?.then(() => {
+        window.location.href = window.location.href + '?v=' + Date.now();
+      });
     } else if (sizeItems.some((h) => h.key === key)) {
       dispatch(setSize(key));
     }
@@ -148,6 +157,6 @@ function Navbar() {
       </div>
     </>
   );
-}
+});
 
 export default Navbar;

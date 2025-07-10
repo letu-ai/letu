@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import type { FrontendMenu } from '@/api/auth';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 export type TokenInfo = {
   sessionId: string;
@@ -22,7 +23,31 @@ const USER_TOKEN_KEY = 'user_token';
 const USER_INFO_KEY = 'user_info';
 const MENU_LIST_KEY = 'menu_list';
 
-const UserStore = {
+class UserStore {
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true });
+    this.initState();
+  }
+
+  token: TokenInfo | null = null;
+  userInfo: UserAuthInfo | null = null;
+  menuList: FrontendMenu[] = [];
+
+  private initState() {
+    const tokenStorage = localStorage.getItem(USER_TOKEN_KEY);
+    if (tokenStorage) {
+      this.token = JSON.parse(tokenStorage);
+    }
+    const userInfoStorage = localStorage.getItem(USER_INFO_KEY);
+    if (userInfoStorage) {
+      this.userInfo = JSON.parse(userInfoStorage);
+    }
+    const menuListStorage = localStorage.getItem(MENU_LIST_KEY);
+    if (menuListStorage) {
+      this.menuList = JSON.parse(menuListStorage);
+    }
+  }
+
   /**
    * 是否登录
    */
@@ -30,14 +55,17 @@ const UserStore = {
     const tokenInfo = this.token;
     if (!tokenInfo || !tokenInfo.accessToken) return false;
     return dayjs(tokenInfo.expiredTime).isAfter(new Date());
-  },
+  }
 
   /**
    * 设置token
    */
   setToken(token: TokenInfo) {
     localStorage.setItem(USER_TOKEN_KEY, JSON.stringify(token));
-  },
+    runInAction(() => {
+      this.token = token;
+    });
+  }
 
   /**
    * 刷新token
@@ -53,42 +81,25 @@ const UserStore = {
       tokenInfo.expiredTime = expiredTime;
       this.setToken(tokenInfo);
     }
-  },
-
-  get token(): TokenInfo | null {
-    const item = localStorage.getItem(USER_TOKEN_KEY);
-    if (item) {
-      return JSON.parse(item);
-    }
-    return null;
-  },
+  }
 
   setUserInfo(userInfo: UserAuthInfo) {
-    localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
-    localStorage.setItem(MENU_LIST_KEY, JSON.stringify(this.flattenTreeDFS(userInfo.menus)));
-  },
-
-  get userInfo(): UserAuthInfo | null {
-    const item = localStorage.getItem(USER_INFO_KEY);
-    if (item) {
-      return JSON.parse(item);
+    if (userInfo) {
+      const _menuList = this.flattenTreeDFS(userInfo.menus);
+      localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
+      localStorage.setItem(MENU_LIST_KEY, JSON.stringify(_menuList));
+      runInAction(() => {
+        this.userInfo = userInfo;
+        this.menuList = _menuList;
+      });
     }
-    return null;
-  },
+  }
 
   logout() {
     localStorage.removeItem(USER_INFO_KEY);
     localStorage.removeItem(USER_TOKEN_KEY);
     localStorage.removeItem(MENU_LIST_KEY);
-  },
-
-  get menuList(): FrontendMenu[] {
-    const item = localStorage.getItem(MENU_LIST_KEY);
-    if (item) {
-      return JSON.parse(item);
-    }
-    return [];
-  },
+  }
 
   flattenTreeDFS(menus: FrontendMenu[]): FrontendMenu[] {
     const result: FrontendMenu[] = [];
@@ -105,7 +116,7 @@ const UserStore = {
       traverse(item);
     });
     return result;
-  },
-};
+  }
+}
 
-export default UserStore;
+export default new UserStore();

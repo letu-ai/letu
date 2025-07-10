@@ -1,4 +1,4 @@
-import { Button, Switch, Image, Space, Form, Input } from 'antd';
+import { Button, Switch, Space, Form, Input, Avatar } from 'antd';
 import { useRef } from 'react';
 import { DeleteOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined } from '@ant-design/icons';
 import useApp from 'antd/es/app/useApp';
@@ -34,7 +34,7 @@ const UserTable = () => {
       title: '头像',
       dataIndex: 'avatar',
       render: (text: string) => {
-        return <Image width={50} src={ossDomain + text} />;
+        return <Avatar size={50} src={ossDomain + text} />;
       },
     },
     {

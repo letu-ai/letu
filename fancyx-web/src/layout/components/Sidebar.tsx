@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { open, selectActiveKey } from '@/store/tabStore.ts';
 import { selectCollapsed } from '@/store/themeStore.ts';
 import { HomeOutlined } from '@ant-design/icons';
+import { observer } from 'mobx-react-lite';
 
 interface MenuItem {
   key: string;
@@ -16,7 +17,7 @@ interface MenuItem {
   children: MenuItem[] | null;
 }
 
-function Sidebar() {
+const Sidebar = observer(() => {
   const dispatch = useDispatch();
   const activeKey = useSelector(selectActiveKey);
   const collapsed = useSelector(selectCollapsed);
@@ -71,6 +72,6 @@ function Sidebar() {
       <Menu mode="inline" items={getItems()} selectedKeys={[activeKey]} inlineCollapsed={collapsed} />
     </div>
   );
-}
+});
 
 export default Sidebar;

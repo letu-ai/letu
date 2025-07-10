@@ -1,27 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Card, Form, Input, Upload, message, Avatar, Divider, Row, Col, Typography, Menu, Radio, Button } from 'antd';
+import { useState } from 'react';
+import { Card, Form, Input, Upload, Avatar, Divider, Row, Col, Typography, Menu, Radio, Button } from 'antd';
 import { UserOutlined, CameraOutlined, LockOutlined } from '@ant-design/icons';
 import './style/profile.scss';
-import UserStore from '@/store/userStore.ts';
 import { type PersonalInfoDto, updateInfo, updatePwd, type UserPwdDto } from '@/api/auth.ts';
-import { Patterns } from '@/utils/globalValue.ts';
+import { ErrorCode, Patterns } from '@/utils/globalValue.ts';
 import { useApplication } from '@/components/Application';
+import { uploadFile } from '@/api/oss';
+import useApp from 'antd/es/app/useApp';
+import { useAuthProvider } from '@/components/AuthProvider';
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import { observer } from 'mobx-react-lite';
+import UserStore from '@/store/userStore.ts';
 
 const { Title } = Typography;
 
-const ProfilePage = () => {
-  const { userName, nickName, avatar: userAvatar, sex } = UserStore.userInfo!;
+const Profile = observer(() => {
+  const userInfo = UserStore.userInfo;
+  const { refreshUserAuthInfo } = useAuthProvider();
   const [baseInfoForm] = Form.useForm();
   const [pwdForm] = Form.useForm();
-  const [avatar, setAvatar] = useState(userAvatar);
+  const [avatar, setAvatar] = useState(userInfo?.avatar);
   const [activeKey, setActiveKey] = useState<string>('baseInfo');
   const [loading, setLoading] = useState<boolean>(false);
   const { ossDomain } = useApplication();
+  const { message } = useApp();
 
-  useEffect(() => {
-    baseInfoForm.setFieldValue('nickName', nickName);
-    baseInfoForm.setFieldValue('sex', sex);
-  }, []);
+  useDeepCompareEffect(() => {
+    baseInfoForm.setFieldValue('nickName', userInfo?.nickName);
+    baseInfoForm.setFieldValue('sex', userInfo?.sex);
+  }, [userInfo ?? {}]);
 
   const profileMenuItems = [
     {
@@ -48,20 +55,13 @@ const ProfilePage = () => {
     return isJpgOrPng && isLt2M;
   };
 
-  const handleAvatarChange = (info: any) => {
-    if (info.file.status === 'done') {
-      const imageUrl = URL.createObjectURL(info.file.originFileObj);
-      setAvatar(imageUrl);
-      message.success('头像上传成功');
-    }
-  };
-
   const updateUserInfo = (info: PersonalInfoDto) => {
     setLoading(true);
     updateInfo(info)
       .then(() => {
         setLoading(false);
         message.success('修改成功');
+        refreshUserAuthInfo();
       })
       .catch(() => setLoading(false));
   };
@@ -92,10 +92,18 @@ const ProfilePage = () => {
                   name="avatar"
                   showUploadList={false}
                   beforeUpload={beforeUpload}
-                  onChange={handleAvatarChange}
                   customRequest={({ file, onSuccess }) => {
-                    console.log(file);
-                    console.log(onSuccess);
+                    uploadFile(file as File).then(async (res) => {
+                      if (res.code === ErrorCode.Success) {
+                        setAvatar(res.data);
+                        const updateRes = await updateInfo({ avatar: res.data });
+                        if (updateRes.code === ErrorCode.Success) {
+                          message.success('新头像上传成功');
+                          refreshUserAuthInfo?.();
+                          onSuccess?.(res.data);
+                        }
+                      }
+                    });
                   }}
                 >
                   <div className="avatar-upload-mask">
@@ -111,7 +119,7 @@ const ProfilePage = () => {
             <div className="profile-summary">
               <div className="nickname-section">
                 <Title level={5} style={{ margin: 0 }}>
-                  {nickName}
+                  {userInfo?.nickName}
                 </Title>
               </div>
             </div>
@@ -143,15 +151,15 @@ const ProfilePage = () => {
                   updateUserInfo(values);
                 }}
               >
-                <Form.Item label="用户名" className="detail-form-item">
-                  <Input value={userName} disabled />
+                <Form.Item label="用户名" className="detail-form-item" rules={[{ required: true }]}>
+                  <Input value={userInfo?.userName} disabled />
                 </Form.Item>
-                <Form.Item label="昵称" className="detail-form-item" name="nickName">
+                <Form.Item label="昵称" className="detail-form-item" name="nickName" rules={[{ required: true }]}>
                   <Input placeholder="请输入您的昵称" />
                 </Form.Item>
-                <Form.Item label="性别" className="detail-form-item" name="sex">
+                <Form.Item label="性别" className="detail-form-item" name="sex" rules={[{ required: true }]}>
                   <Radio.Group
-                    value={sex}
+                    value={userInfo?.sex}
                     options={[
                       { label: '男', value: 1 },
                       { label: '女', value: 2 },
@@ -219,6 +227,6 @@ const ProfilePage = () => {
       </Row>
     </div>
   );
-};
+});
 
-export default ProfilePage;
+export default Profile;

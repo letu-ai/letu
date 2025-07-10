@@ -1,38 +1,43 @@
-import React, { createContext, useContext, useState } from 'react';
-import UserStore, { type TokenInfo } from '@/store/userStore.ts';
+import React, { createContext, useContext } from 'react';
+import UserStore from '@/store/userStore.ts';
 import { getUserAuth, login, type LoginDto } from '@/api/auth.ts';
-import dayjs from 'dayjs';
+import { clearTabs } from '@/store/tabStore.ts';
+import { useDispatch } from 'react-redux';
 
 export interface AuthProviderType {
-  isAuth: () => boolean;
   pwdLogin?: (values: LoginDto) => Promise<void>;
-  tokenInfo?: TokenInfo | null;
-  clearToken?: () => void;
+  clearToken: () => void;
+  refreshUserAuthInfo?: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthProviderType>({ isAuth: () => false });
+const AuthContext = createContext<AuthProviderType>({
+  clearToken: () => {},
+});
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
-
-  const isAuth = () => {
-    if (!tokenInfo || !tokenInfo.accessToken) return false;
-    return dayjs(tokenInfo.expiredTime).isAfter(new Date());
-  };
+  const dispatch = useDispatch();
 
   const pwdLogin = async (values: LoginDto) => {
     const res = await login(values);
     if (res.data) {
-      const _tokenInfo = {
+      UserStore.setToken({
         sessionId: res.data.sessionId,
         accessToken: res.data.accessToken,
         refreshToken: res.data.refreshToken,
         expiredTime: res.data.expiredTime,
-      };
-      setTokenInfo(_tokenInfo);
-      UserStore.setToken(_tokenInfo);
+      });
+      await setOrRefreshUserAuthInfo();
+    }
+  };
+  const clearToken = () => {
+    UserStore.logout();
+    dispatch(clearTabs());
+  };
+
+  const setOrRefreshUserAuthInfo = async () => {
+    if (UserStore.isAuthenticated()) {
       const { data: authInfo } = await getUserAuth();
-      UserStore.setUserInfo({
+      const _authInfo = {
         userId: authInfo.user.userId,
         userName: authInfo.user.userName,
         nickName: authInfo.user.nickName,
@@ -40,14 +45,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         sex: authInfo.user.sex,
         menus: authInfo.menus,
         permissions: authInfo.permissions,
-      });
+      };
+      UserStore.setUserInfo(_authInfo);
     }
   };
-  const clearToken = () => {
-    setTokenInfo(null);
-  };
 
-  return <AuthContext.Provider value={{ isAuth, pwdLogin, tokenInfo, clearToken }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        pwdLogin,
+        clearToken,
+        refreshUserAuthInfo: setOrRefreshUserAuthInfo,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
