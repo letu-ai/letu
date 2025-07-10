@@ -61,7 +61,7 @@ const Profile = observer(() => {
       .then(() => {
         setLoading(false);
         message.success('修改成功');
-        refreshUserAuthInfo();
+        refreshUserAuthInfo?.();
       })
       .catch(() => setLoading(false));
   };
