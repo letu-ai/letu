@@ -26,7 +26,8 @@
                 using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
                 await fileStream.CopyToAsync(fs);
             }
-            return dir + "/" + name;
+            if (!string.IsNullOrEmpty(dir)) return dir + "/" + name;
+            return name;
         }
 
         public Task<Stream> DownloadAsync(string filePathOrKey)

@@ -6,6 +6,7 @@ namespace Fancyx.Logger
     public class LogRecordContext
     {
         private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> KeyValues = [];
+        private static readonly Lock _lockObj = new();
 
         private static string? TraceId
         {
@@ -25,7 +26,10 @@ namespace Fancyx.Logger
         {
             if (string.IsNullOrEmpty(TraceId)) return;
 
-            KeyValues[TraceId].AddOrUpdate(name, value, (key, oldValue) => value);
+            lock (_lockObj)
+            {
+                KeyValues[TraceId].AddOrUpdate(name, value, (key, oldValue) => value);
+            }
         }
 
         public static ConcurrentDictionary<string, object> GetVariables()

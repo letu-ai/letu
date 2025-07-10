@@ -47,7 +47,7 @@ namespace Fancyx.Admin.Service.System
             var rows = await _dictRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.Label), x => x.Label != null && x.Label.Contains(dto.Label!))
                 .WhereIf(!string.IsNullOrEmpty(dto.DictType), x => x.DictType != null && x.DictType.Contains(dto.DictType!))
-                .OrderBy(x => x.Sort).OrderBy(x => x.CreationTime)
+                .OrderBy(x => x.Sort).OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync<DictDataListDto>();

@@ -22,6 +22,15 @@ const BusinessLogList: React.FC = () => {
     {
       title: '操作内容',
       dataIndex: 'content',
+      minWidth: 180,
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (content: string) => (
+        <Tooltip placement="topLeft" title={content}>
+          {content}
+        </Tooltip>
+      ),
     },
     {
       title: '业务编号',
@@ -36,16 +45,36 @@ const BusinessLogList: React.FC = () => {
       ),
     },
     {
-      title: '操作用户',
-      dataIndex: 'userName',
-    },
-    {
       title: '浏览器',
       dataIndex: 'browser',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (browser: string) => (
+        <Tooltip placement="topLeft" title={browser}>
+          {browser}
+        </Tooltip>
+      ),
+    },
+    {
+      title: '跟踪ID',
+      dataIndex: 'traceId',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (traceId: string) => (
+        <Tooltip placement="topLeft" title={traceId}>
+          {traceId}
+        </Tooltip>
+      ),
     },
     {
       title: '操作时间',
       dataIndex: 'creationTime',
+    },
+    {
+      title: '操作用户',
+      dataIndex: 'userName',
     },
   ];
 
@@ -72,7 +101,7 @@ const BusinessLogList: React.FC = () => {
           <Form.Item label="业务类型" name="type">
             <Select placeholder="请选择业务类型" options={typeOptions} allowClear />
           </Form.Item>
-          <Form.Item label="业务子类型" name="type">
+          <Form.Item label="业务子类型" name="subType">
             <Input placeholder="请输入业务子类型" />
           </Form.Item>
           <Form.Item label="操作用户" name="userName">

@@ -39,10 +39,14 @@ public class DictTypeService : IDictTypeService
         await _dictTypeRepository.InsertAsync(entity);
     }
 
+    [AsyncLogRecord(LogRecordConsts.SysDictType, LogRecordConsts.SysDictDeleteSubType, "{{dict.Id}}", LogRecordConsts.SysDictDeleteContent)]
     public async Task DeleteDictTypeAsync(string dictType)
     {
+        var dict = await _dictDataRepository.OneAsync(x => x.DictType.ToLower() == dictType.ToLower()) ?? throw new EntityNotFoundException();
         await _dictDataRepository.DeleteAsync(x => x.DictType == dictType);
         await _dictTypeRepository.DeleteAsync(x => x.DictType == dictType);
+
+        LogRecordContext.PutVariable("dict", dict);
     }
 
     public async Task<PagedResult<DictTypeResultDto>> GetDictTypeListAsync(DictTypeSearchDto dto)
@@ -93,10 +97,13 @@ public class DictTypeService : IDictTypeService
             .ToListAsync(x => new AppOption(x.Label, x.Value));
     }
 
+    [AsyncLogRecord(LogRecordConsts.SysDictType, LogRecordConsts.SysDictBatchDeleteSubType, "{{ids}}", LogRecordConsts.SysDictBatchDeleteContent)]
     public async Task DeleteDictTypesAsync(Guid[] ids)
     {
         var dictTypes = await _dictTypeRepository.Where(x => ids.Contains(x.Id)).ToListAsync(x => x.DictType);
         _dictDataRepository.Delete(x => dictTypes.Contains(x.DictType));
         await _dictTypeRepository.DeleteAsync(x => ids.Contains(x.Id));
+
+        LogRecordContext.PutVariable("ids", string.Join(',', ids));
     }
 }

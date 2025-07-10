@@ -49,7 +49,7 @@ const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
 
   const onFinish = (values: AssignRoleDto) => {
     assignRole({ ...values, userId: currentRow!.id }).then(() => {
-      message.success('指派成功');
+      message.success('分配成功');
       setIsOpenModal(false);
       form.resetFields();
     });

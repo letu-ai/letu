@@ -95,6 +95,7 @@ namespace Fancyx.Admin.Service.System
         {
             var rows = await _userRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
+                .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync<UserListDto>();

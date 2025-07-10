@@ -28,6 +28,10 @@ namespace Fancyx.Admin.Controllers.Oss
             }
             IObjectStorageService objectStorageService = _objectStorageFactory.GetService(StorageType.Local);
             var url = await objectStorageService.UploadAsync(stream, fileName);
+
+            //目前默认是本地服务器模式，后续读取配置
+            url = $"file/{url}";
+
             return Result.Data(url);
         }
 

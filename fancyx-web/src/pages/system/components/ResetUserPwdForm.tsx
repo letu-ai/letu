@@ -37,7 +37,7 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
 
   const onFinish = (values: ResetUserPwdDto) => {
     resetUserPwd({ ...values, userId: currentRow!.id }).then(() => {
-      message.success('指派成功');
+      message.success('重置成功');
       setIsOpenModal(false);
       form.resetFields();
     });

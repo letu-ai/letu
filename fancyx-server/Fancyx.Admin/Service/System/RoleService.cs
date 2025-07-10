@@ -82,6 +82,7 @@ namespace Fancyx.Admin.Service.System
         {
             var rows = await _roleRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.RoleName), x => x.RoleName.Contains(dto.RoleName!))
+                .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync<RoleListDto>();
