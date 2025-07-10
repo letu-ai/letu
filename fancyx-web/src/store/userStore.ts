@@ -29,15 +29,10 @@ class UserStore {
     this.initState();
   }
 
-  token: TokenInfo | null = null;
   userInfo: UserAuthInfo | null = null;
   menuList: FrontendMenu[] = [];
 
   private initState() {
-    const tokenStorage = localStorage.getItem(USER_TOKEN_KEY);
-    if (tokenStorage) {
-      this.token = JSON.parse(tokenStorage);
-    }
     const userInfoStorage = localStorage.getItem(USER_INFO_KEY);
     if (userInfoStorage) {
       this.userInfo = JSON.parse(userInfoStorage);
@@ -46,6 +41,14 @@ class UserStore {
     if (menuListStorage) {
       this.menuList = JSON.parse(menuListStorage);
     }
+  }
+
+  get token(): TokenInfo | null {
+    const tokenStorage = localStorage.getItem(USER_TOKEN_KEY);
+    if (tokenStorage) {
+      return JSON.parse(tokenStorage);
+    }
+    return null;
   }
 
   /**
@@ -62,9 +65,6 @@ class UserStore {
    */
   setToken(token: TokenInfo) {
     localStorage.setItem(USER_TOKEN_KEY, JSON.stringify(token));
-    runInAction(() => {
-      this.token = token;
-    });
   }
 
   /**
@@ -99,6 +99,10 @@ class UserStore {
     localStorage.removeItem(USER_INFO_KEY);
     localStorage.removeItem(USER_TOKEN_KEY);
     localStorage.removeItem(MENU_LIST_KEY);
+    runInAction(() => {
+      this.userInfo = null;
+      this.menuList = [];
+    });
   }
 
   flattenTreeDFS(menus: FrontendMenu[]): FrontendMenu[] {

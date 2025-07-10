@@ -94,7 +94,6 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         form={form}
         wrapperCol={{ flex: 1 }}
         colon={false}
-        style={{ maxWidth: 600 }}
         onFinish={onFinish}
       >
         <Form.Item label="分组名称" name="groupName" rules={[{ required: true }]}>

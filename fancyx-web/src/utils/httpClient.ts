@@ -7,16 +7,16 @@ import { refreshToken } from '@/api/auth.ts';
 
 class HttpClient {
   private readonly instance: AxiosInstance;
-  allowAnonymous: string[] = ['/api/account/login']; //允许匿名访问接口
-  refreshTokenApiPath: string = '/api/account/refreshToken'; //刷新token接口
+  allowAnonymousApis: string[] = ['/api/account/login']; //允许匿名访问接口
+  refreshTokenWhiteApis: string[] = ['/api/account/refreshtoken', '/api/account/signout']; //不需要刷新token接口
 
   constructor(config?: AxiosRequestConfig) {
     this.instance = axios.create(config);
 
     // 请求拦截器
     this.instance.interceptors.request.use(
-      (config) => {
-        if (config.url && this.allowAnonymous.includes(config.url)) {
+      async (config) => {
+        if (config.url && this.allowAnonymousApis.includes(config.url)) {
           return config;
         }
         //添加token
@@ -29,17 +29,21 @@ class HttpClient {
           if (dayjs(expired).subtract(10, 'minute').isBefore(now)) {
             //如果当前是刷新token接口就不调用，避免循环调用
             const refreshTokenValue = UserStore.token?.refreshToken;
-            if ((!config.url || config.url.indexOf(this.refreshTokenApiPath) === -1) && refreshTokenValue) {
-              refreshToken(refreshTokenValue).then((refreshTokenRes) => {
-                if (refreshTokenRes.data) {
-                  const refreshTokenData = refreshTokenRes.data;
-                  UserStore.refreshToken(
-                    refreshTokenData.accessToken,
-                    refreshTokenData.refreshToken,
-                    refreshTokenData.expiredTime,
-                  );
-                }
-              });
+            if (
+              !this.refreshTokenWhiteApis.some(
+                (x) => config.url !== null && config.url!.toLowerCase().indexOf(x) >= 0,
+              ) &&
+              refreshTokenValue
+            ) {
+              const refreshTokenRes = await refreshToken(refreshTokenValue);
+              if (refreshTokenRes.data) {
+                const refreshTokenData = refreshTokenRes.data;
+                UserStore.refreshToken(
+                  refreshTokenData.accessToken,
+                  refreshTokenData.refreshToken,
+                  refreshTokenData.expiredTime,
+                );
+              }
             }
           }
         }
@@ -70,6 +74,7 @@ class HttpClient {
           switch (error.response.status) {
             case 401:
               msg = '身份信息过期，请重新登录';
+              UserStore.logout();
               jumpLogin = true;
               break;
             case 404:

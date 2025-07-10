@@ -83,7 +83,6 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         form={form}
         wrapperCol={{ flex: 1 }}
         colon={false}
-        style={{ maxWidth: 600 }}
         onFinish={onFinish}
       >
         <Form.Item label="字典标签" name="label" rules={[{ required: true }]}>
