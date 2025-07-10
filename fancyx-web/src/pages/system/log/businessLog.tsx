@@ -105,7 +105,7 @@ const BusinessLogList: React.FC = () => {
             <Input placeholder="请输入业务子类型" />
           </Form.Item>
           <Form.Item label="操作用户" name="userName">
-            <Input placeholder="请输入操作用户名" />
+            <Input placeholder="请输入操作账号" />
           </Form.Item>
         </>
       }

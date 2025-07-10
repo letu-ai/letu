@@ -181,7 +181,7 @@ const BusinessLogList: React.FC = () => {
               <Input placeholder="请输入API地址" />
             </Form.Item>
             <Form.Item label="访问用户" name="userName">
-              <Input placeholder="请输入访问用户名" />
+              <Input placeholder="请输入访问账号" />
             </Form.Item>
           </>
         }

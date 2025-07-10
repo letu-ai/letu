@@ -164,7 +164,7 @@ const BusinessLogList: React.FC = () => {
               <Input placeholder="请输入API地址" />
             </Form.Item>
             <Form.Item label="操作用户" name="userName">
-              <Input placeholder="请输入操作账号名" />
+              <Input placeholder="请输入操作账号" />
             </Form.Item>
             <Form.Item label="是否处理" name="isHandled">
               <Select

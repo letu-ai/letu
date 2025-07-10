@@ -151,7 +151,7 @@ const Profile = observer(() => {
                   updateUserInfo(values);
                 }}
               >
-                <Form.Item label="用户名" className="detail-form-item" rules={[{ required: true }]}>
+                <Form.Item label="账号" className="detail-form-item" rules={[{ required: true }]}>
                   <Input value={userInfo?.userName} disabled />
                 </Form.Item>
                 <Form.Item label="昵称" className="detail-form-item" name="nickName" rules={[{ required: true }]}>

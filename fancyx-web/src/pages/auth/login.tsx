@@ -43,8 +43,8 @@ const LoginPage = () => {
                 <h3 className="form-title">用户登录</h3>
 
                 <Form name="login_form" initialValues={{ remember: true }} onFinish={onFinish} size="large">
-                  <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
-                    <Input prefix={<UserOutlined />} placeholder="用户名" />
+                  <Form.Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
+                    <Input prefix={<UserOutlined />} placeholder="账号" />
                   </Form.Item>
 
                   <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
