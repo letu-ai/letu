@@ -87,10 +87,19 @@ namespace Fancyx.Admin.Service.System
             return topMap;
         }
 
-        public async Task<(string[] keys, List<MenuOptionTreeDto> tree)> GetMenuOptionsAsync(bool onlyMenu)
+        public async Task<(string[] keys, List<MenuOptionTreeDto> tree)> GetMenuOptionsAsync(bool onlyMenu, string? keyword)
         {
-            var all = await _menuRepository.WhereIf(onlyMenu, x => x.MenuType == MenuType.Folder || x.MenuType == MenuType.Menu).ToListAsync();
+            var isKeywordSearch = !string.IsNullOrEmpty(keyword);
+            var all = await _menuRepository.WhereIf(onlyMenu, x => x.MenuType == MenuType.Folder || x.MenuType == MenuType.Menu)
+                .WhereIf(isKeywordSearch, x => x.Title != null && x.Title.Contains(keyword!)).ToListAsync();
             var keys = all.Select(x => x.Id.ToString()).ToArray();
+
+            if (isKeywordSearch)
+            {
+                var list = all.Select(x => new MenuOptionTreeDto() { Key = x.Id.ToString(), Title = x.Title, MenuType = (int)x.MenuType }).ToList();
+                return (keys, list);
+            }
+
             var top = all.Where(x => !x.ParentId.HasValue || x.ParentId == Guid.Empty && x.MenuType == MenuType.Menu)
                 .OrderBy(x => x.Sort).ToList();
             var topMap = new List<MenuOptionTreeDto>();

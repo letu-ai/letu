@@ -65,6 +65,7 @@ const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
         wrapperCol={{ flex: 1 }}
         colon={false}
         onFinish={onFinish}
+        style={{ minHeight: '180px' }}
       >
         <Form.Item label="账号" name="userName">
           <Input disabled />
@@ -73,7 +74,12 @@ const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
           <Input disabled />
         </Form.Item>
         <Form.Item label="角色" name="roleIds">
-          <Select mode="multiple" style={{ width: '100%' }} options={roleOptions} />
+          <Select
+            mode="multiple"
+            style={{ width: '100%' }}
+            options={roleOptions}
+            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+          />
         </Form.Item>
       </Form>
     </Modal>

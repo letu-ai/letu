@@ -83,9 +83,9 @@ namespace Fancyx.Admin.Controllers.System
         /// </summary>
         /// <returns></returns>
         [HttpGet("menuOptions")]
-        public async Task<AppResponse<Dictionary<string, object>>> GetMenuOptionsAsync(bool onlyMenu)
+        public async Task<AppResponse<Dictionary<string, object>>> GetMenuOptionsAsync(bool onlyMenu, string? keyword)
         {
-            var (keys, tree) = await _menuService.GetMenuOptionsAsync(onlyMenu);
+            var (keys, tree) = await _menuService.GetMenuOptionsAsync(onlyMenu, keyword);
             return Result.Data(new Dictionary<string, object> { ["keys"] = keys, ["tree"] = tree });
         }
     }

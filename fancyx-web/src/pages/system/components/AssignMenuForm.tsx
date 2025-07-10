@@ -45,9 +45,9 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
     form.submit();
   };
 
-  const onFinish = (values: AssignMenuDto) => {
+  const onFinish = () => {
     assignMenu({
-      menuIds: values.menuIds,
+      menuIds: roleMenuIds ?? [],
       roleId: currentRow!.id!,
     }).then(() => {
       message.success('分配成功');
@@ -56,7 +56,7 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
     });
   };
   const treeCheck = (checkKeys: string[]) => {
-    form.setFieldValue('menuIds', checkKeys);
+    setRoleMenuIds(checkKeys);
   };
 
   return (
@@ -102,7 +102,7 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
                 treeData={menuOptions}
                 checkStrictly={true}
                 expandedKeys={expandKeys}
-                defaultCheckedKeys={roleMenuIds!}
+                checkedKeys={roleMenuIds ?? []}
                 onCheck={({ checked }: any) => treeCheck(checked as string[])}
                 onExpand={(expandKeys) => setExpandKeys(expandKeys as string[])}
               />

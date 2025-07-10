@@ -31,8 +31,8 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     openModal,
   }));
-  const fetchMenuOptions = () => {
-    getMenuOptions(true).then((res) => {
+  const fetchMenuOptions = (keywords?: string) => {
+    getMenuOptions(true, keywords).then((res) => {
       if (res.data) {
         setTreeData(res.data.tree);
       }
@@ -114,11 +114,14 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             }}
             placeholder="请选择上级菜单"
             allowClear
-            treeDefaultExpandAll
             treeData={treeData}
             fieldNames={{
               label: 'title',
               value: 'key',
+            }}
+            filterTreeNode={false}
+            onSearch={(value) => {
+              fetchMenuOptions(value ? value : undefined);
             }}
           />
         </Form.Item>

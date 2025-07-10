@@ -37,7 +37,8 @@ namespace Fancyx.Admin.IService.System
         /// 获取菜单组成的选项树
         /// </summary>
         /// <param name="onlyMenu">true:只要目录+菜单</param>
+        /// <param name="keyword">关键字筛选</param>
         /// <returns></returns>
-        Task<(string[] keys, List<MenuOptionTreeDto> tree)> GetMenuOptionsAsync(bool onlyMenu);
+        Task<(string[] keys, List<MenuOptionTreeDto> tree)> GetMenuOptionsAsync(bool onlyMenu, string? keyword);
     }
 }

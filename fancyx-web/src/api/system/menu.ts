@@ -38,9 +38,15 @@ export function deleteMenu(ids: string[]) {
 /**
  * 获取菜单组成的选项树
  * @param onlyMenu
+ * @param keyword
  */
-export function getMenuOptions(onlyMenu: boolean) {
-  return httpClient.get<number, AppResponse<MenuOptionResultDto>>('/api/menu/menuOptions?onlyMenu=' + onlyMenu);
+export function getMenuOptions(onlyMenu: boolean, keyword?: string) {
+  return httpClient.get<number, AppResponse<MenuOptionResultDto>>('/api/menu/menuOptions', {
+    params: {
+      onlyMenu: onlyMenu,
+      keyword: keyword,
+    },
+  });
 }
 
 export interface MenuDto {
