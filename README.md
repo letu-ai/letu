@@ -21,7 +21,10 @@
 
 在线文档： https://doc.crackerwork.cn <br/>
 预览地址： https://crackerwork.cn <br/>
-预览账号： admin/123qwe*
+预览账号： admin <br/>
+预览密码： 123qwe* <br/>
+
+**如果在输入账号和密码后提示错误，请检查账号密码输入框中是否存在空格**
 
 > 注意：预览是演示模式，屏蔽了非GET请求
 
@@ -34,11 +37,32 @@
 * Redis
 * EventBus
 * AutoMapper
+* Autofac
+* Castle.Core
 * Serilog
 * React
 * Ant Design
 * Vite
 * Sass/SCSS
+
+## 功能模块
+
+* 组织架构
+    * 职位分组
+    * 职位管理
+    * 部门管理
+    * 员工列表
+* 系统管理
+    * 用户管理
+    * 角色管理
+    * 菜单管理
+    * 数据字典
+    * 登录日志
+    * 业务日志
+* 系统监控
+    * 在线用户
+    * 异常日志
+    * 访问日志
 
 ## 系统截图
 
