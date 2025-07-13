@@ -20,6 +20,16 @@ export function getEmployeeList(dto: EmployeeQueryDto) {
 }
 
 /**
+ * 员工列表
+ * @param dto
+ */
+export function getDeptEmployeeList(deptId?: string) {
+  return httpClient.get<string, AppResponse<EmployeeDto[]>>('/api/employee/GetDeptEmployeeList', {
+    params: deptId,
+  });
+}
+
+/**
  * 修改员工
  * @param dto
  */

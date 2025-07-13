@@ -1,5 +1,4 @@
 using AutoMapper;
-
 using Fancyx.Admin.Entities.Organization;
 using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.IService.Organization;
@@ -115,6 +114,13 @@ namespace Fancyx.Admin.Service.Organization
                 });
 
             return new PagedResult<EmployeeListDto>(dto) { Items = list, TotalCount = total };
+        }
+
+        public async Task<List<EmployeeDto>> GetEmployeeListAsync(Guid? deptId)
+        {
+            return await _employeeRepository.Where(x => x.Status == 1)
+                .WhereIf(deptId != null, x => x.DeptId == deptId)
+                .ToListAsync<EmployeeDto>();
         }
 
         public async Task<bool> UpdateEmployeeAsync(EmployeeDto dto)

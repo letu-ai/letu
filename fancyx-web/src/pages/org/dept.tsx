@@ -31,7 +31,7 @@ const DepartmentList: React.FC = () => {
     },
     {
       title: '负责人',
-      dataIndex: 'email',
+      dataIndex: 'curatorName',
     },
     {
       title: '操作',

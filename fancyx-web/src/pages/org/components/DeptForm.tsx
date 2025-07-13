@@ -1,8 +1,9 @@
-import { Form, Input, InputNumber, Modal, Switch, TreeSelect } from 'antd';
+import { Form, Input, InputNumber, Modal, Switch, TreeSelect, Select } from 'antd'; // ++
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { addDept, getDeptList, type DeptDto, type DeptListDto, updateDept } from '@/api/organization/dept';
 import type { AppResponse } from '@/types/api';
 import useApp from 'antd/es/app/useApp';
+import { getDeptEmployeeList } from '@/api/organization/employee.ts'; // ++
 
 interface ModalProps {
   refresh?: () => void;
@@ -18,14 +19,32 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
   const [row, setRow] = useState<DeptDto | null>();
   const [treeData, setTreeData] = useState<DeptListDto[]>([]);
   const { message } = useApp();
+  const [deptEmployeeOptions, setDeptEmployeeOptions] = useState<{ label: string; value: string }[]>(); // ++
 
   useImperativeHandle(ref, () => ({
     openModal,
   }));
 
+  // ++
+  const fetchDeptEmployeeList = (deptId?: string) => {
+    getDeptEmployeeList(deptId).then((res) => {
+      if (res.data && res.data.length > 0) {
+        setDeptEmployeeOptions(
+          res.data.map((x) => {
+            return {
+              label: `${x.name}`,
+              value: x.id || '',
+            };
+          }),
+        );
+      }
+    });
+  };
+
   useEffect(() => {
     if (isOpenModal) {
       fetchTreeData();
+      fetchDeptEmployeeList(); // ++
     }
   }, [isOpenModal]);
 
@@ -141,7 +160,16 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
           <Input placeholder="请输入部门电话" />
         </Form.Item>
         <Form.Item label="部门负责人" name="curatorId">
-          <Input placeholder="请输入部门负责人" />
+          <Select
+            options={deptEmployeeOptions}
+            placeholder="请选择部门负责人"
+            allowClear
+            showSearch
+            filterOption={false}
+            onSearch={(value: string) => {
+              fetchDeptEmployeeList(value);
+            }}
+          />
         </Form.Item>
       </Form>
     </Modal>

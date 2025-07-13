@@ -38,6 +38,11 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         public Guid? CuratorId { get; set; }
 
         /// <summary>
+        /// 负责人姓名
+        /// </summary>
+        public string? CuratorName { get; set; }
+
+        /// <summary>
         /// 邮箱
         /// </summary>
         public string? Email { get; set; }
