@@ -19,7 +19,7 @@ const HomePage = () => {
   const changelog = [
     {
       date: '2025-07-14',
-      items: ['创建sqlite分支，内置fancyx-admin.db文件', '修复已知BUG'],
+      items: ['创建sqlite分支，内置fancyx-admin.db文件', '配置管理', '修复已知BUG'],
     },
     {
       date: '2025-07-10',
