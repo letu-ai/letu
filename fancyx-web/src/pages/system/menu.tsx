@@ -59,6 +59,13 @@ const MenuTable = () => {
       fixed: 'right',
       render: (_: any, record: MenuListDto) => (
         <Space>
+          {(record.menuType === MenuType.Folder || record.menuType === MenuType.Menu) && (
+            <Permission permissions={'Sys.Menu.Add'}>
+              <Button type="link" icon={<PlusOutlined />} onClick={() => addSubItem(record)}>
+                子级
+              </Button>
+            </Permission>
+          )}
           <Permission permissions={'Sys.Menu.Update'}>
             <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
               编辑
@@ -93,6 +100,9 @@ const MenuTable = () => {
   };
   const rowEdit = (record: MenuListDto) => {
     modalRef.current?.openModal(record);
+  };
+  const addSubItem = (record: MenuListDto) => {
+    modalRef.current?.openModal(record, true);
   };
 
   const batchDelete = () => {

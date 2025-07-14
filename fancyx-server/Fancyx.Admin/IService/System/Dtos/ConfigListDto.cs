@@ -4,7 +4,7 @@ namespace Fancyx.Admin.IService.System.Dtos
 {
     public class ConfigListDto
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
 
         public string? Name { get; set; }
 
@@ -19,5 +19,15 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreationTime { get; set; }
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? LastModificationTime { get; set; }
     }
 }

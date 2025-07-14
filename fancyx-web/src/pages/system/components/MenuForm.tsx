@@ -17,7 +17,7 @@ interface ModalProps {
 }
 
 export interface ModalRef {
-  openModal: (row?: MenuListDto) => void;
+  openModal: (row?: MenuListDto, isAddSub?: boolean) => void;
 }
 
 const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
@@ -39,21 +39,24 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     });
   };
   useEffect(() => {
-    fetchMenuOptions();
-  }, []);
+    if (isOpenModal) {
+      fetchMenuOptions();
+    }
+  }, [isOpenModal]);
 
-  const openModal = (row?: MenuListDto) => {
+  const openModal = (row?: MenuListDto, isAddSub?: boolean) => {
     setIsOpenModal(true);
-    if (row) {
+    if (row && !isAddSub) {
       setRow(row);
       setMenuType(row.menuType);
       form.setFieldsValue(row);
     } else {
       setRow(null);
       form.setFieldsValue({
-        menuType: 1,
+        menuType: isAddSub ? (row?.menuType === MenuType.Folder ? MenuType.Menu : MenuType.Button) : MenuType.Folder,
         sort: 0,
         hidden: true,
+        parentId: isAddSub ? row?.id : null,
       });
     }
   };
