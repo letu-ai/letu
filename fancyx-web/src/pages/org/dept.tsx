@@ -1,6 +1,6 @@
 ﻿import { deleteDept, getDeptList, type DeptListDto } from '@/api/organization/dept';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Form, Input, Select, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import DeptForm, { type DeptModalRef } from '@/pages/org/components/DeptForm.tsx';
@@ -98,9 +98,21 @@ const DepartmentList: React.FC = () => {
         }}
         searchItems={
           <>
-            {' '}
             <Form.Item label="部门编码" name="code">
               <Input placeholder="请输入部门编码" />
+            </Form.Item>
+            <Form.Item label="部门名称" name="name">
+              <Input placeholder="请输入部门名称" />
+            </Form.Item>
+            <Form.Item label="状态" name="status">
+              <Select
+                allowClear
+                placeholder="请选择部门状态"
+                options={[
+                  { label: '正常', value: 1 },
+                  { label: '停用', value: 2 },
+                ]}
+              />
             </Form.Item>
           </>
         }

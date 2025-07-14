@@ -35,8 +35,8 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     }
   }, [isOpenModal]);
 
-  const fetchTreeData = () => {
-    getPositionGroupList().then((res) => {
+  const fetchTreeData = (groupName?: string) => {
+    getPositionGroupList({ groupName }).then((res) => {
       setTreeData(res.data!);
     });
   };
@@ -116,6 +116,10 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
               label: 'groupName',
               value: 'id',
               children: 'children',
+            }}
+            filterTreeNode={false}
+            onSearch={(value) => {
+              fetchTreeData(value ? value : undefined);
             }}
           />
         </Form.Item>

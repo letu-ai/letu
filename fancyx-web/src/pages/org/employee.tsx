@@ -2,7 +2,7 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
-import { deleteEmployee, getEmployeeList, type EmployeeListDto } from '@/api/organization/employee';
+import { deleteEmployee, getEmployeePagedList, type EmployeeListDto } from '@/api/organization/employee';
 import SmartTable from '@/components/SmartTable';
 import EmployeeForm, { type EmployeeModalRef } from '@/pages/org/components/EmployeeForm.tsx';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
@@ -102,7 +102,7 @@ const EmployeeList: React.FC = () => {
         rowKey="id"
         ref={tableRef}
         request={async (params) => {
-          const { data } = await getEmployeeList(params);
+          const { data } = await getEmployeePagedList(params);
           return data;
         }}
         searchItems={[

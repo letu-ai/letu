@@ -27,8 +27,8 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
     openModal,
   }));
 
-  const fetchTreeData = () => {
-    getPositionGroupList().then((res) => {
+  const fetchTreeData = (groupName?: string) => {
+    getPositionGroupList({ groupName }).then((res) => {
       setTreeData(res.data!);
     });
   };
@@ -119,6 +119,10 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
               label: 'groupName',
               value: 'id',
               children: 'children',
+            }}
+            filterTreeNode={false}
+            onSearch={(value) => {
+              fetchTreeData(value ? value : undefined);
             }}
           />
         </Form.Item>

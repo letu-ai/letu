@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { addDept, getDeptList, type DeptDto, type DeptListDto, updateDept } from '@/api/organization/dept';
 import type { AppResponse } from '@/types/api';
 import useApp from 'antd/es/app/useApp';
-import { getDeptEmployeeList } from '@/api/organization/employee.ts'; // ++
+import { getEmployeeList } from '@/api/organization/employee.ts'; // ++
 
 interface ModalProps {
   refresh?: () => void;
@@ -26,8 +26,8 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
   }));
 
   // ++
-  const fetchDeptEmployeeList = (deptId?: string) => {
-    getDeptEmployeeList(deptId).then((res) => {
+  const fetchDeptEmployeeList = (deptId?: string, name?: string) => {
+    getEmployeeList({ deptId: deptId, keyword: name }).then((res) => {
       if (res.data && res.data.length > 0) {
         setDeptEmployeeOptions(
           res.data.map((x) => {
@@ -48,8 +48,8 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
     }
   }, [isOpenModal]);
 
-  const fetchTreeData = () => {
-    getDeptList({}).then((res) => {
+  const fetchTreeData = (deptName?: string) => {
+    getDeptList({ name: deptName }).then((res) => {
       setTreeData(res.data!);
     });
   };
@@ -129,6 +129,10 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
               value: 'id',
               children: 'children',
             }}
+            filterTreeNode={false}
+            onSearch={(value) => {
+              fetchTreeData(value ? value : undefined);
+            }}
           />
         </Form.Item>
         <Form.Item label="部门名称" name="name" rules={[{ required: true }]}>
@@ -167,7 +171,7 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
             showSearch
             filterOption={false}
             onSearch={(value: string) => {
-              fetchDeptEmployeeList(value);
+              fetchDeptEmployeeList(undefined, value);
             }}
           />
         </Form.Item>

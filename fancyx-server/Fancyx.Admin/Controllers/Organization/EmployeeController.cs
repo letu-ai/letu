@@ -43,9 +43,9 @@ namespace Fancyx.Admin.Controllers.Organization
         /// <returns></returns>
         [HttpGet("list")]
         [HasPermission("Org.Employee.List")]
-        public async Task<AppResponse<PagedResult<EmployeeListDto>>> GetEmployeeListAsync([FromQuery] EmployeeQueryDto dto)
+        public async Task<AppResponse<PagedResult<EmployeeListDto>>> GetEmployeePagedListAsync([FromQuery] EmployeeQueryDto dto)
         {
-            var data = await _employeeService.GetEmployeeListAsync(dto);
+            var data = await _employeeService.GetEmployeePagedListAsync(dto);
             return Result.Data(data);
         }
 
@@ -105,12 +105,12 @@ namespace Fancyx.Admin.Controllers.Organization
         /// <summary>
         /// 员工列表
         /// </summary>
-        /// <param name="deptId"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("GetDeptEmployeeList")]
-        public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync(Guid? deptId)
+        [HttpGet("GetEmployeeList")]
+        public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync([FromQuery] EmployeeQueryDto dto)
         {
-            var data = await _employeeService.GetEmployeeListAsync(deptId);
+            var data = await _employeeService.GetEmployeeListAsync(dto);
 
             return Result.Data(data);
         }

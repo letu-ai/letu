@@ -13,7 +13,7 @@ export function addEmployee(dto: EmployeeDto) {
  * 员工列表
  * @param dto
  */
-export function getEmployeeList(dto: EmployeeQueryDto) {
+export function getEmployeePagedList(dto: EmployeeQueryDto) {
   return httpClient.get<EmployeeQueryDto, AppResponse<PagedResult<EmployeeListDto>>>('/api/employee/list', {
     params: dto,
   });
@@ -23,9 +23,9 @@ export function getEmployeeList(dto: EmployeeQueryDto) {
  * 员工列表
  * @param dto
  */
-export function getDeptEmployeeList(deptId?: string) {
-  return httpClient.get<string, AppResponse<EmployeeDto[]>>('/api/employee/GetDeptEmployeeList', {
-    params: deptId,
+export function getEmployeeList(dto: EmployeePureQueryDto) {
+  return httpClient.get<string, AppResponse<EmployeeDto[]>>('/api/employee/GetEmployeeList', {
+    params: dto,
   });
 }
 
@@ -82,8 +82,13 @@ export interface EmployeeDto {
 }
 
 export interface EmployeeQueryDto extends PageSearch {
-  keyword: string | null;
-  deptId: string;
+  keyword?: string | null;
+  deptId?: string;
+}
+
+export interface EmployeePureQueryDto {
+  keyword?: string | null;
+  deptId?: string;
 }
 
 export interface EmployeeListDto {

@@ -16,7 +16,7 @@ namespace Fancyx.Admin.IService.Organization
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<EmployeeListDto>> GetEmployeeListAsync(EmployeeQueryDto dto);
+        Task<PagedResult<EmployeeListDto>> GetEmployeePagedListAsync(EmployeeQueryDto dto);
 
         /// <summary>
         /// 修改员工
@@ -49,8 +49,8 @@ namespace Fancyx.Admin.IService.Organization
         /// <summary>
         /// 获取员工列表
         /// </summary>
-        /// <param name="deptId"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<EmployeeDto>> GetEmployeeListAsync(Guid? deptId);
+        Task<List<EmployeeDto>> GetEmployeeListAsync(EmployeeQueryDto dto);
     }
 }

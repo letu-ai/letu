@@ -82,7 +82,7 @@ namespace Fancyx.Admin.Service.Organization
             return true;
         }
 
-        public async Task<PagedResult<EmployeeListDto>> GetEmployeeListAsync(EmployeeQueryDto dto)
+        public async Task<PagedResult<EmployeeListDto>> GetEmployeePagedListAsync(EmployeeQueryDto dto)
         {
             var powerData = await _identityDomainService.GetPowerData();
             var list = await _freeSql.Select<EmployeeDO>().From<DeptDO, PositionDO>((e, d, p) => e.LeftJoin(e1 => e1.DeptId == d.Id).LeftJoin(e2 => e2.PositionId == p.Id))
@@ -116,10 +116,11 @@ namespace Fancyx.Admin.Service.Organization
             return new PagedResult<EmployeeListDto>(dto) { Items = list, TotalCount = total };
         }
 
-        public async Task<List<EmployeeDto>> GetEmployeeListAsync(Guid? deptId)
+        public async Task<List<EmployeeDto>> GetEmployeeListAsync(EmployeeQueryDto dto)
         {
             return await _employeeRepository.Where(x => x.Status == 1)
-                .WhereIf(deptId != null, x => x.DeptId == deptId)
+                .WhereIf(dto.DeptId != null, x => x.DeptId == dto.DeptId!.Value)
+                .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name!.Contains(dto.Keyword!))
                 .ToListAsync<EmployeeDto>();
         }
 

@@ -135,7 +135,7 @@ namespace Fancyx.Admin.Service.Organization
             }
             if (dto.ParentId == entity.Id)
             {
-                throw new BusinessException(message: "不能选择自己为父级");
+                throw new BusinessException(message: "不能选择自己为上级部门");
             }
 
             entity.Name = dto.Name;
@@ -149,6 +149,12 @@ namespace Fancyx.Admin.Service.Organization
             entity.ParentId = dto.ParentId;
             if (entity.ParentId.HasValue)
             {
+                var parentIsSub = await _deptRepository.Where(x => x.Id == entity.ParentId.Value && x.ParentId == entity.Id).AnyAsync();
+                if (parentIsSub)
+                {
+                    throw new BusinessException("不能选择子部门作为上级部门");
+                }
+
                 var all = await _deptRepository.Select.ToListAsync();
                 int layer = 1;
                 entity.ParentIds = GetParentIds(all, entity.ParentId.Value, ref layer);
