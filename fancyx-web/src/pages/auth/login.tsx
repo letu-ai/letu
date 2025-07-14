@@ -69,7 +69,11 @@ const LoginPage = () => {
         </Card>
 
         <div className="login-footer">
-          Copyright © {new Date().getFullYear()} 风汐（fancyxnet@gmail.com） |
+          Copyright © {new Date().getFullYear()} 在线文档：
+          <a href="https://doc.crackerwork.cn" target="_blank">
+            doc.crackerwork.cn
+          </a>{' '}
+          |
           <a href="http://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px' }}>
             湘ICP备2024047029号-1
           </a>

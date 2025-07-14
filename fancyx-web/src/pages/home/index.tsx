@@ -18,6 +18,10 @@ const HomePage = () => {
   // 更新日志数据
   const changelog = [
     {
+      date: '2025-07-14',
+      items: ['创建sqlite分支，内置fancyx-admin.db文件', '修复已知BUG'],
+    },
+    {
       date: '2025-07-10',
       items: ['头像上传功能', '使用mobx进行状态同步', '修复已知BUG'],
     },
@@ -114,19 +118,19 @@ const HomePage = () => {
                     <Tooltip title="Stars">
                       <Space>
                         <StarOutlined />
-                        <Text strong>2</Text>
+                        <Text strong>24</Text>
                       </Space>
                     </Tooltip>
                     <Tooltip title="Forks">
                       <Space>
                         <ForkOutlined />
-                        <Text strong>0</Text>
+                        <Text strong>6</Text>
                       </Space>
                     </Tooltip>
                     <Tooltip title="Watchers">
                       <Space>
                         <EyeOutlined />
-                        <Text strong>1</Text>
+                        <Text strong>2</Text>
                       </Space>
                     </Tooltip>
                   </div>
