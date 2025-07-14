@@ -101,5 +101,18 @@ namespace Fancyx.Admin.Controllers.Organization
             var data = await _employeeService.GetEmployeeInfoAsync(id);
             return Result.Data(data);
         }
+
+        /// <summary>
+        /// 员工列表
+        /// </summary>
+        /// <param name="deptId"></param>
+        /// <returns></returns>
+        [HttpGet("GetDeptEmployeeList")]
+        public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync(Guid? deptId)
+        {
+            var data = await _employeeService.GetEmployeeListAsync(deptId);
+
+            return Result.Data(data);
+        }
     }
 }

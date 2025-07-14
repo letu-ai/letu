@@ -3,6 +3,7 @@ using Fancyx.Admin.IService.Organization;
 using Fancyx.Admin.IService.Organization.Dtos;
 using Fancyx.Core.Helpers;
 using Fancyx.Repository;
+using Fancyx.Shared.Models;
 
 namespace Fancyx.Admin.Service.Organization
 {
@@ -62,22 +63,34 @@ namespace Fancyx.Admin.Service.Organization
             {
                 var filter = await _deptRepository
                     .WhereIf(!string.IsNullOrEmpty(dto.Name), x => x.Name.Contains(dto.Name!))
-                    .WhereIf(!string.IsNullOrEmpty(dto.Code), x => x.Name.Contains(dto.Code!))
-                    .WhereIf(dto.Status > 0, x => x.Status > 0)
+                    .WhereIf(!string.IsNullOrEmpty(dto.Code), x => x.Code.Contains(dto.Code!)) // ==
+                    .WhereIf(dto.Status > 0, x => x.Status == dto.Status) // ==
                     .OrderBy(x => x.Sort).ToListAsync();
-                return AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(filter);
+                var result = AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(filter);
+
+                // Add curator names for filtered results
+                await AddCuratorNames(result); // ++
+
+                return result;
             }
             var all = await _deptRepository.Select.OrderBy(x => x.ParentIds).ToListAsync();
             var tree = AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
+
+            // Add curator names for all departments
+            await AddCuratorNames(tree); // ++
+
             foreach (var item in tree)
             {
-                item.Children = getChildren(item.Id);
+                item.Children = getChildren(item.Id)?.OrderBy(x => x.Sort).ToList();
             }
 
             List<DeptListDto>? getChildren(Guid id)
             {
                 var children = AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(all.Where(x => x.ParentId == id).ToList());
                 if (children.Count <= 0) return null;
+
+                // Add curator names for child departments
+                AddCuratorNames(children).Wait(); // ++
 
                 foreach (var item in children)
                 {
@@ -88,6 +101,27 @@ namespace Fancyx.Admin.Service.Organization
             }
 
             return tree;
+        }
+
+        private async Task AddCuratorNames(List<DeptListDto> depts)
+        {
+            var curatorIds = depts.Select(d => d.CuratorId).Where(id => id.HasValue).Distinct().ToList();
+
+            if (curatorIds.Any())
+            {                var employees = await _employeeRepository
+                    .Where(e => curatorIds.Contains(e.Id))
+                    .ToListAsync(e => new { e.Id, e.Name });
+
+                var employeeDict = employees.ToDictionary(e => e.Id, e => e.Name);
+
+                foreach (var dept in depts)
+                {
+                    if (dept.CuratorId.HasValue && employeeDict.TryGetValue(dept.CuratorId.Value, out var name))
+                    {
+                        dept.CuratorName = name;
+                    }
+                }
+            }
         }
 
         public async Task<bool> UpdateDeptAsync(DeptDto dto)

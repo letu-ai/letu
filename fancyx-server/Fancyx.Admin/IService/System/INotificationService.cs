@@ -1,8 +1,9 @@
 ﻿using Fancyx.Admin.IService.System.Dtos;
+using Fancyx.Core.Interfaces;
 
 namespace Fancyx.Admin.IService.System
 {
-    public interface INotificationService
+    public interface INotificationService : IScopedDependency
     {
         Task AddNotificationAsync(NotificationDto dto);
 

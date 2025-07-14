@@ -61,6 +61,7 @@ export interface DeptListDto {
   description: string | null;
   status: number;
   curatorId: string | null;
+  curatorName: string | null;
   email: string | null;
   phone: string | null;
   parentId: string | null;

@@ -45,5 +45,12 @@ namespace Fancyx.Admin.IService.Organization
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EmployeeInfoDto> GetEmployeeInfoAsync(Guid id);
+
+        /// <summary>
+        /// 获取员工列表
+        /// </summary>
+        /// <param name="deptId"></param>
+        /// <returns></returns>
+        Task<List<EmployeeDto>> GetEmployeeListAsync(Guid? deptId);
     }
 }
