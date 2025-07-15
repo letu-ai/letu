@@ -1,33 +1,29 @@
 ﻿import Permission from '@/components/Permission';
-import { deleteConfig, getConfigList, type ConfigDto, type ConfigListDto } from '@/api/system/config.ts';
+import { deleteTenant, getTenantList, type TenantDto, type TenantListDto } from '@/api/system/tenant.ts';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
-import ConfigForm, { type ModalRef } from '@/pages/system/components/ConfigForm.tsx';
+import TenantForm, { type ModalRef } from '@/pages/system/components/TenantForm.tsx';
 import useApp from 'antd/es/app/useApp';
 
-const ConfigList: React.FC = () => {
+const TenantList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<ModalRef>(null);
   const { message } = useApp();
   const columns: SmartTableColumnType[] = [
     {
-      title: '配置名称',
+      title: '租户名称',
       dataIndex: 'name',
     },
     {
-      title: '配置键名',
-      dataIndex: 'key',
+      title: '租户标识',
+      dataIndex: 'tenantId',
     },
     {
-      title: '配置值',
-      dataIndex: 'value',
-    },
-    {
-      title: '组别',
-      dataIndex: 'groupKey',
+      title: '绑定域名',
+      dataIndex: 'domain',
     },
     {
       title: '备注',
@@ -46,27 +42,27 @@ const ConfigList: React.FC = () => {
       dataIndex: 'option',
       width: 210,
       fixed: 'right',
-      render: (_: any, record: ConfigListDto) => (
+      render: (_: any, record: TenantListDto) => (
         <Space>
-          <Permission permissions={'Sys.Config.Update'}>
+          <Permission permissions={'Sys.Tenant.Update'}>
             <Button
               type="link"
               icon={<EditOutlined />}
               key="edit"
               onClick={() => {
-                modalRef?.current?.openModal(record as ConfigDto);
+                modalRef?.current?.openModal(record as TenantDto);
               }}
             >
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.Config.Delete'}>
+          <Permission permissions={'Sys.Tenant.Delete'}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
               description="删除后无法撤销"
               onConfirm={() => {
-                deleteConfig(record.id!).then(() => {
+                deleteTenant(record.id!).then(() => {
                   message.success('删除成功');
                   tableRef.current?.reload();
                 });
@@ -89,20 +85,17 @@ const ConfigList: React.FC = () => {
         ref={tableRef}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getConfigList(params);
+          const { data } = await getTenantList(params);
           return data;
         }}
         searchItems={[
-          <Form.Item label="配置名称" name="name">
-            <Input placeholder="请输入配置名称" />
-          </Form.Item>,
-          <Form.Item label="配置键名" name="key">
-            <Input placeholder="请输入配置键名" />
+          <Form.Item label="关键词" name="keyword">
+            <Input placeholder="请输入租户名称/标识" />
           </Form.Item>,
         ]}
         toolbar={
           <Space size="middle">
-            <Permission permissions={'Sys.Config.Add'}>
+            <Permission permissions={'Sys.Tenant.Add'}>
               <Button
                 type="primary"
                 key="primary"
@@ -116,10 +109,10 @@ const ConfigList: React.FC = () => {
           </Space>
         }
       />
-      {/** 新增/编辑配置弹窗 */}
-      <ConfigForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
+      {/** 新增/编辑租户弹窗 */}
+      <TenantForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
     </>
   );
 };
 
-export default ConfigList;
+export default TenantList;

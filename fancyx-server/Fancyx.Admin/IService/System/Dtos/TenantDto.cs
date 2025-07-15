@@ -26,5 +26,10 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 租户域名
+        /// </summary>
+        public string? Domain { get; set; }
     }
 }

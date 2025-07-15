@@ -26,6 +26,7 @@ namespace Fancyx.Admin.Service.System
                 Name = dto.Name,
                 TenantId = dto.TenantId,
                 Remark = dto.Remark,
+                Domain = dto.Domain,
             };
             await _tenantRepository.InsertAsync(entity);
         }
@@ -39,15 +40,10 @@ namespace Fancyx.Admin.Service.System
         {
             var items = await _tenantRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!) || x.TenantId.Contains(dto.Keyword!))
+                .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync(x => new TenantResultDto
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Remark = x.Remark,
-                    TenantId = x.TenantId
-                });
+                .ToListAsync<TenantResultDto>();
             return new PagedResult<TenantResultDto>(dto)
             {
                 TotalCount = total,
@@ -60,7 +56,8 @@ namespace Fancyx.Admin.Service.System
             var entity = await _tenantRepository.Where(x => x.Id == dto.Id).FirstAsync();
 
             var tenantIdLower = dto.TenantId.ToLower();
-            if (await _tenantRepository.Select.AnyAsync(x => x.TenantId.ToLower() == tenantIdLower) && !tenantIdLower.Equals(entity.Name, StringComparison.CurrentCultureIgnoreCase))
+            if (await _tenantRepository.Select.AnyAsync(x => x.TenantId.ToLower() == tenantIdLower) 
+                && !tenantIdLower.Equals(entity.TenantId, StringComparison.CurrentCultureIgnoreCase))
             {
                 throw new BusinessException($"租户标识[{dto.TenantId}]已存在");
             }
@@ -68,6 +65,7 @@ namespace Fancyx.Admin.Service.System
             entity.Name = dto.Name;
             entity.TenantId = dto.TenantId;
             entity.Remark = dto.Remark;
+            entity.Domain = dto.Domain;
 
             await _tenantRepository.UpdateAsync(entity);
         }

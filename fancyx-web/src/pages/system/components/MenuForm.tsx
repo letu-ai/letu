@@ -55,7 +55,7 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
       form.setFieldsValue({
         menuType: isAddSub ? (row?.menuType === MenuType.Folder ? MenuType.Menu : MenuType.Button) : MenuType.Folder,
         sort: 0,
-        hidden: true,
+        display: true,
         parentId: isAddSub ? row?.id : null,
       });
     }
@@ -167,7 +167,7 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
           <InputNumber min={1} max={999} placeholder="排序值" />
         </Form.Item>
         <Form.Item label="显示状态" name="display">
-          <Switch defaultChecked checkedChildren="显示" unCheckedChildren="隐藏" />
+          <Switch checkedChildren="显示" unCheckedChildren="隐藏" />
         </Form.Item>
       </Form>
     </Modal>

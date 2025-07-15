@@ -18,4 +18,19 @@ public class TenantResultDto
     /// 备注
     /// </summary>
     public string? Remark { get; set; }
+
+    /// <summary>
+    /// 租户域名
+    /// </summary>
+    public string? Domain { get; set; }
+
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public DateTime CreationTime { get; set; }
+
+    /// <summary>
+    /// 修改时间
+    /// </summary>
+    public DateTime? LastModificationTime { get; set; }
 }

@@ -18,6 +18,10 @@ const HomePage = () => {
   // 更新日志数据
   const changelog = [
     {
+      date: '2025-07-15',
+      items: ['租户管理', '菜单支持外链'],
+    },
+    {
       date: '2025-07-14',
       items: ['创建sqlite分支，内置fancyx-admin.db文件', '配置管理', '修复已知BUG'],
     },
