@@ -36,7 +36,9 @@ const SearchModal = forwardRef<SearchModalRef, any>((_, ref) => {
                   setSearchText('');
                 }}
               >
-                <span>{menu.title}</span>
+                <span>
+                  {menu.title}&nbsp;{menu.path}
+                </span>
               </Link>
             ),
           };

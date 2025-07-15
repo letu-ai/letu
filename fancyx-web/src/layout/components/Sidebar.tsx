@@ -2,7 +2,7 @@ import { Menu } from 'antd';
 import UserStore from '@/store/userStore.ts';
 import type { FrontendMenu } from '@/api/auth.ts';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, { useMemo } from 'react';
 import ProIcon from '@/components/ProIcon';
 import { useDispatch, useSelector } from 'react-redux';
 import { open, selectActiveKey } from '@/store/tabStore.ts';
@@ -52,13 +52,14 @@ const Sidebar = observer(() => {
       });
   }
 
-  const getItems = () => {
+  /* eslint-disable react-hooks/exhaustive-deps */
+  const calcItems = useMemo(() => {
     const menus = UserStore.userInfo?.menus;
     if (Array.isArray(menus) && menus.length > 0) {
       return convertToAntdMenuItems(menus);
     }
     return [];
-  };
+  }, [UserStore.userInfo?.menus]);
 
   return (
     <div className="fancyx-sidebar">
@@ -69,7 +70,7 @@ const Sidebar = observer(() => {
         </h2>
       </div>
 
-      <Menu mode="inline" items={getItems()} selectedKeys={[activeKey]} inlineCollapsed={collapsed} />
+      <Menu mode="inline" items={calcItems} selectedKeys={[activeKey]} inlineCollapsed={collapsed} />
     </div>
   );
 });
