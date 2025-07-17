@@ -12,26 +12,33 @@ namespace Fancyx.Core.Utils
         /// <returns></returns>
         public static IList<Assembly> AllAssemblies
         {
-            get
+            get;
+            private set;
+        }
+
+        static ReflectionUtils()
+        {
+            var list = new List<Assembly>();
+            var deps = DependencyContext.Default;
+            if (deps == null)
             {
-                var list = new List<Assembly>();
-                var deps = DependencyContext.Default;
-                if (deps == null) return [];
-                var libs = deps.CompileLibraries.Where(lib => !lib.Serviceable && lib.Type != "package");//排除所有的系统程序集、Nuget下载包
-                foreach (var lib in libs)
-                {
-                    try
-                    {
-                        var assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(lib.Name));
-                        list.Add(assembly);
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
-                }
-                return list;
+                AllAssemblies = [];
+                return;
             }
+            var libs = deps.CompileLibraries.Where(lib => !lib.Serviceable && lib.Type != "package");//排除所有的系统程序集、Nuget下载包
+            foreach (var lib in libs)
+            {
+                try
+                {
+                    var assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(lib.Name));
+                    list.Add(assembly);
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+            AllAssemblies = list;
         }
 
         /// <summary>
