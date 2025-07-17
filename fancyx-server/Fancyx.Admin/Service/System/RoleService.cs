@@ -124,43 +124,5 @@ namespace Fancyx.Admin.Service.System
         {
             return [.. await _roleMenuRepository.Where(x => x.RoleId == id).ToListAsync(x => x.MenuId)];
         }
-
-        public async Task AssignDataAsync(AssignDataDto dto)
-        {
-            var role = await _roleRepository.Where(x => x.Id == dto.RoleId).FirstAsync();
-            role.PowerDataType = dto.PowerDataType;
-            if (dto.PowerDataType == 1)
-            {
-                if (dto.DeptIds == null || dto.DeptIds.Length <= 0)
-                {
-                    throw new BusinessException(message: "请选择指定部门");
-                }
-                var list = new List<RoleDeptDO>();
-                foreach (var item in dto.DeptIds)
-                {
-                    list.Add(new RoleDeptDO { RoleId = dto.RoleId, DeptId = item });
-                }
-                await _roleDeptRepository.InsertAsync(list);
-            }
-            else
-            {
-                await _roleDeptRepository.DeleteAsync(x => x.RoleId == dto.RoleId);
-            }
-        }
-
-        public async Task<AssignDataResultDto> GetRolePowerDataAsync(Guid id)
-        {
-            var role = await _roleRepository.Where(x => x.Id == id).FirstAsync();
-            var result = new AssignDataResultDto
-            {
-                PowerDataType = role.PowerDataType
-            };
-            if (result.PowerDataType == 1)
-            {
-                result.DeptIds = (await _roleDeptRepository.Where(x => x.RoleId == id).ToListAsync(x => x.DeptId))
-                    .ToArray();
-            }
-            return result;
-        }
     }
 }

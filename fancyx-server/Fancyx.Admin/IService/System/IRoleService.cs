@@ -52,18 +52,5 @@ namespace Fancyx.Admin.IService.System
         /// <param name="id"></param>
         /// <returns></returns>
         Task<Guid[]> GetRoleMenuIdsAsync(Guid id);
-
-        /// <summary>
-        /// 获取角色数据权限
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<AssignDataResultDto> GetRolePowerDataAsync(Guid id);
-
-        /// <summary>
-        /// 分配数据
-        /// </summary>
-        /// <returns></returns>
-        Task AssignDataAsync(AssignDataDto dto);
     }
 }

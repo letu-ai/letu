@@ -113,32 +113,5 @@ namespace Fancyx.Admin.Controllers.System
             var data = await _roleService.GetRoleMenuIdsAsync(id);
             return Result.Data(data);
         }
-
-        /// <summary>
-        /// 分配数据权限
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPost("assignData")]
-        [HasPermission("Sys.Role.AssignData")]
-        [ApiAccessLog(operateName: "分配数据权限", operateType: [OperateType.Update], reponseEnable: true)]
-        public async Task<AppResponse<bool>> AssignDataAsync([FromBody] AssignDataDto dto)
-        {
-            await _roleService.AssignDataAsync(dto);
-            return Result.Ok();
-        }
-
-        /// <summary>
-        /// 获取角色数据权限
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("rolePowerData")]
-        [HasPermission("Sys.Role.AssignData")]
-        public async Task<AppResponse<AssignDataResultDto>> GetRolePowerDataAsync(Guid id)
-        {
-            var data = await _roleService.GetRolePowerDataAsync(id);
-            return Result.Data(data);
-        }
     }
 }

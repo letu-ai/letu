@@ -27,11 +27,6 @@ namespace Fancyx.Admin.Entities.System
         public string? Remark { get; set; }
 
         /// <summary>
-        /// 数据权限类型
-        /// </summary>
-        public int PowerDataType { get; set; } = 0;
-
-        /// <summary>
         /// 用户角色
         /// </summary>
         public virtual ICollection<UserRoleDO>? UserRoles { get; set; }

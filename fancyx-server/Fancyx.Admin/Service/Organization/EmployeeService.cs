@@ -16,17 +16,15 @@ namespace Fancyx.Admin.Service.Organization
     public class EmployeeService : IScopedDependency, IEmployeeService
     {
         private readonly IRepository<EmployeeDO> _employeeRepository;
-        private readonly IdentitySharedService _identityDomainService;
         private readonly IFreeSql _freeSql;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IRepository<UserDO> _userRepository;
 
         public EmployeeService(IRepository<EmployeeDO> employeeRepository, IRepository<DeptDO> orgDeptRepository, IRepository<PositionDO> orgPositionRepository
-            , IdentitySharedService identityDomainService, IFreeSql freeSql, IMapper mapper, IUserService userService, IRepository<UserDO> userRepository)
+            , IFreeSql freeSql, IMapper mapper, IUserService userService, IRepository<UserDO> userRepository)
         {
             _employeeRepository = employeeRepository;
-            _identityDomainService = identityDomainService;
             _freeSql = freeSql;
             _mapper = mapper;
             _userService = userService;
@@ -84,7 +82,6 @@ namespace Fancyx.Admin.Service.Organization
 
         public async Task<PagedResult<EmployeeListDto>> GetEmployeePagedListAsync(EmployeeQueryDto dto)
         {
-            var powerData = await _identityDomainService.GetPowerData();
             var list = await _freeSql.Select<EmployeeDO>().From<DeptDO, PositionDO>((e, d, p) => e.LeftJoin(e1 => e1.DeptId == d.Id).LeftJoin(e2 => e2.PositionId == p.Id))
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), (x, d, p) => x.Code!.Contains(dto.Keyword!) || x.Name!.Contains(dto.Keyword!) || x.Phone!.Contains(dto.Keyword!))
                 .WhereIf(dto.DeptId.HasValue, (x, d, p) => x.DeptId == dto.DeptId!.Value)
