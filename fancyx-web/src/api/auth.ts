@@ -94,6 +94,7 @@ export interface FrontendMenu {
   children: FrontendMenu[] | null;
   layerName: string;
   menuType: number;
+  isExternal: boolean;
 }
 
 interface UserAuthInfoDto {

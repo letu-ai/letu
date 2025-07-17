@@ -79,5 +79,10 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
         public string? TenantId { get; set; }
+
+        /// <summary>
+        /// 是否外链
+        /// </summary>
+        public bool IsExternal { get; set; } = false;
     }
 }

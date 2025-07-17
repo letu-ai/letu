@@ -59,5 +59,10 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// 子集
         /// </summary>
         public List<MenuListDto>? Children { get; set; }
+
+        /// <summary>
+        /// 是否外链
+        /// </summary>
+        public bool IsExternal { get; set; }
     }
 }

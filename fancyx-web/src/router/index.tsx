@@ -6,6 +6,7 @@ import Home from '@/pages/home';
 import Profile from '@/pages/auth/profile.tsx';
 import Authorize from '@/components/Authorize';
 import { StaticRoutes } from '@/utils/globalValue.ts';
+import ExternalWrapper from '@/components/ExternalWrapper';
 
 const routes: RouteObject[] = [
   {
@@ -31,6 +32,10 @@ const routes: RouteObject[] = [
       {
         path: 'profile',
         element: <Profile />,
+      },
+      {
+        path: '/external/*',
+        element: <ExternalWrapper />,
       },
     ],
   },

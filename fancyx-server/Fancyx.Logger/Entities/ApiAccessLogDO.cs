@@ -52,6 +52,7 @@ namespace Fancyx.Logger.Entities
         /// <summary>
         /// 请求体
         /// </summary>
+        [Column(DbType = "text")]
         public string? RequestBody { get; set; }
 
         /// <summary>

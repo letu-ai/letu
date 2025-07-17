@@ -57,5 +57,10 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// 组件地址
         /// </summary>
         public string? Component { get; set; }
+
+        /// <summary>
+        /// 是否外链
+        /// </summary>
+        public bool IsExternal { get; set; }
     }
 }

@@ -46,5 +46,10 @@ namespace Fancyx.Shared.Models
         /// 菜单类型
         /// </summary>
         public int MenuType { get; set; }
+
+        /// <summary>
+        /// 是否外链
+        /// </summary>
+        public bool IsExternal { get; set; }
     }
 }

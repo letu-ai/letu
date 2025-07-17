@@ -1,16 +1,10 @@
-import type { RouteObject } from "react-router-dom";
-import React, { lazy } from "react";
-import type { FrontendMenu } from "@/api/auth";
+import type { RouteObject } from 'react-router-dom';
+import React, { lazy } from 'react';
+import type { FrontendMenu } from '@/api/auth';
 
 // 获取所有页面文件
-const PageKeys = Object.keys(import.meta.glob([
-  "@/pages/**/index.tsx",
-  "@/pages/**/*.tsx"
-], { eager: true }));
-const PagesList = import.meta.glob([
-  "@/pages/**/index.tsx",
-  "@/pages/**/*.tsx"
-]);
+const PageKeys = Object.keys(import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx'], { eager: true }));
+const PagesList = import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx']);
 
 const getChildrenRoutes = (children: FrontendMenu[]) => {
   const newChildren: RouteObject[] = [];
@@ -19,9 +13,9 @@ const getChildrenRoutes = (children: FrontendMenu[]) => {
     const newRoute: RouteObject = {
       path: route.path,
     };
-    if (PageKeys.includes(componentPath)) {
+    if (!route.isExternal || PageKeys.includes(componentPath)) {
       newRoute.element = React.createElement(
-        lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>)
+        lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>),
       );
     }
     if (route.children != null && route.children.length > 0) {
@@ -37,12 +31,12 @@ export const generateDynamicRoutes = (apiRoutes: FrontendMenu[]) => {
   apiRoutes?.forEach((route) => {
     const componentPath = `/src/pages/${route.component}.tsx`;
     const newRoute: RouteObject = {
-      path: route.path
+      path: route.path,
     };
 
-    if (PageKeys.includes(componentPath)) {
+    if (!route.isExternal && PageKeys.includes(componentPath)) {
       newRoute.element = React.createElement(
-        lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>)
+        lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>),
       );
     }
     if (route.children != null && route.children.length > 0) {

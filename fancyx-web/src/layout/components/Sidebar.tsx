@@ -9,6 +9,7 @@ import { open, selectActiveKey } from '@/store/tabStore.ts';
 import { selectCollapsed } from '@/store/themeStore.ts';
 import { HomeOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
+import _ from 'lodash';
 
 interface MenuItem {
   key: string;
@@ -40,9 +41,11 @@ const Sidebar = observer(() => {
         if (menu.children && menu.children.length > 0) {
           item.children = convertToAntdMenuItems(menu.children);
         } else if (menu.path) {
+          if (menu.isExternal) {
+            menu.path = `/external/${menu.path}`;
+          }
           item.label = (
             <Link to={menu.path} onClick={() => addTab(menu)}>
-              {menu.icon && <ProIcon icon={menu.icon} />}
               <span>{menu.title}</span>
             </Link>
           );
@@ -54,7 +57,7 @@ const Sidebar = observer(() => {
 
   /* eslint-disable react-hooks/exhaustive-deps */
   const calcItems = useMemo(() => {
-    const menus = UserStore.userInfo?.menus;
+    const menus = _.cloneDeep(UserStore.userInfo?.menus ?? []);
     if (Array.isArray(menus) && menus.length > 0) {
       return convertToAntdMenuItems(menus);
     }

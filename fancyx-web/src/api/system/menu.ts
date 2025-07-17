@@ -61,6 +61,7 @@ export interface MenuDto {
   sort: number;
   display: boolean;
   component: string;
+  isExternal: boolean;
 }
 
 export interface MenuQueryDto {
@@ -92,4 +93,5 @@ export interface MenuListDto {
   display: boolean;
   component: string;
   children: MenuListDto[];
+  isExternal: boolean;
 }
