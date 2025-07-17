@@ -1,15 +1,15 @@
-﻿using Coravel.Invocable;
-using Fancyx.Admin.Entities.System;
+﻿using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.SharedService;
 using Fancyx.Core.AutoInject;
 using Fancyx.Repository;
 using FreeRedis;
+using Quartz;
 using RedLockNet.SERedis;
 
 namespace Fancyx.Admin.Jobs
 {
     [DenpendencyInject(AsSelf = true)]
-    public class NotificationJob : IInvocable
+    public class NotificationJob : IJob
     {
         private readonly ILogger<NotificationJob> _logger;
         private readonly IRepository<NotificationDO> _repository;
@@ -27,7 +27,7 @@ namespace Fancyx.Admin.Jobs
             this.redLockFactory = redLockFactory;
         }
 
-        public async Task Invoke()
+        public async Task Execute(IJobExecutionContext context)
         {
             try
             {

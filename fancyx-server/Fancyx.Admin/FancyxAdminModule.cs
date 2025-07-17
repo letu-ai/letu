@@ -1,6 +1,4 @@
-﻿using Coravel;
-using Fancyx.Admin.Filters;
-using Fancyx.Admin.Jobs;
+﻿using Fancyx.Admin.Filters;
 using Fancyx.Admin.Middlewares;
 using Fancyx.Admin.SharedService;
 using Fancyx.Cap;
@@ -8,6 +6,7 @@ using Fancyx.Core.AutoInject;
 using Fancyx.Core.Context;
 using Fancyx.Core.Helpers;
 using Fancyx.Core.JsonConverters;
+using Fancyx.Job;
 using Fancyx.Logger;
 using Fancyx.Logger.Options;
 using Fancyx.ObjectStorage;
@@ -31,7 +30,8 @@ namespace Fancyx.Admin
         typeof(FancyxRedisModule),
         typeof(FancyxCapModule),
         typeof(FancyxLoggerModule),
-        typeof(FancyxObjectStorageModule)
+        typeof(FancyxObjectStorageModule),
+        typeof(FancyxJobModule)
         )]
     public class FancyxAdminModule : ModuleBase
     {
@@ -104,8 +104,6 @@ namespace Fancyx.Admin
             });
 
             services.AddHostedService<PreparationHostService>();
-            //Coravel
-            services.AddScheduler();
             //限流
             services.AddRateLimiter(options =>
             {
@@ -165,12 +163,6 @@ namespace Fancyx.Admin
             });
 
             app.UseRateLimiter(); // 启用限流中间件
-
-            //定时任务
-            context.ServiceProvider.UseScheduler(sch =>
-            {
-                sch.Schedule<NotificationJob>().EveryMinute().RunOnceAtStart();
-            });
         }
     }
 }

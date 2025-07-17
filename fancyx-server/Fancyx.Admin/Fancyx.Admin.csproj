@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Fancyx.Cap\Fancyx.Cap.csproj" />
     <ProjectReference Include="..\Fancyx.Core\Fancyx.Core.csproj" />
+    <ProjectReference Include="..\Fancyx.Job\Fancyx.Job.csproj" />
     <ProjectReference Include="..\Fancyx.Logger\Fancyx.Logger.csproj" />
     <ProjectReference Include="..\Fancyx.ObjectStorage\Fancyx.ObjectStorage.csproj" />
     <ProjectReference Include="..\Fancyx.Redis\Fancyx.Redis.csproj" />
@@ -19,7 +20,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Coravel" Version="5.0.4" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
 		<PackageReference Include="MQTTnet" Version="5.0.1.1416" />
 		<PackageReference Include="MQTTnet.Server" Version="5.0.1.1416" />
