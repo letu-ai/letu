@@ -3,6 +3,7 @@ using Fancyx.Admin.IService.System;
 using Fancyx.Admin.IService.System.Dtos;
 using Fancyx.Admin.SharedService;
 using Fancyx.Core.Helpers;
+using Fancyx.Core.Utils;
 using Fancyx.Repository;
 using Fancyx.Shared.Enums;
 
@@ -25,7 +26,11 @@ namespace Fancyx.Admin.Service.System
         {
             if (dto.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
             {
-                throw new Exception("菜单的路由不能为空");
+                throw new BusinessException("菜单的路由不能为空");
+            }
+            if (dto.IsExternal && !StringUtils.IsValidUrlStrict(dto.Path))
+            {
+                throw new BusinessException("外链地址不合法");
             }
             if (dto.ParentId.HasValue)
             {
@@ -139,7 +144,11 @@ namespace Fancyx.Admin.Service.System
         {
             if (dto.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
             {
-                throw new Exception("菜单的路由不能为空");
+                throw new BusinessException("菜单的路由不能为空");
+            }
+            if (dto.IsExternal && !StringUtils.IsValidUrlStrict(dto.Path))
+            {
+                throw new BusinessException("外链地址不合法");
             }
             if (dto.ParentId.HasValue)
             {
@@ -171,6 +180,7 @@ namespace Fancyx.Admin.Service.System
             entity.Sort = dto.Sort;
             entity.Display = dto.Display;
             entity.Component = dto.Component;
+            entity.IsExternal = dto.IsExternal;
             await _menuRepository.UpdateAsync(entity);
 
             if (updatePermission)

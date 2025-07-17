@@ -8,6 +8,26 @@ namespace Fancyx.Core.Utils
     public static partial class StringUtils
     {
         /// <summary>
+        /// 检查URL是否合法
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static bool IsValidUrlStrict(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return false;
+
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uriResult) && uriResult != null)
+            {
+                return uriResult.Scheme == Uri.UriSchemeHttp
+                       || uriResult.Scheme == Uri.UriSchemeHttps
+                       || uriResult.Scheme == Uri.UriSchemeFtp
+                       || uriResult.Scheme == Uri.UriSchemeFtps;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// 截断字符串
         /// </summary>
         /// <param name="str"></param>
