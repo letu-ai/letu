@@ -61,6 +61,20 @@ export function getEmployeeInfo(id: string) {
   return httpClient.get<string, AppResponse<EmployeeInfoDto>>('/api/employee/info/' + id);
 }
 
+/**
+ * 部门+员工树形
+ * @param dto 
+ * @returns 
+ */
+export function getDeptEmployeeTree(dto?: DeptEmployeeTreeQueryDto) {
+  return httpClient.get<DeptEmployeeTreeQueryDto, AppResponse<DeptEmployeeTreeDto[]>>(
+    '/api/employee/getDeptEmployeeTree',
+    {
+      params: dto,
+    },
+  );
+}
+
 export interface EmployeeDto {
   id?: string | null;
   name: string;
@@ -120,4 +134,15 @@ export interface EmployeeBindUserDto {
 export interface EmployeeInfoDto extends EmployeeListDto {
   userName?: string | null;
   nickName?: string | null;
+}
+
+export interface DeptEmployeeTreeDto {
+  label: string;
+  value: string;
+  type: number;
+  children: DeptEmployeeTreeDto[];
+}
+
+export interface DeptEmployeeTreeQueryDto {
+  employeeName?: string;
 }

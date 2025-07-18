@@ -52,5 +52,12 @@ namespace Fancyx.Admin.IService.Organization
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<List<EmployeeDto>> GetEmployeeListAsync(EmployeeQueryDto dto);
+
+        /// <summary>
+        /// 部门+员工树形
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<DeptEmployeeTreeDto>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeQueryDto dto);
     }
 }

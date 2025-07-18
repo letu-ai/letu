@@ -5,7 +5,6 @@ using Fancyx.Admin.IService.Organization;
 using Fancyx.Admin.IService.Organization.Dtos;
 using Fancyx.Admin.IService.System;
 using Fancyx.Admin.IService.System.Dtos;
-using Fancyx.Admin.SharedService;
 using Fancyx.Core.Interfaces;
 using Fancyx.Core.Utils;
 using Fancyx.Repository;
@@ -16,15 +15,17 @@ namespace Fancyx.Admin.Service.Organization
     public class EmployeeService : IScopedDependency, IEmployeeService
     {
         private readonly IRepository<EmployeeDO> _employeeRepository;
+        private readonly IRepository<DeptDO> _deptRepository;
         private readonly IFreeSql _freeSql;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IRepository<UserDO> _userRepository;
 
-        public EmployeeService(IRepository<EmployeeDO> employeeRepository, IRepository<DeptDO> orgDeptRepository, IRepository<PositionDO> orgPositionRepository
+        public EmployeeService(IRepository<EmployeeDO> employeeRepository, IRepository<DeptDO> deptRepository, IRepository<PositionDO> orgPositionRepository
             , IFreeSql freeSql, IMapper mapper, IUserService userService, IRepository<UserDO> userRepository)
         {
             _employeeRepository = employeeRepository;
+            _deptRepository = deptRepository;
             _freeSql = freeSql;
             _mapper = mapper;
             _userService = userService;
@@ -172,6 +173,58 @@ namespace Fancyx.Admin.Service.Organization
             }
 
             return result;
+        }
+
+        public async Task<List<DeptEmployeeTreeDto>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeQueryDto dto)
+        {
+            if (!string.IsNullOrEmpty(dto.EmployeeName))
+            {
+                return await _employeeRepository.Where(x => x.Status == 1).ToListAsync(x => new DeptEmployeeTreeDto
+                {
+                    Label = x.Name,
+                    Value = x.Id.ToString(),
+                    Type = 2
+                });
+            }
+            var employees = await _employeeRepository.Where(x => x.Status == 1).ToListAsync();
+            var depts = await _deptRepository.Where(x => x.Status == 1).ToListAsync();
+            var list = depts.Where(x => !x.ParentId.HasValue).OrderBy(x => x.Sort).Select(x => new DeptEmployeeTreeDto
+            {
+                Label = x.Name,
+                Value = x.Id.ToString(),
+                Type = 1
+            }).ToList();
+            foreach (var item in list)
+            {
+                item.Children = GetSubItems(item);
+            }
+
+            List<DeptEmployeeTreeDto>? GetSubItems(DeptEmployeeTreeDto parent)
+            {
+                var children = depts.Where(x => x.ParentId.HasValue && x.ParentId.ToString() == parent.Value).OrderBy(x => x.Sort).Select(x => new DeptEmployeeTreeDto
+                {
+                    Label = x.Name,
+                    Value = x.Id.ToString(),
+                    Type = 1
+                }).ToList();
+                foreach (var item in children)
+                {
+                    item.Children = GetSubItems(item);
+                }
+
+                var subItemEmployees = employees.Where(x => x.DeptId.ToString() == parent.Value).Select(x => new DeptEmployeeTreeDto
+                {
+                    Label = x.Name,
+                    Value = x.Id.ToString(),
+                    Type = 2
+                }).ToList();
+
+                children.AddRange(subItemEmployees);
+
+                return children.Count > 0 ? children : null;
+            }
+
+            return list;
         }
     }
 }

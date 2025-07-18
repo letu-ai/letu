@@ -7,7 +7,7 @@ namespace Fancyx.Admin.IService.System
     {
         Task AddNotificationAsync(NotificationDto dto);
 
-        Task<PagedResult<NotificationResultDto>> GetNotificationListAsync(NotificationSearchDto dto);
+        Task<PagedResult<NotificationResultDto>> GetNotificationListAsync(NotificationQueryDto dto);
 
         Task UpdateNotificationAsync(NotificationDto dto);
 

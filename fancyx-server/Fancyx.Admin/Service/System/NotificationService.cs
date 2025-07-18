@@ -34,7 +34,7 @@ namespace Fancyx.Admin.Service.System
             return _repository.DeleteAsync(x => ids.Contains(x.Id));
         }
 
-        public async Task<PagedResult<NotificationResultDto>> GetNotificationListAsync(NotificationSearchDto dto)
+        public async Task<PagedResult<NotificationResultDto>> GetNotificationListAsync(NotificationQueryDto dto)
         {
             var list = await _repository.Select.From<EmployeeDO>().LeftJoin((n, e) => n.EmployeeId == e.Id)
                 .WhereIf(!string.IsNullOrEmpty(dto.Title), (x, e) => x.Title!.Contains(x.Title))

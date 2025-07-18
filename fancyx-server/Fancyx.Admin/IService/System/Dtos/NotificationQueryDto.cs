@@ -1,6 +1,6 @@
 ﻿namespace Fancyx.Admin.IService.System.Dtos
 {
-    public class NotificationSearchDto : PageSearch
+    public class NotificationQueryDto : PageSearch
     {
         public string? Title { get; set; }
 

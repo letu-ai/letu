@@ -111,7 +111,18 @@ namespace Fancyx.Admin.Controllers.Organization
         public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync([FromQuery] EmployeeQueryDto dto)
         {
             var data = await _employeeService.GetEmployeeListAsync(dto);
+            return Result.Data(data);
+        }
 
+        /// <summary>
+        /// 部门+员工树形
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("GetDeptEmployeeTree")]
+        public async Task<AppResponse<List<DeptEmployeeTreeDto>>> GetDeptEmployeeTreeAsync([FromQuery] DeptEmployeeTreeQueryDto dto)
+        {
+            var data = await _employeeService.GetDeptEmployeeTreeAsync(dto);
             return Result.Data(data);
         }
     }
