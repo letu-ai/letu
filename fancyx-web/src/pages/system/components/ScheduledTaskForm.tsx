@@ -67,10 +67,11 @@ const ScheduledTaskForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
       onCancel={onCancel}
       onOk={onOk}
       maskClosable={false}
+      width="40%"
     >
       <Form<ScheduledTaskDto>
         name="wrap"
-        labelCol={{ flex: '110px' }}
+        labelCol={{ flex: '100px' }}
         labelWrap
         form={form}
         wrapperCol={{ flex: 1 }}
@@ -79,9 +80,6 @@ const ScheduledTaskForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
       >
         <Form.Item label="任务KEY" name="taskKey" rules={[{ required: true }]}>
           <Input placeholder="请输入任务KEY，唯一" />
-        </Form.Item>
-        <Form.Item label="任务描述" name="description" rules={[{ required: true }]}>
-          <Input placeholder="请输入任务描述" />
         </Form.Item>
         <Form.Item label="Cron表达式" name="cronExpression" rules={[{ required: true }]}>
           <Input placeholder="请输入Cron表达式" />

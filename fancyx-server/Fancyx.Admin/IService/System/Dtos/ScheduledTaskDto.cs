@@ -3,8 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Fancyx.Admin.IService.System.Dtos
 {
-    public class ScheduledTaskCreateDto
+    public class ScheduledTaskDto
     {
+        public Guid? Id { get; set; }
+
         /// <summary>
         /// 任务KEY（唯一标识）
         /// </summary>
@@ -19,6 +21,7 @@ namespace Fancyx.Admin.IService.System.Dtos
 
         /// <summary>
         /// Cron表达式
+        /// </summary>
         [NotNull]
         [Required]
         public string? CronExpression { get; set; }

@@ -19,7 +19,7 @@ namespace Fancyx.Admin.Service.System
             _jobControl = jobControl;
         }
 
-        public Task AddAsync(ScheduledTaskCreateDto dto)
+        public Task AddAsync(ScheduledTaskDto dto)
         {
             return _jobControl.AddJobAsync(dto.TaskKey, dto.CronExpression, dto.Description, dto.IsActive);
         }
@@ -53,9 +53,11 @@ namespace Fancyx.Admin.Service.System
             return new PagedResult<ScheduledTaskListDto>(dto, total, list);
         }
 
-        public async Task UpdateAsync(ScheduledTaskUpdateDto dto)
+        public async Task UpdateAsync(ScheduledTaskDto dto)
         {
-            var entity = await _scheduledTaskRepository.OneAsync(x => x.Id == dto.Id) ?? throw new EntityNotFoundException();
+            ArgumentNullException.ThrowIfNull(dto.Id, nameof(dto));
+
+            var entity = await _scheduledTaskRepository.OneAsync(x => x.Id == dto.Id.Value) ?? throw new EntityNotFoundException();
             await _jobControl.UpdateJobAsync(entity.TaskKey, dto.TaskKey, dto.CronExpression, dto.Description, dto.IsActive);
         }
     }

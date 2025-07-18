@@ -1,11 +1,14 @@
-﻿using Fancyx.Core.AutoInject;
+﻿using System.Reflection;
+
+using Fancyx.Core.AutoInject;
 using Fancyx.Job.Database.Entities;
 using Fancyx.Job.Database.Models;
 using Fancyx.Repository;
 using Fancyx.Repository.Aop;
+
 using Microsoft.Extensions.Caching.Memory;
+
 using Quartz;
-using System.Reflection;
 
 namespace Fancyx.Job.Database
 {
@@ -67,8 +70,12 @@ namespace Fancyx.Job.Database
                 await _scheduler.PauseJob(new JobKey(JobKeyUtils.GetJobKey(key)));
             }
 
-            await _scheduledTaskRepository.UpdateDiy.Where(x => x.TaskKey == oldKey)
-                .SetDto(new { TaskKey = key, CronExpression = cron, IsActive = isActive, Description = description })
+            await _scheduledTaskRepository.UpdateDiy
+                .Set(x => x.TaskKey, key)
+                .Set(x => x.CronExpression, cron)
+                .Set(x => x.IsActive, isActive)
+                .Set(x => x.Description, description)
+                .Where(x => x.TaskKey == oldKey)
                 .ExecuteAffrowsAsync();
         }
 

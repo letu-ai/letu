@@ -5,11 +5,11 @@ namespace Fancyx.Admin.IService.System
 {
     public interface IScheduledTaskService : IScopedDependency
     {
-        Task AddAsync(ScheduledTaskCreateDto dto);
+        Task AddAsync(ScheduledTaskDto dto);
 
         Task<PagedResult<ScheduledTaskListDto>> GetListAsync(ScheduledTaskQueryDto dto);
 
-        Task UpdateAsync(ScheduledTaskUpdateDto dto);
+        Task UpdateAsync(ScheduledTaskDto dto);
 
         Task DeleteAsync(string key);
 

@@ -36,6 +36,17 @@ export function deleteScheduledTask(id: string) {
   return httpClient.delete<string, AppResponse<boolean>>(`/api/scheduledTask/delete/${id}`);
 }
 
+/**
+ * 任务执行日志
+ * @param dto
+ */
+export function getExecutionLogList(dto: TaskExecutionLogQueryDto) {
+  return httpClient.get<TaskExecutionLogQueryDto, AppResponse<PagedResult<TaskExecutionLogListDto>>>(
+    '/api/scheduledTask/Log',
+    { params: dto },
+  );
+}
+
 export interface ScheduledTaskDto {
   id?: string;
   taskKey: string;
@@ -57,4 +68,20 @@ export interface ScheduledTaskListDto {
 export interface ScheduledTaskQueryDto extends PageSearch {
   taskKey?: string;
   description?: string;
+}
+
+export interface TaskExecutionLogQueryDto {
+  taskKey: string;
+  status?: number;
+  executionTimeRange?: string[];
+  cost?: number;
+}
+
+export interface TaskExecutionLogListDto {
+  id: string;
+  taskKey: string;
+  status: number;
+  result: string;
+  cost: number;
+  executionTime: string;
 }

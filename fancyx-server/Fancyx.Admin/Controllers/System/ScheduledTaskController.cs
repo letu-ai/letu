@@ -20,7 +20,7 @@ namespace Fancyx.Admin.Controllers.System
 
         [HttpPost("Add")]
         [HasPermission("Sys.ScheduledTask.Add")]
-        public async Task<AppResponse<bool>> AddAsync([FromBody] ScheduledTaskCreateDto dto)
+        public async Task<AppResponse<bool>> AddAsync([FromBody] ScheduledTaskDto dto)
         {
             await _scheduledTaskService.AddAsync(dto);
             return Result.Ok();
@@ -36,7 +36,7 @@ namespace Fancyx.Admin.Controllers.System
 
         [HttpPut("Update")]
         [HasPermission("Sys.ScheduledTask.Update")]
-        public async Task<AppResponse<bool>> UpdateAsync([FromBody] ScheduledTaskUpdateDto dto)
+        public async Task<AppResponse<bool>> UpdateAsync([FromBody] ScheduledTaskDto dto)
         {
             await _scheduledTaskService.UpdateAsync(dto);
             return Result.Ok();

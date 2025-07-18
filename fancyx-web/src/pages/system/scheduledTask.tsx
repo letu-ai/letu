@@ -5,18 +5,21 @@ import {
   type ScheduledTaskDto,
   type ScheduledTaskListDto,
 } from '@/api/system/scheduledTask.ts';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Tag } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
 import ScheduledTaskForm, { type ModalRef } from '@/pages/system/components/ScheduledTaskForm.tsx';
 import useApp from 'antd/es/app/useApp';
+import TaskExecutionLogModal from '@/pages/system/components/TaskExecutionLogModal.tsx';
 
 const ScheduledTaskList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<ModalRef>(null);
   const { message } = useApp();
+  const [logModalVisible, setLogModalVisible] = useState<boolean>(false);
+  const [currentTaskKey, setCurrentTaskKey] = useState<string>('');
   const columns: SmartTableColumnType[] = [
     {
       title: '任务KEY',
@@ -52,6 +55,18 @@ const ScheduledTaskList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: ScheduledTaskListDto) => (
         <Space>
+          <Permission permissions={'Sys.ScheduledTask.Log'}>
+            <Button
+              type="link"
+              icon={<UnorderedListOutlined />}
+              onClick={() => {
+                setLogModalVisible(true);
+                setCurrentTaskKey(record.taskKey);
+              }}
+            >
+              日志
+            </Button>
+          </Permission>
           <Permission permissions={'Sys.ScheduledTask.Update'}>
             <Button
               type="link"
@@ -122,6 +137,14 @@ const ScheduledTaskList: React.FC = () => {
       />
       {/** 新增/编辑任务弹窗 */}
       <ScheduledTaskForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
+      {/** 执行日志弹窗 */}
+      <TaskExecutionLogModal
+        visible={logModalVisible}
+        taskKey={currentTaskKey}
+        onCancel={() => {
+          setLogModalVisible(false);
+        }}
+      />
     </>
   );
 };
