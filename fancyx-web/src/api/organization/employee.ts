@@ -63,8 +63,8 @@ export function getEmployeeInfo(id: string) {
 
 /**
  * 部门+员工树形
- * @param dto 
- * @returns 
+ * @param dto
+ * @returns
  */
 export function getDeptEmployeeTree(dto?: DeptEmployeeTreeQueryDto) {
   return httpClient.get<DeptEmployeeTreeQueryDto, AppResponse<DeptEmployeeTreeDto[]>>(
@@ -141,6 +141,7 @@ export interface DeptEmployeeTreeDto {
   value: string;
   type: number;
   children: DeptEmployeeTreeDto[];
+  disabled: boolean;
 }
 
 export interface DeptEmployeeTreeQueryDto {

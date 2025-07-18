@@ -6,7 +6,7 @@ import {
   type NotificationListDto,
 } from '@/api/system/notification.ts';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Popconfirm, Space, Tag } from 'antd';
+import { Button, Form, Input, Popconfirm, Select, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
@@ -95,6 +95,16 @@ const NotificationList: React.FC = () => {
         searchItems={[
           <Form.Item label="通知标题" name="title">
             <Input placeholder="请输入通知标题" />
+          </Form.Item>,
+          <Form.Item label="通知状态" name="isReaded">
+            <Select
+              allowClear
+              placeholder="请选择通知状态"
+              options={[
+                { label: '已读', value: true },
+                { label: '未读', value: false },
+              ]}
+            />
           </Form.Item>,
         ]}
         toolbar={
