@@ -1,6 +1,7 @@
 ﻿using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.SharedService;
 using Fancyx.Core.AutoInject;
+using Fancyx.Job;
 using Fancyx.Repository;
 using FreeRedis;
 using Quartz;
@@ -9,6 +10,7 @@ using RedLockNet.SERedis;
 namespace Fancyx.Admin.Jobs
 {
     [DenpendencyInject(AsSelf = true)]
+    [JobKey("NotificationJob")]
     public class NotificationJob : IJob
     {
         private readonly ILogger<NotificationJob> _logger;

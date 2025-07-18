@@ -23,5 +23,9 @@
         /// 是否激活
         /// </summary>
         public bool IsActive { get; set; } = false;
+
+        public DateTime CreationTime { get; set; }
+
+        public DateTime? LastModificationTime { get; set; }
     }
 }
