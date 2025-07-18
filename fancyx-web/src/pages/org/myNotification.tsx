@@ -1,6 +1,6 @@
 ﻿import { readed, getMyNotificationList, type MyNotificationListDto } from '@/api/organization/myNotification.ts';
-import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Select, Space, Tag } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Select, Tag } from 'antd';
 import React, { useRef } from 'react';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
@@ -16,8 +16,8 @@ const NotificationList: React.FC = () => {
       dataIndex: 'title',
     },
     {
-      title: '通知描述',
-      dataIndex: 'description',
+      title: '通知内容',
+      dataIndex: 'content',
     },
     {
       title: '状态',
@@ -33,34 +33,41 @@ const NotificationList: React.FC = () => {
     {
       title: '操作',
       dataIndex: 'option',
-      width: 210,
+      width: 70,
       fixed: 'right',
-      render: (_: any, record: MyNotificationListDto) => (
-        <Space>
-          <Button
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              readed([record.id]).then((res) => {
-                if (res.code === ErrorCode.Success) {
-                  message.success('已读成功');
-                }
-              });
-            }}
-          >
-            删除
-          </Button>
-        </Space>
-      ),
+      render: (_: any, record: MyNotificationListDto) => {
+        if (!record.isReaded) {
+          return (
+            <Button
+              type="link"
+              icon={<CheckOutlined />}
+              onClick={() => {
+                batchReaded([record.id]);
+              }}
+            >
+              已读
+            </Button>
+          );
+        }
+      },
     },
   ];
+
+  const batchReaded = (ids: string[]) => {
+    readed(ids).then((res) => {
+      if (res.code === ErrorCode.Success) {
+        message.success('已读成功');
+        tableRef?.current?.reload();
+      }
+    });
+  };
 
   return (
     <>
       <SmartTable
         columns={columns}
         ref={tableRef}
+        selection
         rowKey="id"
         request={async (params) => {
           const { data } = await getMyNotificationList(params);
@@ -81,6 +88,22 @@ const NotificationList: React.FC = () => {
             />
           </Form.Item>,
         ]}
+        toolbar={
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            onClick={() => {
+              const ids = tableRef?.current?.getSelectedKeys() as string[];
+              if (ids.length <= 0) {
+                message.warning('请选择一条记录进行操作');
+                return;
+              }
+              batchReaded(ids);
+            }}
+          >
+            批量已读
+          </Button>
+        }
       />
     </>
   );

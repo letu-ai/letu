@@ -1,0 +1,43 @@
+.notification-popover {
+  width: 350px;
+}
+
+.notification-popover .ant-list-item {
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.notification-popover .notification-item.unread {
+  background-color: #f6ffed;
+}
+
+.notification-popover .notification-title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-popover .notification-content {
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.notification-popover .notification-time {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+}
+
+.notification-popover .notification-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.notification-badge {
+  .ant-scroll-number.ant-badge-count {
+    transform: translate(0%, 40%);
+  }
+}

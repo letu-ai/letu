@@ -4,13 +4,13 @@ import {
   getNotificationList,
   type NotificationDto,
   type NotificationListDto,
-} from '@/api/system/notification.ts';
+} from '@/api/organization/notification.ts';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Select, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
-import NotificationForm, { type ModalRef } from '@/pages/system/components/NotificationForm.tsx';
+import NotificationForm, { type ModalRef } from './components/NotificationForm.tsx';
 import useApp from 'antd/es/app/useApp';
 
 const NotificationList: React.FC = () => {
@@ -27,8 +27,8 @@ const NotificationList: React.FC = () => {
       dataIndex: 'employeeName',
     },
     {
-      title: '通知描述',
-      dataIndex: 'description',
+      title: '通知内容',
+      dataIndex: 'content',
     },
     {
       title: '状态',

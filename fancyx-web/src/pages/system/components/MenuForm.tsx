@@ -52,8 +52,14 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
       form.setFieldsValue(row);
     } else {
       setRow(null);
+      const _menuType = isAddSub
+        ? row?.menuType === MenuType.Folder
+          ? MenuType.Menu
+          : MenuType.Button
+        : MenuType.Folder;
+      setMenuType(_menuType);
       form.setFieldsValue({
-        menuType: isAddSub ? (row?.menuType === MenuType.Folder ? MenuType.Menu : MenuType.Button) : MenuType.Folder,
+        menuType: _menuType,
         sort: 0,
         display: true,
         parentId: isAddSub ? row?.id : null,

@@ -27,15 +27,15 @@ export function getMyNotificationList(dto: UserNotificationQueryDto) {
  * @param dto
  */
 export function getMyNotificationNavbarInfo() {
-  return httpClient.get<unknown, AppResponse<UserNotificationNavbarItemDto>>(
-    '/api/UserNotification/MyNotificationNavbarInfo'
+  return httpClient.get<unknown, AppResponse<UserNotificationNavbarDto>>(
+    '/api/UserNotification/MyNotificationNavbarInfo',
   );
 }
 
 export interface MyNotificationListDto {
   id: string;
   title: string;
-  description: string | null;
+  content: string | null;
   isReaded: boolean;
   creationTime: string;
   readedTime: string;
@@ -54,7 +54,7 @@ export interface UserNotificationNavbarDto {
 export interface UserNotificationNavbarItemDto {
   id: string;
   title?: string;
-  description: string | null;
+  content: string | null;
   isReaded: boolean;
   creationTime: string;
 }

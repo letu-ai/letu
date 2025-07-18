@@ -25,11 +25,12 @@ namespace Fancyx.Admin.Service.Account
             var employeeId = await this.GetCurrentEmployeeIdAsync();
             if (!employeeId.HasValue) return new PagedResult<UserNotificationListDto>();
 
-            var list = await _repository.Select.From<EmployeeDO>().LeftJoin((n, e) => n.EmployeeId == e.Id)
-                .Where((x, e) => x.EmployeeId == employeeId)
-                .WhereIf(!string.IsNullOrEmpty(dto.Title), (x, e) => x.Title!.Contains(x.Title))
-                .WhereIf(dto.IsReaded.HasValue, (x, e) => x.IsReaded == dto.IsReaded)
-                .OrderByDescending((x, e) => x.CreationTime)
+            var list = await _repository
+                .Where(x => x.EmployeeId == employeeId)
+                .WhereIf(!string.IsNullOrEmpty(dto.Title), x => x.Title!.Contains(x.Title))
+                .WhereIf(dto.IsReaded.HasValue, x => x.IsReaded == dto.IsReaded)
+                .OrderBy(x => x.IsReaded)
+                .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync<UserNotificationListDto>();
@@ -42,9 +43,10 @@ namespace Fancyx.Admin.Service.Account
             var employeeId = await this.GetCurrentEmployeeIdAsync();
             if (!employeeId.HasValue) return result;
 
-            var query = _repository.Where(x => x.EmployeeId == employeeId && !x.IsReaded);
-            result.Items = await query.OrderByDescending(x => x.CreationTime).Take(5).ToListAsync<UserNotificationNavbarItemDto>();
-            result.NoReadedCount = (int)await query.CountAsync();
+            var query = _repository.Where(x => x.EmployeeId == employeeId);
+            result.Items = await query.OrderBy(x => x.IsReaded).OrderByDescending(x => x.CreationTime)
+                .Take(5).ToListAsync<UserNotificationNavbarItemDto>();
+            result.NoReadedCount = (int)await query.Where(x => !x.IsReaded).CountAsync();
 
             return result;
         }
@@ -54,7 +56,11 @@ namespace Fancyx.Admin.Service.Account
             var employeeId = await this.GetCurrentEmployeeIdAsync();
             if (!employeeId.HasValue) return;
 
-            await _repository.UpdateDiy.Where(x => x.EmployeeId == employeeId && ids.Contains(x.Id)).SetDto(new { IsReaded = true }).ExecuteAffrowsAsync();
+            var now = DateTime.Now;
+            await _repository.UpdateDiy.Set(x => x.IsReaded, true)
+                .Set(x => x.ReadedTime, now)
+                .Where(x => x.EmployeeId == employeeId && ids.Contains(x.Id))
+                .ExecuteAffrowsAsync();
         }
 
         private async Task<Guid?> GetCurrentEmployeeIdAsync()

@@ -1,9 +1,10 @@
 import { Form, Input, Modal, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import type { AppResponse } from '@/types/api';
-import { addNotification, type NotificationDto, updateNotification } from '@/api/system/notification.ts';
+import { addNotification, type NotificationDto, updateNotification } from '@/api/organization/notification.ts';
 import useApp from 'antd/es/app/useApp';
-import { getDeptEmployeeTree, type DeptEmployeeTreeDto } from '@/api/organization/employee';
+import { getDeptEmployeeTree, type DeptEmployeeTreeDto } from '@/api/organization/employee.ts';
+import TextArea from 'antd/es/input/TextArea';
 
 interface ModalProps {
   refresh?: () => void;
@@ -113,8 +114,8 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             }}
           />
         </Form.Item>
-        <Form.Item label="通知描述" name="description">
-          <Input placeholder="请输入通知描述" />
+        <Form.Item label="通知内容" name="content">
+          <TextArea placeholder="请输入通知内容" autoSize={{ minRows: 2 }} maxLength={500} showCount />
         </Form.Item>
       </Form>
     </Modal>

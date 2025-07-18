@@ -40,14 +40,14 @@ export function deleteNotifications(ids: string[]) {
 export interface NotificationDto {
   id?: string;
   title: string;
-  description: string | null;
+  content: string | null;
   employeeId: string;
 }
 
 export interface NotificationListDto {
   id: string;
   title: string;
-  description: string | null;
+  content: string | null;
   employeeId: string;
   isReaded: boolean;
   creationTime: string;

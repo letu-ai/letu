@@ -22,7 +22,7 @@ namespace Fancyx.Admin.Service.System
             var entity = new NotificationDO()
             {
                 Title = dto.Title,
-                Description = dto.Description,
+                Content = dto.Content,
                 EmployeeId = dto.EmployeeId,
                 IsReaded = false
             };
@@ -39,13 +39,14 @@ namespace Fancyx.Admin.Service.System
             var list = await _repository.Select.From<EmployeeDO>().LeftJoin((n, e) => n.EmployeeId == e.Id)
                 .WhereIf(!string.IsNullOrEmpty(dto.Title), (x, e) => x.Title!.Contains(x.Title))
                 .WhereIf(dto.IsReaded.HasValue, (x, e) => x.IsReaded == dto.IsReaded)
+                .OrderByDescending((x, e) => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync((n, e) => new NotificationResultDto
                 {
                     Id = n.Id,
                     Title = n.Title,
-                    Description = n.Description,
+                    Content = n.Content,
                     EmployeeId = n.EmployeeId,
                     IsReaded = n.IsReaded,
                     CreationTime = n.CreationTime,
@@ -63,7 +64,7 @@ namespace Fancyx.Admin.Service.System
                 throw new BusinessException(message: "已读消息不能修改");
             }
             entity.Title = dto.Title;
-            entity.Description = dto.Description;
+            entity.Content = dto.Content;
             entity.EmployeeId = dto.EmployeeId;
             await _repository.UpdateAsync(entity);
         }

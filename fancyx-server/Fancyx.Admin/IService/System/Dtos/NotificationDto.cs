@@ -16,10 +16,10 @@ namespace Fancyx.Admin.IService.System.Dtos
         public string? Title { get; set; }
 
         /// <summary>
-        /// 通知描述
+        /// 通知内容
         /// </summary>
         [MaxLength(500)]
-        public string? Description { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// 通知员工

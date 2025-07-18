@@ -13,6 +13,7 @@ import { useApplication } from '@/components/Application';
 import { StaticRoutes } from '@/utils/globalValue.ts';
 import { useAuthProvider } from '@/components/AuthProvider';
 import { observer } from 'mobx-react-lite';
+import NotificationPopover from '@/layout/components/NotificationPopover.tsx';
 
 const Navbar = observer(() => {
   const collapsed = useSelector(selectCollapsed);
@@ -127,6 +128,10 @@ const Navbar = observer(() => {
                 {UserStore.userInfo?.nickName ?? UserStore.userInfo?.userName}
               </Button>
             </Dropdown>
+          </div>
+          {/** 通知 */}
+          <div>
+            <NotificationPopover />
           </div>
           {/** 尺寸 */}
           <div>

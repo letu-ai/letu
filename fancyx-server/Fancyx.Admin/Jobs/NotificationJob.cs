@@ -63,7 +63,7 @@ namespace Fancyx.Admin.Jobs
                                     }
                                 }
                             }
-                            var isSuc = await _mqttService.PushAsync("Notification:" + item.EmployeeId, new { title = item.Title, description = item.Description, NoReadedCount = g.Value });
+                            var isSuc = await _mqttService.PushAsync("Notification:" + item.EmployeeId, new { title = item.Title, content = item.Content, NoReadedCount = g.Value });
                             if (!isSuc) continue;
                             //上条通知的ID
                             await _database.SetAsync("LastNotification" + item.EmployeeId, item.Id.ToString(), TimeSpan.FromMinutes(1));

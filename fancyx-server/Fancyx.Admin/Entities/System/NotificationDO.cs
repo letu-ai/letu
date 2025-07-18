@@ -19,10 +19,10 @@ namespace Fancyx.Admin.Entities.System
         public string? Title { get; set; }
 
         /// <summary>
-        /// 通知描述
+        /// 通知内容
         /// </summary>
         [MaxLength(500)]
-        public string? Description { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// 通知员工
@@ -33,7 +33,7 @@ namespace Fancyx.Admin.Entities.System
         public Guid EmployeeId { get; set; }
 
         /// <summary>
-        /// 是否已读(1已读0未读)
+        /// 是否已读(true已读false未读)
         /// </summary>
         [Required]
         [Column(IsNullable = false)]

@@ -17,9 +17,9 @@
         public string? Title { get; set; }
 
         /// <summary>
-        /// 通知描述
+        /// 通知内容
         /// </summary>
-        public string? Description { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// 是否已读(1已读0未读)
