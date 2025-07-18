@@ -265,6 +265,7 @@ namespace Fancyx.Admin.Service.Account
             //移除刷新token
             await _redisDb.DelAsync(SystemCacheKey.RefreshToken(uid.Value, sessionId));
             //移除权限缓存
+            _memoryCache.Remove(SystemCacheKey.UserPermission(uid.Value));
             await _redisDb.DelAsync(SystemCacheKey.UserPermission(uid.Value));
             return true;
         }

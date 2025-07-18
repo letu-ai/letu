@@ -6,43 +6,30 @@ import type { FrontendMenu } from '@/api/auth';
 const PageKeys = Object.keys(import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx'], { eager: true }));
 const PagesList = import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx']);
 
-const getChildrenRoutes = (children: FrontendMenu[]) => {
-  const newChildren: RouteObject[] = [];
-  children?.forEach((route) => {
-    const componentPath = `/src/pages/${route.component}.tsx`;
-    const newRoute: RouteObject = {
-      path: route.path,
+const createElementFromPath = (componentPath: string) => {
+  if (!PageKeys.includes(componentPath)) return undefined;
+
+  const LazyComponent = lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>);
+  return React.createElement(LazyComponent);
+};
+
+const convertMenuToRoutes = (menus: FrontendMenu[]): RouteObject[] => {
+  return menus.map((menu) => {
+    const componentPath = `/src/pages/${menu.component}.tsx`;
+    const route: RouteObject = {
+      path: menu.path,
+      element: !menu.isExternal ? createElementFromPath(componentPath) : undefined,
     };
-    if (!route.isExternal || PageKeys.includes(componentPath)) {
-      newRoute.element = React.createElement(
-        lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>),
-      );
+
+    if (menu.children?.length) {
+      route.children = convertMenuToRoutes(menu.children);
     }
-    if (route.children != null && route.children.length > 0) {
-      newRoute.children = getChildrenRoutes(route.children);
-    }
-    newChildren.push(newRoute);
+
+    return route;
   });
-  return newChildren;
 };
 
 export const generateDynamicRoutes = (apiRoutes: FrontendMenu[]) => {
-  const dynamicRoutes: RouteObject[] = [];
-  apiRoutes?.forEach((route) => {
-    const componentPath = `/src/pages/${route.component}.tsx`;
-    const newRoute: RouteObject = {
-      path: route.path,
-    };
-
-    if (!route.isExternal && PageKeys.includes(componentPath)) {
-      newRoute.element = React.createElement(
-        lazy(() => PagesList[componentPath]() as Promise<{ default: React.ComponentType<any> }>),
-      );
-    }
-    if (route.children != null && route.children.length > 0) {
-      newRoute.children = getChildrenRoutes(route.children);
-    }
-    dynamicRoutes.push(newRoute);
-  });
-  return dynamicRoutes;
+  if (apiRoutes.length <= 0) return [];
+  return convertMenuToRoutes(apiRoutes);
 };
