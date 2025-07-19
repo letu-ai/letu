@@ -48,26 +48,26 @@
 ## 功能模块
 
 * 组织架构
-    * 职位分组
-    * 职位管理
-    * 部门管理
-    * 员工列表
-    * 通知管理
-    * 我的通知
+  * 职位分组
+  * 职位管理
+  * 部门管理
+  * 员工列表
+  * 通知管理
+  * 我的通知
 * 系统管理
-    * 用户管理
-    * 角色管理
-    * 菜单管理
-    * 数据字典
-    * 配置管理
-    * 租户管理
-    * 定时任务
-    * 登录日志
-    * 业务日志
+  * 用户管理
+  * 角色管理
+  * 菜单管理
+  * 数据字典
+  * 配置管理
+  * 租户管理
+  * 定时任务
+  * 登录日志
+  * 业务日志
 * 系统监控
-    * 在线用户
-    * 异常日志
-    * 访问日志
+  * 在线用户
+  * 异常日志
+  * 访问日志
 
 ## 系统截图
 
@@ -76,3 +76,98 @@
 
 2. 首页
 ![首页](./docs/home.png "home")
+
+## 快速上手
+
+### 项目结构
+
+**后端**
+
+![后端目录结构](./docs/project_struct.png "fancyx-server")
+
+**前端**
+
+![前端目录结构](./docs/frontend_struct.png "fancyx-web")
+
+### 配置文件
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "App": {
+    //跨域配置
+    "CorsOrigins": "http://localhost:8080",
+    //是否演示模式
+    "DemonstrationMode": false,
+    //是否允许一个用户多处同时登录
+    "AccountManyLogin": true
+  },
+  "ConnectionStrings": {
+    //连接字符串
+    "Default": "Host=数据库地址;Port=5432;Database=数据库名;User ID=账号;Password=密码;"
+  },
+  "Redis": {
+    //Redis连接字符串
+    "Connection": "127.0.0.1:6379,password=123456"
+  },
+  "Jwt": {
+    //JWT误差时间（秒）
+    "ClockSkew": 300,
+    //JWT发布者
+    "ValidAudience": "api",
+    //JWT发布者
+    "ValidIssuer": "fancyx-admin",
+    //JWT签名密钥
+    "IssuerSigningKey": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "Oss": {
+    //对象存储路径
+    "Bucket": "D:\\Oss",
+    //对象存储域名
+    "Domain": "http://localhost:5000/",
+    //阿里云OSS配置
+    "Aliyun": {
+      "AccessKey": "", 
+      "AccessKeySecret": "",
+      "Endpoint": "",
+      "Bucket": "",
+      "Timeout": 60000,
+      "Domain": ""
+    }
+  },
+  "Snowflake": {
+    //雪花ID工作ID
+    "WorkerId": 1,
+    //雪花ID数据中心ID
+    "DataCenterId": 4
+  },
+  "Mqtt": {
+    //MQTT服务器暴露端口
+    "Port": 1883,
+    //MQTT连接账号
+    "UserName": "admin",
+    //MQTT连接密码
+    "Password": "123qwe*"
+  }
+}
+```
+
+### 项目启动
+
+后端项目启动：
+
+* 修改PostgreSQL,Redis配置
+* 执行根目录下`dbscripts/xxx/v年月日_column_data.sql`，会创建表结构，初始化数据
+* 修改OSS配置，使用本地目录（盘符一定要有，目录不存在会自动创建）
+* 使用VS2022调试启动（也可以在Fancyx.Admin目录下使用`dotnet run`）
+
+前端项目启动：
+
+* 提前安装`yarn`，运行命令：`npm install -g yarn`
+* 安装依赖包，运行命令：`yarn install`
+* 开发环境启动，运行命令：`yarn run dev`
