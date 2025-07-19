@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Badge, Popover, List, Divider, Button } from 'antd';
+import { Badge, Popover, List, Divider, Button, notification } from 'antd';
 import '../style/NotificationPopover.scss';
 import ProIcon from '@/components/ProIcon';
 import {
@@ -10,13 +10,17 @@ import {
 import useApp from 'antd/es/app/useApp'; // 自定义样式
 import { useNavigate } from 'react-router-dom';
 import { CheckOutlined, EyeOutlined } from '@ant-design/icons';
+import { observer } from 'mobx-react-lite';
+import { useMqtt } from '@/hooks/useMqtt.ts';
+import UserStore from '@/store/userStore.ts';
 
-const NotificationPopover = () => {
+const NotificationPopover = observer(() => {
   const [visible, setVisible] = useState(false);
   const [notifications, setNotifications] = useState<UserNotificationNavbarItemDto[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { message } = useApp();
   const navigate = useNavigate();
+  const [api, contextHolder] = notification.useNotification();
 
   const fetchNotifications = () => {
     getMyNotificationNavbarInfo().then((res) => {
@@ -28,6 +32,21 @@ const NotificationPopover = () => {
   useEffect(() => {
     fetchNotifications();
   }, []);
+
+  useMqtt('Notification:' + UserStore.userInfo?.employeeId, {
+    onMessage: (json: string) => {
+      const data = JSON.parse(json);
+      if (data instanceof Object) {
+        fetchNotifications();
+        api['info']({
+          message: data.title,
+          description: data.content,
+          duration: 3,
+          placement: 'bottomRight',
+        });
+      }
+    },
+  });
 
   // 一键全部已读
   const markAllAsRead = () => {
@@ -94,6 +113,7 @@ const NotificationPopover = () => {
       onOpenChange={setVisible}
       placement="bottomRight"
     >
+      {contextHolder}
       <Badge count={unreadCount} size="small" className="notification-badge">
         <Button type="text" className="navbar-btn">
           <ProIcon icon="antd:BellOutlined" />
@@ -101,6 +121,6 @@ const NotificationPopover = () => {
       </Badge>
     </Popover>
   );
-};
+});
 
 export default NotificationPopover;

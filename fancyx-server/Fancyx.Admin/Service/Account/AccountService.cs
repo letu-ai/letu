@@ -4,6 +4,7 @@ using AutoMapper;
 
 using DotNetCore.CAP;
 
+using Fancyx.Admin.Entities.Organization;
 using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.IService.Account;
 using Fancyx.Admin.IService.Account.Dtos;
@@ -31,11 +32,12 @@ namespace Fancyx.Admin.Service.Account
         private readonly IdentitySharedService _identitySharedService;
         private readonly ICapPublisher _capPublisher;
         private readonly IMapper _mapper;
+        private readonly IRepository<EmployeeDO> _employeeRepository;
         private readonly HttpContext _httpContext;
 
         public AccountService(IRepository<UserDO> userRepository, ICurrentUser currentUser, IRepository<MenuDO> menuRepository
             , IConfiguration configuration, IHybridCache hybridCache, IdentitySharedService identitySharedService
-            , ICapPublisher capPublisher, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+            , ICapPublisher capPublisher, IHttpContextAccessor httpContextAccessor, IMapper mapper, IRepository<EmployeeDO> employeeRepository)
         {
             _userRepository = userRepository;
             _currentUser = currentUser;
@@ -45,6 +47,7 @@ namespace Fancyx.Admin.Service.Account
             _identitySharedService = identitySharedService;
             _capPublisher = capPublisher;
             _mapper = mapper;
+            _employeeRepository = employeeRepository;
             _httpContext = httpContextAccessor.HttpContext!;
         }
 
@@ -116,6 +119,7 @@ namespace Fancyx.Admin.Service.Account
                     NickName = user.NickName,
                     Avatar = user.Avatar,
                     Sex = (int)user.Sex,
+                    EmployeeId = _employeeRepository.Where(x => x.UserId == uid).ToOne(x => x.Id)
                 },
                 Menus = await GetFrontMenus(),
                 Permissions = permission.Auths ?? []

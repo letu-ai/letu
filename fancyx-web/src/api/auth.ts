@@ -82,6 +82,7 @@ interface UserInfoDto {
   avatar: string;
   nickName: string;
   sex: number;
+  employeeId?: string | null;
 }
 
 export interface FrontendMenu {

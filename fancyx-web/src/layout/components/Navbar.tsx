@@ -56,7 +56,6 @@ const Navbar = observer(() => {
     },
   ];
   const location = useLocation();
-
   const setCollapsed = () => {
     dispatch(toggleCollapsed());
   };

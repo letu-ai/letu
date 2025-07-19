@@ -26,5 +26,10 @@ namespace Fancyx.Admin.IService.Account.Dtos
         /// 性别
         /// </summary>
         public int Sex { get; set; }
+
+        /// <summary>
+        /// 绑定员工ID
+        /// </summary>
+        public Guid? EmployeeId { get; set; }
     }
 }

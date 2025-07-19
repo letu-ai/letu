@@ -198,6 +198,37 @@ const HomePage = () => {
         {/* 右侧列 - 更新日志和捐赠 */}
         <Col xs={24} md={8}>
           <Row gutter={[24, 24]}>
+            {/* 打赏二维码 */}
+            <Col span={24}>
+              <Card
+                title={
+                  <Space>
+                    <GiftOutlined />
+                    <Title level={5} style={{ margin: 0 }}>
+                      支持作者
+                    </Title>
+                  </Space>
+                }
+                className="dashboard-card"
+              >
+                <div className="donation-container">
+                  <div className="qrcode-placeholder">
+                    <div className="qrcode-icon">
+                      <Image src={AliPay} />
+                    </div>
+                  </div>
+                  <div className="donation-text">
+                    <Paragraph type="secondary" style={{ textAlign: 'center' }}>
+                      请使用支付宝扫一扫
+                    </Paragraph>
+                    <Paragraph style={{ textAlign: 'center' }}>
+                      <Text strong>如果您觉得这个项目对您有帮助，就请作者喝杯咖啡吧！</Text>
+                    </Paragraph>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
             {/* 更新日志 */}
             <Col span={24}>
               <Card
@@ -231,37 +262,6 @@ const HomePage = () => {
                     };
                   })}
                 />
-              </Card>
-            </Col>
-
-            {/* 打赏二维码 */}
-            <Col span={24}>
-              <Card
-                title={
-                  <Space>
-                    <GiftOutlined />
-                    <Title level={5} style={{ margin: 0 }}>
-                      支持作者
-                    </Title>
-                  </Space>
-                }
-                className="dashboard-card"
-              >
-                <div className="donation-container">
-                  <div className="qrcode-placeholder">
-                    <div className="qrcode-icon">
-                      <Image src={AliPay} />
-                    </div>
-                  </div>
-                  <div className="donation-text">
-                    <Paragraph type="secondary" style={{ textAlign: 'center' }}>
-                      请使用支付宝扫一扫
-                    </Paragraph>
-                    <Paragraph style={{ textAlign: 'center' }}>
-                      <Text strong>如果您觉得这个项目对您有帮助，就请作者喝杯咖啡吧！</Text>
-                    </Paragraph>
-                  </div>
-                </div>
               </Card>
             </Col>
           </Row>

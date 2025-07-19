@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
+    "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@reduxjs/toolkit": "^2.6.1",
     "@tanstack/react-query": "^5.81.5",
     "antd": "^5.25.4",
@@ -19,6 +20,7 @@
     "lodash": "^4.17.21",
     "mobx": "^6.13.7",
     "mobx-react-lite": "^4.1.0",
+    "mqtt": "^5.13.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^6.0.0",
