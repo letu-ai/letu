@@ -1,5 +1,11 @@
 # 风汐管理系统(fancyx-admin)
 
+<!-- PROJECT SHIELDS -->
+
+[![GitHub stars](https://img.shields.io/github/stars/fancyxnet/fancyx-admin?style=social)](https://github.com/fancyxnet/fancyx-admin)
+[![GitHub forks](https://img.shields.io/github/forks/fancyxnet/fancyx-admin?style=social)](https://github.com/fancyxnet/fancyx-admin)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/fancyxnet/fancyx-admin)
+
 ## 项目介绍
 
 风汐管理系统，使用.NET9+React18构建的RBAC通用权限管理系统（支持按钮级别权限），支持多租户功能，简单易上手，不使用任何三方Admin框架，完全作者独立开发；旨在为个人、企业提供高效、美观的后台管理解决方案，为.NET+React后台方案添砖加瓦， 系统采用最新最稳定的技术栈，具有良好的扩展性和可维护性，支持快速定制开发。
@@ -171,3 +177,21 @@
 * 提前安装`yarn`，运行命令：`npm install -g yarn`
 * 安装依赖包，运行命令：`yarn install`
 * 开发环境启动，运行命令：`yarn run dev`
+
+## 参与贡献
+
+1. Fork本项目
+2. 创建您的特性分支 (git checkout -b feature/AmazingFeature)
+3. 提交您的更改 (git commit -m 'Add some AmazingFeature')
+4. 推送到分支 (git push origin feature/AmazingFeature)
+5. 提交Pull Request
+
+## 许可证
+
+本项目采用[MIT](./LICENSE)开源许可，个人或企业均可免费使用
+
+## 联系方式
+
+* 邮箱：fancyxnet@gmail.com/crackerwork@outlook.com
+* QQ：3805712581
+* 在线文档： https://doc.crackerwork.cn

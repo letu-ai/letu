@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import './index.scss';
 import AliPay from '@/assets/alipay.jpg';
+import { useEffect, useState } from 'react';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -69,6 +70,24 @@ const HomePage = () => {
     { name: 'Gitee', icon: <GithubOutlined />, url: 'https://gitee.com/fancyxnet/fancyx-admin' },
     { name: '文档', icon: <BookOutlined />, url: 'https://crackerwork.com' },
   ];
+  const [githubRepoInfo, setGithubRepoInfo] = useState<any>({
+    starCount: 26,
+    forkCount: 6,
+    watchCount: 2,
+  });
+
+  useEffect(() => {
+    fetch('https://api.github.com/repos/fancyxnet/fancyx-admin').then(async (res) => {
+      const json = await res.json();
+      if (json instanceof Object) {
+        setGithubRepoInfo({
+          starCount: json['stargazers_count'],
+          forkCount: json['forks'],
+          watchCount: json['subscribers_count'],
+        });
+      }
+    });
+  }, []);
 
   return (
     <div className="home-page">
@@ -126,19 +145,19 @@ const HomePage = () => {
                     <Tooltip title="Stars">
                       <Space>
                         <StarOutlined />
-                        <Text strong>24</Text>
+                        <Text strong>{githubRepoInfo.starCount}</Text>
                       </Space>
                     </Tooltip>
                     <Tooltip title="Forks">
                       <Space>
                         <ForkOutlined />
-                        <Text strong>6</Text>
+                        <Text strong>{githubRepoInfo.forkCount}</Text>
                       </Space>
                     </Tooltip>
                     <Tooltip title="Watchers">
                       <Space>
                         <EyeOutlined />
-                        <Text strong>2</Text>
+                        <Text strong>{githubRepoInfo.watchCount}</Text>
                       </Space>
                     </Tooltip>
                   </div>
