@@ -12,17 +12,15 @@ namespace Fancyx.Admin.Service.System
         private readonly IRepository<RoleDO> _roleRepository;
         private readonly IRepository<RoleMenuDO> _roleMenuRepository;
         private readonly IRepository<UserRoleDO> _userRoleRepository;
-        private readonly IdentitySharedService _identityDomainService;
-        private readonly IRepository<RoleDeptDO> _roleDeptRepository;
+        private readonly IdentitySharedService _identitySharedService;
 
         public RoleService(IRepository<RoleDO> roleRepository, IRepository<RoleMenuDO> roleMenuRepository
-            , IRepository<UserRoleDO> userRoleRepository, IdentitySharedService identityDomainService, IRepository<RoleDeptDO> roleDeptRepository)
+            , IRepository<UserRoleDO> userRoleRepository, IdentitySharedService identitySharedService)
         {
             _roleRepository = roleRepository;
             _roleMenuRepository = roleMenuRepository;
             _userRoleRepository = userRoleRepository;
-            _identityDomainService = identityDomainService;
-            _roleDeptRepository = roleDeptRepository;
+            _identitySharedService = identitySharedService;
         }
 
         public async Task<bool> AddRoleAsync(RoleDto dto)
@@ -60,7 +58,8 @@ namespace Fancyx.Admin.Service.System
                     await _roleMenuRepository.InsertAsync(items);
                 }
             }
-            await _identityDomainService.DelUserPermissionCacheByRoleIdAsync(dto.RoleId);
+
+            await _identitySharedService.DelUserPermissionCacheByRoleIdAsync(dto.RoleId);
             return true;
         }
 
@@ -75,6 +74,7 @@ namespace Fancyx.Admin.Service.System
                 throw new BusinessException(message: $"{role.RoleName}不能删除");
             }
             await _roleRepository.DeleteAsync(x => x.Id == id);
+            await _identitySharedService.DelUserPermissionCacheByRoleIdAsync(id);
             return true;
         }
 
@@ -117,6 +117,11 @@ namespace Fancyx.Admin.Service.System
             entity.Remark = dto.Remark;
             entity.IsEnabled = dto.IsEnabled;
             await _roleRepository.UpdateAsync(entity);
+
+            if (!entity.IsEnabled)
+            {
+                await _identitySharedService.DelUserPermissionCacheByRoleIdAsync(entity.Id);
+            }
             return true;
         }
 

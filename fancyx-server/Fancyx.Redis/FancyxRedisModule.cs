@@ -17,6 +17,8 @@ namespace Fancyx.Redis
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            context.Services.AddMemoryCache();
+
             //FreeRedis
             var redisClient = new RedisClient((ConnectionStringBuilder)context.Configuration["Redis:Connection"])
             {
@@ -25,6 +27,7 @@ namespace Fancyx.Redis
             };
             redisClient.Interceptors.Add(() => new RedisClientInterceptor());
             context.Services.AddSingleton<IRedisClient>(sp => redisClient);
+            context.Services.AddSingleton<IHybridCache, HybridCache>();
 
             //RedLock
             var multiplexers = new List<RedLockMultiplexer>

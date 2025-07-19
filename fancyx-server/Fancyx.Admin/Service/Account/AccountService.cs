@@ -1,5 +1,9 @@
+using System.Security.Claims;
+
 using AutoMapper;
+
 using DotNetCore.CAP;
+
 using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.IService.Account;
 using Fancyx.Admin.IService.Account.Dtos;
@@ -12,10 +16,8 @@ using Fancyx.Repository;
 using Fancyx.Shared.Consts;
 using Fancyx.Shared.Enums;
 using Fancyx.Shared.Keys;
-using FreeRedis;
+
 using FreeSql;
-using Microsoft.Extensions.Caching.Memory;
-using System.Security.Claims;
 
 namespace Fancyx.Admin.Service.Account
 {
@@ -25,26 +27,24 @@ namespace Fancyx.Admin.Service.Account
         private readonly ICurrentUser _currentUser;
         private readonly IRepository<MenuDO> _menuRepository;
         private readonly IConfiguration _configuration;
-        private readonly IRedisClient _redisDb;
+        private readonly IHybridCache _hybridCache;
         private readonly IdentitySharedService _identitySharedService;
         private readonly ICapPublisher _capPublisher;
         private readonly IMapper _mapper;
-        private readonly IMemoryCache _memoryCache;
         private readonly HttpContext _httpContext;
 
         public AccountService(IRepository<UserDO> userRepository, ICurrentUser currentUser, IRepository<MenuDO> menuRepository
-            , IConfiguration configuration, IRedisClient redisDb, IdentitySharedService identitySharedService
-            , ICapPublisher capPublisher, IHttpContextAccessor httpContextAccessor, IMapper mapper, IMemoryCache memoryCache)
+            , IConfiguration configuration, IHybridCache hybridCache, IdentitySharedService identitySharedService
+            , ICapPublisher capPublisher, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _userRepository = userRepository;
             _currentUser = currentUser;
             _menuRepository = menuRepository;
             _configuration = configuration;
-            _redisDb = redisDb;
+            _hybridCache = hybridCache;
             _identitySharedService = identitySharedService;
             _capPublisher = capPublisher;
             _mapper = mapper;
-            _memoryCache = memoryCache;
             _httpContext = httpContextAccessor.HttpContext!;
         }
 
@@ -79,31 +79,13 @@ namespace Fancyx.Admin.Service.Account
             if (!bool.Parse(_configuration["App:AccountManyLogin"]!))
             {
                 //移除其它记录token
-                await _redisDb.KeyDeleteByPatternAsync(SystemCacheKey.AccessToken(userId, "*"));
-                await _redisDb.KeyDeleteByPatternAsync(SystemCacheKey.RefreshToken(userId, "*"));
-                var removeIds = _memoryCache.Get<HashSet<string>>(SystemCacheKey.UserSessionId(userId));
-                if (removeIds != null)
-                {
-                    foreach (var id in removeIds)
-                    {
-                        _memoryCache.Remove(SystemCacheKey.AccessToken(userId, id));
-                    }
-                    _memoryCache.Remove(SystemCacheKey.UserSessionId(userId));
-                }
+                await _hybridCache.RemoveByPatternAsync(SystemCacheKey.AccessToken(userId, "*"));
+                await _hybridCache.RemoveByPatternAsync(SystemCacheKey.RefreshToken(userId, "*"));
             }
 
             var expired = TimeSpan.FromHours(AdminConsts.TokenExpiredHour);
-            HashSet<string>? sessionIds = _memoryCache.GetOrCreate(SystemCacheKey.UserSessionId(userId), entry =>
-            {
-                return new HashSet<string> { sessionId };
-            }) ?? [sessionId];
-
-            _memoryCache.Set(SystemCacheKey.AccessToken(userId, sessionId), rs.AccessToken, expired);
-            sessionIds.Add(sessionId);
-            _memoryCache.Set(SystemCacheKey.UserSessionId(userId), sessionIds);
-
-            await _redisDb.SetAsync(SystemCacheKey.AccessToken(userId, sessionId), rs.AccessToken, expired);
-            await _redisDb.SetAsync(SystemCacheKey.RefreshToken(userId, sessionId), refreshToken, TimeSpan.FromMinutes(AdminConsts.TokenExpiredHour * 60 + 20));
+            await _hybridCache.SetAsync(SystemCacheKey.AccessToken(userId, sessionId), rs.AccessToken, expired);
+            await _hybridCache.SetAsync(SystemCacheKey.RefreshToken(userId, sessionId), refreshToken, TimeSpan.FromMinutes(AdminConsts.TokenExpiredHour * 60 + 20));
 
             return (rs, sessionId);
         }
@@ -112,9 +94,9 @@ namespace Fancyx.Admin.Service.Account
         {
             var sessionId = _currentUser.FindClaim(AdminConsts.SessionId)!.Value;
             var key = SystemCacheKey.RefreshToken(_currentUser.Id!.Value, sessionId);
-            if (!await _redisDb.ExistsAsync(key)) throw new BusinessException(message: "刷新token已过期");
+            if (!await _hybridCache.ExistsAsync(key)) throw new BusinessException(message: "刷新token已过期");
 
-            var existRefreshToken = await _redisDb.GetAsync<string>(key);
+            var existRefreshToken = await _hybridCache.GetAsync<string>(key);
             if (!refreshToken.Equals(existRefreshToken)) throw new BusinessException(message: "刷新token不正确");
 
             return (await GenerateTokenAsync(_currentUser.Id!.Value, _currentUser.UserName!, sessionId)).tokenRes;
@@ -260,13 +242,11 @@ namespace Fancyx.Admin.Service.Account
             if (!uid.HasValue) return false;
             var sessionId = _currentUser.FindClaim(AdminConsts.SessionId)!.Value;
             //移除访问token
-            _memoryCache.Remove(SystemCacheKey.AccessToken(uid.Value, sessionId));
-            await _redisDb.DelAsync(SystemCacheKey.AccessToken(uid.Value, sessionId));
+            await _hybridCache.RemoveAsync(SystemCacheKey.AccessToken(uid.Value, sessionId));
             //移除刷新token
-            await _redisDb.DelAsync(SystemCacheKey.RefreshToken(uid.Value, sessionId));
+            await _hybridCache.RemoveAsync(SystemCacheKey.RefreshToken(uid.Value, sessionId));
             //移除权限缓存
-            _memoryCache.Remove(SystemCacheKey.UserPermission(uid.Value));
-            await _redisDb.DelAsync(SystemCacheKey.UserPermission(uid.Value));
+            await _hybridCache.RemoveAsync(SystemCacheKey.UserPermission(uid.Value));
             return true;
         }
     }

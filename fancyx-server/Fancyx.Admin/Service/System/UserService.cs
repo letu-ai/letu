@@ -77,7 +77,6 @@ namespace Fancyx.Admin.Service.System
                     await _userRoleRepository.InsertAsync(items);
                 }
             }
-            await _identityDomainService.DelUserPermissionCacheByUserIdAsync(dto.UserId);
             return true;
         }
 
@@ -88,6 +87,7 @@ namespace Fancyx.Admin.Service.System
                 throw new BusinessException("不能删除自己");
             }
             await _userRepository.DeleteAsync(x => x.Id == id);
+            await _identityDomainService.DelUserPermissionCacheByUserIdAsync(id);
             return true;
         }
 
@@ -114,6 +114,11 @@ namespace Fancyx.Admin.Service.System
                 ?? throw new BusinessException("数据不存在");
             entity.IsEnabled = !entity.IsEnabled;
             await _userRepository.UpdateAsync(entity);
+
+            if (!entity.IsEnabled)
+            {
+                await _identityDomainService.DelUserPermissionCacheByUserIdAsync(id);
+            }
             return true;
         }
 

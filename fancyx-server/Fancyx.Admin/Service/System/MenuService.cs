@@ -14,12 +14,10 @@ namespace Fancyx.Admin.Service.System
     public class MenuService : IMenuService
     {
         private readonly IRepository<MenuDO> _menuRepository;
-        private readonly IdentitySharedService _identityDomainService;
 
-        public MenuService(IRepository<MenuDO> menuRepository, IdentitySharedService identityDomainService)
+        public MenuService(IRepository<MenuDO> menuRepository)
         {
             _menuRepository = menuRepository;
-            _identityDomainService = identityDomainService;
         }
 
         public async Task<bool> AddMenuAsync(MenuDto dto)
@@ -47,17 +45,12 @@ namespace Fancyx.Admin.Service.System
             }
             var entity = AutoMapperHelper.Instance.Map<MenuDto, MenuDO>(dto);
             await _menuRepository.InsertAsync(entity);
-            await _identityDomainService.DelAdminUserPermissionCacheAsync();
             return true;
         }
 
         public async Task<bool> DeleteMenusAsync(Guid[] ids)
         {
             await _menuRepository.DeleteAsync(x => ids.Contains(x.Id));
-            foreach (var item in ids)
-            {
-                await _identityDomainService.DelUserPermissionCacheByMenuIdAsync(item);
-            }
             return true;
         }
 
@@ -182,11 +175,6 @@ namespace Fancyx.Admin.Service.System
             entity.Component = dto.Component;
             entity.IsExternal = dto.IsExternal;
             await _menuRepository.UpdateAsync(entity);
-
-            if (updatePermission)
-            {
-                await _identityDomainService.DelUserPermissionCacheByMenuIdAsync(entity.Id);
-            }
 
             return true;
         }

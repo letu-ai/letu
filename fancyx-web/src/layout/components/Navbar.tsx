@@ -7,7 +7,7 @@ import { selectCollapsed, selectSize, setSize, toggleCollapsed } from '@/store/t
 import { useDispatch, useSelector } from 'react-redux';
 import { open } from '@/store/tabStore.ts';
 import { useMemo, useRef } from 'react';
-import { ClearOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import SearchModal, { type SearchModalRef } from '@/layout/components/SearchModal.tsx';
 import { useApplication } from '@/components/Application';
 import { StaticRoutes } from '@/utils/globalValue.ts';
@@ -29,11 +29,6 @@ const Navbar = observer(() => {
       icon: <UserOutlined />,
     },
     {
-      key: 'clearCache',
-      label: '清除缓存',
-      icon: <ClearOutlined />,
-    },
-    {
       type: 'divider',
     },
     {
@@ -43,7 +38,6 @@ const Navbar = observer(() => {
     },
   ];
   const { ossDomain } = useApplication();
-  const { refreshUserAuthInfo } = useAuthProvider();
   const sizeItems = [
     {
       key: 'large',
@@ -76,10 +70,6 @@ const Navbar = observer(() => {
     } else if (key === 'profile') {
       navigate('/profile');
       dispatch(open('/profile'));
-    } else if (key === 'clearCache') {
-      refreshUserAuthInfo?.()?.then(() => {
-        window.location.href = window.location.href + '?v=' + Date.now();
-      });
     } else if (sizeItems.some((h) => h.key === key)) {
       dispatch(setSize(key));
     }
