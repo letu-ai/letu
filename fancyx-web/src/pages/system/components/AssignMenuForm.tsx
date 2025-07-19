@@ -60,7 +60,7 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
   };
 
   return (
-    <Modal title="分配功能" open={isOpenModal} onCancel={onCancel} onOk={onOk} maskClosable={false} width="50%">
+    <Modal title="分配菜单权限" open={isOpenModal} onCancel={onCancel} onOk={onOk} maskClosable={false} width="50%">
       <Form
         labelCol={{ flex: '80px' }}
         labelWrap

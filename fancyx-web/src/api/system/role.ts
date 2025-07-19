@@ -64,14 +64,6 @@ export function assignData(dto: AssignDataDto) {
   return httpClient.post<AssignDataDto, AppResponse<boolean>>('/api/role/assignData', dto);
 }
 
-/**
- * 获取角色数据权限
- * @param id
- */
-export function getRolePowerData(id: string) {
-  return httpClient.get<unknown, AppResponse<AssignDataResultDto>>('/api/role/rolePowerData/' + id);
-}
-
 export interface RoleDto {
   id?: string | null;
   roleName: string;
@@ -98,11 +90,6 @@ export interface AssignMenuDto {
 
 export interface AssignDataDto {
   roleId: string;
-  powerDataType: number;
-  deptIds: string[] | null;
-}
-
-export interface AssignDataResultDto {
   powerDataType: number;
   deptIds: string[] | null;
 }
