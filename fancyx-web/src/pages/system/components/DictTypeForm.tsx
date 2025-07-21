@@ -78,16 +78,16 @@ const DictTypeForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="字典名称" name="name" rules={[{ required: true }]}>
+        <Form.Item label="字典名称" name="name" rules={[{ required: true }, { max: 128 }]}>
           <Input placeholder="请输入字典名称" />
         </Form.Item>
-        <Form.Item label="字典类型" name="dictType" rules={[{ required: true }]}>
+        <Form.Item label="字典类型" name="dictType" rules={[{ required: true }, { max: 128 }]}>
           <Input placeholder="请输入字典类型" />
         </Form.Item>
         <Form.Item label="状态" name="isEnabled" valuePropName="checked">
           <Switch />
         </Form.Item>
-        <Form.Item label="备注" name="remark">
+        <Form.Item label="备注" name="remark" rules={[{ max: 512 }]}>
           <Input placeholder="请输入备注" />
         </Form.Item>
       </Form>

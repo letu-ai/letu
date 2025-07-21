@@ -6,6 +6,7 @@ import { getPositionGroupList, type PositionGroupListDto } from '@/api/organizat
 import SysDict from '@/components/SysDict';
 import { DictType } from '@/utils/globalValue.ts';
 import useApp from 'antd/es/app/useApp';
+import TextArea from 'antd/es/input/TextArea';
 
 interface ModalProps {
   refresh?: () => void;
@@ -126,10 +127,10 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
             }}
           />
         </Form.Item>
-        <Form.Item label="职位名称" name="name" rules={[{ required: true }]}>
+        <Form.Item label="职位名称" name="name" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入职位名称" />
         </Form.Item>
-        <Form.Item label="职位编号" name="code" rules={[{ required: true }]}>
+        <Form.Item label="职位编号" name="code" rules={[{ required: true }, { max: 32 }]}>
           <Input placeholder="请输入职位编号" />
         </Form.Item>
         <Form.Item label="职位职级" name="level" rules={[{ required: true, message: '请选择职位职级' }]}>
@@ -150,8 +151,8 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
             }}
           />
         </Form.Item>
-        <Form.Item label="描述" name="description">
-          <Input placeholder="请输入描述" />
+        <Form.Item label="描述" name="description" rules={[{ max: 500 }]}>
+          <TextArea placeholder="请输入描述" />
         </Form.Item>
       </Form>
     </Modal>

@@ -9,6 +9,7 @@ import {
 } from '@/api/organization/positionGroup';
 import type { AppResponse } from '@/types/api';
 import useApp from 'antd/es/app/useApp';
+import TextArea from 'antd/es/input/TextArea';
 
 interface ModalProps {
   refresh?: () => void;
@@ -96,7 +97,7 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="分组名称" name="groupName" rules={[{ required: true }]}>
+        <Form.Item label="分组名称" name="groupName" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入分组名称" />
         </Form.Item>
         <Form.Item label="上级分组" name="parentId">
@@ -126,8 +127,8 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         <Form.Item label="显示排序" name="sort">
           <InputNumber min={1} max={999} placeholder="排序值" />
         </Form.Item>
-        <Form.Item label="备注" name="remark">
-          <Input placeholder="请输入备注" />
+        <Form.Item label="备注" name="remark" rules={[{ max: 500 }]}>
+          <TextArea placeholder="请输入备注" />
         </Form.Item>
       </Form>
     </Modal>

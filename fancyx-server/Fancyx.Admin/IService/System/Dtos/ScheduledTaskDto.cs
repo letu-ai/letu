@@ -18,6 +18,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// <summary>
         /// 任务描述
         /// </summary>
+        [MaxLength(512)]
         public string? Description { get; set; }
 
         /// <summary>

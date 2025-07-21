@@ -129,12 +129,12 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
       >
         <Row>
           <Col span={12}>
-            <Form.Item label="姓名" name="name" rules={[{ required: true }]}>
+            <Form.Item label="姓名" name="name" rules={[{ required: true }, { max: 64 }]}>
               <Input placeholder="请输入姓名" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="工号" name="code" rules={[{ required: true }]}>
+            <Form.Item label="工号" name="code" rules={[{ required: true }, { max: 64 }]}>
               <Input placeholder="请输入工号" />
             </Form.Item>
           </Col>
@@ -151,7 +151,7 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="手机号" name="phone" rules={[{ required: true }]}>
+            <Form.Item label="手机号" name="phone" rules={[{ required: true }, { max: 16 }]}>
               <Input placeholder="请输入手机号" />
             </Form.Item>
           </Col>
@@ -185,7 +185,7 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
         </Row>
         <Row>
           <Col span={12}>
-            <Form.Item label="身份证号" name="idNo">
+            <Form.Item label="身份证号" name="idNo" rules={[{ max: 32 }]}>
               <Input placeholder="请输入身份证号" />
             </Form.Item>
           </Col>
@@ -197,12 +197,12 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
         </Row>
         <Row>
           <Col span={12}>
-            <Form.Item label="邮箱" name="email">
+            <Form.Item label="邮箱" name="email" rules={[{ max: 64 }]}>
               <Input placeholder="请输入邮箱" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="现住址" name="address">
+            <Form.Item label="现住址" name="address" rules={[{ max: 512 }]}>
               <Input placeholder="请输入现住址" maxLength={512} />
             </Form.Item>
           </Col>

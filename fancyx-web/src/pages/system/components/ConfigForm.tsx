@@ -3,6 +3,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import type { AppResponse } from '@/types/api';
 import { addConfig, type ConfigDto, updateConfig } from '@/api/system/config.ts';
 import useApp from 'antd/es/app/useApp';
+import TextArea from 'antd/es/input/TextArea';
 
 interface ModalProps {
   refresh?: () => void;
@@ -80,17 +81,17 @@ const ConfigForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         <Form.Item label="组别" name="groupKey">
           <Input placeholder="组别" />
         </Form.Item>
-        <Form.Item label="配置名称" name="name" rules={[{ required: true }]}>
+        <Form.Item label="配置名称" name="name" rules={[{ required: true }, { max: 256 }]}>
           <Input placeholder="请输入配置名称" />
         </Form.Item>
-        <Form.Item label="配置键名" name="key" rules={[{ required: true }]}>
+        <Form.Item label="配置键名" name="key" rules={[{ required: true }, { max: 128 }]}>
           <Input placeholder="请输入配置键名" />
         </Form.Item>
-        <Form.Item label="配置值" name="value" rules={[{ required: true }]}>
+        <Form.Item label="配置值" name="value" rules={[{ required: true }, { max: 1024 }]}>
           <Input placeholder="请输入配置值" />
         </Form.Item>
-        <Form.Item label="备注" name="remark">
-          <Input placeholder="请输入备注" />
+        <Form.Item label="备注" name="remark" rules={[{ max: 64 }]}>
+          <TextArea placeholder="请输入备注" />
         </Form.Item>
       </Form>
     </Modal>

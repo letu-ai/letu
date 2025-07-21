@@ -134,10 +134,10 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             }}
           />
         </Form.Item>
-        <Form.Item label="菜单名称" name="title" rules={[{ required: true }]}>
+        <Form.Item label="菜单名称" name="title" rules={[{ required: true }, { max: 32 }]}>
           <Input placeholder="请输入菜单名称" />
         </Form.Item>
-        <Form.Item label="菜单类型" name="menuType" rules={[{ required: true }]}>
+        <Form.Item label="菜单类型" name="menuType" rules={[{ required: true }, { max: 64 }]}>
           <Radio.Group
             buttonStyle="solid"
             onChange={(e) => {
@@ -151,21 +151,21 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         </Form.Item>
         {(menuType === MenuType.Folder || menuType === MenuType.Menu) && (
           <>
-            <Form.Item label="菜单图标" name="icon">
+            <Form.Item label="菜单图标" name="icon" rules={[{ max: 64 }]}>
               <Input placeholder="请输入菜单图标" />
             </Form.Item>
-            <Form.Item label="路由地址" name="path" rules={[{ required: true }]}>
+            <Form.Item label="路由地址" name="path" rules={[{ required: true }, { max: 256 }]}>
               <Input placeholder="请输入路由地址" />
             </Form.Item>
             {menuType === MenuType.Menu && (
-              <Form.Item label="组件地址" name="component" rules={[{ required: true }]}>
+              <Form.Item label="组件地址" name="component" rules={[{ required: true }, { max: 256 }]}>
                 <Input placeholder="请输入组件地址" />
               </Form.Item>
             )}
           </>
         )}
         {menuType === MenuType.Button && (
-          <Form.Item label="权限标识" name="permission">
+          <Form.Item label="权限标识" name="permission" rules={[{ max: 128 }]}>
             <Input placeholder="请输入权限标识" />
           </Form.Item>
         )}

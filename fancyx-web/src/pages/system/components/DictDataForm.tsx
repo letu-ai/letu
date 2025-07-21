@@ -4,6 +4,7 @@ import type { AppResponse } from '@/types/api';
 import { addDictData, type DictDataDto, updateDictData } from '@/api/system/dictData.ts';
 import { useParams } from 'react-router-dom';
 import useApp from 'antd/es/app/useApp';
+import TextArea from 'antd/es/input/TextArea';
 
 interface ModalProps {
   refresh?: () => void;
@@ -85,10 +86,10 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="字典标签" name="label" rules={[{ required: true }]}>
+        <Form.Item label="字典标签" name="label" rules={[{ required: true }, { max: 256 }]}>
           <Input placeholder="请输入字典标签" />
         </Form.Item>
-        <Form.Item label="字典键值" name="value" rules={[{ required: true }]}>
+        <Form.Item label="字典键值" name="value" rules={[{ required: true }, { max: 128 }]}>
           <Input placeholder="请输入字典键值" />
         </Form.Item>
         <Form.Item label="状态" name="isEnabled">
@@ -97,8 +98,8 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         <Form.Item label="显示排序" name="sort" rules={[{ required: true }]}>
           <InputNumber min={1} max={999} placeholder="排序值" />
         </Form.Item>
-        <Form.Item label="备注" name="remark">
-          <Input placeholder="请输入备注" />
+        <Form.Item label="备注" name="remark" rules={[{ max: 512 }]}>
+          <TextArea placeholder="请输入备注" />
         </Form.Item>
       </Form>
     </Modal>

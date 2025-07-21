@@ -21,7 +21,7 @@ namespace Fancyx.Job.Database.Entities
         /// <summary>
         /// 任务描述
         /// </summary>
-        [Column(Name = "task_description", StringLength = -2)]
+        [Column(Name = "task_description", StringLength = 512)]
         public string? Description { get; set; }
 
         /// <summary>

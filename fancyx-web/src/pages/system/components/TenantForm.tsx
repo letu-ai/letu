@@ -77,16 +77,16 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="租户名称" name="name" rules={[{ required: true }]}>
+        <Form.Item label="租户名称" name="name" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入租户名称" />
         </Form.Item>
-        <Form.Item label="租户标识" name="tenantId" rules={[{ required: true }]}>
+        <Form.Item label="租户标识" name="tenantId" rules={[{ required: true }, { max: 18 }]}>
           <Input placeholder="请输入租户标识" />
         </Form.Item>
-        <Form.Item label="绑定域名" name="domain">
+        <Form.Item label="绑定域名" name="domain" rules={[{ max: 256 }]}>
           <Input placeholder="请输入绑定域名" />
         </Form.Item>
-        <Form.Item label="备注" name="remark">
+        <Form.Item label="备注" name="remark" rules={[{ max: 512 }]}>
           <Input placeholder="请输入备注" />
         </Form.Item>
       </Form>

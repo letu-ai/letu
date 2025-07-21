@@ -58,10 +58,10 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="账号" name="userName" rules={[{ required: true }]}>
+        <Form.Item label="账号" name="userName" rules={[{ required: true }, { max: 32 }]}>
           <Input placeholder="请输入账号" />
         </Form.Item>
-        <Form.Item label="昵称" name="nickName" rules={[{ required: true }]}>
+        <Form.Item label="昵称" name="nickName" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入昵称" />
         </Form.Item>
         <Form.Item label="性别" name="sex" rules={[{ required: true }]} initialValue={1}>

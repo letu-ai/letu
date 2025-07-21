@@ -92,10 +92,10 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="通知标题" name="title" rules={[{ required: true }]}>
+        <Form.Item label="通知标题" name="title" rules={[{ required: true }, { max: 100 }]}>
           <Input placeholder="请输入通知标题" />
         </Form.Item>
-        <Form.Item label="通知员工" name="employeeId" rules={[{ required: true }]}>
+        <Form.Item label="通知员工" name="employeeId" rules={[{ required: true }, { max: 500 }]}>
           <TreeSelect
             showSearch
             style={{ width: '100%' }}

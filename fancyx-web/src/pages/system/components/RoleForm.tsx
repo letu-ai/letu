@@ -78,13 +78,13 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="角色名" name="roleName" rules={[{ required: true }]}>
+        <Form.Item label="角色名" name="roleName" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入角色名" />
         </Form.Item>
         <Form.Item label="状态" name="isEnabled" rules={[{ required: true, message: '请选择角色状态' }]}>
           <Switch />
         </Form.Item>
-        <Form.Item label="备注" name="remark">
+        <Form.Item label="备注" name="remark" rules={[{ max: 512 }]}>
           <Input placeholder="请输入备注" allowClear />
         </Form.Item>
       </Form>

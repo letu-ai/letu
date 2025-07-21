@@ -78,13 +78,13 @@ const ScheduledTaskForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="任务KEY" name="taskKey" rules={[{ required: true }]}>
+        <Form.Item label="任务KEY" name="taskKey" rules={[{ required: true }, { max: 100 }]}>
           <Input placeholder="请输入任务KEY，唯一" />
         </Form.Item>
-        <Form.Item label="Cron表达式" name="cronExpression" rules={[{ required: true }]}>
+        <Form.Item label="Cron表达式" name="cronExpression" rules={[{ required: true }, { max: 50 }]}>
           <Input placeholder="请输入Cron表达式" />
         </Form.Item>
-        <Form.Item label="任务描述" name="description">
+        <Form.Item label="任务描述" name="description" rules={[{ max: 512 }]}>
           <Input placeholder="请输入任务描述" />
         </Form.Item>
         <Form.Item label="是否激活" name="isActive" rules={[{ required: true, message: '请选择任务状态' }]}>
