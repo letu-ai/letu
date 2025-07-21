@@ -72,22 +72,20 @@ const OnlineUserList: React.FC = () => {
   ];
 
   return (
-    <>
-      <SmartTable
-        ref={tableRef}
-        columns={columns}
-        rowKey="sessionId"
-        request={async (params) => {
-          const { data } = await getOnlineUsers(params);
-          return data;
-        }}
-        searchItems={
-          <Form.Item label="账号" name="userName">
-            <Input placeholder="请输入账号" />
-          </Form.Item>
-        }
-      />
-    </>
+    <SmartTable
+      ref={tableRef}
+      columns={columns}
+      rowKey="sessionId"
+      request={async (params) => {
+        const { data } = await getOnlineUsers(params);
+        return data;
+      }}
+      searchItems={
+        <Form.Item label="账号" name="userName">
+          <Input placeholder="请输入账号" />
+        </Form.Item>
+      }
+    />
   );
 };
 

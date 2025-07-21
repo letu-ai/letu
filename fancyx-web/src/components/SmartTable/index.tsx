@@ -168,7 +168,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
             {...restProps}
             dataSource={dataSource}
             columns={columns}
-            rowKey="id"
+            rowKey={props.rowKey ?? 'id'}
             size={tableSize}
             pagination={{
               current: queryParams.current,
