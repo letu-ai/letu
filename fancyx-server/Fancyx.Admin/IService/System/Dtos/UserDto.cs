@@ -14,7 +14,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
-        [MinLength(3)]
+        [StringLength(32, MinimumLength = 3)]
         [RegularExpression(RegexConsts.UserName)]
         public string? UserName { get; set; }
 
@@ -30,6 +30,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// <summary>
         /// 头像
         /// </summary>
+        [MaxLength(256)]
         public string? Avatar { get; set; }
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(64)]
         public string? NickName { get; set; }
 
         /// <summary>

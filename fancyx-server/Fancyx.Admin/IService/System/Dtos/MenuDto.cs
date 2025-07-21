@@ -15,16 +15,19 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(32)]
         public string? Title { get; set; }
 
         /// <summary>
         /// 图标
         /// </summary>
+        [MaxLength(64)]
         public string? Icon { get; set; }
 
         /// <summary>
         /// 路由/地址
         /// </summary>
+        [MaxLength(256)]
         public string? Path { get; set; }
 
         /// <summary>
@@ -35,6 +38,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// <summary>
         /// 授权码
         /// </summary>
+        [MaxLength(128)]
         public string? Permission { get; set; }
 
         /// <summary>
@@ -56,6 +60,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// <summary>
         /// 组件地址
         /// </summary>
+        [MaxLength(256)]
         public string? Component { get; set; }
 
         /// <summary>

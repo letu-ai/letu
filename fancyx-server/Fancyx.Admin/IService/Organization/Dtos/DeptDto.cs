@@ -13,12 +13,14 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// 部门名称
         /// </summary>
         [Required]
+        [MaxLength(64)]
         public string? Name { get; set; }
 
         /// <summary>
         /// 部门编号
         /// </summary>
         [Required]
+        [MaxLength(32)]
         public string? Code { get; set; }
 
         /// <summary>
@@ -29,6 +31,7 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// <summary>
         /// 描述
         /// </summary>
+        [MaxLength(512)]
         public string? Description { get; set; }
 
         /// <summary>
@@ -45,11 +48,13 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// <summary>
         /// 邮箱
         /// </summary>
+        [MaxLength(64)]
         public string? Email { get; set; }
 
         /// <summary>
         /// 电话
         /// </summary>
+        [MaxLength(64)]
         public string? Phone { get; set; }
 
         /// <summary>

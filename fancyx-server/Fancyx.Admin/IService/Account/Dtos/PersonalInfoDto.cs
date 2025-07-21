@@ -1,4 +1,5 @@
 using Fancyx.Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Fancyx.Admin.IService.Account.Dtos
 {
@@ -7,11 +8,13 @@ namespace Fancyx.Admin.IService.Account.Dtos
         /// <summary>
         /// 头像
         /// </summary>
+        [MaxLength(256)]
         public string? Avatar { get; set; }
 
         /// <summary>
         /// 昵称
         /// </summary>
+        [MaxLength(64)]
         public string? NickName { get; set; }
 
         /// <summary>

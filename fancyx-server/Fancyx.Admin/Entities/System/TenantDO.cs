@@ -14,7 +14,7 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [Required]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -29,11 +29,13 @@ namespace Fancyx.Admin.Entities.System
         /// <summary>
         /// 备注
         /// </summary>
+        [Column(StringLength = 512)]
         public string? Remark { get; set; }
 
         /// <summary>
         /// 租户域名
         /// </summary>
+        [Column(StringLength = 256)]
         public string? Domain { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(64)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -25,11 +26,13 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// <summary>
         /// 备注
         /// </summary>
+        [MaxLength(512)]
         public string? Remark { get; set; }
 
         /// <summary>
         /// 租户域名
         /// </summary>
+        [MaxLength(256)]
         public string? Domain { get; set; }
     }
 }

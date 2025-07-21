@@ -1,5 +1,5 @@
-using Fancyx.Repository.BaseEntity;
 using Fancyx.Core.Interfaces;
+using Fancyx.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -18,13 +18,16 @@ namespace Fancyx.Admin.Entities.System
         [NotNull]
         [Required]
         [StringLength(256)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 256)]
         public string? Value { get; set; }
 
         /// <summary>
         /// 显示文本
         /// </summary>
+        [NotNull]
+        [Required]
         [StringLength(128)]
+        [Column(IsNullable = false, StringLength = 128)]
         public string? Label { get; set; }
 
         /// <summary>
@@ -33,13 +36,14 @@ namespace Fancyx.Admin.Entities.System
         [NotNull]
         [Required]
         [StringLength(128)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 128)]
         public string? DictType { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Remark { get; set; }
 
         /// <summary>

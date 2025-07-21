@@ -35,7 +35,7 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [Required]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 1024)]
         public string? Value { get; set; }
 
         /// <summary>

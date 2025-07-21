@@ -1,5 +1,5 @@
-using Fancyx.Repository.BaseEntity;
 using Fancyx.Core.Interfaces;
+using Fancyx.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -17,13 +17,14 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [StringLength(64)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? RoleName { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Remark { get; set; }
 
         /// <summary>

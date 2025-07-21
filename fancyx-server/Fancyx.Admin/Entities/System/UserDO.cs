@@ -1,10 +1,10 @@
-using Fancyx.Repository.BaseEntity;
 using Fancyx.Core.Interfaces;
+using Fancyx.Repository.BaseEntity;
+using Fancyx.Shared.Enums;
 using FreeSql.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Fancyx.Shared.Enums;
 
 namespace Fancyx.Admin.Entities.System
 {
@@ -19,7 +19,7 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [StringLength(32)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 32)]
         public string? UserName { get; set; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [StringLength(512)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 512)]
         public string? Password { get; set; }
 
         /// <summary>
@@ -35,13 +35,14 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [StringLength(256)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 256)]
         public string? PasswordSalt { get; set; }
 
         /// <summary>
         /// 头像
         /// </summary>
         [StringLength(256)]
+        [Column(IsNullable = true, StringLength = 256)]
         public string? Avatar { get; set; }
 
         /// <summary>
@@ -49,8 +50,8 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [Required]
-        [Column(IsNullable = false)]
         [StringLength(64)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? NickName { get; set; }
 
         /// <summary>
@@ -79,5 +80,11 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
         public string? TenantId { get; set; }
+
+        /// <summary>
+        /// 手机号码
+        /// </summary>
+        [Column(StringLength = 11)]
+        public string? Phone { get; set; }
     }
 }

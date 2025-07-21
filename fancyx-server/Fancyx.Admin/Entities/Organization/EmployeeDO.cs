@@ -20,7 +20,7 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(64)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? Code { get; set; }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(64)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -45,25 +45,28 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(16)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 16)]
         public string? Phone { get; set; }
 
         /// <summary>
         /// 身份证
         /// </summary>
         [StringLength(32)]
+        [Column(StringLength = 32)]
         public string? IdNo { get; set; }
 
         /// <summary>
         /// 身份证正面
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? FrontIdNoUrl { get; set; }
 
         /// <summary>
         /// 身份证背面
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? BackIdNoUrl { get; set; }
 
         /// <summary>
@@ -75,6 +78,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// 现住址
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Address { get; set; }
 
         /// <summary>
@@ -82,6 +86,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// </summary>
         [StringLength(64)]
         [EmailAddress]
+        [Column(StringLength = 64)]
         public string? Email { get; set; }
 
         /// <summary>

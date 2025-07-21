@@ -1,6 +1,6 @@
-using Fancyx.Shared.Enums;
-using Fancyx.Repository.BaseEntity;
 using Fancyx.Core.Interfaces;
+using Fancyx.Repository.BaseEntity;
+using Fancyx.Shared.Enums;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -19,25 +19,28 @@ namespace Fancyx.Admin.Entities.System
         [NotNull]
         [Required]
         [StringLength(32)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 32)]
         public string? Title { get; set; }
 
         /// <summary>
         /// 图标
         /// </summary>
         [StringLength(64)]
+        [Column(StringLength = 64)]
         public string? Icon { get; set; }
 
         /// <summary>
         /// 路由/地址
         /// </summary>
         [StringLength(256)]
+        [Column(StringLength = 256)]
         public string? Path { get; set; }
 
         /// <summary>
         /// 组件地址
         /// </summary>
         [StringLength(256)]
+        [Column(StringLength = 256)]
         public string? Component { get; set; }
 
         /// <summary>
@@ -51,7 +54,7 @@ namespace Fancyx.Admin.Entities.System
         [NotNull]
         [Required]
         [StringLength(128)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 128)]
         public string? Permission { get; set; }
 
         /// <summary>

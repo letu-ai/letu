@@ -10,11 +10,13 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// 职位名称
         /// </summary>
         [Required]
+        [MaxLength(64)]
         public string? Name { get; set; }
 
         /// <summary>
         /// 职位编号
         /// </summary>
+        [MaxLength(32)]
         public string? Code { get; set; }
 
         /// <summary>
@@ -32,6 +34,7 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// <summary>
         /// 描述
         /// </summary>
+        [MaxLength(512)]
         public string? Description { get; set; }
 
         /// <summary>

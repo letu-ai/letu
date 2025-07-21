@@ -16,6 +16,7 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(64)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -23,6 +24,7 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(64)]
         public string? Code { get; set; }
 
         /// <summary>
@@ -36,21 +38,25 @@ namespace Fancyx.Admin.IService.Organization.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(16)]
         public string? Phone { get; set; }
 
         /// <summary>
         /// 身份证
         /// </summary>
+        [MaxLength(32)]
         public string? IdNo { get; set; }
 
         /// <summary>
         /// 身份证正面
         /// </summary>
+        [MaxLength(512)]
         public string? FrontIdNoUrl { get; set; }
 
         /// <summary>
         /// 身份证背面
         /// </summary>
+        [MaxLength(512)]
         public string? BackIdNoUrl { get; set; }
 
         /// <summary>

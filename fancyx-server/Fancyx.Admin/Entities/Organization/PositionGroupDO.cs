@@ -20,13 +20,14 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(64)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? GroupName { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Remark { get; set; }
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// 层级父ID
         /// </summary>
         [StringLength(1024)]
+        [Column(StringLength = 1024)]
         public string? ParentIds { get; set; }
 
         /// <summary>

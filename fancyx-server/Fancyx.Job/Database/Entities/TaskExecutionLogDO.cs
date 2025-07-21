@@ -26,13 +26,13 @@ namespace Fancyx.Job.Database.Entities
         /// <summary>
         /// 执行结果或错误信息
         /// </summary>
-        [Column(Name = "result", DbType = "text")]
+        [Column(Name = "result", StringLength = -2)]
         public string? Result { get; set; }
 
         /// <summary>
         /// 服务器节点标识
         /// </summary>
-        [Column(Name = "node_id", StringLength = 50)]
+        [Column(Name = "node_id", StringLength = 128)]
         public string? NodeId { get; set; }
 
         /// <summary>

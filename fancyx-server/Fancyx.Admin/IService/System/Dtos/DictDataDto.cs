@@ -15,22 +15,28 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(256)]
         public string? Value { get; set; }
 
         /// <summary>
         /// 显示文本
         /// </summary>
+        [NotNull]
+        [Required]
+        [MaxLength(128)]
         public string? Label { get; set; }
 
         /// <summary>
         /// 字典类型
         /// </summary>
         [Required]
+        [MaxLength(128)]
         public string? DictType { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
+        [MaxLength(512)]
         public string? Remark { get; set; }
 
         /// <summary>

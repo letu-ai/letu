@@ -18,7 +18,7 @@ namespace Fancyx.Admin.Entities.System
         [NotNull]
         [Required]
         [StringLength(128)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 128)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -27,13 +27,14 @@ namespace Fancyx.Admin.Entities.System
         [NotNull]
         [Required]
         [StringLength(128)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 128)]
         public string? DictType { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Remark { get; set; }
 
         /// <summary>

@@ -12,6 +12,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(100)]
         public string? TaskKey { get; set; }
 
         /// <summary>
@@ -24,6 +25,7 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// </summary>
         [NotNull]
         [Required]
+        [MaxLength(50)]
         public string? CronExpression { get; set; }
 
         /// <summary>

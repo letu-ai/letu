@@ -1,5 +1,5 @@
-using Fancyx.Repository.BaseEntity;
 using Fancyx.Core.Interfaces;
+using Fancyx.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +19,7 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(32)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 32)]
         public string? Code { get; set; }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(64)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -40,6 +40,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// 描述
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Description { get; set; }
 
         /// <summary>
@@ -56,12 +57,14 @@ namespace Fancyx.Admin.Entities.Organization
         /// 邮箱
         /// </summary>
         [StringLength(64)]
+        [Column(StringLength = 64)]
         public string? Email { get; set; }
 
         /// <summary>
         /// 电话
         /// </summary>
         [StringLength(64)]
+        [Column(StringLength = 64)]
         public string? Phone { get; set; }
 
         /// <summary>
@@ -73,6 +76,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// 层级父ID
         /// </summary>
         [StringLength(1024)]
+        [Column(StringLength = 1024)]
         public string? ParentIds { get; set; }
 
         /// <summary>

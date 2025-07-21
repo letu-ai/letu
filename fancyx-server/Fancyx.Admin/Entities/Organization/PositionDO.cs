@@ -18,7 +18,7 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(32)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 32)]
         public string? Code { get; set; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Fancyx.Admin.Entities.Organization
         [NotNull]
         [Required]
         [StringLength(64)]
-        [Column(IsNullable = false)]
+        [Column(IsNullable = false, StringLength = 64)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -48,6 +48,7 @@ namespace Fancyx.Admin.Entities.Organization
         /// 描述
         /// </summary>
         [StringLength(512)]
+        [Column(StringLength = 512)]
         public string? Description { get; set; }
 
         /// <summary>

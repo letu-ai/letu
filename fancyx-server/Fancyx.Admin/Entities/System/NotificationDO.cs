@@ -14,14 +14,15 @@ namespace Fancyx.Admin.Entities.System
         /// </summary>
         [NotNull]
         [Required]
-        [MaxLength(100)]
-        [Column(IsNullable = false)]
+        [MaxLength(128)]
+        [Column(IsNullable = false, StringLength = 128)]
         public string? Title { get; set; }
 
         /// <summary>
         /// 通知内容
         /// </summary>
-        [MaxLength(500)]
+        [MaxLength(512)]
+        [Column(StringLength = 512)]
         public string? Content { get; set; }
 
         /// <summary>
