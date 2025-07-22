@@ -1,5 +1,7 @@
+using Fancyx.Admin.SharedService;
 using Fancyx.Core.Helpers;
 using Fancyx.ObjectStorage;
+using Fancyx.Shared.Keys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,12 @@ namespace Fancyx.Admin.Controllers.Oss
     public class OssController : ControllerBase
     {
         private readonly IObjectStorageFactory _objectStorageFactory;
+        private readonly ConfigSharedService _configSharedService;
 
-        public OssController(IObjectStorageFactory objectStorageFactory)
+        public OssController(IObjectStorageFactory objectStorageFactory, ConfigSharedService configSharedService)
         {
             _objectStorageFactory = objectStorageFactory;
+            _configSharedService = configSharedService;
         }
 
         [HttpPost]
@@ -26,7 +30,9 @@ namespace Fancyx.Admin.Controllers.Oss
             {
                 fileName = dir + "/" + fileName;
             }
-            IObjectStorageService objectStorageService = _objectStorageFactory.GetService(StorageType.Local);
+            var storageType = await _configSharedService.GetAsync(SystemConfigKey.StorageType);
+            _ = Enum.TryParse(storageType, out StorageType type);
+            IObjectStorageService objectStorageService = _objectStorageFactory.GetService(type);
             var url = await objectStorageService.UploadAsync(stream, fileName);
 
             //目前默认是本地服务器模式，后续读取配置
@@ -41,7 +47,9 @@ namespace Fancyx.Admin.Controllers.Oss
         {
             try
             {
-                IObjectStorageService objectStorageService = _objectStorageFactory.GetService(StorageType.Local);
+                var storageType = await _configSharedService.GetAsync(SystemConfigKey.StorageType);
+                _ = Enum.TryParse(storageType, out StorageType type);
+                IObjectStorageService objectStorageService = _objectStorageFactory.GetService(type);
                 var stream = await objectStorageService.DownloadAsync(fileName);
                 var name = Path.GetFileName(fileName);
                 var mimeType = MimeTypesMapHelper.Instance.GetMimeType(name);
