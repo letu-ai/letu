@@ -84,7 +84,12 @@ const LoginPage = () => {
 
                 <Form
                   name="login_form"
-                  initialValues={{ remember: true, userName: 'admin', password: '123qwe*' }}
+                  initialValues={{
+                    remember: true,
+                    userName: 'admin',
+                    password: '123qwe*',
+                    phone: '18211112222',
+                  }}
                   onFinish={onFinish}
                   form={form}
                   size="large"
