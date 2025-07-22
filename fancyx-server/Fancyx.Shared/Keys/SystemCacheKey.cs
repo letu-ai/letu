@@ -73,5 +73,12 @@
         /// <param name="userId"></param>
         /// <returns></returns>
         public static string UserSessionId(Guid userId) => $"user_session:{userId}";
+
+        /// <summary>
+        /// 登录验证码
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        public static string LoginSmsCode(string phone) => $"Admin:LoginSmsCode:{phone}";
     }
 }

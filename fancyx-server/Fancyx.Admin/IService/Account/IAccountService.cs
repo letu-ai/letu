@@ -13,6 +13,13 @@ namespace Fancyx.Admin.IService.Account
         Task<LoginResultDto> LoginAsync(LoginDto dto);
 
         /// <summary>
+        /// 短信验证码登录
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<LoginResultDto> SmsLoginAsync(SmsLoginDto dto);
+
+        /// <summary>
         /// 刷新token
         /// </summary>
         /// <param name="refreshToken"></param>
@@ -44,5 +51,12 @@ namespace Fancyx.Admin.IService.Account
         /// </summary>
         /// <returns></returns>
         Task<UserAuthInfoDto> GetUserAuthInfoAsync();
+
+        /// <summary>
+        /// 发送登录短信验证码
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        Task<string> SendLoginSmsCodeAsync(string phone);
     }
 }

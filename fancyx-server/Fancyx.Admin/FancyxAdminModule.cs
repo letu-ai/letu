@@ -108,7 +108,7 @@ namespace Fancyx.Admin
             services.AddRateLimiter(options =>
             {
                 // 防抖1秒内1次
-                options.AddFixedWindowLimiter("DebouncePolicy", opt =>
+                options.AddFixedWindowLimiter(RateLimiterConsts.DebouncePolicy, opt =>
                 {
                     opt.PermitLimit = 1;
                     opt.Window = TimeSpan.FromSeconds(1);
@@ -116,7 +116,7 @@ namespace Fancyx.Admin
                 });
 
                 // 滑动窗口限流
-                options.AddSlidingWindowLimiter("SlidingPolicy", opt =>
+                options.AddSlidingWindowLimiter(RateLimiterConsts.SlidingPolicy, opt =>
                 {
                     opt.PermitLimit = 10;
                     opt.Window = TimeSpan.FromSeconds(10);

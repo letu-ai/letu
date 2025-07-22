@@ -20,7 +20,7 @@ namespace Fancyx.Admin.Controllers.Account
         }
 
         /// <summary>
-        /// 登录
+        /// 账号密码登录
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -30,6 +30,20 @@ namespace Fancyx.Admin.Controllers.Account
         public async Task<AppResponse<LoginResultDto>> LoginAsync([FromBody] LoginDto dto)
         {
             var data = await _accountService.LoginAsync(dto);
+            return Result.Data(data);
+        }
+
+        /// <summary>
+        /// 手机短信登录
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("SmsLogin")]
+        [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
+        public async Task<AppResponse<LoginResultDto>> SmsLoginAsync([FromBody] SmsLoginDto dto)
+        {
+            var data = await _accountService.SmsLoginAsync(dto);
             return Result.Data(data);
         }
 
@@ -90,6 +104,20 @@ namespace Fancyx.Admin.Controllers.Account
         {
             var data = await _accountService.GetUserAuthInfoAsync();
             return Result.Data(data);
+        }
+
+        /// <summary>
+        /// 发送登录短信验证码
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        [HttpPost("SendLoginSmsCode")]
+        [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
+        public async Task<AppResponse<string>> SendLoginSmsCodeAsync(string phone)
+        {
+            //TODO: 正式环境不需要将验证码返回给前端
+            var code = await _accountService.SendLoginSmsCodeAsync(phone);
+            return Result.Data(code);
         }
     }
 }

@@ -1,9 +1,5 @@
-using System.Security.Claims;
-
 using AutoMapper;
-
 using DotNetCore.CAP;
-
 using Fancyx.Admin.Entities.Organization;
 using Fancyx.Admin.Entities.System;
 using Fancyx.Admin.IService.Account;
@@ -17,8 +13,8 @@ using Fancyx.Repository;
 using Fancyx.Shared.Consts;
 using Fancyx.Shared.Enums;
 using Fancyx.Shared.Keys;
-
 using FreeSql;
+using System.Security.Claims;
 
 namespace Fancyx.Admin.Service.Account
 {
@@ -168,6 +164,48 @@ namespace Fancyx.Admin.Service.Account
             }
         }
 
+        public async Task<LoginResultDto> SmsLoginAsync(SmsLoginDto dto)
+        {
+            var loginLog = new LoginLogDO
+            {
+                IsSuccess = true,
+                Ip = RequestUtils.GetIp(_httpContext),
+                OperationMsg = "登录成功",
+                UserName = dto.Phone
+            };
+            try
+            {
+                var user = await _userRepository.Where(x => x.Phone == dto.Phone && x.IsEnabled).FirstAsync() ?? throw new BusinessException(message: "手机号不存在");
+                var code = await _hybridCache.GetAsync<string>(SystemCacheKey.LoginSmsCode(dto.Phone));
+                if (string.IsNullOrEmpty(code)) throw new BusinessException("验证码已过期");
+                if (dto.Code != code) throw new BusinessException("验证码错误");
+
+                var (tokenRes, sessionId) = await GenerateTokenAsync(user.Id, user.UserName);
+
+                loginLog.SessionId = sessionId;
+
+                var rs = _mapper.Map<TokenResultDto, LoginResultDto>(tokenRes);
+                var permission = await _identitySharedService.GetUserPermissionAsync(user.Id);
+                rs.UserId = user.Id;
+                rs.UserName = dto.Phone;
+                rs.SessionId = sessionId;
+
+                return rs;
+            }
+            catch (BusinessException ex)
+            {
+                loginLog.IsSuccess = false;
+                loginLog.OperationMsg = ex.Message;
+                throw;
+            }
+            finally
+            {
+                loginLog.Address = RequestUtils.ResolveAddress(loginLog.Ip);
+                loginLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
+                await _capPublisher.PublishAsync(AdminEventBusTopicConsts.LoginLogEvent, loginLog);
+            }
+        }
+
         public async Task<List<FrontendMenu>> GetFrontMenus()
         {
             var uid = _currentUser.Id!.Value;
@@ -252,6 +290,19 @@ namespace Fancyx.Admin.Service.Account
             //移除权限缓存
             await _hybridCache.RemoveAsync(SystemCacheKey.UserPermission(uid.Value));
             return true;
+        }
+
+        public async Task<string> SendLoginSmsCodeAsync(string phone)
+        {
+            var userIsExist = await _userRepository.Where(x => x.Phone == phone).AnyAsync();
+            if (!userIsExist)
+            {
+                throw new BusinessException("手机号不存在");
+            }
+
+            var code = StringUtils.RandomStr(6, true);
+            await _hybridCache.SetAsync(SystemCacheKey.LoginSmsCode(phone), code, TimeSpan.FromMinutes(5));
+            return code;
         }
     }
 }
