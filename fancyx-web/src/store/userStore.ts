@@ -18,6 +18,7 @@ export type UserAuthInfo = {
   permissions: string[];
   menus: FrontendMenu[];
   employeeId?: string | null;
+  phone?: string | null;
 };
 
 const USER_TOKEN_KEY = 'user_token';

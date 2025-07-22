@@ -48,5 +48,11 @@ namespace Fancyx.Admin.IService.System.Dtos
         [Required]
         [Range(1, 3)]
         public SexType Sex { get; set; }
+
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        [Phone]
+        public string? Phone { get; set; }
     }
 }

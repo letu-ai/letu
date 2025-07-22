@@ -19,6 +19,7 @@ export const MenuType = {
  */
 export const Patterns = {
   LoginPassword: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d~`!@#$%^&*()_\-+={[}\]|\\:;"'<,>.?\/]{6,16}$/,
+  Phone: /^1[3-9]\d{9}$/,
 };
 
 /**

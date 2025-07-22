@@ -21,5 +21,11 @@ namespace Fancyx.Admin.IService.Account.Dtos
         /// 性别
         /// </summary>
         public SexType Sex { get; set; }
+
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        [Phone]
+        public string? Phone { get; set; }
     }
 }

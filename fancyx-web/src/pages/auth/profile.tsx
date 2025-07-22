@@ -28,6 +28,7 @@ const Profile = observer(() => {
   useDeepCompareEffect(() => {
     baseInfoForm.setFieldValue('nickName', userInfo?.nickName);
     baseInfoForm.setFieldValue('sex', userInfo?.sex);
+    baseInfoForm.setFieldValue('phone', userInfo?.phone);
   }, [userInfo ?? {}]);
 
   const profileMenuItems = [
@@ -154,8 +155,26 @@ const Profile = observer(() => {
                 <Form.Item label="账号" className="detail-form-item" rules={[{ required: true }]}>
                   <Input value={userInfo?.userName} disabled />
                 </Form.Item>
-                <Form.Item label="昵称" className="detail-form-item" name="nickName" rules={[{ required: true }]}>
+                <Form.Item
+                  label="昵称"
+                  className="detail-form-item"
+                  name="nickName"
+                  rules={[{ required: true }, { max: 64 }]}
+                >
                   <Input placeholder="请输入您的昵称" />
+                </Form.Item>
+                <Form.Item
+                  label="手机号"
+                  className="detail-form-item"
+                  name="phone"
+                  rules={[
+                    {
+                      pattern: Patterns.Phone,
+                      message: '请输入正确的手机号格式',
+                    },
+                  ]}
+                >
+                  <Input placeholder="请输入手机号" />
                 </Form.Item>
                 <Form.Item label="性别" className="detail-form-item" name="sex" rules={[{ required: true }]}>
                   <Radio.Group

@@ -112,6 +112,7 @@ namespace Fancyx.Admin.Controllers.Account
         /// <param name="phone"></param>
         /// <returns></returns>
         [HttpPost("SendLoginSmsCode")]
+        [AllowAnonymous]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task<AppResponse<string>> SendLoginSmsCodeAsync(string phone)
         {

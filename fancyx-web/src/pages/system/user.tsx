@@ -66,6 +66,10 @@ const UserTable = () => {
       ),
     },
     {
+      title: '手机号',
+      dataIndex: 'phone',
+    },
+    {
       title: '操作',
       key: 'action',
       width: 240,

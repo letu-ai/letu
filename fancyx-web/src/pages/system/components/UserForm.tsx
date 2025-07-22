@@ -61,6 +61,9 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         <Form.Item label="账号" name="userName" rules={[{ required: true }, { max: 32 }]}>
           <Input placeholder="请输入账号" />
         </Form.Item>
+        <Form.Item<UserDto> label="密码" name="password" rules={[{ required: true }, pwdPatternValidateItem]}>
+          <Input.Password placeholder="请输入密码" />
+        </Form.Item>
         <Form.Item label="昵称" name="nickName" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入昵称" />
         </Form.Item>
@@ -70,9 +73,17 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
             <Radio value={2}> 女 </Radio>
           </Radio.Group>
         </Form.Item>
-
-        <Form.Item<UserDto> label="密码" name="password" rules={[{ required: true }, pwdPatternValidateItem]}>
-          <Input.Password placeholder="请输入密码" />
+        <Form.Item
+          label="手机号"
+          name="phone"
+          rules={[
+            {
+              pattern: Patterns.Phone,
+              message: '请输入正确的手机号格式',
+            },
+          ]}
+        >
+          <Input placeholder="请输入手机号" />
         </Form.Item>
       </Form>
     </Modal>

@@ -47,6 +47,7 @@ namespace Fancyx.Admin.Service.System
                 Avatar = dto.Avatar,
                 NickName = dto.NickName ?? dto.UserName,
                 Sex = dto.Sex,
+                Phone = dto.Phone,
                 IsEnabled = true
             };
             if (string.IsNullOrWhiteSpace(dto.Avatar))

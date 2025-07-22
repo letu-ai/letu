@@ -31,5 +31,10 @@ namespace Fancyx.Admin.IService.Account.Dtos
         /// 绑定员工ID
         /// </summary>
         public Guid? EmployeeId { get; set; }
+
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        public string? Phone { get; set; }
     }
 }

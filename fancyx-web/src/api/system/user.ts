@@ -77,6 +77,7 @@ export interface UserDto {
   nickName?: string | null;
   sex: number;
   isEnabled: boolean;
+  phone?: string;
 }
 
 export interface UserQueryDto extends PageSearch {

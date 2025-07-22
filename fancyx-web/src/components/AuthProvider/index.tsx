@@ -1,11 +1,12 @@
 import React, { createContext, useContext } from 'react';
 import UserStore from '@/store/userStore.ts';
-import { getUserAuth, login, type LoginDto } from '@/api/auth.ts';
+import { getUserAuth, login, type LoginDto, smsLogin, type SmsLoginDto } from '@/api/auth.ts';
 import { clearTabs } from '@/store/tabStore.ts';
 import { useDispatch } from 'react-redux';
 
 export interface AuthProviderType {
   pwdLogin?: (values: LoginDto) => Promise<void>;
+  smsLogin?: (values: SmsLoginDto) => Promise<void>;
   clearToken: () => void;
   refreshUserAuthInfo?: () => Promise<void>;
 }
@@ -29,6 +30,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await setOrRefreshUserAuthInfo();
     }
   };
+  const _smsLogin = async (values: SmsLoginDto) => {
+    const res = await smsLogin(values);
+    if (res.data) {
+      UserStore.setToken({
+        sessionId: res.data.sessionId,
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+        expiredTime: res.data.expiredTime,
+      });
+      await setOrRefreshUserAuthInfo();
+    }
+  };
+
   const clearToken = () => {
     UserStore.logout();
     dispatch(clearTabs());
@@ -46,6 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         menus: authInfo.menus,
         permissions: authInfo.permissions,
         employeeId: authInfo.user.employeeId,
+        phone: authInfo.user.phone,
       };
       UserStore.setUserInfo(_authInfo);
     }
@@ -55,6 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{
         pwdLogin,
+        smsLogin: _smsLogin,
         clearToken,
         refreshUserAuthInfo: setOrRefreshUserAuthInfo,
       }}

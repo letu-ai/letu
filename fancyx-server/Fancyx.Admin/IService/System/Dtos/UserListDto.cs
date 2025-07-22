@@ -31,5 +31,10 @@ namespace Fancyx.Admin.IService.System.Dtos
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
+
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        public string? Phone { get; set; }
     }
 }

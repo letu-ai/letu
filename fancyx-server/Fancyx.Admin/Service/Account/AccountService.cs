@@ -115,6 +115,7 @@ namespace Fancyx.Admin.Service.Account
                     NickName = user.NickName,
                     Avatar = user.Avatar,
                     Sex = (int)user.Sex,
+                    Phone = user.Phone,
                     EmployeeId = _employeeRepository.Where(x => x.UserId == uid).ToOne(x => x.Id)
                 },
                 Menus = await GetFrontMenus(),
@@ -176,7 +177,8 @@ namespace Fancyx.Admin.Service.Account
             try
             {
                 var user = await _userRepository.Where(x => x.Phone == dto.Phone && x.IsEnabled).FirstAsync() ?? throw new BusinessException(message: "手机号不存在");
-                var code = await _hybridCache.GetAsync<string>(SystemCacheKey.LoginSmsCode(dto.Phone));
+                var codeKey = SystemCacheKey.LoginSmsCode(dto.Phone);
+                var code = await _hybridCache.GetAsync<string>(codeKey);
                 if (string.IsNullOrEmpty(code)) throw new BusinessException("验证码已过期");
                 if (dto.Code != code) throw new BusinessException("验证码错误");
 
@@ -189,6 +191,8 @@ namespace Fancyx.Admin.Service.Account
                 rs.UserId = user.Id;
                 rs.UserName = dto.Phone;
                 rs.SessionId = sessionId;
+
+                await _hybridCache.RemoveAsync(codeKey);
 
                 return rs;
             }
@@ -261,6 +265,10 @@ namespace Fancyx.Admin.Service.Account
             if (dto.Sex > 0)
             {
                 user.Sex = dto.Sex;
+            }
+            if (!string.IsNullOrEmpty(dto.Phone))
+            {
+                user.Phone = dto.Phone;
             }
             await _userRepository.UpdateAsync(user);
             return true;

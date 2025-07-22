@@ -1,7 +1,7 @@
-import { Card, Form, Input, Button, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Button, Checkbox, Tabs, message } from 'antd';
+import { UserOutlined, LockOutlined, MobileOutlined, MailOutlined } from '@ant-design/icons';
 import './style/login.scss';
-import { type LoginDto } from '@/api/auth.ts';
+import { sendLoginSmsCode } from '@/api/auth.ts';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import LoginBg from '@/assets/login-bg.png';
@@ -9,12 +9,16 @@ import { useAuthProvider } from '@/components/AuthProvider';
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('password');
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
-  const { pwdLogin } = useAuthProvider();
+  const { pwdLogin, smsLogin } = useAuthProvider();
+  const [form] = Form.useForm();
 
-  const onFinish = (values: LoginDto) => {
+  const onFinish = (values: any) => {
     setLoading(true);
-    pwdLogin!(values)
+    const loginMethod = activeTab === 'password' ? pwdLogin : smsLogin;
+    loginMethod!(values)
       .then(() => {
         setLoading(false);
         navigate('/');
@@ -22,6 +26,26 @@ const LoginPage = () => {
       .catch(() => {
         setLoading(false);
       });
+  };
+
+  const handleSendCode = (phone: string) => {
+    if (!phone) {
+      message.warning('请输入手机号码');
+      return;
+    }
+
+    sendLoginSmsCode!(phone).then((res) => {
+      message.success(`【测试】您的验证码是：${res.data}，5分钟内有效`, 3);
+      let seconds = 60;
+      setCountdown(seconds);
+      const timer = setInterval(() => {
+        seconds -= 1;
+        setCountdown(seconds);
+        if (seconds <= 0) {
+          clearInterval(timer);
+        }
+      }, 1000);
+    });
   };
 
   return (
@@ -42,25 +66,76 @@ const LoginPage = () => {
               <div className="form-container">
                 <h3 className="form-title">用户登录</h3>
 
+                <Tabs
+                  activeKey={activeTab}
+                  onChange={setActiveTab}
+                  centered
+                  items={[
+                    {
+                      key: 'password',
+                      label: '账号密码登录',
+                    },
+                    {
+                      key: 'sms',
+                      label: '短信验证码登录',
+                    },
+                  ]}
+                />
+
                 <Form
                   name="login_form"
                   initialValues={{ remember: true, userName: 'admin', password: '123qwe*' }}
                   onFinish={onFinish}
+                  form={form}
                   size="large"
                 >
-                  <Form.Item name="userName" rules={[{ required: true, message: '请输入账号' }]}>
-                    <Input prefix={<UserOutlined />} placeholder="账号" />
-                  </Form.Item>
+                  {activeTab === 'password' ? (
+                    <>
+                      <Form.Item name="userName" rules={[{ required: true, message: '请输入账号' }]}>
+                        <Input prefix={<UserOutlined />} placeholder="账号" />
+                      </Form.Item>
 
-                  <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-                    <Input.Password prefix={<LockOutlined />} placeholder="密码" />
-                  </Form.Item>
+                      <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
+                        <Input.Password prefix={<LockOutlined />} placeholder="密码" />
+                      </Form.Item>
+                    </>
+                  ) : (
+                    <>
+                      <Form.Item
+                        name="phone"
+                        rules={[
+                          { required: true, message: '请输入手机号' },
+                          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' },
+                        ]}
+                      >
+                        <Input prefix={<MobileOutlined />} placeholder="手机号" />
+                      </Form.Item>
 
-                  <Form.Item>
-                    <Form.Item name="remember" valuePropName="checked" noStyle>
-                      <Checkbox>记住密码</Checkbox>
+                      <Form.Item name="code" rules={[{ required: true, message: '请输入验证码' }, { max: 6 }]}>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <Input prefix={<MailOutlined />} placeholder="验证码" maxLength={6} />
+                          <Button
+                            onClick={() => {
+                              const phone = form.getFieldValue('phone');
+                              handleSendCode(phone);
+                            }}
+                            disabled={countdown > 0}
+                            className="btn-send"
+                          >
+                            {countdown > 0 ? `${countdown}秒后重试` : '获取验证码'}
+                          </Button>
+                        </div>
+                      </Form.Item>
+                    </>
+                  )}
+
+                  {activeTab === 'password' && (
+                    <Form.Item>
+                      <Form.Item name="remember" valuePropName="checked" noStyle>
+                        <Checkbox>记住密码</Checkbox>
+                      </Form.Item>
                     </Form.Item>
-                  </Form.Item>
+                  )}
 
                   <Form.Item>
                     <Button type="primary" htmlType="submit" block loading={loading}>

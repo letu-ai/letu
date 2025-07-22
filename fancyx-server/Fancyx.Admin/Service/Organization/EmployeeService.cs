@@ -63,6 +63,7 @@ namespace Fancyx.Admin.Service.Organization
                 {
                     NickName = dto.Name,
                     Sex = dto.Sex,
+                    Phone = dto.Phone,
                     UserName = dto.Phone,
                     Password = dto.UserPassword
                 });

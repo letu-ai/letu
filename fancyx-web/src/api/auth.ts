@@ -10,6 +10,22 @@ export function login(dto: LoginDto) {
 }
 
 /**
+ * 短信登录
+ * @param dto
+ */
+export function smsLogin(dto: SmsLoginDto) {
+  return httpClient.post<SmsLoginDto, AppResponse<LoginResultDto>>('/api/account/SmsLogin', dto);
+}
+
+/**
+ * 获取短信验证码
+ * @param phone
+ */
+export function sendLoginSmsCode(phone: string) {
+  return httpClient.post<string, AppResponse<string>>('/api/account/SendLoginSmsCode?phone=' + phone);
+}
+
+/**
  * 刷新token
  * @param refreshToken
  * @returns
@@ -69,6 +85,7 @@ export interface PersonalInfoDto {
   avatar?: string;
   nickName?: string;
   sex?: number;
+  phone?: string;
 }
 
 export interface UserPwdDto {
@@ -83,6 +100,7 @@ interface UserInfoDto {
   nickName: string;
   sex: number;
   employeeId?: string | null;
+  phone?: string | null;
 }
 
 export interface FrontendMenu {
@@ -102,4 +120,9 @@ interface UserAuthInfoDto {
   user: UserInfoDto;
   permissions: string[];
   menus: FrontendMenu[];
+}
+
+export interface SmsLoginDto {
+  phone: string;
+  code: string;
 }
