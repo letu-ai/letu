@@ -1,14 +1,22 @@
-# 风汐管理系统(fancyx-admin)
+# 乐途开源开发框架(letu.run)
 
 <!-- PROJECT SHIELDS -->
 
-[![GitHub stars](https://img.shields.io/github/stars/fancyxnet/fancyx-admin?style=social)](https://github.com/fancyxnet/fancyx-admin)
-[![GitHub forks](https://img.shields.io/github/forks/fancyxnet/fancyx-admin?style=social)](https://github.com/fancyxnet/fancyx-admin)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/fancyxnet/fancyx-admin)
+[![GitHub stars](https://img.shields.io/github/stars/letu-ai/letu?style=social)](https://github.com/letu-ai/letu)
+[![GitHub forks](https://img.shields.io/github/forks/letu-ai/letu?style=social)](https://github.com/letu-ai/letu)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/letu-ai/letu)
+
+<img src="./docs/letu.logo.png" alt="Letu" width="300" height="auto" />
 
 ## 项目介绍
 
-风汐管理系统，使用.NET9+React18构建的RBAC通用权限管理系统（支持按钮级别权限），支持多租户功能，简单易上手，不使用任何三方Admin框架，完全作者独立开发；旨在为个人、企业提供高效、美观的后台管理解决方案，为.NET+React后台方案添砖加瓦， 系统采用最新最稳定的技术栈，具有良好的扩展性和可维护性，支持快速定制开发。
+乐途开源框架是基于[风汐管理系统](https://github.com/fancyxnet/fancyx-admin)开发的通用Web框架。
+
+在风汐的基础上主要做了如下改动：
+- 选用ABP框架作为底座
+- 前端使用Shadcn UI + TailwindCSS
+- 调整项目目录结构更便于AI生成代码
+
 
 **核心特点：**
 
@@ -20,15 +28,14 @@
 
 ## 代码仓库
 
-* GitHub: https://github.com/fancyxnet/fancyx-admin
-* Gitee: https://gitee.com/fancyxnet/fancyx-admin
+* GitHub: https://github.com/letu-ai/letu
 
 ## 在线预览
 
-在线文档： https://doc.crackerwork.cn <br/>
-预览地址： https://crackerwork.cn <br/>
-预览账号： admin <br/>
-预览密码： 123qwe* <br/>
+- 在线文档： https://docs.letu.run (未开放)
+- 预览地址： https://demo.lete.run (未开放)
+- 预览账号： admin
+- 预览密码： 123qwe* 
 
 **如果在输入账号和密码后提示错误，请检查账号密码输入框中是否存在空格**
 
@@ -37,6 +44,7 @@
 ## 使用技术
 
 * .NET Core
+* ABP
 * PostgreSQL
 * FreeSql
 * Aop
@@ -47,9 +55,9 @@
 * Castle.Core
 * Serilog
 * React
-* Ant Design
+* Shadcn UI
 * Vite
-* Sass/SCSS
+* TailwindCSS
 
 ## 功能模块
 
@@ -174,9 +182,9 @@
 
 前端项目启动：
 
-* 提前安装`yarn`，运行命令：`npm install -g yarn`
-* 安装依赖包，运行命令：`yarn install`
-* 开发环境启动，运行命令：`yarn run dev`
+* 提前安装`pnpm`，运行命令：`npm install -g pnpm`
+* 安装依赖包，运行命令：`pnpm install`
+* 开发环境启动，运行命令：`pnpm dev`
 
 ## 参与贡献
 
@@ -192,6 +200,4 @@
 
 ## 联系方式
 
-* 邮箱：fancyxnet@gmail.com/crackerwork@outlook.com
-* QQ：3805712581
-* 在线文档： https://doc.crackerwork.cn
+* 邮箱：stephenevanstehi@gmail.com
