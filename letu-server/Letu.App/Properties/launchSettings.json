@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Letu.App": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_PORT": "5000"
+      },
+      "applicationUrl": "https://localhost:2220;http://localhost:2221"
+    }
+  }
+}
