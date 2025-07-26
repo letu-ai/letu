@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Letu.Basis.Account.Dtos;
 using Letu.Basis.Admin.DataDictionary;
+using Letu.Basis.Admin.DataDictionary.Dtos;
 using Letu.Basis.Admin.Menus;
-using Letu.Basis.IService.Account.Dtos;
-using Letu.Basis.IService.System.Dtos;
+using Letu.Basis.Admin.Menus.Dtos;
 
 namespace Letu.Basis.Profiles
 {

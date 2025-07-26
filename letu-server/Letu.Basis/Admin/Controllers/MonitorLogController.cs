@@ -1,11 +1,11 @@
-﻿using Letu.Basis.IService.Monitor;
-using Letu.Basis.IService.Monitor.Dtos;
+﻿using Letu.Basis.Admin.Monitor;
+using Letu.Basis.Admin.Monitor.Dtos;
 using Letu.Core.Attributes;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers.Monitor
+namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]

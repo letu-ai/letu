@@ -1,10 +1,10 @@
-﻿using Letu.Basis.IService.System;
-using Letu.Basis.IService.System.Dtos;
+﻿using Letu.Basis.Admin.Notifications;
+using Letu.Basis.Admin.Notifications.Dtos;
 using Letu.Core.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers.System
+namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]

@@ -1,0 +1,81 @@
+using Letu.Basis.Admin.Positions.Dtos;
+using Letu.Core.Helpers;
+using Letu.Repository;
+
+namespace Letu.Basis.Admin.Positions
+{
+    public class PositionGroupService : IPositionGroupService
+    {
+        private readonly IRepository<PositionGroup> _positionGroupRepository;
+        private readonly IRepository<Position> _positionRepository;
+
+        public PositionGroupService(IRepository<PositionGroup> positionGroupRepository, IRepository<Position> positionRepository)
+        {
+            _positionGroupRepository = positionGroupRepository;
+            _positionRepository = positionRepository;
+        }
+
+        public async Task<bool> AddPositionGroupAsync(PositionGroupDto dto)
+        {
+            var entity = AutoMapperHelper.Instance.Map<PositionGroupDto, PositionGroup>(dto);
+            entity.ParentId = dto.ParentId;
+            if (entity.ParentId.HasValue)
+            {
+                var all = await _positionGroupRepository.Select.ToListAsync();
+                entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
+            }
+            await _positionGroupRepository.InsertAsync(entity);
+            return true;
+        }
+
+        public string GetParentIds(List<PositionGroup> all, Guid id)
+        {
+            var parentId = all.Find(x => x.Id == id)?.ParentId;
+            if (parentId == null) return id.ToString();
+            return GetParentIds(all, parentId.Value) + "," + id;
+        }
+
+        public async Task<bool> DeletePositionGroupAsync(Guid id)
+        {
+            var hasPositions = await _positionRepository.Select.AnyAsync(x => x.GroupId == id);
+            if (hasPositions)
+            {
+                throw new BusinessException(message: "分组下有职位，不能删除");
+            }
+            await _positionGroupRepository.DeleteAsync(x => x.Id == id);
+            return true;
+        }
+
+        public async Task<List<PositionGroupListDto>> GetPositionGroupListAsync(PositionGroupQueryDto dto)
+        {
+            var rawTree = await _positionGroupRepository.Select
+                .WhereIf(!string.IsNullOrEmpty(dto.GroupName), x => x.GroupName.Contains(dto.GroupName!))
+                .OrderBy(x => x.Sort)
+                .ToTreeListAsync();
+
+            return AutoMapperHelper.Instance.Map<List<PositionGroup>, List<PositionGroupListDto>>(rawTree);
+        }
+
+        public async Task<bool> UpdatePositionGroupAsync(PositionGroupDto dto)
+        {
+            if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
+            var entity = await _positionGroupRepository.Where(x => x.Id == dto.Id).FirstAsync();
+            if (dto.ParentId == entity.Id)
+            {
+                throw new BusinessException(message: "不能选择自己为父级");
+            }
+
+            entity.GroupName = dto.GroupName;
+            entity.Remark = dto.Remark;
+            entity.ParentId = dto.ParentId;
+            entity.Sort = dto.Sort;
+            if (entity.ParentId.HasValue)
+            {
+                var all = await _positionGroupRepository.Select.ToListAsync();
+                entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
+            }
+            await _positionGroupRepository.UpdateAsync(entity);
+            return true;
+        }
+    }
+}

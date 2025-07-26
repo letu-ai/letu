@@ -1,12 +1,12 @@
-using Letu.Basis.IService.System;
-using Letu.Basis.IService.System.Dtos;
+using Letu.Basis.Admin.DataDictionary;
+using Letu.Basis.Admin.DataDictionary.Dtos;
 using Letu.Core.Attributes;
 using Letu.Logger;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers.System
+namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]

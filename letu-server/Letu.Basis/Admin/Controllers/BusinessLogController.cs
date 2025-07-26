@@ -1,5 +1,5 @@
-using Letu.Basis.IService.System.LogManagement;
-using Letu.Basis.IService.System.LogManagement.Dtos;
+using Letu.Basis.Admin.Logging;
+using Letu.Basis.Admin.Logging.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

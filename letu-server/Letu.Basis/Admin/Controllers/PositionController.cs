@@ -1,5 +1,5 @@
-using Letu.Basis.IService.Organization;
-using Letu.Basis.IService.Organization.Dtos;
+using Letu.Basis.Admin.Positions;
+using Letu.Basis.Admin.Positions.Dtos;
 using Letu.Core.Attributes;
 using Letu.Logger;
 using Letu.Shared.Consts;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace Letu.Basis.Controllers.Organization
+namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]

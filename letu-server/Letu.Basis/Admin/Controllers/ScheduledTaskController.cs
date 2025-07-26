@@ -4,7 +4,7 @@ using Letu.Core.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers.System
+namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
