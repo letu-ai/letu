@@ -51,6 +51,18 @@ namespace Letu.Basis.Admin.Controllers
         }
 
         /// <summary>
+        /// 员工列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("all")]
+        public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync([FromQuery] EmployeeQueryDto dto)
+        {
+            var data = await _employeeService.GetEmployeeListAsync(dto);
+            return Result.Data(data);
+        }
+
+        /// <summary>
         /// 修改员工
         /// </summary>
         /// <param name="dto"></param>
@@ -100,18 +112,6 @@ namespace Letu.Basis.Admin.Controllers
         public async Task<AppResponse<EmployeeInfoDto>> GetEmployeeInfoAsync(Guid id)
         {
             var data = await _employeeService.GetEmployeeInfoAsync(id);
-            return Result.Data(data);
-        }
-
-        /// <summary>
-        /// 员工列表
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync([FromQuery] EmployeeQueryDto dto)
-        {
-            var data = await _employeeService.GetEmployeeListAsync(dto);
             return Result.Data(data);
         }
 
