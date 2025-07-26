@@ -1,0 +1,236 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+/** ================================ 覆盖antd pro样式开始 ================================ */
+.ant-pro-page-container-children-container-no-header {
+  padding-block-start: 0 !important;
+}
+
+.ant-pro-page-container-children-container {
+  padding-block-end: 0 !important;
+  padding-inline: 0 !important;
+}
+
+/** ================================ 覆盖antdpro样式结束 ================================ */
+
+.w-full {
+  width: 100% !important;
+}
+
+.h-full {
+  height: 100% !important;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+/** 行高样式10-100px */
+@for $i from 10 through 100 {
+  .line-height-#{$i} {
+    line-height: #{$i}px;
+  }
+}
+
+/** 底部间距10-100px */
+@for $i from 1 through 10 {
+  .mb-#{$i} {
+    margin-bottom: #{$i*10}px;
+  }
+}
+
+/** 顶部间距10-100px */
+@for $i from 1 through 10 {
+  .mt-#{$i} {
+    margin-top: #{$i*10}px;
+  }
+}
+
+/** 左侧间距1-100px */
+@for $i from 1 through 100 {
+  .ml-#{$i} {
+    margin-left: #{$i}px;
+  }
+}
+
+/** 右侧间距1-100px */
+@for $i from 1 through 100 {
+  .mr-#{$i} {
+    margin-right: #{$i}px;
+  }
+}
+
+.letu-table-wrapper {
+  .ant-table-cell .ant-btn-link {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    gap: 0 !important;
+  }
+
+  .right-operation-toolbar {
+    button {
+      padding: 0 !important;
+    }
+  }
+}
+
+.letu-layout {
+  .letu-sidebar {
+    min-height: 100vh;
+  }
+
+  //侧边栏标题
+  .sidebar-header {
+    height: 50px; // 严格限定高度
+    padding: 0 20px;
+    background: linear-gradient(135deg, #7E57C2 0%, #9575CD 100%);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    // 紫色波纹装饰
+    &::after {
+      content: '';
+      position: absolute;
+      right: -30px;
+      top: -30px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    h2 {
+      margin: 0;
+      color: white;
+      font-size: 18px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      white-space: nowrap;
+
+      .header-icon {
+        font-size: 22px;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
+
+      .header-icon-center {
+        margin: 0 auto;
+      }
+    }
+
+    // 悬停动画
+    &:hover::after {
+      transform: scale(1.1);
+      transition: transform 0.3s ease;
+    }
+  }
+
+  .letu-navbar {
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #ffffff;
+
+    button.ant-btn {
+      height: 50px !important;
+      border-radius: 0 !important;
+    }
+
+    .letu-navbar-breadcrumb-wrapper {
+      nav {
+        line-height: 50px !important;
+      }
+    }
+
+    .letu-navbar-right-wrapper {
+      button.ant-btn {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+      }
+    }
+  }
+
+  .letu-tabs {
+    background-color: #ffffff;
+  }
+
+  main {
+    padding: 15px;
+    background-color: #f5f5f5;
+  }
+}
+
+// 菜单项悬停动画
+.ant-menu-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: #F5F3FF !important;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #7E57C2;
+    }
+  }
+}
+
+// 选中状态
+.ant-menu-item-selected {
+  background: #EDE7F6 !important;
+  color: #7E57C2 !important;
+  font-weight: 500;
+}
+
+.ant-btn-primary {
+  box-shadow: 0 2px 6px rgba(126, 87, 194, 0.3);
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(126, 87, 194, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(126, 87, 194, 0.3);
+  }
+}
+
+.icon-info:hover {
+  color: #000000;
+}

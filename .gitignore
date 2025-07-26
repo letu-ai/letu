@@ -1,5 +1,5 @@
 **/bin/**
 **/obj/**
-**/Fancyx.Admin/Logs/**
+**/Letu.Admin/Logs/**
 **/.vs/**
-/fancyx-server/TemplateEngineHost/vs
+/letu-server/TemplateEngineHost/vs

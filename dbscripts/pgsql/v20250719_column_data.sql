@@ -5,7 +5,7 @@
  Source Server Type    : PostgreSQL
  Source Server Version : 160009 (160009)
  Source Host           : localhost:5432
- Source Catalog        : fancyx-admin
+ Source Catalog        : letu-admin
  Source Schema         : public
 
  Target Server Type    : PostgreSQL

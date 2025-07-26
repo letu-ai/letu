@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FreeSql" Version="3.5.209" />
+		<PackageReference Include="FreeSql.DbContext" Version="3.5.209" />
+		<PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.5.209" />
+		<PackageReference Include="FreeSql.Cloud" Version="2.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Letu.Core\Letu.Core.csproj" />
+	</ItemGroup>
+</Project>

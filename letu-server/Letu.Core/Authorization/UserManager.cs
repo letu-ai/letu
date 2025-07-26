@@ -1,0 +1,18 @@
+﻿namespace Letu.Core.Authorization
+{
+    public class UserManager
+    {
+        private static AsyncLocal<string> asyncLocal = null!;
+
+        public static string? Current
+        {
+            get => asyncLocal?.Value;
+        }
+
+        public static void SetCurrent(string tenant)
+        {
+            asyncLocal ??= new AsyncLocal<string>();
+            asyncLocal.Value = tenant;
+        }
+    }
+}

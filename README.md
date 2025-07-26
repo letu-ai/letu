@@ -10,7 +10,7 @@
 
 ## 项目介绍
 
-乐途开源框架是基于[风汐管理系统](https://github.com/fancyxnet/fancyx-admin)开发的通用Web框架。
+乐途开源框架是基于[风汐管理系统](https://github.com/letunet/letu-admin)开发的通用Web框架。
 
 在风汐的基础上主要做了如下改动：
 - 选用ABP框架作为底座
@@ -97,11 +97,11 @@
 
 **后端**
 
-![后端目录结构](./docs/project_struct.png "fancyx-server")
+![后端目录结构](./docs/project_struct.png "letu-server")
 
 **前端**
 
-![前端目录结构](./docs/frontend_struct.png "fancyx-web")
+![前端目录结构](./docs/frontend_struct.png "letu-web")
 
 ### 配置文件
 
@@ -135,7 +135,7 @@
     //JWT发布者
     "ValidAudience": "api",
     //JWT发布者
-    "ValidIssuer": "fancyx-admin",
+    "ValidIssuer": "letu-admin",
     //JWT签名密钥
     "IssuerSigningKey": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
@@ -178,7 +178,7 @@
 * 修改PostgreSQL,Redis配置
 * 执行根目录下`dbscripts/xxx/v年月日_column_data.sql`，会创建表结构，初始化数据
 * 修改OSS配置，使用本地目录（盘符一定要有，目录不存在会自动创建）
-* 使用VS2022调试启动（也可以在Fancyx.Admin目录下使用`dotnet run`）
+* 使用VS2022调试启动（也可以在Letu.Admin目录下使用`dotnet run`）
 
 前端项目启动：
 
