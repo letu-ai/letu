@@ -13,7 +13,7 @@ namespace Letu.Basis.Admin.Controllers
     [Authorize]
     [ApiController]
     [MustMainPower]
-    [Route("api/[controller]")]
+    [Route("api/admin/tenants")]
     public class TenantController : ControllerBase
     {
         private readonly ITenantAppService tenantService;
@@ -23,7 +23,7 @@ namespace Letu.Basis.Admin.Controllers
             this.tenantService = tenantService;
         }
 
-        [HttpPost("Add")]
+        [HttpPost]
         [HasPermission("Sys.Tenant.Add")]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         [ApiAccessLog(operateName: "添加租户", operateType: [OperateType.Create], reponseEnable: true)]
@@ -38,7 +38,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("List")]
+        [HttpGet]
         [HasPermission("Sys.Tenant.List")]
         public async Task<AppResponse<PagedResult<TenantResultDto>>> GetTenantListAsync([FromQuery] TenantSearchDto dto)
         {
@@ -51,7 +51,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("Update")]
+        [HttpPut]
         [HasPermission("Sys.Tenant.Update")]
         [ApiAccessLog(operateName: "修改租户", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> UpdateTenantAsync([FromBody] TenantDto dto)
@@ -65,7 +65,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("Delete/{id:Guid}")]
+        [HttpDelete("{id:Guid}")]
         [HasPermission("Sys.Tenant.Delete")]
         [ApiAccessLog(operateName: "删除租户", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteTenantAsync(Guid id)

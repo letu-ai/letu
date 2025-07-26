@@ -13,7 +13,7 @@ namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/employee")]
+    [Route("api/admin/employees")]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeAppService _employeeService;
@@ -28,7 +28,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("add")]
+        [HttpPost]
         [HasPermission("Org.Employee.Add")]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task<AppResponse<bool>> AddEmployeeAsync([FromBody] EmployeeDto dto)
@@ -42,7 +42,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
+        [HttpGet]
         [HasPermission("Org.Employee.List")]
         public async Task<AppResponse<PagedResult<EmployeeListDto>>> GetEmployeePagedListAsync([FromQuery] EmployeeQueryDto dto)
         {
@@ -55,7 +55,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("update")]
+        [HttpPut]
         [HasPermission("Org.Employee.Update")]
         public async Task<AppResponse<bool>> UpdateEmployeeAsync([FromBody] EmployeeDto dto)
         {
@@ -68,7 +68,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("delete/{id:guid}")]
+        [HttpDelete("{id:guid}")]
         [HasPermission("Org.Employee.Delete")]
         [ApiAccessLog(operateName: "删除员工", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteEmployeeAsync(Guid id)
@@ -82,7 +82,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("bindUser")]
+        [HttpPost("bind-user")]
         [HasPermission("Org.Employee.BindUser")]
         public async Task<AppResponse<bool>> EmployeeBindUserAsync([FromBody] EmployeeBindUserDto dto)
         {
@@ -108,7 +108,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("GetEmployeeList")]
+        [HttpGet]
         public async Task<AppResponse<List<EmployeeDto>>> GetEmployeeListAsync([FromQuery] EmployeeQueryDto dto)
         {
             var data = await _employeeService.GetEmployeeListAsync(dto);
@@ -120,7 +120,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("GetDeptEmployeeTree")]
+        [HttpGet("dept-employee-tree")]
         public async Task<AppResponse<List<DeptEmployeeTreeDto>>> GetDeptEmployeeTreeAsync([FromQuery] DeptEmployeeTreeQueryDto dto)
         {
             var data = await _employeeService.GetDeptEmployeeTreeAsync(dto);

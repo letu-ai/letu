@@ -6,7 +6,7 @@ namespace Letu.Basis.Account
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/my/notifications")]
     public class UserNotificationController : ControllerBase
     {
         private readonly IUserNotificationAppService _userNotificationService;
@@ -16,21 +16,21 @@ namespace Letu.Basis.Account
             _userNotificationService = userNotificationService;
         }
 
-        [HttpGet("MyNotificationList")]
+        [HttpGet]
         public async Task<AppResponse<PagedResult<UserNotificationListDto>>> GetMyNotificationListAsync([FromQuery] UserNotificationQueryDto dto)
         {
             var data = await _userNotificationService.GetMyNotificationListAsync(dto);
             return Result.Data(data);
         }
 
-        [HttpPut("Readed")]
+        [HttpPut("mark-as-read")]
         public async Task<AppResponse<bool>> ReadedAsync([FromBody] Guid[] ids)
         {
             await _userNotificationService.ReadedAsync(ids);
             return Result.Ok();
         }
 
-        [HttpGet("MyNotificationNavbarInfo")]
+        [HttpGet("navbar-info")]
         public async Task<AppResponse<UserNotificationNavbarDto>> GetMyNotificationNavbarInfoAsync()
         {
             var data = await _userNotificationService.GetMyNotificationNavbarInfoAsync();

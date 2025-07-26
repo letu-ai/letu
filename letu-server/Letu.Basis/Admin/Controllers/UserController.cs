@@ -13,7 +13,7 @@ namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/user")]
+    [Route("api/admin/users")]
     public class UserController : ControllerBase
     {
         private readonly IUserAppService _userService;
@@ -28,7 +28,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("add")]
+        [HttpPost]
         [HasPermission("Sys.User.Add")]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         [ApiAccessLog(operateName: "新增用户", operateType: [OperateType.Create], reponseEnable: true)]
@@ -43,7 +43,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
+        [HttpGet]
         [HasPermission("Sys.User.List")]
         [ApiAccessLog(operateName: "用户分页列表")]
         public async Task<AppResponse<PagedResult<UserListDto>>> GetUserListAsync([FromQuery] UserQueryDto dto)
@@ -57,7 +57,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("delete/{id:Guid}")]
+        [HttpDelete("{id:Guid}")]
         [HasPermission("Sys.User.Delete")]
         public async Task<AppResponse<bool>> DeleteUserAsync(Guid id)
         {
@@ -70,7 +70,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("assignRole")]
+        [HttpPost("assign-role")]
         [HasPermission("Sys.User.AssignRole")]
         [ApiAccessLog(operateName: "分配角色", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> AssignRoleAsync([FromBody] AssignRoleDto dto)
@@ -84,7 +84,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPut("changeEnabled/{id:Guid}")]
+        [HttpPut("{id:Guid}/enabled")]
         [HasPermission("Sys.User.SwitchEnabledStatus")]
         [ApiAccessLog(operateName: "切换用户启用状态", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> SwitchUserEnabledStatusAsync(Guid id)
@@ -110,7 +110,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("resetPwd")]
+        [HttpPut("reset-password")]
         [HasPermission("Sys.User.ResetPwd")]
         [ApiAccessLog(operateName: "重置用户密码", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> ResetUserPasswordAsync([FromBody] ResetUserPwdDto dto)
@@ -124,7 +124,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        [HttpGet("simpleUserInfos")]
+        [HttpGet("simple")]
         public async Task<AppResponse<List<UserSimpleInfoDto>>> GetUserSimpleInfosAsync(string? keyword)
         {
             var data = await _userService.GetUserSimpleInfosAsync(keyword);

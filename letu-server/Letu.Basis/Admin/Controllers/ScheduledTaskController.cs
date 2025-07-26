@@ -8,7 +8,7 @@ namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/admin/scheduled-tasks")]
     public class ScheduledTaskController : ControllerBase
     {
         private readonly IScheduledTaskAppService _scheduledTaskService;
@@ -18,15 +18,21 @@ namespace Letu.Basis.Admin.Controllers
             _scheduledTaskService = scheduledTaskService;
         }
 
-        [HttpPost("Add")]
+        /// <summary>
+        /// 创建定时任务
+        /// </summary>
+        [HttpPost]
         [HasPermission("Sys.ScheduledTask.Add")]
-        public async Task<AppResponse<bool>> AddAsync([FromBody] ScheduledTaskDto dto)
+        public async Task<AppResponse<bool>> CreateAsync([FromBody] ScheduledTaskDto dto)
         {
             await _scheduledTaskService.AddAsync(dto);
             return Result.Ok();
         }
 
-        [HttpGet("List")]
+        /// <summary>
+        /// 获取定时任务列表
+        /// </summary>
+        [HttpGet]
         [HasPermission("Sys.ScheduledTask.List")]
         public async Task<AppResponse<PagedResult<ScheduledTaskListDto>>> GetListAsync([FromQuery] ScheduledTaskQueryDto dto)
         {
@@ -34,15 +40,21 @@ namespace Letu.Basis.Admin.Controllers
             return Result.Data(data);
         }
 
-        [HttpPut("Update")]
+        /// <summary>
+        /// 更新定时任务
+        /// </summary>
+        [HttpPut("{key}")]
         [HasPermission("Sys.ScheduledTask.Update")]
-        public async Task<AppResponse<bool>> UpdateAsync([FromBody] ScheduledTaskDto dto)
+        public async Task<AppResponse<bool>> UpdateAsync(string key, [FromBody] ScheduledTaskDto dto)
         {
             await _scheduledTaskService.UpdateAsync(dto);
             return Result.Ok();
         }
 
-        [HttpDelete("Delete")]
+        /// <summary>
+        /// 删除定时任务
+        /// </summary>
+        [HttpDelete("{key}")]
         [HasPermission("Sys.ScheduledTask.Delete")]
         public async Task<AppResponse<bool>> DeleteAsync(string key)
         {
@@ -50,9 +62,12 @@ namespace Letu.Basis.Admin.Controllers
             return Result.Ok();
         }
 
-        [HttpGet("Log")]
+        /// <summary>
+        /// 获取定时任务执行日志
+        /// </summary>
+        [HttpGet("logs")]
         [HasPermission("Sys.ScheduledTask.Log")]
-        public async Task<AppResponse<PagedResult<TaskExecutionLogListDto>>> GetExecutionLogListAsync([FromQuery] TaskExecutionLogQueryDto dto)
+        public async Task<AppResponse<PagedResult<TaskExecutionLogListDto>>> GetExecutionLogsAsync([FromQuery] TaskExecutionLogQueryDto dto)
         {
             var data = await _scheduledTaskService.GetExecutionLogListAsync(dto);
             return Result.Data(data);

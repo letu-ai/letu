@@ -86,7 +86,7 @@ namespace Letu.Basis.Account
         /// 注销
         /// </summary>
         /// <returns></returns>
-        [HttpPost("signOut")]
+        [HttpPost("logout")]
         [AllowAnonymous]
         public async Task<AppResponse<bool>> SignOutAsync()
         {

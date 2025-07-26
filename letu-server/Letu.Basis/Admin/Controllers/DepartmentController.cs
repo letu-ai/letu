@@ -12,7 +12,7 @@ namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/dept")]
+    [Route("api/admin/departments")]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentAppService _deptService;
@@ -27,7 +27,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("add")]
+        [HttpPost]
         [HasPermission("Org.Dept.Add")]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task<AppResponse<bool>> AddDeptAsync([FromBody] DeptDto dto)
@@ -41,7 +41,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("list")]
+        [HttpGet]
         [HasPermission("Org.Dept.List")]
         public async Task<AppResponse<List<DeptListDto>>> GetDeptListAsync([FromQuery] DeptQueryDto dto)
         {
@@ -54,7 +54,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("update")]
+        [HttpPut]
         [HasPermission("Org.Dept.Update")]
         public async Task<AppResponse<bool>> UpdateDeptAsync([FromBody] DeptDto dto)
         {
@@ -67,7 +67,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("delete/{id:guid}")]
+        [HttpDelete("{id:guid}")]
         [HasPermission("Org.Dept.Delete")]
         [ApiAccessLog(operateName: "删除部门", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteDeptAsync(Guid id)

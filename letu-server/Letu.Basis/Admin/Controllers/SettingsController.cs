@@ -12,7 +12,7 @@ namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/admin/settings")]
     public class ConfigController : ControllerBase
     {
         private readonly IConfigService _configService;
@@ -22,7 +22,7 @@ namespace Letu.Basis.Admin.Controllers
             _configService = configService;
         }
 
-        [HttpPost("Add")]
+        [HttpPost]
         [HasPermission("Sys.Config.Add")]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task<AppResponse<bool>> AddConfigAsync([FromBody] ConfigDto dto)
@@ -31,7 +31,7 @@ namespace Letu.Basis.Admin.Controllers
             return Result.Data(true);
         }
 
-        [HttpGet("List")]
+        [HttpGet]
         [HasPermission("Sys.Config.List")]
         public async Task<AppResponse<PagedResult<ConfigListDto>>> GetConfigListAsync([FromQuery] ConfigQueryDto dto)
         {
@@ -39,7 +39,7 @@ namespace Letu.Basis.Admin.Controllers
             return Result.Data(data);
         }
 
-        [HttpPut("Update")]
+        [HttpPut]
         [HasPermission("Sys.Config.Update")]
         [ApiAccessLog(operateName: "修改配置", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task<AppResponse<bool>> UpdateConfigAsync(ConfigDto dto)
@@ -48,7 +48,7 @@ namespace Letu.Basis.Admin.Controllers
             return Result.Data(true);
         }
 
-        [HttpDelete("Delete/{id}")]
+        [HttpDelete("{id}")]
         [HasPermission("Sys.Config.Delete")]
         [ApiAccessLog(operateName: "删除配置", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeleteConfigAsync(Guid id)

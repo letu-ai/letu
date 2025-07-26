@@ -10,7 +10,7 @@ namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("api/admin/online-users")]
     public class OnlineUserController : ControllerBase
     {
         private readonly IOnlineUserAppService onlineUserService;
@@ -28,7 +28,7 @@ namespace Letu.Basis.Admin.Controllers
         [HttpGet]
         [HasPermission("Monitor.OnlineUser")]
         [ApiAccessLog(operateName: "在线用户列表", operateType: [OperateType.Query])]
-        public async Task<AppResponse<PagedResult<OnlineUserResultDto>>> GetOnlineUserListAsync([FromQuery] OnlineUserSearchDto dto)
+        public async Task<AppResponse<PagedResult<OnlineUserResultDto>>> GetOnlineUsersAsync([FromQuery] OnlineUserSearchDto dto)
         {
             var data = await onlineUserService.GetOnlineUserListAsync(dto);
             return Result.Data(data);
@@ -37,14 +37,14 @@ namespace Letu.Basis.Admin.Controllers
         /// <summary>
         /// 注销用户会话
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="sessionKey">会话键值</param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete("{sessionKey}")]
         [HasPermission("Monitor.Logout")]
         [ApiAccessLog(operateName: "注销用户会话", operateType: [OperateType.Delete])]
-        public async Task<AppResponse<bool>> LogoutAsync(string key)
+        public async Task<AppResponse<bool>> LogoutSessionAsync(string sessionKey)
         {
-            await onlineUserService.LogoutAsync(key);
+            await onlineUserService.LogoutAsync(sessionKey);
             return Result.Ok();
         }
     }
