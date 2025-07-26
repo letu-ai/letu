@@ -3,16 +3,16 @@ using Letu.Basis.IService.System.LogManagement.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers.System.LogManagement
+namespace Letu.Basis.Admin.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("api/loginLog")]
-    public class LoginLogController : ControllerBase
+    public class SecurityLogController : ControllerBase
     {
         private readonly ILoginLogService _loginLogService;
 
-        public LoginLogController(ILoginLogService loginLogService)
+        public SecurityLogController(ILoginLogService loginLogService)
         {
             _loginLogService = loginLogService;
         }

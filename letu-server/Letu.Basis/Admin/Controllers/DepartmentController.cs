@@ -13,11 +13,11 @@ namespace Letu.Basis.Controllers.Organization
     [Authorize]
     [ApiController]
     [Route("api/dept")]
-    public class DeptController : ControllerBase
+    public class DepartmentController : ControllerBase
     {
         private readonly IDeptService _deptService;
 
-        public DeptController(IDeptService deptService)
+        public DepartmentController(IDeptService deptService)
         {
             _deptService = deptService;
         }
