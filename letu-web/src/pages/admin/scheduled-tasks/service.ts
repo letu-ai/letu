@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  * @param dto
  */
 export function addScheduledTask(dto: ScheduledTaskDto) {
-  return httpClient.post<ScheduledTaskDto, AppResponse<boolean>>('/api/scheduledTask/add', dto);
+  return httpClient.post<ScheduledTaskDto, AppResponse<boolean>>('/api/admin/scheduled-tasks', dto);
 }
 
 /**
@@ -15,7 +15,7 @@ export function addScheduledTask(dto: ScheduledTaskDto) {
  */
 export function getScheduledTaskList(dto: ScheduledTaskQueryDto) {
   return httpClient.get<ScheduledTaskQueryDto, AppResponse<PagedResult<ScheduledTaskListDto>>>(
-    '/api/scheduledTask/list',
+    '/api/admin/scheduled-tasks',
     { params: dto },
   );
 }
@@ -25,7 +25,7 @@ export function getScheduledTaskList(dto: ScheduledTaskQueryDto) {
  * @param dto
  */
 export function updateScheduledTask(dto: ScheduledTaskDto) {
-  return httpClient.put<ScheduledTaskDto, AppResponse<boolean>>('/api/scheduledTask/update', dto);
+  return httpClient.put<ScheduledTaskDto, AppResponse<boolean>>('/api/admin/scheduled-tasks', dto);
 }
 
 /**
@@ -42,7 +42,7 @@ export function deleteScheduledTask(id: string) {
  */
 export function getExecutionLogList(dto: TaskExecutionLogQueryDto) {
   return httpClient.get<TaskExecutionLogQueryDto, AppResponse<PagedResult<TaskExecutionLogListDto>>>(
-    '/api/scheduledTask/Log',
+    '/api/admin/scheduled-tasks/Log',
     { params: dto },
   );
 }

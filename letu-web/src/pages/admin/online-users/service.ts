@@ -7,7 +7,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  */
 export function getOnlineUsers(dto: OnlineUserSearchDto) {
   return httpClient.get<OnlineUserSearchDto, AppResponse<PagedResult<OnlineUserResultDto>>>(
-    '/api/OnlineUser/GetOnlineUserList',
+    '/api/admin/online-users',
     {
       params: dto,
     },
@@ -19,7 +19,7 @@ export function getOnlineUsers(dto: OnlineUserSearchDto) {
  * @param key
  */
 export function onlineUserLogout(key: string) {
-  return httpClient.post<string, AppResponse<boolean>>('/api/OnlineUser/Logout?key=' + key);
+  return httpClient.post<string, AppResponse<boolean>>('/api/admin/online-users/logout?key=' + key);
 }
 
 export interface OnlineUserSearchDto extends PageSearch {

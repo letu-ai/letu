@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult, PageSearch, AppOption } from '@/types/ap
  * @param dto
  */
 export function addRole(dto: RoleDto) {
-  return httpClient.post<RoleDto, AppResponse<boolean>>('/api/role/add', dto);
+  return httpClient.post<RoleDto, AppResponse<boolean>>('/api/admin/roles', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addRole(dto: RoleDto) {
  * @param dto
  */
 export function getRoleList(dto: RoleQueryDto) {
-  return httpClient.get<RoleQueryDto, AppResponse<PagedResult<RoleListDto>>>('/api/role/list', { params: dto });
+  return httpClient.get<RoleQueryDto, AppResponse<PagedResult<RoleListDto>>>('/api/admin/roles', { params: dto });
 }
 
 /**
@@ -22,7 +22,7 @@ export function getRoleList(dto: RoleQueryDto) {
  * @param dto
  */
 export function updateRole(dto: RoleDto) {
-  return httpClient.put<RoleDto, AppResponse<boolean>>('/api/role/update', dto);
+  return httpClient.put<RoleDto, AppResponse<boolean>>('/api/admin/roles', dto);
 }
 
 /**
@@ -30,7 +30,7 @@ export function updateRole(dto: RoleDto) {
  * @param id
  */
 export function deleteRole(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/role/delete/${id}`);
+  return httpClient.delete<string, AppResponse<boolean>>(`/api/admin/roles/${id}`);
 }
 
 /**
@@ -38,14 +38,14 @@ export function deleteRole(id: string) {
  * @param dto
  */
 export function assignMenu(dto: AssignMenuDto) {
-  return httpClient.post<AssignMenuDto, AppResponse<boolean>>('/api/role/assignMenu', dto);
+  return httpClient.post<AssignMenuDto, AppResponse<boolean>>('/api/admin/roles/assignMenu', dto);
 }
 
 /**
  * 获取角色
  */
 export function getRoleOptions() {
-  return httpClient.get<unknown, AppResponse<AppOption[]>>('/api/role/options');
+  return httpClient.get<unknown, AppResponse<AppOption[]>>('/api/admin/roles/options');
 }
 
 /**
@@ -61,7 +61,7 @@ export function getRoleMenuIds(id: string) {
  * @param dto
  */
 export function assignData(dto: AssignDataDto) {
-  return httpClient.post<AssignDataDto, AppResponse<boolean>>('/api/role/assignData', dto);
+  return httpClient.post<AssignDataDto, AppResponse<boolean>>('/api/admin/roles/assignData', dto);
 }
 
 export interface RoleDto {

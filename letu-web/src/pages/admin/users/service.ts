@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  * @param dto
  */
 export function addUser(dto: UserDto) {
-  return httpClient.post<UserDto, AppResponse<boolean>>('/api/user/add', dto);
+  return httpClient.post<UserDto, AppResponse<boolean>>('/api/admin/users', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addUser(dto: UserDto) {
  * @param dto
  */
 export function getUserList(dto: UserQueryDto) {
-  return httpClient.get<UserQueryDto, AppResponse<PagedResult<UserListDto>>>('/api/user/list', { params: dto });
+  return httpClient.get<UserQueryDto, AppResponse<PagedResult<UserListDto>>>('/api/admin/users', { params: dto });
 }
 
 /**
@@ -22,7 +22,7 @@ export function getUserList(dto: UserQueryDto) {
  * @param id
  */
 export function deleteUser(id: string) {
-  return httpClient.delete<UserDto, AppResponse<boolean>>('/api/user/delete/' + id);
+  return httpClient.delete<UserDto, AppResponse<boolean>>('/api/admin/users/' + id);
 }
 
 /**
@@ -30,7 +30,7 @@ export function deleteUser(id: string) {
  * @param dto
  */
 export function assignRole(dto: AssignRoleDto) {
-  return httpClient.post<AssignRoleDto, AppResponse<boolean>>('/api/user/assignRole', dto);
+  return httpClient.post<AssignRoleDto, AppResponse<boolean>>('/api/admin/users/assignRole', dto);
 }
 
 /**
@@ -38,7 +38,7 @@ export function assignRole(dto: AssignRoleDto) {
  * @param id
  */
 export function switchUserEnabledStatus(id: string) {
-  return httpClient.put<string, AppResponse<boolean>>('/api/user/changeEnabled/' + id);
+  return httpClient.put<string, AppResponse<boolean>>('/api/admin/users/changeEnabled/' + id);
 }
 
 /**
@@ -46,7 +46,7 @@ export function switchUserEnabledStatus(id: string) {
  * @param uid
  */
 export function getUserRoleIds(uid: string) {
-  return httpClient.get<string, AppResponse<string[]>>('/api/user/roles/' + uid);
+  return httpClient.get<string, AppResponse<string[]>>('/api/admin/users/roles/' + uid);
 }
 
 /**
@@ -54,7 +54,7 @@ export function getUserRoleIds(uid: string) {
  * @param dto
  */
 export function resetUserPwd(dto: ResetUserPwdDto) {
-  return httpClient.put<string, AppResponse<boolean>>('/api/user/resetPwd', dto);
+  return httpClient.put<string, AppResponse<boolean>>('/api/admin/users/resetPwd', dto);
 }
 
 /**
@@ -62,7 +62,7 @@ export function resetUserPwd(dto: ResetUserPwdDto) {
  * @param keyword 账号/昵称
  */
 export function getUserSimpleInfos(keyword?: string) {
-  return httpClient.get<string, AppResponse<UserSimpleInfoDto[]>>('/api/user/simpleUserInfos', {
+  return httpClient.get<string, AppResponse<UserSimpleInfoDto[]>>('/api/admin/users/simpleUserInfos', {
     params: {
       keyword,
     },

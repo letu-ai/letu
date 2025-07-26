@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  * @param dto
  */
 export function addTenant(dto: TenantDto) {
-  return httpClient.post<TenantDto, AppResponse<boolean>>('/api/tenant/add', dto);
+  return httpClient.post<TenantDto, AppResponse<boolean>>('/api/admin/tenants', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addTenant(dto: TenantDto) {
  * @param dto
  */
 export function getTenantList(dto: TenantQueryDto) {
-  return httpClient.get<TenantQueryDto, AppResponse<PagedResult<TenantListDto>>>('/api/tenant/list', { params: dto });
+  return httpClient.get<TenantQueryDto, AppResponse<PagedResult<TenantListDto>>>('/api/admin/tenants', { params: dto });
 }
 
 /**
@@ -22,7 +22,7 @@ export function getTenantList(dto: TenantQueryDto) {
  * @param dto
  */
 export function updateTenant(dto: TenantDto) {
-  return httpClient.put<TenantDto, AppResponse<boolean>>('/api/tenant/update', dto);
+  return httpClient.put<TenantDto, AppResponse<boolean>>('/api/admin/tenants', dto);
 }
 
 /**
@@ -30,7 +30,7 @@ export function updateTenant(dto: TenantDto) {
  * @param id
  */
 export function deleteTenant(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/tenant/delete/${id}`);
+  return httpClient.delete<string, AppResponse<boolean>>(`/api/admin/tenants/${id}`);
 }
 
 export interface TenantDto {

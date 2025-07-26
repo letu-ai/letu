@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  * @param dto
  */
 export function addConfig(dto: ConfigDto) {
-  return httpClient.post<ConfigDto, AppResponse<boolean>>('/api/config/add', dto);
+  return httpClient.post<ConfigDto, AppResponse<boolean>>('/api/admin/settings', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addConfig(dto: ConfigDto) {
  * @param dto
  */
 export function getConfigList(dto: ConfigQueryDto) {
-  return httpClient.get<ConfigQueryDto, AppResponse<PagedResult<ConfigListDto>>>('/api/config/list', { params: dto });
+  return httpClient.get<ConfigQueryDto, AppResponse<PagedResult<ConfigListDto>>>('/api/admin/settings', { params: dto });
 }
 
 /**
@@ -22,7 +22,7 @@ export function getConfigList(dto: ConfigQueryDto) {
  * @param dto
  */
 export function updateConfig(dto: ConfigDto) {
-  return httpClient.put<ConfigDto, AppResponse<boolean>>('/api/config/update', dto);
+  return httpClient.put<ConfigDto, AppResponse<boolean>>('/api/admin/settings', dto);
 }
 
 /**

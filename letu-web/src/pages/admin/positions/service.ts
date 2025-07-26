@@ -6,7 +6,7 @@ import type { AppResponse, AppOptionTree, PageSearch, PagedResult } from '@/type
  * @param dto
  */
 export function addPositionGroup(dto: PositionGroupDto) {
-  return httpClient.post<PositionGroupDto, AppResponse<boolean>>('/api/positionGroup/add', dto);
+  return httpClient.post<PositionGroupDto, AppResponse<boolean>>('/api/admin/positions', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addPositionGroup(dto: PositionGroupDto) {
  * @param dto
  */
 export function getPositionGroupList(dto?: PositionGroupQueryDto) {
-  return httpClient.get<PositionGroupQueryDto, AppResponse<PositionGroupListDto[]>>('/api/positionGroup/list', {
+  return httpClient.get<PositionGroupQueryDto, AppResponse<PositionGroupListDto[]>>('/api/admin/positions', {
     params: dto,
   });
 }
@@ -24,7 +24,7 @@ export function getPositionGroupList(dto?: PositionGroupQueryDto) {
  * @param dto
  */
 export function updatePositionGroup(dto: PositionGroupDto) {
-  return httpClient.put<PositionGroupDto, AppResponse<boolean>>('/api/positionGroup/update', dto);
+  return httpClient.put<PositionGroupDto, AppResponse<boolean>>('/api/admin/positions', dto);
 }
 
 /**
@@ -62,7 +62,7 @@ export interface PositionGroupListDto {
  * @param dto
  */
 export function addPosition(dto: PositionDto) {
-  return httpClient.post<PositionDto, AppResponse<boolean>>('/api/position/add', dto);
+  return httpClient.post<PositionDto, AppResponse<boolean>>('/api/admin/positions', dto);
 }
 
 /**
@@ -70,7 +70,7 @@ export function addPosition(dto: PositionDto) {
  * @param dto
  */
 export function getPositionList(dto: PositionQueryDto) {
-  return httpClient.get<PositionQueryDto, AppResponse<PagedResult<PositionListDto>>>('/api/position/list', {
+  return httpClient.get<PositionQueryDto, AppResponse<PagedResult<PositionListDto>>>('/api/admin/positions', {
     params: dto,
   });
 }
@@ -80,7 +80,7 @@ export function getPositionList(dto: PositionQueryDto) {
  * @param dto
  */
 export function updatePosition(dto: PositionDto) {
-  return httpClient.put<PositionDto, AppResponse<boolean>>('/api/position/update', dto);
+  return httpClient.put<PositionDto, AppResponse<boolean>>('/api/admin/positions', dto);
 }
 
 /**
