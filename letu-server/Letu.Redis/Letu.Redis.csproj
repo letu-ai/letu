@@ -1,14 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<Import Project="..\common.props" />
+
 
 	<ItemGroup>
-		<PackageReference Include="FreeRedis" Version="1.3.7" />
-		<PackageReference Include="RedLock.net" Version="2.3.2" />
+		<PackageReference Include="FreeRedis" />
+		<PackageReference Include="RedLock.net" />
 	</ItemGroup>
 
 	<ItemGroup>

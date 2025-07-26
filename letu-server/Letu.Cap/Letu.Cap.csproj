@@ -1,16 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<Import Project="..\common.props" />
+
 
 	<ItemGroup>
-		<PackageReference Include="DotNetCore.CAP" Version="8.3.4" />
-		<PackageReference Include="DotNetCore.CAP.RedisStreams" Version="8.3.4" />
-		<PackageReference Include="DotNetCore.CAP.PostgreSql" Version="8.3.4" />
-		<PackageReference Include="DotNetCore.CAP.Dashboard" Version="8.3.4" />
+		<PackageReference Include="DotNetCore.CAP" />
+		<PackageReference Include="DotNetCore.CAP.RedisStreams" />
+		<PackageReference Include="DotNetCore.CAP.PostgreSql" />
+		<PackageReference Include="DotNetCore.CAP.Dashboard" />
 	</ItemGroup>
 
 	<ItemGroup>

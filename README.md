@@ -178,7 +178,7 @@
 * 修改PostgreSQL,Redis配置
 * 执行根目录下`dbscripts/xxx/v年月日_column_data.sql`，会创建表结构，初始化数据
 * 修改OSS配置，使用本地目录（盘符一定要有，目录不存在会自动创建）
-* 使用VS2022调试启动（也可以在Letu.Admin目录下使用`dotnet run`）
+* 使用VS2022调试启动（也可以在Letu.Basis目录下使用`dotnet run`）
 
 前端项目启动：
 

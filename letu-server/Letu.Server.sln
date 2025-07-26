@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Core", "Letu.Core\Letu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Shared", "Letu.Shared\Letu.Shared.csproj", "{E3E6B4B3-2985-4506-8681-806264287BF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Admin", "Letu.Admin\Letu.Admin.csproj", "{C0FB332D-78AF-4230-9750-2914BE0406D1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Basis", "Letu.Basis\Letu.Basis.csproj", "{C0FB332D-78AF-4230-9750-2914BE0406D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Repository", "Letu.Repository\Letu.Repository.csproj", "{979A8DFF-BAE5-49D7-A6F4-335974873E31}"
 EndProject
