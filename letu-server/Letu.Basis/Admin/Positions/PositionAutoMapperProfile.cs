@@ -7,19 +7,15 @@ using Letu.Basis.Admin.Positions.Dtos;
 
 namespace Letu.Basis.Profiles
 {
-    public class OrganizationAutoMapperProfile : Profile
+    public class PositionAutoMapperProfile : Profile
     {
-        public OrganizationAutoMapperProfile()
+        public PositionAutoMapperProfile()
         {
-            CreateMap<EmployeeDto, Employee>();
-            CreateMap<DeptDto, Department>();
-            CreateMap<Department, DeptListDto>();
             CreateMap<PositionGroupDto, PositionGroup>();
             CreateMap<PositionGroup, PositionGroupListDto>()
                 .ForMember(d => d.Rawchildren, o => o.MapFrom(s => s.Children));
             CreateMap<Position, PositionListDto>();
             CreateMap<PositionDto, Position>();
-            CreateMap<Employee, EmployeeInfoDto>();
         }
     }
 }
