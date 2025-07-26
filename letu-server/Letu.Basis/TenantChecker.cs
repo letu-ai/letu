@@ -1,17 +1,17 @@
-﻿using Letu.Basis.Entities.System;
-using Letu.Core.Interfaces;
+﻿using Letu.Core.Interfaces;
 using Letu.Repository;
 using Letu.Shared.Keys;
 using FreeRedis;
+using Letu.Basis.Admin.Tenants;
 
 namespace Letu.Basis
 {
     public class TenantChecker : ITenantChecker, ISingletonDependency
     {
-        private readonly IRepository<TenantDO> tenantRepository;
+        private readonly IRepository<Tenant> tenantRepository;
         private readonly IRedisClient redisClient;
 
-        public TenantChecker(IRepository<TenantDO> tenantRepository, IRedisClient redisClient)
+        public TenantChecker(IRepository<Tenant> tenantRepository, IRedisClient redisClient)
         {
             this.tenantRepository = tenantRepository;
             this.redisClient = redisClient;

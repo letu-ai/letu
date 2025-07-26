@@ -1,6 +1,8 @@
 using AutoMapper;
-using Letu.Basis.Entities.Organization;
-using Letu.Basis.Entities.System;
+using Letu.Basis.Admin.Departments;
+using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.Positions;
+using Letu.Basis.Admin.Users;
 using Letu.Basis.IService.Organization;
 using Letu.Basis.IService.Organization.Dtos;
 using Letu.Basis.IService.System;
@@ -14,15 +16,15 @@ namespace Letu.Basis.Service.Organization
 {
     public class EmployeeService : IScopedDependency, IEmployeeService
     {
-        private readonly IRepository<EmployeeDO> _employeeRepository;
-        private readonly IRepository<DeptDO> _deptRepository;
+        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IRepository<Department> _deptRepository;
         private readonly IFreeSql _freeSql;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        private readonly IRepository<UserDO> _userRepository;
+        private readonly IRepository<User> _userRepository;
 
-        public EmployeeService(IRepository<EmployeeDO> employeeRepository, IRepository<DeptDO> deptRepository, IRepository<PositionDO> orgPositionRepository
-            , IFreeSql freeSql, IMapper mapper, IUserService userService, IRepository<UserDO> userRepository)
+        public EmployeeService(IRepository<Employee> employeeRepository, IRepository<Department> deptRepository, IRepository<Position> orgPositionRepository
+            , IFreeSql freeSql, IMapper mapper, IUserService userService, IRepository<User> userRepository)
         {
             _employeeRepository = employeeRepository;
             _deptRepository = deptRepository;
@@ -69,7 +71,7 @@ namespace Letu.Basis.Service.Organization
                 });
             }
 
-            var entity = _mapper.Map<EmployeeDto, EmployeeDO>(dto);
+            var entity = _mapper.Map<EmployeeDto, Employee>(dto);
             entity.UserId = userId;
             await _employeeRepository.InsertAsync(entity);
 
@@ -84,7 +86,7 @@ namespace Letu.Basis.Service.Organization
 
         public async Task<PagedResult<EmployeeListDto>> GetEmployeePagedListAsync(EmployeeQueryDto dto)
         {
-            var list = await _freeSql.Select<EmployeeDO>().From<DeptDO, PositionDO>((e, d, p) => e.LeftJoin(e1 => e1.DeptId == d.Id).LeftJoin(e2 => e2.PositionId == p.Id))
+            var list = await _freeSql.Select<Employee>().From<Department, Position>((e, d, p) => e.LeftJoin(e1 => e1.DeptId == d.Id).LeftJoin(e2 => e2.PositionId == p.Id))
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), (x, d, p) => x.Code!.Contains(dto.Keyword!) || x.Name!.Contains(dto.Keyword!) || x.Phone!.Contains(dto.Keyword!))
                 .WhereIf(dto.DeptId.HasValue, (x, d, p) => x.DeptId == dto.DeptId!.Value)
                 .Count(out var total)

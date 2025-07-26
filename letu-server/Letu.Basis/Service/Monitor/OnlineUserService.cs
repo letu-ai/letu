@@ -1,5 +1,4 @@
-﻿using Letu.Basis.Entities.System;
-using Letu.Basis.IService.Monitor;
+﻿using Letu.Basis.IService.Monitor;
 using Letu.Basis.IService.Monitor.Dtos;
 using Letu.Repository;
 using Letu.Shared.Consts;
@@ -10,17 +9,19 @@ using FreeRedis;
 using FreeSql;
 
 using Microsoft.Extensions.Caching.Memory;
+using Letu.Basis.Admin.Users;
+using Letu.Basis.Admin.Logging;
 
 namespace Letu.Basis.Service.Monitor
 {
     public class OnlineUserService : IOnlineUserService
     {
-        private readonly IRepository<LoginLogDO> _loginLogRepository;
+        private readonly IRepository<SecurityLog> _loginLogRepository;
         private readonly IRedisClient _redisDb;
-        private readonly IRepository<UserDO> _userRepository;
+        private readonly IRepository<User> _userRepository;
         private readonly IMemoryCache _memoryCache;
 
-        public OnlineUserService(IRepository<LoginLogDO> loginLogRepository, IRedisClient redisDb, IRepository<UserDO> userRepository, IMemoryCache memoryCache)
+        public OnlineUserService(IRepository<SecurityLog> loginLogRepository, IRedisClient redisDb, IRepository<User> userRepository, IMemoryCache memoryCache)
         {
             _loginLogRepository = loginLogRepository;
             _redisDb = redisDb;

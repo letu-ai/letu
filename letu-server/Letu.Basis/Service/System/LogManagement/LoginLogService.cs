@@ -1,4 +1,4 @@
-using Letu.Basis.Entities.System;
+using Letu.Basis.Admin.Logging;
 using Letu.Basis.IService.System.LogManagement;
 using Letu.Basis.IService.System.LogManagement.Dtos;
 using Letu.Repository;
@@ -7,9 +7,9 @@ namespace Letu.Basis.Service.System.LogManagement
 {
     public class LoginLogService : ILoginLogService
     {
-        private readonly IRepository<LoginLogDO> _loginLogRepository;
+        private readonly IRepository<SecurityLog> _loginLogRepository;
 
-        public LoginLogService(IRepository<LoginLogDO> loginLogRepository)
+        public LoginLogService(IRepository<SecurityLog> loginLogRepository)
         {
             _loginLogRepository = loginLogRepository;
         }

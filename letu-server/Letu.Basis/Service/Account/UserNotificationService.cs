@@ -1,5 +1,5 @@
-﻿using Letu.Basis.Entities.Organization;
-using Letu.Basis.Entities.System;
+﻿using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.Notifications;
 using Letu.Basis.IService.Account;
 using Letu.Basis.IService.Account.Dtos;
 using Letu.Core.Interfaces;
@@ -9,11 +9,11 @@ namespace Letu.Basis.Service.Account
 {
     public class UserNotificationService : IUserNotificationService, IScopedDependency
     {
-        private readonly IRepository<NotificationDO> _repository;
-        private readonly IRepository<EmployeeDO> _employeeRepository;
+        private readonly IRepository<Notification> _repository;
+        private readonly IRepository<Employee> _employeeRepository;
         private readonly ICurrentUser _currentUser;
 
-        public UserNotificationService(IRepository<NotificationDO> repository, IRepository<EmployeeDO> employeeRepository, ICurrentUser currentUser)
+        public UserNotificationService(IRepository<Notification> repository, IRepository<Employee> employeeRepository, ICurrentUser currentUser)
         {
             _repository = repository;
             _employeeRepository = employeeRepository;

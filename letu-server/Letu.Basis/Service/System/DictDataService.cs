@@ -1,4 +1,4 @@
-using Letu.Basis.Entities.System;
+using Letu.Basis.Admin.DataDictionary;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
 using Letu.Core.Helpers;
@@ -10,9 +10,9 @@ namespace Letu.Basis.Service.System
 {
     public class DictDataService : IDictDataService
     {
-        private readonly IRepository<DictDataDO> _dictRepository;
+        private readonly IRepository<DictionaryItem> _dictRepository;
 
-        public DictDataService(IRepository<DictDataDO> dictRepository)
+        public DictDataService(IRepository<DictionaryItem> dictRepository)
         {
             _dictRepository = dictRepository;
         }
@@ -24,7 +24,7 @@ namespace Letu.Basis.Service.System
             {
                 throw new BusinessException("字典值已存在");
             }
-            var entity = AutoMapperHelper.Instance.Map<DictDataDto, DictDataDO>(dto);
+            var entity = AutoMapperHelper.Instance.Map<DictDataDto, DictionaryItem>(dto);
             await _dictRepository.InsertAsync(entity);
 
             return true;

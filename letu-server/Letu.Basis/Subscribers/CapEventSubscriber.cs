@@ -1,6 +1,6 @@
 ﻿using DotNetCore.CAP;
 using Letu.Shared.Consts;
-using Letu.Basis.Entities.System;
+using Letu.Basis.Admin.Logging;
 
 namespace Letu.Basis.Subscribers
 {
@@ -14,7 +14,7 @@ namespace Letu.Basis.Subscribers
         }
 
         [CapSubscribe(AdminEventBusTopicConsts.LoginLogEvent)]
-        public async Task WriteLoginLog(LoginLogDO log)
+        public async Task WriteLoginLog(SecurityLog log)
         {
             await freeSql.Insert(log).ExecuteAffrowsAsync();
         }

@@ -1,4 +1,4 @@
-using Letu.Basis.Entities.System;
+using Letu.Basis.Admin.Roles;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
 using Letu.Basis.SharedService;
@@ -9,13 +9,13 @@ namespace Letu.Basis.Service.System
 {
     public class RoleService : IRoleService
     {
-        private readonly IRepository<RoleDO> _roleRepository;
-        private readonly IRepository<RoleMenuDO> _roleMenuRepository;
-        private readonly IRepository<UserRoleDO> _userRoleRepository;
+        private readonly IRepository<Role> _roleRepository;
+        private readonly IRepository<MenuInRole> _roleMenuRepository;
+        private readonly IRepository<UserInRole> _userRoleRepository;
         private readonly IdentitySharedService _identitySharedService;
 
-        public RoleService(IRepository<RoleDO> roleRepository, IRepository<RoleMenuDO> roleMenuRepository
-            , IRepository<UserRoleDO> userRoleRepository, IdentitySharedService identitySharedService)
+        public RoleService(IRepository<Role> roleRepository, IRepository<MenuInRole> roleMenuRepository
+            , IRepository<UserInRole> userRoleRepository, IdentitySharedService identitySharedService)
         {
             _roleRepository = roleRepository;
             _roleMenuRepository = roleMenuRepository;
@@ -30,7 +30,7 @@ namespace Letu.Basis.Service.System
             {
                 throw new BusinessException("角色名已存在");
             }
-            var entity = new RoleDO
+            var entity = new Role
             {
                 RoleName = dto.RoleName,
                 Remark = dto.Remark
@@ -44,10 +44,10 @@ namespace Letu.Basis.Service.System
             await _roleMenuRepository.DeleteAsync(x => x.RoleId == dto.RoleId);
             if (dto.MenuIds != null)
             {
-                var items = new List<RoleMenuDO>();
+                var items = new List<MenuInRole>();
                 foreach (var item in dto.MenuIds)
                 {
-                    items.Add(new RoleMenuDO
+                    items.Add(new MenuInRole
                     {
                         RoleId = dto.RoleId,
                         MenuId = item

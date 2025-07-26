@@ -1,11 +1,11 @@
-﻿using Letu.Basis.Entities.System;
-using Letu.Basis.SharedService;
+﻿using Letu.Basis.SharedService;
 using Letu.Core.AutoInject;
 using Letu.Job;
 using Letu.Repository;
 using FreeRedis;
 using Quartz;
 using RedLockNet.SERedis;
+using Letu.Basis.Admin.Notifications;
 
 namespace Letu.Basis.Jobs
 {
@@ -14,12 +14,12 @@ namespace Letu.Basis.Jobs
     public class NotificationJob : IJob
     {
         private readonly ILogger<NotificationJob> _logger;
-        private readonly IRepository<NotificationDO> _repository;
+        private readonly IRepository<Notification> _repository;
         private readonly MqttSharedService _mqttService;
         private readonly IRedisClient _database;
         private readonly RedLockFactory redLockFactory;
 
-        public NotificationJob(ILogger<NotificationJob> logger, IRepository<NotificationDO> repository, MqttSharedService mqttService, IRedisClient database
+        public NotificationJob(ILogger<NotificationJob> logger, IRepository<Notification> repository, MqttSharedService mqttService, IRedisClient database
             , RedLockFactory redLockFactory)
         {
             _logger = logger;

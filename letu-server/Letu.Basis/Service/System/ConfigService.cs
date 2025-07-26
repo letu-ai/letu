@@ -1,4 +1,4 @@
-﻿using Letu.Basis.Entities.System;
+﻿using Letu.Basis.Admin.Settings;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
 using Letu.Basis.SharedService;

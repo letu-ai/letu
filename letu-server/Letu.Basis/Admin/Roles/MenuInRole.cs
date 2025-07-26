@@ -2,13 +2,13 @@ using Letu.Repository.BaseEntity;
 using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Roles
 {
     /// <summary>
     /// 角色菜单表
     /// </summary>
     [Table(Name = "sys_role_menu")]
-    public class RoleMenuDO : Entity, ITenant
+    public class MenuInRole : Entity, ITenant
     {
         /// <summary>
         /// 菜单ID

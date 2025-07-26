@@ -3,7 +3,7 @@ using Letu.Basis.IService.Account.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers.Account
+namespace Letu.Basis.Account
 {
     [Authorize]
     [ApiController]

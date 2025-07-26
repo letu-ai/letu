@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace Letu.Basis.Controllers.Account
+namespace Letu.Basis.Account
 {
     [Authorize]
     [ApiController]

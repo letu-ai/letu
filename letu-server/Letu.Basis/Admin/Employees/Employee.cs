@@ -6,13 +6,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using Letu.Shared.Enums;
 
-namespace Letu.Basis.Entities.Organization
+namespace Letu.Basis.Admin.Employees
 {
     /// <summary>
     /// 员工表
     /// </summary>
     [Table(Name = "org_employee")]
-    public class EmployeeDO : FullAuditedEntity, ITenant
+    public class Employee : FullAuditedEntity, ITenant
     {
         /// <summary>
         /// 工号

@@ -1,4 +1,3 @@
-using Letu.Basis.Entities.System;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
 using Letu.Basis.SharedService;
@@ -8,14 +7,15 @@ using Letu.Repository;
 using Letu.Shared.Enums;
 
 using FreeSql;
+using Letu.Basis.Admin.Menus;
 
 namespace Letu.Basis.Service.System
 {
     public class MenuService : IMenuService
     {
-        private readonly IRepository<MenuDO> _menuRepository;
+        private readonly IRepository<MenuItem> _menuRepository;
 
-        public MenuService(IRepository<MenuDO> menuRepository)
+        public MenuService(IRepository<MenuItem> menuRepository)
         {
             _menuRepository = menuRepository;
         }
@@ -43,7 +43,7 @@ namespace Letu.Basis.Service.System
             {
                 throw new BusinessException(message: $"已存在【{dto.Path}】菜单路由");
             }
-            var entity = AutoMapperHelper.Instance.Map<MenuDto, MenuDO>(dto);
+            var entity = AutoMapperHelper.Instance.Map<MenuDto, MenuItem>(dto);
             await _menuRepository.InsertAsync(entity);
             return true;
         }
@@ -63,7 +63,7 @@ namespace Letu.Basis.Service.System
                 .WhereIf(!string.IsNullOrEmpty(dto.Path), x => !string.IsNullOrEmpty(x.Path) && x.Path.Contains(dto.Path!))
                 .ToListAsync();
             var top = all.Where(x => isFilter || !x.ParentId.HasValue || x.ParentId == Guid.Empty).OrderBy(x => x.Sort).ToList();
-            var topMap = AutoMapperHelper.Instance.Map<List<MenuDO>, List<MenuListDto>>(top);
+            var topMap = AutoMapperHelper.Instance.Map<List<MenuItem>, List<MenuListDto>>(top);
             if (isFilter) return topMap;
             foreach (var item in topMap)
             {
@@ -74,7 +74,7 @@ namespace Letu.Basis.Service.System
             {
                 var children = all.Where(x => x.ParentId == currentId).OrderBy(x => x.Sort).ToList();
                 if (children.Count == 0) return null;
-                var childrenMap = AutoMapperHelper.Instance.Map<List<MenuDO>, List<MenuListDto>>(children);
+                var childrenMap = AutoMapperHelper.Instance.Map<List<MenuItem>, List<MenuListDto>>(children);
                 foreach (var item in childrenMap)
                 {
                     item.Children = getChildren(item.Id);

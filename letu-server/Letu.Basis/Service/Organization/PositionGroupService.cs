@@ -1,4 +1,4 @@
-using Letu.Basis.Entities.Organization;
+using Letu.Basis.Admin.Positions;
 using Letu.Basis.IService.Organization;
 using Letu.Basis.IService.Organization.Dtos;
 using Letu.Core.Helpers;
@@ -8,10 +8,10 @@ namespace Letu.Basis.Service.Organization
 {
     public class PositionGroupService : IPositionGroupService
     {
-        private readonly IRepository<PositionGroupDO> _positionGroupRepository;
-        private readonly IRepository<PositionDO> _positionRepository;
+        private readonly IRepository<PositionGroup> _positionGroupRepository;
+        private readonly IRepository<Position> _positionRepository;
 
-        public PositionGroupService(IRepository<PositionGroupDO> positionGroupRepository, IRepository<PositionDO> positionRepository)
+        public PositionGroupService(IRepository<PositionGroup> positionGroupRepository, IRepository<Position> positionRepository)
         {
             _positionGroupRepository = positionGroupRepository;
             _positionRepository = positionRepository;
@@ -19,7 +19,7 @@ namespace Letu.Basis.Service.Organization
 
         public async Task<bool> AddPositionGroupAsync(PositionGroupDto dto)
         {
-            var entity = AutoMapperHelper.Instance.Map<PositionGroupDto, PositionGroupDO>(dto);
+            var entity = AutoMapperHelper.Instance.Map<PositionGroupDto, PositionGroup>(dto);
             entity.ParentId = dto.ParentId;
             if (entity.ParentId.HasValue)
             {
@@ -30,7 +30,7 @@ namespace Letu.Basis.Service.Organization
             return true;
         }
 
-        public string GetParentIds(List<PositionGroupDO> all, Guid id)
+        public string GetParentIds(List<PositionGroup> all, Guid id)
         {
             var parentId = all.Find(x => x.Id == id)?.ParentId;
             if (parentId == null) return id.ToString();
@@ -55,7 +55,7 @@ namespace Letu.Basis.Service.Organization
                 .OrderBy(x => x.Sort)
                 .ToTreeListAsync();
 
-            return AutoMapperHelper.Instance.Map<List<PositionGroupDO>, List<PositionGroupListDto>>(rawTree);
+            return AutoMapperHelper.Instance.Map<List<PositionGroup>, List<PositionGroupListDto>>(rawTree);
         }
 
         public async Task<bool> UpdatePositionGroupAsync(PositionGroupDto dto)

@@ -4,14 +4,15 @@ using Letu.Shared.Enums;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Letu.Basis.Admin.Roles;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Menus
 {
     /// <summary>
     /// 菜单表
     /// </summary>
     [Table(Name = "sys_menu")]
-    public class MenuDO : AuditedEntity, ITenant
+    public class MenuItem : AuditedEntity, ITenant
     {
         /// <summary>
         /// 显示标题/名称
@@ -75,7 +76,7 @@ namespace Letu.Basis.Entities.System
         /// <summary>
         /// 角色菜单
         /// </summary>
-        public virtual ICollection<RoleMenuDO>? RoleMenus { get; set; }
+        public virtual ICollection<MenuInRole>? RoleMenus { get; set; }
 
         /// <summary>
         /// 租户ID

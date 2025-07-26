@@ -4,13 +4,13 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Logging
 {
     /// <summary>
     /// 登录日志
     /// </summary>
     [Table(Name = "sys_login_log")]
-    public class LoginLogDO : CreationEntity, ITenant
+    public class SecurityLog : CreationEntity, ITenant
     {
         /// <summary>
         /// 账号

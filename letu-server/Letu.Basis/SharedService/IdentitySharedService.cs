@@ -1,8 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
-using Letu.Basis.Entities.System;
 using Letu.Core.Authorization;
 using Letu.Core.Interfaces;
 using Letu.Redis;
@@ -14,21 +12,24 @@ using Letu.Shared.Keys;
 using FreeSql;
 
 using Microsoft.IdentityModel.Tokens;
+using Letu.Basis.Admin.Roles;
+using Letu.Basis.Admin.Users;
+using Letu.Basis.Admin.Menus;
 
 namespace Letu.Basis.SharedService
 {
     public class IdentitySharedService : IScopedDependency
     {
-        private readonly IRepository<UserRoleDO> _userRoleRepository;
-        private readonly IRepository<RoleMenuDO> _roleMenuRepository;
-        private readonly IRepository<RoleDO> _roleRepository;
-        private readonly IRepository<MenuDO> _menuRepository;
+        private readonly IRepository<UserInRole> _userRoleRepository;
+        private readonly IRepository<MenuInRole> _roleMenuRepository;
+        private readonly IRepository<Role> _roleRepository;
+        private readonly IRepository<MenuItem> _menuRepository;
         private readonly IConfiguration _configuration;
-        private readonly IRepository<UserDO> _userRepository;
+        private readonly IRepository<User> _userRepository;
         private readonly IHybridCache _hybridCache;
 
-        public IdentitySharedService(IRepository<UserRoleDO> userRoleRepository, IRepository<RoleMenuDO> roleMenuRepository, IRepository<RoleDO> roleRepository,
-            IRepository<MenuDO> menuRepository, IConfiguration configuration, IRepository<UserDO> userRepository, IHybridCache hybridCache)
+        public IdentitySharedService(IRepository<UserInRole> userRoleRepository, IRepository<MenuInRole> roleMenuRepository, IRepository<Role> roleRepository,
+            IRepository<MenuItem> menuRepository, IConfiguration configuration, IRepository<User> userRepository, IHybridCache hybridCache)
         {
             _userRoleRepository = userRoleRepository;
             _roleMenuRepository = roleMenuRepository;

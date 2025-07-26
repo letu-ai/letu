@@ -1,4 +1,4 @@
-﻿using Letu.Basis.Entities.System;
+﻿using Letu.Basis.Admin.DataDictionary;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
 using Letu.Logger;
@@ -9,10 +9,10 @@ namespace Letu.Basis.Service.System;
 
 public class DictTypeService : IDictTypeService
 {
-    private readonly IRepository<DictTypeDO> _dictTypeRepository;
-    private readonly IRepository<DictDataDO> _dictDataRepository;
+    private readonly IRepository<DictionaryType> _dictTypeRepository;
+    private readonly IRepository<DictionaryItem> _dictDataRepository;
 
-    public DictTypeService(IRepository<DictTypeDO> dictTypeRepository, IRepository<DictDataDO> dictDataRepository)
+    public DictTypeService(IRepository<DictionaryType> dictTypeRepository, IRepository<DictionaryItem> dictDataRepository)
     {
         _dictTypeRepository = dictTypeRepository;
         _dictDataRepository = dictDataRepository;
@@ -26,7 +26,7 @@ public class DictTypeService : IDictTypeService
             throw new BusinessException(message: "字典类型已存在");
         }
 
-        var entity = new DictTypeDO
+        var entity = new DictionaryType
         {
             Name = dto.Name,
             IsEnabled = dto.IsEnabled,

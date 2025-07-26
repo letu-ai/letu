@@ -4,13 +4,13 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.DataDictionary
 {
     /// <summary>
     /// 字典类型表
     /// </summary>
     [Table(Name = "sys_dict_type")]
-    public class DictTypeDO : AuditedEntity, ITenant
+    public class DictionaryType : AuditedEntity, ITenant
     {
         /// <summary>
         /// 字典名称

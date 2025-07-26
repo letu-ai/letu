@@ -2,13 +2,13 @@ using Letu.Repository.BaseEntity;
 using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Roles
 {
     /// <summary>
     /// 用户角色关联表
     /// </summary>
     [Table(Name = "sys_user_role")]
-    public class UserRoleDO : Entity, ITenant
+    public class UserInRole : Entity, ITenant
     {
         /// <summary>
         /// 用户ID

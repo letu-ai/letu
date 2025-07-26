@@ -6,13 +6,13 @@ using Letu.Repository.BaseEntity;
 
 using FreeSql.DataAnnotations;
 
-namespace Letu.Basis.Entities.Organization
+namespace Letu.Basis.Admin.Positions
 {
     /// <summary>
     /// 职位分组
     /// </summary>
     [Table(Name = "org_position_group")]
-    public class PositionGroupDO : AuditedEntity, ITenant
+    public class PositionGroup : AuditedEntity, ITenant
     {
         /// <summary>
         /// 分组名
@@ -56,9 +56,9 @@ namespace Letu.Basis.Entities.Organization
         public string? TenantId { get; set; }
 
         [Navigate(nameof(ParentId))]
-        public PositionGroupDO? Parent { get; set; }
+        public PositionGroup? Parent { get; set; }
 
         [Navigate(nameof(ParentId))]
-        public List<PositionGroupDO>? Children { get; set; }
+        public List<PositionGroup>? Children { get; set; }
     }
 }

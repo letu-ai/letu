@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Letu.Basis.Entities.System;
+using Letu.Basis.Admin.DataDictionary;
+using Letu.Basis.Admin.Menus;
 using Letu.Basis.IService.Account.Dtos;
 using Letu.Basis.IService.System.Dtos;
 
@@ -10,10 +11,10 @@ namespace Letu.Basis.Profiles
         public SystemAutoMapperProfile()
         {
             CreateMap<TokenResultDto, LoginResultDto>();
-            CreateMap<MenuDto, MenuDO>();
-            CreateMap<MenuDO, MenuListDto>();
-            CreateMap<DictDataDto, DictDataDO>();
-            CreateMap<MenuDO, FrontendMenu>();
+            CreateMap<MenuDto, MenuItem>();
+            CreateMap<MenuItem, MenuListDto>();
+            CreateMap<DictDataDto, DictionaryItem>();
+            CreateMap<MenuItem, FrontendMenu>();
         }
     }
 }

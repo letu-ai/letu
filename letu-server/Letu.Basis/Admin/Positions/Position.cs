@@ -4,13 +4,13 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.Organization
+namespace Letu.Basis.Admin.Positions
 {
     /// <summary>
     /// 职位表
     /// </summary>
     [Table(Name = "org_position")]
-    public class PositionDO : FullAuditedEntity, ITenant
+    public class Position : FullAuditedEntity, ITenant
     {
         /// <summary>
         /// 职位编号

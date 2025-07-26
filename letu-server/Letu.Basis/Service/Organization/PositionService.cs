@@ -1,4 +1,3 @@
-using Letu.Basis.Entities.Organization;
 using Letu.Basis.IService.Organization;
 using Letu.Basis.IService.Organization.Dtos;
 using Letu.Basis.Service.Organization.Models;
@@ -6,17 +5,19 @@ using Letu.Core.Helpers;
 using Letu.Repository;
 using FreeSql;
 using System.Data;
+using Letu.Basis.Admin.Positions;
+using Letu.Basis.Admin.Employees;
 
 namespace Letu.Basis.Service.Organization
 {
     public class PositionService : IPositionService
     {
-        private readonly IRepository<PositionDO> _positionRepository;
-        private readonly IRepository<PositionGroupDO> _positionGroupRepository;
-        private readonly IRepository<EmployeeDO> _employeeRepository;
+        private readonly IRepository<Position> _positionRepository;
+        private readonly IRepository<PositionGroup> _positionGroupRepository;
+        private readonly IRepository<Employee> _employeeRepository;
 
-        public PositionService(IRepository<PositionDO> positionRepository, IRepository<PositionGroupDO> positionGroupRepository
-            , IRepository<EmployeeDO> employeeRepository)
+        public PositionService(IRepository<Position> positionRepository, IRepository<PositionGroup> positionGroupRepository
+            , IRepository<Employee> employeeRepository)
         {
             _positionRepository = positionRepository;
             _positionGroupRepository = positionGroupRepository;
@@ -57,7 +58,7 @@ namespace Letu.Basis.Service.Organization
             {
                 throw new BusinessException("职位编号已存在");
             }
-            var entity = AutoMapperHelper.Instance.Map<PositionDto, PositionDO>(dto);
+            var entity = AutoMapperHelper.Instance.Map<PositionDto, Position>(dto);
             await _positionRepository.InsertAsync(entity);
             return true;
         }
@@ -83,7 +84,7 @@ namespace Letu.Basis.Service.Organization
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync();
             var ids = rows.Select(x => x.Id).ToList();
-            var list = AutoMapperHelper.Instance.Map<List<PositionDO>, List<PositionListDto>>(rows);
+            var list = AutoMapperHelper.Instance.Map<List<Position>, List<PositionListDto>>(rows);
             var names = await GetPosistionGroupNameAsync(ids);
             foreach (var item in list)
             {

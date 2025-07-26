@@ -2,10 +2,10 @@
 using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Roles
 {
     [Table(Name = "sys_role_dept")]
-    public class RoleDeptDO : Entity, ITenant
+    public class DepartmentInRole : Entity, ITenant
     {
         /// <summary>
         /// 角色ID

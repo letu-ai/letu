@@ -5,14 +5,15 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Letu.Basis.Admin.Roles;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Users
 {
     /// <summary>
     /// 用户表
     /// </summary>
     [Table(Name = "sys_user")]
-    public class UserDO : FullAuditedEntity, ITenant
+    public class User : FullAuditedEntity, ITenant
     {
         /// <summary>
         /// 用户名
@@ -73,7 +74,7 @@ namespace Letu.Basis.Entities.System
         /// <summary>
         /// 用户角色
         /// </summary>
-        public virtual ICollection<UserRoleDO>? UserRoles { get; set; }
+        public virtual ICollection<UserInRole>? UserRoles { get; set; }
 
         /// <summary>
         /// 租户ID

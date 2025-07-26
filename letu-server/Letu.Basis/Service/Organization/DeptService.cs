@@ -1,4 +1,5 @@
-using Letu.Basis.Entities.Organization;
+using Letu.Basis.Admin.Departments;
+using Letu.Basis.Admin.Employees;
 using Letu.Basis.IService.Organization;
 using Letu.Basis.IService.Organization.Dtos;
 using Letu.Core.Helpers;
@@ -9,10 +10,10 @@ namespace Letu.Basis.Service.Organization
 {
     public class DeptService : IDeptService
     {
-        private readonly IRepository<DeptDO> _deptRepository;
-        private readonly IRepository<EmployeeDO> _employeeRepository;
+        private readonly IRepository<Department> _deptRepository;
+        private readonly IRepository<Employee> _employeeRepository;
 
-        public DeptService(IRepository<DeptDO> deptRepository, IRepository<EmployeeDO> employeeRepository)
+        public DeptService(IRepository<Department> deptRepository, IRepository<Employee> employeeRepository)
         {
             _deptRepository = deptRepository;
             _employeeRepository = employeeRepository;
@@ -25,7 +26,7 @@ namespace Letu.Basis.Service.Organization
                 throw new BusinessException(message: "部门编号已存在");
             }
 
-            var entity = AutoMapperHelper.Instance.Map<DeptDto, DeptDO>(dto);
+            var entity = AutoMapperHelper.Instance.Map<DeptDto, Department>(dto);
             entity.ParentId = dto.ParentId;
             entity.Code = dto.Code;
             if (entity.ParentId.HasValue)
@@ -39,7 +40,7 @@ namespace Letu.Basis.Service.Organization
             return true;
         }
 
-        public string GetParentIds(List<DeptDO> all, Guid id, ref int layer)
+        public string GetParentIds(List<Department> all, Guid id, ref int layer)
         {
             layer += 1;
             var parentId = all.Find(x => x.Id == id)?.ParentId;
@@ -66,7 +67,7 @@ namespace Letu.Basis.Service.Organization
                     .WhereIf(!string.IsNullOrEmpty(dto.Code), x => x.Code.Contains(dto.Code!)) // ==
                     .WhereIf(dto.Status > 0, x => x.Status == dto.Status) // ==
                     .OrderBy(x => x.Sort).ToListAsync();
-                var result = AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(filter);
+                var result = AutoMapperHelper.Instance.Map<List<Department>, List<DeptListDto>>(filter);
 
                 // Add curator names for filtered results
                 await AddCuratorNames(result); // ++
@@ -74,7 +75,7 @@ namespace Letu.Basis.Service.Organization
                 return result;
             }
             var all = await _deptRepository.Select.OrderBy(x => x.ParentIds).ToListAsync();
-            var tree = AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
+            var tree = AutoMapperHelper.Instance.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
 
             // Add curator names for all departments
             await AddCuratorNames(tree); // ++
@@ -86,7 +87,7 @@ namespace Letu.Basis.Service.Organization
 
             List<DeptListDto>? getChildren(Guid id)
             {
-                var children = AutoMapperHelper.Instance.Map<List<DeptDO>, List<DeptListDto>>(all.Where(x => x.ParentId == id).ToList());
+                var children = AutoMapperHelper.Instance.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == id).ToList());
                 if (children.Count <= 0) return null;
 
                 // Add curator names for child departments

@@ -3,11 +3,11 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Tenants
 {
     [Index("uk_tenant_id", nameof(TenantId), true)]
     [Table(Name = "sys_tenant")]
-    public class TenantDO : AuditedEntity
+    public class Tenant : AuditedEntity
     {
         /// <summary>
         /// 租户名称

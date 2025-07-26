@@ -4,7 +4,7 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Settings
 {
     /// <summary>
     /// 系统配置

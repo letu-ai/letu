@@ -5,13 +5,13 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.Organization
+namespace Letu.Basis.Admin.Departments
 {
     /// <summary>
     /// 部门表
     /// </summary>
     [Table(Name = "sys_dept")]
-    public class DeptDO : FullAuditedEntity, ITenant
+    public class Department : FullAuditedEntity, ITenant
     {
         /// <summary>
         /// 部门编号
@@ -93,9 +93,9 @@ namespace Letu.Basis.Entities.Organization
         public string? TenantId { get; set; }
 
         [Navigate(nameof(ParentId))]
-        public DeptDO? Parent { get; set; }
+        public Department? Parent { get; set; }
 
         [Navigate(nameof(ParentId))]
-        public List<DeptDO>? Children { get; set; }
+        public List<Department>? Children { get; set; }
     }
 }

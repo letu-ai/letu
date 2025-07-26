@@ -1,4 +1,4 @@
-﻿using Letu.Basis.Entities.System;
+﻿using Letu.Basis.Admin.Tenants;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
 using Letu.Repository;
@@ -7,9 +7,9 @@ namespace Letu.Basis.Service.System
 {
     public class TenantService : ITenantService
     {
-        private readonly IRepository<TenantDO> _tenantRepository;
+        private readonly IRepository<Tenant> _tenantRepository;
 
-        public TenantService(IRepository<TenantDO> tenantRepository)
+        public TenantService(IRepository<Tenant> tenantRepository)
         {
             _tenantRepository = tenantRepository;
         }
@@ -21,7 +21,7 @@ namespace Letu.Basis.Service.System
                 throw new BusinessException($"租户标识[{dto.TenantId}]已存在");
             }
 
-            var entity = new TenantDO()
+            var entity = new Tenant()
             {
                 Name = dto.Name,
                 TenantId = dto.TenantId,

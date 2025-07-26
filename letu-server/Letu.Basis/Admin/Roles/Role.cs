@@ -4,13 +4,13 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Letu.Basis.Entities.System
+namespace Letu.Basis.Admin.Roles
 {
     /// <summary>
     /// 角色表
     /// </summary>
     [Table(Name = "sys_role")]
-    public class RoleDO : FullAuditedEntity, ITenant
+    public class Role : FullAuditedEntity, ITenant
     {
         /// <summary>
         /// 角色名
@@ -30,17 +30,17 @@ namespace Letu.Basis.Entities.System
         /// <summary>
         /// 用户角色
         /// </summary>
-        public virtual ICollection<UserRoleDO>? UserRoles { get; set; }
+        public virtual ICollection<UserInRole>? Users { get; set; }
 
         /// <summary>
         /// 角色菜单
         /// </summary>
-        public virtual ICollection<RoleMenuDO>? RoleMenus { get; set; }
+        public virtual ICollection<MenuInRole>? Menus { get; set; }
 
         /// <summary>
         /// 角色查看部门（数据权限类型=1时，指定部门时才存入）
         /// </summary>
-        public virtual ICollection<RoleDeptDO>? RoleDepts { get; set; }
+        public virtual ICollection<DepartmentInRole>? Departments { get; set; }
 
         /// <summary>
         /// 租户ID

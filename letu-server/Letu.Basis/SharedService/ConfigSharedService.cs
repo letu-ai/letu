@@ -1,8 +1,8 @@
-﻿using Letu.Basis.Entities.System;
-using Letu.Core.Interfaces;
+﻿using Letu.Core.Interfaces;
 using Letu.Repository;
 using Letu.Shared.Keys;
 using FreeRedis;
+using Letu.Basis.Admin.Settings;
 
 namespace Letu.Basis.SharedService
 {
