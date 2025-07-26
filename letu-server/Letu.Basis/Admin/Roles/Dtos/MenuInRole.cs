@@ -2,7 +2,7 @@ using Letu.Repository.BaseEntity;
 using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
 
-namespace Letu.Basis.Admin.Roles
+namespace Letu.Basis.Admin.Roles.Dtos
 {
     /// <summary>
     /// 角色菜单表

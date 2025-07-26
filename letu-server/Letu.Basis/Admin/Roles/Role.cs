@@ -3,6 +3,7 @@ using Letu.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Letu.Basis.Admin.Roles.Dtos;
 
 namespace Letu.Basis.Admin.Roles
 {

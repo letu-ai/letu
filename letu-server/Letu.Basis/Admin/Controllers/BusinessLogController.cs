@@ -1,5 +1,5 @@
-using Letu.Basis.Admin.Logging;
-using Letu.Basis.Admin.Logging.Dtos;
+using Letu.Basis.Admin.Loggings;
+using Letu.Basis.Admin.Loggings.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/[controller]")]
     public class BusinessLogController : ControllerBase
     {
-        private readonly IBusinessLogService _businessLogService;
+        private readonly IBusinessLogAppService _businessLogService;
 
-        public BusinessLogController(IBusinessLogService businessLogService)
+        public BusinessLogController(IBusinessLogAppService businessLogService)
         {
             _businessLogService = businessLogService;
         }

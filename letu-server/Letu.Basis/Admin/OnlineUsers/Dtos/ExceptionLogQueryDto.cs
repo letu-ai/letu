@@ -1,4 +1,4 @@
-﻿namespace Letu.Basis.Admin.Monitor.Dtos
+﻿namespace Letu.Basis.Admin.OnlineUsers.Dtos
 {
     public class ExceptionLogQueryDto : PageSearch
     {

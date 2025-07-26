@@ -11,9 +11,9 @@ namespace Letu.Basis.Account
     [Route("api/account")]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountService _accountService;
+        private readonly IAccountAppService _accountService;
 
-        public AccountController(IAccountService accountService)
+        public AccountController(IAccountAppService accountService)
         {
             _accountService = accountService;
         }

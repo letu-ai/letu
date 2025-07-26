@@ -15,9 +15,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/position")]
     public class PositionController : ControllerBase
     {
-        private readonly IPositionService _positionService;
+        private readonly IPositionAppService _positionService;
 
-        public PositionController(IPositionService positionService)
+        public PositionController(IPositionAppService positionService)
         {
             _positionService = positionService;
         }

@@ -14,9 +14,9 @@ namespace Letu.Basis.Admin.Controllers;
 [Route("api/[controller]/[action]")]
 public class DictTypeController : ControllerBase
 {
-    private readonly IDictTypeService _dictTypeService;
+    private readonly IDataDictionaryAppService _dictTypeService;
 
-    public DictTypeController(IDictTypeService dictTypeService)
+    public DictTypeController(IDataDictionaryAppService dictTypeService)
     {
         _dictTypeService = dictTypeService;
     }

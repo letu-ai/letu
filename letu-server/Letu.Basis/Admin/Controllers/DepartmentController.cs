@@ -1,4 +1,5 @@
 using Letu.Basis.Admin.Departments;
+using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Core.Attributes;
 using Letu.Logger;
 using Letu.Shared.Consts;
@@ -14,9 +15,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/dept")]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDeptService _deptService;
+        private readonly IDepartmentAppService _deptService;
 
-        public DepartmentController(IDeptService deptService)
+        public DepartmentController(IDepartmentAppService deptService)
         {
             _deptService = deptService;
         }

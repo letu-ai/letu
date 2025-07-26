@@ -1,4 +1,4 @@
-using Letu.Basis.Admin.Roles;
+using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Admin.Users.Dtos;
 using Letu.Core.Attributes;
@@ -16,9 +16,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("/api/user")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserAppService _userService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserAppService userService)
         {
             _userService = userService;
         }

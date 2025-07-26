@@ -11,9 +11,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/[controller]")]
     public class NotificationController : ControllerBase
     {
-        private readonly INotificationService notificationService;
+        private readonly INotificationAppService notificationService;
 
-        public NotificationController(INotificationService notificationService)
+        public NotificationController(INotificationAppService notificationService)
         {
             this.notificationService = notificationService;
         }

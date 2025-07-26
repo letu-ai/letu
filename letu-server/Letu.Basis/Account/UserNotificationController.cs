@@ -9,9 +9,9 @@ namespace Letu.Basis.Account
     [Route("api/[controller]")]
     public class UserNotificationController : ControllerBase
     {
-        private readonly IUserNotificationService _userNotificationService;
+        private readonly IUserNotificationAppService _userNotificationService;
 
-        public UserNotificationController(IUserNotificationService userNotificationService)
+        public UserNotificationController(IUserNotificationAppService userNotificationService)
         {
             _userNotificationService = userNotificationService;
         }

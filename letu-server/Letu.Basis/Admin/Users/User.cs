@@ -5,7 +5,7 @@ using FreeSql.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Letu.Basis.Admin.Roles;
+using Letu.Basis.Admin.Roles.Dtos;
 
 namespace Letu.Basis.Admin.Users
 {

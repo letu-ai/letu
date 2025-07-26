@@ -11,9 +11,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/[controller]")]
     public class ScheduledTaskController : ControllerBase
     {
-        private readonly IScheduledTaskService _scheduledTaskService;
+        private readonly IScheduledTaskAppService _scheduledTaskService;
 
-        public ScheduledTaskController(IScheduledTaskService scheduledTaskService)
+        public ScheduledTaskController(IScheduledTaskAppService scheduledTaskService)
         {
             _scheduledTaskService = scheduledTaskService;
         }

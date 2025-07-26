@@ -1,4 +1,4 @@
-using Letu.Basis.Admin.Departments;
+using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Employees.Dtos;
 using Letu.Core.Attributes;
@@ -16,9 +16,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/employee")]
     public class EmployeeController : ControllerBase
     {
-        private readonly IEmployeeService _employeeService;
+        private readonly IEmployeeAppService _employeeService;
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(IEmployeeAppService employeeService)
         {
             _employeeService = employeeService;
         }

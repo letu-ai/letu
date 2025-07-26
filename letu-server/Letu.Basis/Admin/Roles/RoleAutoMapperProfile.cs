@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace Letu.Basis.Profiles
+namespace Letu.Basis.Admin.Roles
 {
     public class RoleAutoMapperProfile : Profile
     {

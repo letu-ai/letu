@@ -2,7 +2,7 @@
 using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
 
-namespace Letu.Basis.Admin.Roles
+namespace Letu.Basis.Admin.Roles.Dtos
 {
     [Table(Name = "sys_role_dept")]
     public class DepartmentInRole : Entity, ITenant

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace Letu.Basis.Profiles
+namespace Letu.Basis.Admin.Notifications
 {
     public class NotificationAutoMapperProfile : Profile
     {

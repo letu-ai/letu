@@ -1,5 +1,5 @@
-﻿using Letu.Basis.Admin.Monitor;
-using Letu.Basis.Admin.Monitor.Dtos;
+﻿using Letu.Basis.Admin.OnlineUsers;
+using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Core.Attributes;
 using Letu.Logger;
 
@@ -13,9 +13,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/[controller]/[action]")]
     public class OnlineUserController : ControllerBase
     {
-        private readonly IOnlineUserService onlineUserService;
+        private readonly IOnlineUserAppService onlineUserService;
 
-        public OnlineUserController(IOnlineUserService onlineUserService)
+        public OnlineUserController(IOnlineUserAppService onlineUserService)
         {
             this.onlineUserService = onlineUserService;
         }

@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Employees.Dtos;
 
-namespace Letu.Basis.Profiles
+namespace Letu.Basis.Admin.Employees
 {
     public class EmployeeAutoMapperProfile : Profile
     {

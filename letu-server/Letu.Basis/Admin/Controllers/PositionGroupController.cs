@@ -15,11 +15,11 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/positionGroup")]
     public class PositionGroupController : ControllerBase
     {
-        private readonly IPositionGroupService _positionGroupService;
+        private readonly IPositionAppService positionAppService;
 
-        public PositionGroupController(IPositionGroupService positionGroupService)
+        public PositionGroupController(IPositionAppService positionAppService)
         {
-            _positionGroupService = positionGroupService;
+            this.positionAppService = positionAppService;
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Letu.Basis.Admin.Controllers
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task<AppResponse<bool>> AddPositionGroupAsync([FromBody] PositionGroupDto dto)
         {
-            await _positionGroupService.AddPositionGroupAsync(dto);
+            await positionAppService.AddPositionGroupAsync(dto);
             return Result.Ok();
         }
 
@@ -45,7 +45,7 @@ namespace Letu.Basis.Admin.Controllers
         [HasPermission("Org.PositionGroup.List")]
         public async Task<AppResponse<List<PositionGroupListDto>>> GetPositionGroupListAsync([FromQuery] PositionGroupQueryDto dto)
         {
-            var data = await _positionGroupService.GetPositionGroupListAsync(dto);
+            var data = await positionAppService.GetPositionGroupListAsync(dto);
             return Result.Data(data);
         }
 
@@ -58,7 +58,7 @@ namespace Letu.Basis.Admin.Controllers
         [HasPermission("Org.PositionGroup.Update")]
         public async Task<AppResponse<bool>> UpdatePositionGroupAsync([FromBody] PositionGroupDto dto)
         {
-            await _positionGroupService.UpdatePositionGroupAsync(dto);
+            await positionAppService.UpdatePositionGroupAsync(dto);
             return Result.Ok();
         }
 
@@ -72,7 +72,7 @@ namespace Letu.Basis.Admin.Controllers
         [ApiAccessLog(operateName: "删除职位分组", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task<AppResponse<bool>> DeletePositionGroupAsync(Guid id)
         {
-            await _positionGroupService.DeletePositionGroupAsync(id);
+            await positionAppService.DeletePositionGroupAsync(id);
             return Result.Ok();
         }
     }

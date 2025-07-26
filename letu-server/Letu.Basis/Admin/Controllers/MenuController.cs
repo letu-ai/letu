@@ -15,9 +15,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/menu")]
     public class MenuController : ControllerBase
     {
-        private readonly IMenuService _menuService;
+        private readonly IMenuAppService _menuService;
 
-        public MenuController(IMenuService menuService)
+        public MenuController(IMenuAppService menuService)
         {
             _menuService = menuService;
         }

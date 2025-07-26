@@ -1,5 +1,5 @@
-﻿using Letu.Basis.Admin.Monitor;
-using Letu.Basis.Admin.Monitor.Dtos;
+﻿using Letu.Basis.Admin.Loggings;
+using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Core.Attributes;
 
 using Microsoft.AspNetCore.Authorization;

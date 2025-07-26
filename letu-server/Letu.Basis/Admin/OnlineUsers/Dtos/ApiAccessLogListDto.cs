@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Letu.Logger;
 
-namespace Letu.Basis.Admin.Monitor.Dtos
+namespace Letu.Basis.Admin.OnlineUsers.Dtos
 {
     public class ApiAccessLogListDto
     {

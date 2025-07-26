@@ -16,9 +16,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/[controller]")]
     public class TenantController : ControllerBase
     {
-        private readonly ITenantService tenantService;
+        private readonly ITenantAppService tenantService;
 
-        public TenantController(ITenantService tenantService)
+        public TenantController(ITenantAppService tenantService)
         {
             this.tenantService = tenantService;
         }

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Letu.Basis.Admin.Roles
+namespace Letu.Basis.Admin.Roles.Dtos
 {
     public class AssignMenuDto
     {

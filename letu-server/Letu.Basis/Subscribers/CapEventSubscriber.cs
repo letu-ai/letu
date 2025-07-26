@@ -1,6 +1,6 @@
 ﻿using DotNetCore.CAP;
 using Letu.Shared.Consts;
-using Letu.Basis.Admin.Logging;
+using Letu.Basis.Admin.Loggings;
 
 namespace Letu.Basis.Subscribers
 {

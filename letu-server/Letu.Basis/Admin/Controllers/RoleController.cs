@@ -15,9 +15,9 @@ namespace Letu.Basis.Admin.Controllers
     [Route("api/role")]
     public class RoleController : ControllerBase
     {
-        private readonly IRoleService _roleService;
+        private readonly IRoleAppService _roleService;
 
-        public RoleController(IRoleService roleService)
+        public RoleController(IRoleAppService roleService)
         {
             _roleService = roleService;
         }
