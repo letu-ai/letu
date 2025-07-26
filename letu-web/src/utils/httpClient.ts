@@ -3,7 +3,7 @@ import UserStore from '@/store/userStore';
 import { ErrorCode, StaticRoutes } from '@/utils/globalValue.ts';
 import { message } from 'antd';
 import dayjs from 'dayjs';
-import { refreshToken } from '@/api/auth.ts';
+import { refreshToken } from '@/pages/accounts/service';
 
 class HttpClient {
   private readonly instance: AxiosInstance;

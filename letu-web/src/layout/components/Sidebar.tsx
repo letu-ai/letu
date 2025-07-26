@@ -1,6 +1,6 @@
 import { Menu } from 'antd';
 import UserStore from '@/store/userStore.ts';
-import type { FrontendMenu } from '@/api/auth.ts';
+import type { FrontendMenu } from '@/pages/accounts/service';
 import { Link } from 'react-router-dom';
 import React, { useMemo } from 'react';
 import ProIcon from '@/components/ProIcon';

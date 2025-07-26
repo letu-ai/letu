@@ -1,6 +1,6 @@
 import type { RouteObject } from 'react-router-dom';
 import React, { lazy } from 'react';
-import type { FrontendMenu } from '@/api/auth';
+import type { FrontendMenu } from '@/pages/accounts/service';
 
 // 获取所有页面文件
 const PageKeys = Object.keys(import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx'], { eager: true }));

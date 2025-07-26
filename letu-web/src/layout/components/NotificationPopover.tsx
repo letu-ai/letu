@@ -6,7 +6,7 @@ import {
   getMyNotificationNavbarInfo,
   readed,
   type UserNotificationNavbarItemDto,
-} from '@/api/organization/myNotification.ts';
+} from '@/pages/accounts/myNotification';
 import useApp from 'antd/es/app/useApp'; // 自定义样式
 import { useNavigate } from 'react-router-dom';
 import { CheckOutlined, EyeOutlined } from '@ant-design/icons';

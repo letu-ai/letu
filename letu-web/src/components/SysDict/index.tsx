@@ -1,4 +1,4 @@
-﻿import { getDictDataOptions } from '@/api/system/dictType';
+﻿import { getDictDataOptions } from '@/pages/admin/data-dictionaries/dictType';
 import React from 'react';
 import { Select, Radio } from 'antd';
 import { useQuery } from '@tanstack/react-query';

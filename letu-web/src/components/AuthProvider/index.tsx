@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import UserStore from '@/store/userStore.ts';
-import { getUserAuth, login, type LoginDto, smsLogin, type SmsLoginDto } from '@/api/auth.ts';
+import { getUserAuth, login, type LoginDto, smsLogin, type SmsLoginDto } from '@/pages/accounts/service';
 import { clearTabs } from '@/store/tabStore.ts';
 import { useDispatch } from 'react-redux';
 

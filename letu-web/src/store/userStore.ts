@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import type { FrontendMenu } from '@/api/auth';
+import type { FrontendMenu } from '@/pages/accounts/service';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 export type TokenInfo = {

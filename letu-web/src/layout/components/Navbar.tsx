@@ -1,6 +1,6 @@
 import { Avatar, Breadcrumb, Button, Dropdown, type MenuProps } from 'antd';
 import ProIcon from '@/components/ProIcon';
-import { signOut } from '@/api/auth.ts';
+import { signOut } from '@/pages/accounts/service';
 import { useLocation, useNavigate } from 'react-router-dom';
 import UserStore from '@/store/userStore.ts';
 import { selectCollapsed, selectSize, setSize, toggleCollapsed } from '@/store/themeStore.ts';
