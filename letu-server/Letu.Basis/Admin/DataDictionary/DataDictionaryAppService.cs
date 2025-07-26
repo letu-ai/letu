@@ -112,7 +112,7 @@ public class DataDictionaryAppService : IDataDictionaryAppService
         var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == dto.Value.ToLower());
         if (isExist)
         {
-            throw new BusinessException("字典值已存在");
+            throw new BusinessException(message: "字典值已存在");
         }
         var entity = AutoMapperHelper.Instance.Map<DictDataDto, DictionaryItem>(dto);
         await _dictDataRepository.InsertAsync(entity);
@@ -124,7 +124,7 @@ public class DataDictionaryAppService : IDataDictionaryAppService
     public async Task<bool> DeleteDictDataAsync(Guid[] ids)
     {
         var entity = await _dictDataRepository.Where(x => ids.Contains(x.Id)).FirstAsync()
-            ?? throw new BusinessException("数据不存在");
+            ?? throw new BusinessException(message: "数据不存在");
         await _dictDataRepository.DeleteAsync(entity);
 
         LogRecordContext.PutVariable("ids", string.Join(',', ids));
@@ -150,11 +150,11 @@ public class DataDictionaryAppService : IDataDictionaryAppService
     {
         if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
         var entity = await _dictDataRepository.Where(x => x.Id == dto.Id).FirstAsync()
-            ?? throw new BusinessException("数据不存在");
+            ?? throw new BusinessException(message: "数据不存在");
         var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == dto.Value.ToLower());
         if (entity.Value.ToLower() != dto.Value.ToLower() && isExist)
         {
-            throw new BusinessException("字典值已存在");
+            throw new BusinessException(message: "字典值已存在");
         }
 
         entity.Value = dto.Value;

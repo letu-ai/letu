@@ -58,7 +58,7 @@ namespace Letu.Basis.Admin.Employees
             {
                 if (string.IsNullOrEmpty(dto.UserPassword))
                 {
-                    throw new BusinessException("用户密码不能为空");
+                    throw new BusinessException(message: "用户密码不能为空");
                 }
                 userId = await _userService.AddUserAsync(new UserDto
                 {

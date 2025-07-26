@@ -180,8 +180,8 @@ namespace Letu.Basis.Account
                 var user = await _userRepository.Where(x => x.Phone == dto.Phone && x.IsEnabled).FirstAsync() ?? throw new BusinessException(message: "手机号不存在");
                 var codeKey = SystemCacheKey.LoginSmsCode(dto.Phone);
                 var code = await _hybridCache.GetAsync<string>(codeKey);
-                if (string.IsNullOrEmpty(code)) throw new BusinessException("验证码已过期");
-                if (dto.Code != code) throw new BusinessException("验证码错误");
+                if (string.IsNullOrEmpty(code)) throw new BusinessException(message: "验证码已过期");
+                if (dto.Code != code) throw new BusinessException(message: "验证码错误");
 
                 var (tokenRes, sessionId) = await GenerateTokenAsync(user.Id, user.UserName);
 
@@ -306,7 +306,7 @@ namespace Letu.Basis.Account
             var userIsExist = await _userRepository.Where(x => x.Phone == phone).AnyAsync();
             if (!userIsExist)
             {
-                throw new BusinessException("手机号不存在");
+                throw new BusinessException(message: "手机号不存在");
             }
 
             var code = StringUtils.RandomStr(6, true);

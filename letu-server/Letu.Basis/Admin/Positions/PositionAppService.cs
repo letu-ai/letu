@@ -116,7 +116,7 @@ namespace Letu.Basis.Admin.Positions
         {
             if (_positionRepository.Select.Any(x => x.Code.ToLower() == dto.Code!.ToLower()))
             {
-                throw new BusinessException("职位编号已存在");
+                throw new BusinessException(message: "职位编号已存在");
             }
             var entity = AutoMapperHelper.Instance.Map<PositionDto, Position>(dto);
             await _positionRepository.InsertAsync(entity);
@@ -158,11 +158,11 @@ namespace Letu.Basis.Admin.Positions
         {
             if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
             var entity = await _positionRepository.Where(x => x.Id == dto.Id).FirstAsync()
-                ?? throw new BusinessException("数据不存在");
+                ?? throw new BusinessException(message: "数据不存在");
             string code = dto.Code!.ToLower();
             if (entity.Code.ToLower() != code && _positionRepository.Select.Any(x => x.Code.ToLower() == code))
             {
-                throw new BusinessException("职位编号已存在");
+                throw new BusinessException(message: "职位编号已存在");
             }
 
             entity.Name = dto.Name;

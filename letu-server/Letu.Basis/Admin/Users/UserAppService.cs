@@ -32,11 +32,11 @@ namespace Letu.Basis.Admin.Users
             var isExist = await _userRepository.Select.AnyAsync(x => x.UserName.ToLower() == dto.UserName.ToLower());
             if (isExist)
             {
-                throw new BusinessException("账号已存在");
+                throw new BusinessException(message: "账号已存在");
             }
             if (!RegexCodeGen.Password().IsMatch(dto.Password))
             {
-                throw new BusinessException("密码格式不正确");
+                throw new BusinessException(message: "密码格式不正确");
             }
             var user = new User
             {
@@ -84,7 +84,7 @@ namespace Letu.Basis.Admin.Users
         {
             if (_currentUser.Id == id)
             {
-                throw new BusinessException("不能删除自己");
+                throw new BusinessException(message: "不能删除自己");
             }
             await _userRepository.DeleteAsync(x => x.Id == id);
             await _identityDomainService.DelUserPermissionCacheByUserIdAsync(id);
@@ -111,7 +111,7 @@ namespace Letu.Basis.Admin.Users
         public async Task<bool> SwitchUserEnabledStatusAsync(Guid id)
         {
             var entity = await _userRepository.Where(x => x.Id == id).FirstAsync()
-                ?? throw new BusinessException("数据不存在");
+                ?? throw new BusinessException(message: "数据不存在");
             entity.IsEnabled = !entity.IsEnabled;
             await _userRepository.UpdateAsync(entity);
 
@@ -128,7 +128,7 @@ namespace Letu.Basis.Admin.Users
             var user = await _userRepository.Where(x => x.Id == dto.UserId).FirstAsync();
             if (!RegexCodeGen.Password().IsMatch(dto.Password))
             {
-                throw new BusinessException("密码格式不正确");
+                throw new BusinessException(message: "密码格式不正确");
             }
 
             user.PasswordSalt = EncryptionUtils.GetPasswordSalt();

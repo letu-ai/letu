@@ -22,11 +22,11 @@ namespace Letu.Basis.Admin.Menus
         {
             if (dto.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
             {
-                throw new BusinessException("菜单的路由不能为空");
+                throw new BusinessException(message: "菜单的路由不能为空");
             }
             if (dto.IsExternal && !StringUtils.IsValidUrlStrict(dto.Path))
             {
-                throw new BusinessException("外链地址不合法");
+                throw new BusinessException(message: "外链地址不合法");
             }
             if (dto.ParentId.HasValue)
             {
@@ -135,11 +135,11 @@ namespace Letu.Basis.Admin.Menus
         {
             if (dto.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
             {
-                throw new BusinessException("菜单的路由不能为空");
+                throw new BusinessException(message: "菜单的路由不能为空");
             }
             if (dto.IsExternal && !StringUtils.IsValidUrlStrict(dto.Path))
             {
-                throw new BusinessException("外链地址不合法");
+                throw new BusinessException(message: "外链地址不合法");
             }
             if (dto.ParentId.HasValue)
             {
@@ -150,7 +150,7 @@ namespace Letu.Basis.Admin.Menus
                 }
             }
             var isExist = await _menuRepository.Select.AnyAsync(x => x.Path != null && dto.Path != null && x.Path.ToLower() == dto.Path.ToLower());
-            var entity = await _menuRepository.Where(x => x.Id == dto.Id).FirstAsync() ?? throw new BusinessException("数据不存在");
+            var entity = await _menuRepository.Where(x => x.Id == dto.Id).FirstAsync() ?? throw new BusinessException(message: "数据不存在");
             if (isExist && entity.Path != null && dto.Path!.ToLower() != entity.Path.ToLower())
             {
                 throw new BusinessException(message: $"已存在【{dto.Path}】菜单路由");

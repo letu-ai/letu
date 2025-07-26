@@ -53,7 +53,7 @@ namespace Letu.Basis.Admin.Settings
             var entity = _configRepository.Select.Where(x => x.Id == id).ToOne();
             if (entity == null)
             {
-                throw new BusinessException("数据已删除");
+                throw new BusinessException(message: "数据已删除");
             }
 
             await _configRepository.DeleteAsync(entity);
@@ -71,7 +71,7 @@ namespace Letu.Basis.Admin.Settings
             var entity = _configRepository.Select.Where(x => x.Id == dto.Id).ToOne();
             if (entity == null)
             {
-                throw new BusinessException("数据不存在");
+                throw new BusinessException(message: "数据不存在");
             }
 
             var key = dto.Key.ToLower();

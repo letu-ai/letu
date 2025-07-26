@@ -151,7 +151,7 @@ namespace Letu.Basis.Admin.Departments
                 var parentIsSub = await _deptRepository.Where(x => x.Id == entity.ParentId.Value && x.ParentId == entity.Id).AnyAsync();
                 if (parentIsSub)
                 {
-                    throw new BusinessException("不能选择子部门作为上级部门");
+                    throw new BusinessException(message: "不能选择子部门作为上级部门");
                 }
 
                 var all = await _deptRepository.Select.ToListAsync();

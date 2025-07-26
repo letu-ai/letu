@@ -26,7 +26,7 @@ namespace Letu.Basis.Admin.Roles
             var isExist = await _roleRepository.Select.AnyAsync(x => x.RoleName.ToLower() == dto.RoleName.ToLower());
             if (isExist)
             {
-                throw new BusinessException("角色名已存在");
+                throw new BusinessException(message: "角色名已存在");
             }
             var entity = new Role
             {
@@ -101,11 +101,11 @@ namespace Letu.Basis.Admin.Roles
         {
             if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
             var entity = await _roleRepository.Where(x => x.Id == dto.Id).FirstAsync()
-                ?? throw new BusinessException("数据不存在");
+                ?? throw new BusinessException(message: "数据不存在");
             var isExist = await _roleRepository.Select.AnyAsync(x => x.RoleName.ToLower() == dto.RoleName.ToLower());
             if (entity.RoleName.ToLower() != dto.RoleName.ToLower() && isExist)
             {
-                throw new BusinessException("角色名已存在");
+                throw new BusinessException(message: "角色名已存在");
             }
             if (entity.RoleName == AdminConsts.SuperAdminRole)
             {
