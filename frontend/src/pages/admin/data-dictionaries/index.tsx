@@ -70,7 +70,7 @@ const DictList: React.FC = () => {
               icon={<ProIcon icon="iconify:mi:database" />}
               key="data"
               onClick={() => {
-                navigate(`/system/dictItem/${record.dictType}`);
+                navigate(`/admin/data-dictionaries/items/${record.dictType}`);
               }}
             >
               数据

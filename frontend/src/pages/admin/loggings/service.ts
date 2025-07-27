@@ -6,7 +6,7 @@ import type { AppOption, AppResponse, PageSearch, PagedResult } from '@/types/ap
  * @param dto
  */
 export function getLoginLogList(dto: LoginLogQueryDto) {
-  return httpClient.get<LoginLogQueryDto, AppResponse<PagedResult<LoginLogListDto>>>('/api/loginLog/GetLoginLogList', {
+  return httpClient.get<LoginLogQueryDto, AppResponse<PagedResult<LoginLogListDto>>>('/api/admin/logs/security', {
     params: dto,
   });
 }
@@ -36,7 +36,7 @@ export interface LoginLogListDto {
  * @param dto
  */
 export function getBusinessLogList(dto: BusinessLogQueryDto) {
-  return httpClient.get<BusinessLogQueryDto, AppResponse<PagedResult<BusinessLogListDto>>>('/api/businessLog/list', {
+  return httpClient.get<BusinessLogQueryDto, AppResponse<PagedResult<BusinessLogListDto>>>('/api/admin/logs/business', {
     params: dto,
   });
 }
@@ -46,7 +46,7 @@ export function getBusinessLogList(dto: BusinessLogQueryDto) {
  * @param type
  */
 export function getBusinessTypeOptions(type?: string | null) {
-  return httpClient.get<string, AppResponse<AppOption[]>>('/api/businessLog/TypeOptions', {
+  return httpClient.get<string, AppResponse<AppOption[]>>('/api/admin/logs/business/type-options', {
     params: type,
   });
 }
@@ -76,7 +76,7 @@ export interface BusinessLogListDto {
  */
 export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
   return httpClient.get<ApiAccessLogQueryDto, AppResponse<PagedResult<ApiAccessLogListDto[]>>>(
-    '/api/MonitorLog/ApiAccessLogList',
+    '/api/admin/logs/access',
     {
       params: dto,
     },
@@ -89,7 +89,7 @@ export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
  */
 export function getExceptionLogList(dto: ExceptionLogQueryDto) {
   return httpClient.get<ExceptionLogQueryDto, AppResponse<PagedResult<ExceptionLogListDto[]>>>(
-    '/api/MonitorLog/ExceptionLogList',
+    '/api/admin/logs/exception',
     {
       params: dto,
     },
@@ -101,7 +101,7 @@ export function getExceptionLogList(dto: ExceptionLogQueryDto) {
  * @param exceptionId
  */
 export function handleException(exceptionId: string) {
-  return httpClient.post<string, AppResponse<boolean>>('/api/MonitorLog/HandleException?exceptionId=' + exceptionId);
+  return httpClient.post<string, AppResponse<boolean>>(`/api/admin/logs/exception/${exceptionId}/handled`);
 }
 
 export interface ApiAccessLogQueryDto extends PageSearch {

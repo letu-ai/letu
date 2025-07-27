@@ -53,7 +53,7 @@ export function getRoleOptions() {
  * @param id
  */
 export function getRoleMenuIds(id: string) {
-  return httpClient.get<string, AppResponse<string[]>>(`/api/role/menus/${id}`);
+  return httpClient.get<string, AppResponse<string[]>>(`/api/admin/roles/${id}/menus`);
 }
 
 /**

@@ -8,7 +8,7 @@ import {
   type MenuListDto,
   type MenuOptionTreeDto,
   updateMenu,
-} from '@/pages/admin/menus/service';
+} from './service';
 import { MenuType } from '@/utils/globalValue';
 import useApp from 'antd/es/app/useApp';
 
@@ -137,7 +137,7 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         <Form.Item label="菜单名称" name="title" rules={[{ required: true }, { max: 32 }]}>
           <Input placeholder="请输入菜单名称" />
         </Form.Item>
-        <Form.Item label="菜单类型" name="menuType" rules={[{ required: true }, { max: 64 }]}>
+        <Form.Item label="菜单类型" name="menuType" rules={[{ required: true, message: '请选择菜单类型' }]}>
           <Radio.Group
             buttonStyle="solid"
             onChange={(e) => {

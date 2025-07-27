@@ -1,6 +1,6 @@
 import { Avatar, Breadcrumb, Button, Dropdown, type MenuProps } from 'antd';
 import ProIcon from '@/components/ProIcon';
-import { signOut } from '@/pages/accounts/service';
+import { logout } from '@/pages/accounts/service';
 import { useLocation, useNavigate } from 'react-router-dom';
 import UserStore from '@/store/userStore.ts';
 import { selectCollapsed, selectSize, setSize, toggleCollapsed } from '@/store/themeStore.ts';
@@ -62,7 +62,7 @@ const Navbar = observer(() => {
 
   const onClick = ({ key }: { key: string }) => {
     if (key === 'logout') {
-      signOut().then(() => {
+      logout().then(() => {
         clearToken();
         navigate(StaticRoutes.Login);
       });

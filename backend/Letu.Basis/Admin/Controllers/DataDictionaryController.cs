@@ -149,7 +149,7 @@ namespace Letu.Basis.Admin.Controllers
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    [HttpGet("options")]
+    [HttpGet("types/type-options")]
     public async Task<AppResponse<List<AppOption>>> GetDictDataOptionsAsync(string type)
     {
         var data = await _dictTypeService.GetDictDataOptionsAsync(type);

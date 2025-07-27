@@ -18,6 +18,13 @@ export function smsLogin(dto: SmsLoginDto) {
 }
 
 /**
+ * 注销
+ */
+export function logout() {
+  return httpClient.post<AppResponse<boolean>>('/api/account/logout');
+}
+
+/**
  * 获取短信验证码
  * @param phone
  */
@@ -48,13 +55,6 @@ export function updateInfo(info: PersonalInfoDto) {
  */
 export function updatePwd(dto: UserPwdDto) {
   return httpClient.put<UserPwdDto, AppResponse<boolean>>('/api/account/updatePwd', dto);
-}
-
-/**
- * 注销
- */
-export function signOut() {
-  return httpClient.post<AppResponse<boolean>>('/api/account/signOut');
 }
 
 /**

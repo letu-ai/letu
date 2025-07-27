@@ -107,7 +107,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("info/{id:guid}")]
+        [HttpGet("{id:guid}/info")]
         [HasPermission("Org.Employee.List")]
         public async Task<AppResponse<EmployeeInfoDto>> GetEmployeeInfoAsync(Guid id)
         {

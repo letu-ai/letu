@@ -41,7 +41,7 @@ export function deleteMenu(ids: string[]) {
  * @param keyword
  */
 export function getMenuOptions(onlyMenu: boolean, keyword?: string) {
-  return httpClient.get<number, AppResponse<MenuOptionResultDto>>('/api/admin/menus/options', {
+  return httpClient.get<number, AppResponse<MenuOptionResultDto>>('/api/admin/menus/menu-options', {
     params: {
       onlyMenu: onlyMenu,
       keyword: keyword,
@@ -52,16 +52,16 @@ export function getMenuOptions(onlyMenu: boolean, keyword?: string) {
 export interface MenuDto {
   id?: string | null;
   title: string;
-  name: string;
+  name?: string;
   icon?: string | null;
   path: string | null;
-  functionType: number;
-  permission: string;
-  parentId: string;
+  menuType: number;
+  permission?: string;
+  parentId?: string | null;
   sort: number;
   display: boolean;
-  component: string;
-  isExternal: boolean;
+  component?: string;
+  isExternal?: boolean;
 }
 
 export interface MenuQueryDto {

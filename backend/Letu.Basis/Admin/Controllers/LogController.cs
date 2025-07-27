@@ -42,7 +42,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet("exceptions")]
+        [HttpGet("exception")]
         [HasPermission("Monitor.ExceptionLogList")]
         public async Task<AppResponse<PagedResult<ExceptionLogListDto>>> GetExceptionLogListAsync([FromQuery] ExceptionLogQueryDto dto)
         {
@@ -55,7 +55,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="exceptionId">异常日志ID</param>
         /// <returns></returns>
-        [HttpPost("handle-exception/{exceptionId}")]
+        [HttpPost("exception/{exceptionId}/handled")]
         [HasPermission("Monitor.ExceptionLog.HandleException")]
         public async Task<AppResponse<bool>> HandleExceptionAsync(Guid exceptionId)
         {
@@ -80,7 +80,7 @@ namespace Letu.Basis.Admin.Controllers
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        [HttpGet("types")]
+        [HttpGet("business/type-options")]
         public async Task<AppResponse<List<AppOption>>> GetBusinessTypeOptionsAsync(string? type)
         {
             var data = await businessLogService.GetBusinessTypeOptionsAsync(type);

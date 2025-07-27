@@ -6,7 +6,7 @@ import type { AppResponse, PageSearch, AppOption, PagedResult } from '@/types/ap
  * @param dto
  */
 export function addDictType(dto: DictTypeDto) {
-  return httpClient.post<DictTypeDto, AppResponse<boolean>>('/api/dictType/addDictType', dto);
+  return httpClient.post<DictTypeDto, AppResponse<boolean>>('/api/admin/data-dictionaries/types', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addDictType(dto: DictTypeDto) {
  */
 export function getDictTypeList(dto: DictTypeSearchDto) {
   return httpClient.get<DictTypeSearchDto, AppResponse<PagedResult<DictTypeResultDto>>>(
-    '/api/dictType/getDictTypeList',
+    '/api/admin/data-dictionaries/types',
     { params: dto },
   );
 }
@@ -24,7 +24,7 @@ export function getDictTypeList(dto: DictTypeSearchDto) {
  * @param dto
  */
 export function updateDictType(dto: DictTypeDto) {
-  return httpClient.put<DictTypeDto, AppResponse<boolean>>('/api/dictType/updateDictType', dto);
+  return httpClient.put<DictTypeDto, AppResponse<boolean>>('/api/admin/data-dictionaries/types', dto);
 }
 
 /**
@@ -32,7 +32,7 @@ export function updateDictType(dto: DictTypeDto) {
  * @param dictType
  */
 export function deleteDictType(dictType: string) {
-  return httpClient.delete<string, AppResponse<boolean>>('/api/dictType/deleteDictType/' + dictType);
+  return httpClient.delete<string, AppResponse<boolean>>('/api/admin/data-dictionaries/types/' + dictType);
 }
 
 /**
@@ -40,7 +40,7 @@ export function deleteDictType(dictType: string) {
  * @param ids
  */
 export function deleteDictTypes(ids: string[]) {
-  return httpClient.delete<string[], AppResponse<boolean>>('/api/dictType/deleteDictTypes', {
+  return httpClient.delete<string[], AppResponse<boolean>>('/api/admin/data-dictionaries/types', {
     data: ids,
   });
 }
@@ -51,7 +51,7 @@ export function deleteDictTypes(ids: string[]) {
  * @returns
  */
 export function getDictDataOptions(type: string) {
-  return httpClient.get<string, AppResponse<AppOption[]>>('/api/dictType/getDictDataOptions?type=' + type);
+  return httpClient.get<string, AppResponse<AppOption[]>>('/api/admin/data-dictionaries/types/type-options?type=' + type);
 }
 
 export interface DictTypeDto {
@@ -80,7 +80,7 @@ export interface DictTypeResultDto {
  * 新增字典数据
  */
 export function addDictData(dto: DictDataDto) {
-  return httpClient.post<DictDataDto, AppResponse<boolean>>('/api/DictData/Add', dto);
+  return httpClient.post<DictDataDto, AppResponse<boolean>>('/api/admin/data-dictionaries', dto);
 }
 
 /**
@@ -89,7 +89,7 @@ export function addDictData(dto: DictDataDto) {
  * @returns
  */
 export function getDictDataList(dto: DictDataQueryDto) {
-  return httpClient.get<DictDataQueryDto, AppResponse<PagedResult<DictDataListDto>>>('/api/DictData/list', {
+  return httpClient.get<DictDataQueryDto, AppResponse<PagedResult<DictDataListDto>>>('/api/admin/data-dictionaries', {
     params: dto,
   });
 }
@@ -98,7 +98,7 @@ export function getDictDataList(dto: DictDataQueryDto) {
  * 修改字典数据
  */
 export function updateDictData(dto: DictDataDto) {
-  return httpClient.put<DictDataDto, AppResponse<boolean>>('/api/DictData/Update', dto);
+  return httpClient.put<DictDataDto, AppResponse<boolean>>('/api/admin/data-dictionaries', dto);
 }
 
 /**
@@ -107,7 +107,7 @@ export function updateDictData(dto: DictDataDto) {
  * @returns
  */
 export function deleteDictData(ids: string[]) {
-  return httpClient.delete<string[], AppResponse<boolean>>('/api/DictData/Delete', {
+  return httpClient.delete<string[], AppResponse<boolean>>('/api/admin/data-dictionaries', {
     data: ids,
   });
 }

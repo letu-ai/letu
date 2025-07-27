@@ -56,13 +56,12 @@ function App() {
   const renderRoutes = routes;
 
   if (UserStore.isAuthenticated()) {
-    const menus = UserStore.userInfo?.menus;
-    if (Array.isArray(menus) && menus.length > 0) {
-      const dyRoutes = generateDynamicRoutes(menus);
+    generateDynamicRoutes().then((dyRoutes) => {
       dyRoutes.forEach((dy) => {
         renderRoutes[1].children?.push(dy);
       });
-    }
+    });
+
   }
 
   const fallback = (

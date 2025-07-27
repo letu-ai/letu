@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
  * @param dto
  */
 export function addEmployee(dto: EmployeeDto) {
-  return httpClient.post<EmployeeDto, AppResponse<boolean>>('/api/employee/add', dto);
+  return httpClient.post<EmployeeDto, AppResponse<boolean>>('/api/admin/employees', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addEmployee(dto: EmployeeDto) {
  * @param dto
  */
 export function getEmployeePagedList(dto: EmployeeQueryDto) {
-  return httpClient.get<EmployeeQueryDto, AppResponse<PagedResult<EmployeeListDto>>>('/api/employee/list', {
+  return httpClient.get<EmployeeQueryDto, AppResponse<PagedResult<EmployeeListDto>>>('/api/admin/employees', {
     params: dto,
   });
 }
@@ -24,7 +24,7 @@ export function getEmployeePagedList(dto: EmployeeQueryDto) {
  * @param dto
  */
 export function getEmployeeList(dto: EmployeePureQueryDto) {
-  return httpClient.get<string, AppResponse<EmployeeDto[]>>('/api/employee/GetEmployeeList', {
+  return httpClient.get<string, AppResponse<EmployeeDto[]>>('/api/admin/employees', {
     params: dto,
   });
 }
@@ -34,7 +34,7 @@ export function getEmployeeList(dto: EmployeePureQueryDto) {
  * @param dto
  */
 export function updateEmployee(dto: EmployeeDto) {
-  return httpClient.put<EmployeeDto, AppResponse<boolean>>('/api/employee/update', dto);
+  return httpClient.put<EmployeeDto, AppResponse<boolean>>('/api/admin/employees', dto);
 }
 
 /**
@@ -42,7 +42,7 @@ export function updateEmployee(dto: EmployeeDto) {
  * @param id
  */
 export function deleteEmployee(id: string) {
-  return httpClient.delete<AppResponse<boolean>>('/api/employee/delete/' + id);
+  return httpClient.delete<AppResponse<boolean>>('/api/admin/employees/' + id);
 }
 
 /**
@@ -50,7 +50,7 @@ export function deleteEmployee(id: string) {
  * @param dto
  */
 export function bindUser(dto: EmployeeBindUserDto) {
-  return httpClient.post<AppResponse<boolean>>('/api/employee/bindUser', dto);
+  return httpClient.post<AppResponse<boolean>>('/api/admin/employees/bind-user', dto);
 }
 
 /**
@@ -58,7 +58,7 @@ export function bindUser(dto: EmployeeBindUserDto) {
  * @param id
  */
 export function getEmployeeInfo(id: string) {
-  return httpClient.get<string, AppResponse<EmployeeInfoDto>>('/api/employee/info/' + id);
+  return httpClient.get<string, AppResponse<EmployeeInfoDto>>(`/api/admin/employees/${id}/info`);
 }
 
 /**
@@ -68,7 +68,7 @@ export function getEmployeeInfo(id: string) {
  */
 export function getDeptEmployeeTree(dto?: DeptEmployeeTreeQueryDto) {
   return httpClient.get<DeptEmployeeTreeQueryDto, AppResponse<DeptEmployeeTreeDto[]>>(
-    '/api/employee/getDeptEmployeeTree',
+    '/api/admin/employees/dept-employee-tree',
     {
       params: dto,
     },

@@ -54,7 +54,7 @@ export function getUserRoleIds(uid: string) {
  * @param dto
  */
 export function resetUserPwd(dto: ResetUserPwdDto) {
-  return httpClient.put<string, AppResponse<boolean>>('/api/admin/users/resetPwd', dto);
+  return httpClient.put<string, AppResponse<boolean>>('/api/admin/users/reset-password', dto);
 }
 
 /**
@@ -62,7 +62,7 @@ export function resetUserPwd(dto: ResetUserPwdDto) {
  * @param keyword 账号/昵称
  */
 export function getUserSimpleInfos(keyword?: string) {
-  return httpClient.get<string, AppResponse<UserSimpleInfoDto[]>>('/api/admin/users/simpleUserInfos', {
+  return httpClient.get<string, AppResponse<UserSimpleInfoDto[]>>('/api/admin/users/simple', {
     params: {
       keyword,
     },
