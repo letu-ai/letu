@@ -42,7 +42,7 @@ export function deleteScheduledTask(id: string) {
  */
 export function getExecutionLogList(dto: TaskExecutionLogQueryDto) {
   return httpClient.get<TaskExecutionLogQueryDto, AppResponse<PagedResult<TaskExecutionLogListDto>>>(
-    '/api/admin/scheduled-tasks/Log',
+    '/api/admin/scheduled-tasks/logs',
     { params: dto },
   );
 }

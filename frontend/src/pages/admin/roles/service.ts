@@ -22,7 +22,7 @@ export function getRoleList(dto: RoleQueryDto) {
  * @param dto
  */
 export function updateRole(dto: RoleDto) {
-  return httpClient.put<RoleDto, AppResponse<boolean>>('/api/admin/roles', dto);
+  return httpClient.put<RoleDto, AppResponse<boolean>>(`/api/admin/roles/${dto.id}`, dto);
 }
 
 /**
@@ -38,7 +38,7 @@ export function deleteRole(id: string) {
  * @param dto
  */
 export function assignMenu(dto: AssignMenuDto) {
-  return httpClient.post<AssignMenuDto, AppResponse<boolean>>('/api/admin/roles/assignMenu', dto);
+  return httpClient.put<AssignMenuDto, AppResponse<boolean>>(`/api/admin/roles/${dto.roleId}/menus`, dto);
 }
 
 /**
@@ -61,7 +61,7 @@ export function getRoleMenuIds(id: string) {
  * @param dto
  */
 export function assignData(dto: AssignDataDto) {
-  return httpClient.post<AssignDataDto, AppResponse<boolean>>('/api/admin/roles/assignData', dto);
+  return httpClient.put<AssignDataDto, AppResponse<boolean>>(`/api/admin/roles/${dto.roleId}/data`, dto);
 }
 
 export interface RoleDto {
