@@ -1,4 +1,4 @@
-﻿import { readed, getMyNotificationList, type MyNotificationListDto } from './myNotification.ts';
+﻿import { readed, getMyNotificationList, type MyNotificationListDto } from './service';
 import { CheckOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Select, Tag } from 'antd';
 import React, { useRef } from 'react';

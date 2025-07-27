@@ -6,7 +6,7 @@ import type { AppResponse, PagedResult } from '@/types/api';
  * @param dto
  */
 export function readed(ids: string[]) {
-  return httpClient.put<string[], AppResponse<boolean>>('/api/UserNotification/readed', ids);
+  return httpClient.put<string[], AppResponse<boolean>>('/api/my/notifications/mark-as-read', ids);
 }
 
 /**
@@ -15,7 +15,7 @@ export function readed(ids: string[]) {
  */
 export function getMyNotificationList(dto: UserNotificationQueryDto) {
   return httpClient.get<UserNotificationQueryDto, AppResponse<PagedResult<MyNotificationListDto>>>(
-    '/api/UserNotification/MyNotificationList',
+    '/api/my/notifications',
     {
       params: dto,
     },
@@ -28,7 +28,7 @@ export function getMyNotificationList(dto: UserNotificationQueryDto) {
  */
 export function getMyNotificationNavbarInfo() {
   return httpClient.get<unknown, AppResponse<UserNotificationNavbarDto>>(
-    '/api/UserNotification/MyNotificationNavbarInfo',
+    '/api/my/notifications/navbar-info',
   );
 }
 
