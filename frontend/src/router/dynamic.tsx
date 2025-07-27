@@ -10,6 +10,7 @@ import type { FrontendMenu } from '@/pages/accounts/service';
 4. layout.tsx 作为该目录下的布局页面
 5. index.tsx作为默认页面
 6. 如果目录中有route.ts文件，则直接使用route导出的路由，不再搜索这个目录
+7. 文件名中包含$的文件，作为动态路由，例如items.$dictType.tsx，则作为动态路由，路径为/items/:dictType
 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  */
 
@@ -33,6 +34,42 @@ const createElementFromPath = (componentPath: string) => {
 };
 
 /**
+ * 处理动态路由段，将$符号转换为:符号
+ * @param segment 路径段
+ * @returns 处理后的路径段
+ */
+const processDynamicRouteSegment = (segment: string): string => {
+  // 如果段不包含$，则保持不变
+  if (!segment.includes('$')) {
+    return segment;
+  }
+  
+  // 情况1: 纯$paramName格式，如$dictType
+  if (segment.startsWith('$')) {
+    return ':' + segment.substring(1);
+  }
+  
+  // 情况2: 包含$的复合格式，如items.$dictType
+  const parts = segment.split('.');
+  let result = '';
+  
+  parts.forEach((part, index) => {
+    if (part.startsWith('$')) {
+      // $paramName部分转为/:paramName
+      result += '/:' + part.substring(1);
+    } else if (index === 0) {
+      // 第一部分直接使用
+      result = part;
+    } else {
+      // 其他非动态部分，添加为子路径
+      result += '/' + part;
+    }
+  });
+  
+  return result;
+};
+
+/**
  * 从文件路径提取路由路径
  * @param filePath 文件路径
  * @returns 路由路径
@@ -43,10 +80,17 @@ const extractRoutePathFromFile = (filePath: string): string => {
     .replace('@/pages', '')
     .replace('/src/pages', '')
     .replace('src/pages', '')
-    .replace(/\.(tsx|ts)$/, '');
+    .replace(/\.tsx$/, '');
 
   // 将 /index 替换为空字符串（作为默认页面）
   routePath = routePath.replace(/\/index$/, '');
+
+  // 处理动态路由：将文件名中的 $paramName 转换为 :paramName
+  const segments = routePath.split('/');
+  const processedSegments = segments.map(processDynamicRouteSegment);
+  
+  // 重新组合路径
+  routePath = processedSegments.join('/');
 
   // 确保路径以 / 开头
   if (!routePath.startsWith('/')) {
@@ -55,7 +99,7 @@ const extractRoutePathFromFile = (filePath: string): string => {
 
   // 如果是根路径，返回 /
   return routePath === '' ? '/' : routePath;
-};
+}
 
 /**
  * 检查文件是否应该被排除
@@ -305,15 +349,15 @@ export const generateDynamicRoutes = async (): Promise<RouteObject[]> => {
   const routes = await generateRoutesFromFiles(PageKeys);
   
   // 调试模式下打印路由结构
-  // if (process.env.NODE_ENV === 'development') {
-  //   console.group('🚀 动态路由生成结果:');
-  //   console.log(`📁 扫描到的页面文件数量: ${PageKeys.length}`);
-  //   console.log(`📁 扫描到的自定义路由文件数量: ${RouteKeys.length}`);
-  //   console.log(`🛣️  生成的路由数量: ${routes.length}`);
-  //   console.log('🗂️  路由结构:');
-  //   debugPrintRoutes(routes);
-  //   console.groupEnd();
-  // }
+  if (process.env.NODE_ENV === 'development') {
+    console.group('🚀 动态路由生成结果:');
+    console.log(`📁 扫描到的页面文件数量: ${PageKeys.length}`);
+    console.log(`📁 扫描到的自定义路由文件数量: ${RouteKeys.length}`);
+    console.log(`🛣️  生成的路由数量: ${routes.length}`);
+    console.log('🗂️  路由结构:');
+    debugPrintRoutes(routes);
+    console.groupEnd();
+  }
   
   return routes;
 };
