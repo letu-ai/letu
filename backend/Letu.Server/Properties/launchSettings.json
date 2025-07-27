@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Letu.App": {
+    "Letu.Server": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

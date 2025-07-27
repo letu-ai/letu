@@ -2,6 +2,9 @@
 
 	<Import Project="..\common.props" />
 
+	<PropertyGroup>
+		<RootNamespace>Letu</RootNamespace>
+	</PropertyGroup>
 
 	<ItemGroup>
 	</ItemGroup>
