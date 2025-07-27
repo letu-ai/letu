@@ -4,7 +4,7 @@ import {
   getNotificationList,
   type NotificationDto,
   type NotificationListDto,
-} from '@/api/organization/notification.ts';
+} from './service.ts';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Select, Space, Tag } from 'antd';
 import React, { useRef } from 'react';

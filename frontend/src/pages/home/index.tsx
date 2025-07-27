@@ -66,9 +66,8 @@ const HomePage = () => {
 
   // 仓库地址
   const repoLinks = [
-    { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/letu-ai/letu-admin' },
-    { name: 'Gitee', icon: <GithubOutlined />, url: 'https://gitee.com/letu-ai/letu-admin' },
-    { name: '文档', icon: <BookOutlined />, url: 'https://crackerwork.com' },
+    { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/letu-ai/letu' },
+    { name: '文档', icon: <BookOutlined />, url: 'https://docs.letu.run' },
   ];
   const [githubRepoInfo, setGithubRepoInfo] = useState<any>({
     starCount: 26,
@@ -77,7 +76,7 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/letu-ai/letu-admin').then(async (res) => {
+    fetch('https://api.github.com/repos/letu-ai/letu').then(async (res) => {
       const json = await res.json();
       if (json instanceof Object) {
         setGithubRepoInfo({
