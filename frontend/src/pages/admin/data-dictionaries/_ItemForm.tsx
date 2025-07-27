@@ -59,13 +59,13 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     });
   };
   const onFinish = (values: DictDataDto) => {
-    if (!urlParams?.dictType) {
+    if (!urlParams?.type) {
       message.error('字典类型不能为空');
       return;
     }
     const isEdit = !!row?.id;
 
-    values.dictType = urlParams!.dictType;
+    values.dictType = urlParams!.type;
     execute(values, isEdit ? updateDictData : addDictData, isEdit ? '编辑成功' : '新增成功');
   };
 

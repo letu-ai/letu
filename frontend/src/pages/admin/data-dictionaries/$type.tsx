@@ -1,13 +1,14 @@
 ﻿import Permission from '@/components/Permission';
 import { deleteDictData, getDictDataList, type DictDataDto, type DictDataListDto } from './service';
-import { CopyOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CopyOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Switch } from 'antd';
 import React, { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
-import DictDataForm, { type ModalRef } from './_DictDataForm';
+import DictDataForm, { type ModalRef } from './_ItemForm';
 import SmartTable from '@/components/SmartTable';
 import useApp from 'antd/es/app/useApp';
+import { Link } from 'react-router-dom';
 
 const DictDataList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
@@ -106,7 +107,7 @@ const DictDataList: React.FC = () => {
         rowKey="id"
         ref={tableRef}
         request={async (params) => {
-          const { data } = await getDictDataList({ ...params, dictType: urlParams?.dictType });
+          const { data } = await getDictDataList({ ...params, dictType: urlParams?.type });
           return data;
         }}
         searchItems={[
@@ -115,17 +116,24 @@ const DictDataList: React.FC = () => {
           </Form.Item>,
         ]}
         toolbar={
-          <Permission permissions={'Sys.DictData.Add'}>
-            <Button
-              type="primary"
-              key="primary"
-              onClick={() => {
-                modalRef?.current?.openModal();
-              }}
-            >
-              <PlusOutlined /> 新增
-            </Button>
-          </Permission>
+          <Space size="middle">
+            <Link to={`/admin/data-dictionaries`}>
+              <Button type="link" icon={<ArrowLeftOutlined />}>
+                返回
+              </Button>
+            </Link>
+            <Permission permissions={'Sys.DictData.Add'}>
+              <Button
+                type="primary"
+                key="primary"
+                onClick={() => {
+                  modalRef?.current?.openModal();
+                }}
+              >
+                <PlusOutlined /> 新增
+              </Button>
+            </Permission>
+          </Space>
         }
       />
       {/* 新增/编辑字典数据弹窗 */}

@@ -9,17 +9,16 @@ import {
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Switch } from 'antd';
 import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
-import DictTypeForm, { type ModalRef } from './_DictTypeForm';
+import DictTypeForm, { type ModalRef } from './_TypeForm';
 import ProIcon from '@/components/ProIcon';
 import useApp from 'antd/es/app/useApp';
 
 const DictList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<ModalRef>(null);
-  const navigate = useNavigate();
   const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
@@ -65,16 +64,15 @@ const DictList: React.FC = () => {
             </Button>
           </Permission>
           <Permission permissions={'Sys.DictData.List'}>
+            <Link to={`/admin/data-dictionaries/${record.dictType}`}>
             <Button
               type="link"
               icon={<ProIcon icon="iconify:mi:database" />}
               key="data"
-              onClick={() => {
-                navigate(`/admin/data-dictionaries/items/${record.dictType}`);
-              }}
-            >
-              数据
-            </Button>
+              >
+                数据
+              </Button>
+            </Link>
           </Permission>
           <Permission permissions={'Sys.DictType.Delete'}>
             <Popconfirm
