@@ -10,7 +10,7 @@
 
 ## 项目介绍
 
-乐途开源框架是基于[风汐管理系统](https://github.com/letunet/letu-admin)开发的通用Web框架。
+乐途开源框架是基于[风汐管理系统](https://github.com/fancyxnet/fancyx-admin)开发的通用Web框架。
 
 在风汐的基础上主要做了如下改动：
 - 选用ABP框架作为底座
