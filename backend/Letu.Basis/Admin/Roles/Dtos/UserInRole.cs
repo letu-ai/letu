@@ -1,6 +1,6 @@
-using Letu.Repository.BaseEntity;
-using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
+using Volo.Abp.Domain.Entities;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Roles.Dtos
 {
@@ -8,7 +8,7 @@ namespace Letu.Basis.Admin.Roles.Dtos
     /// 用户角色关联表
     /// </summary>
     [Table(Name = "sys_user_role")]
-    public class UserInRole : Entity, ITenant
+    public class UserInRole : Entity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 用户ID
@@ -26,6 +26,6 @@ namespace Letu.Basis.Admin.Roles.Dtos
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 import { Form, Input, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import { addScheduledTask, type ScheduledTaskDto, updateScheduledTask } from './service';
 import useApp from 'antd/es/app/useApp';
 
@@ -42,22 +41,21 @@ const ScheduledTaskForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: ScheduledTaskDto,
-    apiAction: (params: ScheduledTaskDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: ScheduledTaskDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateScheduledTask : addScheduledTask, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: ScheduledTaskDto) => {
+    if (row?.id) {
+      await updateScheduledTask({ ...values, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addScheduledTask(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

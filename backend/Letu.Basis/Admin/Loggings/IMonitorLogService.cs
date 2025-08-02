@@ -1,4 +1,5 @@
-﻿using Letu.Basis.Admin.OnlineUsers.Dtos;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.OnlineUsers.Dtos;
 
 namespace Letu.Basis.Admin.Loggings
 {

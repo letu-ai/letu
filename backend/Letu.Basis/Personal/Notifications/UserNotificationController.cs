@@ -1,8 +1,9 @@
-﻿using Letu.Basis.Personal.Notifications.Dtos;
+﻿using Letu.Applications;
+using Letu.Basis.Personal.Notifications.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Personal
+namespace Letu.Basis.Personal.Notifications
 {
     [Authorize]
     [ApiController]
@@ -17,24 +18,21 @@ namespace Letu.Basis.Personal
         }
 
         [HttpGet]
-        public async Task<AppResponse<PagedResult<UserNotificationListDto>>> GetMyNotificationListAsync([FromQuery] UserNotificationQueryDto dto)
+        public async Task<PagedResult<UserNotificationListDto>> GetMyNotificationListAsync([FromQuery] UserNotificationQueryDto dto)
         {
-            var data = await _userNotificationService.GetMyNotificationListAsync(dto);
-            return Result.Data(data);
+            return await _userNotificationService.GetMyNotificationListAsync(dto);
         }
 
         [HttpPut("mark-as-read")]
-        public async Task<AppResponse<bool>> ReadedAsync([FromBody] Guid[] ids)
+        public async Task ReadedAsync([FromBody] Guid[] ids)
         {
             await _userNotificationService.ReadedAsync(ids);
-            return Result.Ok();
         }
 
         [HttpGet("navbar-info")]
-        public async Task<AppResponse<UserNotificationNavbarDto>> GetMyNotificationNavbarInfoAsync()
+        public async Task<UserNotificationNavbarDto> GetMyNotificationNavbarInfoAsync()
         {
-            var data = await _userNotificationService.GetMyNotificationNavbarInfoAsync();
-            return Result.Data(data);
+            return await _userNotificationService.GetMyNotificationNavbarInfoAsync();
         }
     }
 }

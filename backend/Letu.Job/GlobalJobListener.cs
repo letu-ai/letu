@@ -61,7 +61,7 @@ namespace Letu.Job
 
         private void ProcessQueue()
         {
-            IRepository<TaskExecutionLogDO>? repository = _serviceProvider.GetService<IRepository<TaskExecutionLogDO>>();
+            IFreeSqlRepository<TaskExecutionLogDO>? repository = _serviceProvider.GetService<IFreeSqlRepository<TaskExecutionLogDO>>();
 
             Task.Run(() =>
             {

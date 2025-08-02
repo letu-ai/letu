@@ -1,19 +1,23 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.SharedService;
 using Letu.Repository;
 using Letu.Shared.Consts;
+using Letu.Shared.Models;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Roles
 {
-    public class RoleAppService : IRoleAppService
+    public class RoleAppService : ApplicationService, IRoleAppService
     {
-        private readonly IRepository<Role> _roleRepository;
-        private readonly IRepository<MenuInRole> _roleMenuRepository;
-        private readonly IRepository<UserInRole> _userRoleRepository;
+        private readonly IFreeSqlRepository<Role> _roleRepository;
+        private readonly IFreeSqlRepository<MenuInRole> _roleMenuRepository;
+        private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
         private readonly IdentitySharedService _identitySharedService;
 
-        public RoleAppService(IRepository<Role> roleRepository, IRepository<MenuInRole> roleMenuRepository
-            , IRepository<UserInRole> userRoleRepository, IdentitySharedService identitySharedService)
+        public RoleAppService(IFreeSqlRepository<Role> roleRepository, IFreeSqlRepository<MenuInRole> roleMenuRepository
+            , IFreeSqlRepository<UserInRole> userRoleRepository, IdentitySharedService identitySharedService)
         {
             _roleRepository = roleRepository;
             _roleMenuRepository = roleMenuRepository;

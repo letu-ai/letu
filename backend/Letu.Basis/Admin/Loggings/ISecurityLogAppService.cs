@@ -1,9 +1,9 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Loggings.Dtos;
-using Letu.Core.Interfaces;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public interface ISecurityLogAppService : IScopedDependency
+    public interface ISecurityLogAppService
     {
         /// <summary>
         /// 登录日志分页列表

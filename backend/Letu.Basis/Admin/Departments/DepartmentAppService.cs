@@ -1,17 +1,17 @@
 using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Admin.Employees;
-using Letu.Core.Helpers;
 using Letu.Repository;
-using Letu.Shared.Models;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Departments
 {
-    public class DepartmentAppService : IDepartmentAppService
+    public class DepartmentAppService : ApplicationService, IDepartmentAppService
     {
-        private readonly IRepository<Department> _deptRepository;
-        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IFreeSqlRepository<Department> _deptRepository;
+        private readonly IFreeSqlRepository<Employee> _employeeRepository;
 
-        public DepartmentAppService(IRepository<Department> deptRepository, IRepository<Employee> employeeRepository)
+        public DepartmentAppService(IFreeSqlRepository<Department> deptRepository, IFreeSqlRepository<Employee> employeeRepository)
         {
             _deptRepository = deptRepository;
             _employeeRepository = employeeRepository;
@@ -24,7 +24,7 @@ namespace Letu.Basis.Admin.Departments
                 throw new BusinessException(message: "部门编号已存在");
             }
 
-            var entity = AutoMapperHelper.Instance.Map<DeptDto, Department>(dto);
+            var entity = ObjectMapper.Map<DeptDto, Department>(dto);
             entity.ParentId = dto.ParentId;
             entity.Code = dto.Code;
             if (entity.ParentId.HasValue)
@@ -65,7 +65,7 @@ namespace Letu.Basis.Admin.Departments
                     .WhereIf(!string.IsNullOrEmpty(dto.Code), x => x.Code.Contains(dto.Code!)) // ==
                     .WhereIf(dto.Status > 0, x => x.Status == dto.Status) // ==
                     .OrderBy(x => x.Sort).ToListAsync();
-                var result = AutoMapperHelper.Instance.Map<List<Department>, List<DeptListDto>>(filter);
+                var result = ObjectMapper.Map<List<Department>, List<DeptListDto>>(filter);
 
                 // Add curator names for filtered results
                 await AddCuratorNames(result); // ++
@@ -73,7 +73,7 @@ namespace Letu.Basis.Admin.Departments
                 return result;
             }
             var all = await _deptRepository.Select.OrderBy(x => x.ParentIds).ToListAsync();
-            var tree = AutoMapperHelper.Instance.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
+            var tree = ObjectMapper.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
 
             // Add curator names for all departments
             await AddCuratorNames(tree); // ++
@@ -85,7 +85,7 @@ namespace Letu.Basis.Admin.Departments
 
             List<DeptListDto>? getChildren(Guid id)
             {
-                var children = AutoMapperHelper.Instance.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == id).ToList());
+                var children = ObjectMapper.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == id).ToList());
                 if (children.Count <= 0) return null;
 
                 // Add curator names for child departments
@@ -107,7 +107,8 @@ namespace Letu.Basis.Admin.Departments
             var curatorIds = depts.Select(d => d.CuratorId).Where(id => id.HasValue).Distinct().ToList();
 
             if (curatorIds.Any())
-            {                var employees = await _employeeRepository
+            {
+                var employees = await _employeeRepository
                     .Where(e => curatorIds.Contains(e.Id))
                     .ToListAsync(e => new { e.Id, e.Name });
 

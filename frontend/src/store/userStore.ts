@@ -1,13 +1,13 @@
 import dayjs from 'dayjs';
-import type { FrontendMenu } from '@/pages/accounts/service';
+import type { IFrontendMenu } from '@/pages/accounts/service';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 export type TokenInfo = {
-  sessionId: string;
-  accessToken: string;
-  refreshToken: string;
-  expiredTime: Date;
-};
+    accessToken: string;
+    refreshToken?: string;
+    /** AccessToken过期的UTC时间 */
+    expiredTime: Date;
+  };
 
 export type UserAuthInfo = {
   userId: string;
@@ -16,7 +16,7 @@ export type UserAuthInfo = {
   avatar: string;
   sex: number;
   permissions: string[];
-  menus: FrontendMenu[];
+  menus: IFrontendMenu[];
   employeeId?: string | null;
   phone?: string | null;
 };
@@ -32,7 +32,7 @@ class UserStore {
   }
 
   userInfo: UserAuthInfo | null = null;
-  menuList: FrontendMenu[] = [];
+  menuList: IFrontendMenu[] = [];
 
   private initState() {
     const userInfoStorage = localStorage.getItem(USER_INFO_KEY);
@@ -75,7 +75,7 @@ class UserStore {
    * @param refreshToken
    * @param expiredTime
    */
-  refreshToken(accessToken: string, refreshToken: string, expiredTime: Date) {
+  refreshToken(accessToken: string, refreshToken: string | undefined, expiredTime: Date) {
     const tokenInfo = this.token;
     if (tokenInfo) {
       tokenInfo.accessToken = accessToken;
@@ -107,10 +107,10 @@ class UserStore {
     });
   }
 
-  flattenTreeDFS(menus: FrontendMenu[]): FrontendMenu[] {
-    const result: FrontendMenu[] = [];
+  flattenTreeDFS(menus: IFrontendMenu[]): IFrontendMenu[] {
+    const result: IFrontendMenu[] = [];
 
-    function traverse(node: FrontendMenu) {
+    function traverse(node: IFrontendMenu) {
       if (!node) return;
 
       result.push(node); // 前序遍历

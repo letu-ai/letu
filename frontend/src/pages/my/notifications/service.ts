@@ -1,12 +1,12 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse, PagedResult } from '@/types/api';
+import type { PagedResult } from '@/types/api';
 
 /**
  * 标记已读
  * @param dto
  */
 export function readed(ids: string[]) {
-  return httpClient.put<string[], AppResponse<boolean>>('/api/my/notifications/mark-as-read', ids);
+  return httpClient.put<string[], void>('/api/my/notifications/mark-as-read', ids);
 }
 
 /**
@@ -14,7 +14,7 @@ export function readed(ids: string[]) {
  * @param dto
  */
 export function getMyNotificationList(dto: UserNotificationQueryDto) {
-  return httpClient.get<UserNotificationQueryDto, AppResponse<PagedResult<MyNotificationListDto>>>(
+  return httpClient.get<UserNotificationQueryDto, PagedResult<MyNotificationListDto>>(
     '/api/my/notifications',
     {
       params: dto,
@@ -27,7 +27,7 @@ export function getMyNotificationList(dto: UserNotificationQueryDto) {
  * @param dto
  */
 export function getMyNotificationNavbarInfo() {
-  return httpClient.get<unknown, AppResponse<UserNotificationNavbarDto>>(
+  return httpClient.get<unknown, UserNotificationNavbarDto>(
     '/api/my/notifications/navbar-info',
   );
 }

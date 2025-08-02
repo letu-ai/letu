@@ -9,12 +9,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Letu.Cap\Letu.Cap.csproj" />
 		<ProjectReference Include="..\Letu.Core\Letu.Core.csproj" />
 		<ProjectReference Include="..\Letu.Job\Letu.Job.csproj" />
-		<ProjectReference Include="..\Letu.Logger\Letu.Logger.csproj" />
+		<ProjectReference Include="..\Letu.Logging\Letu.Logging.csproj" />
 		<ProjectReference Include="..\Letu.ObjectStorage\Letu.ObjectStorage.csproj" />
-		<ProjectReference Include="..\Letu.Redis\Letu.Redis.csproj" />
 		<ProjectReference Include="..\Letu.Repository\Letu.Repository.csproj" />
 		<ProjectReference Include="..\Letu.Shared\Letu.Shared.csproj" />
 	</ItemGroup>
@@ -24,6 +22,18 @@
 		<PackageReference Include="MQTTnet" />
 		<PackageReference Include="MQTTnet.Server" />
 		<PackageReference Include="MQTTnet.AspNetCore" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" />
+		<PackageReference Include="Volo.Abp.AutoMapper" />
+		<PackageReference Include="Volo.Abp.Autofac" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" />
+		<PackageReference Include="Volo.Abp.AspNetCore.MultiTenancy" />
+		<PackageReference Include="Volo.Abp.DistributedLocking" />
+		<PackageReference Include="Volo.Abp.EventBus" />
+		<PackageReference Include="DistributedLock.Redis" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Admin\Settings\" />
 	</ItemGroup>
 
 </Project>

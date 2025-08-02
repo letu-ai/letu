@@ -1,12 +1,12 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse, PagedResult, PageSearch, AppOption } from '@/types/api';
+import httpClient from '@/utils/httpClient';
+import type { PagedResult, PagedResultRequest, AppOption } from '@/types/api';
 
 /**
  * 新增角色
  * @param dto
  */
 export function addRole(dto: RoleDto) {
-  return httpClient.post<RoleDto, AppResponse<boolean>>('/api/admin/roles', dto);
+  return httpClient.post<RoleDto, void>('/api/admin/roles', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addRole(dto: RoleDto) {
  * @param dto
  */
 export function getRoleList(dto: RoleQueryDto) {
-  return httpClient.get<RoleQueryDto, AppResponse<PagedResult<RoleListDto>>>('/api/admin/roles', { params: dto });
+  return httpClient.get<RoleQueryDto, PagedResult<RoleListDto>>('/api/admin/roles', { params: dto });
 }
 
 /**
@@ -22,7 +22,7 @@ export function getRoleList(dto: RoleQueryDto) {
  * @param dto
  */
 export function updateRole(dto: RoleDto) {
-  return httpClient.put<RoleDto, AppResponse<boolean>>(`/api/admin/roles/${dto.id}`, dto);
+  return httpClient.put<RoleDto, void>(`/api/admin/roles/${dto.id}`, dto);
 }
 
 /**
@@ -30,7 +30,7 @@ export function updateRole(dto: RoleDto) {
  * @param id
  */
 export function deleteRole(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/admin/roles/${id}`);
+  return httpClient.delete<string, void>(`/api/admin/roles/${id}`);
 }
 
 /**
@@ -38,14 +38,14 @@ export function deleteRole(id: string) {
  * @param dto
  */
 export function assignMenu(dto: AssignMenuDto) {
-  return httpClient.put<AssignMenuDto, AppResponse<boolean>>(`/api/admin/roles/${dto.roleId}/menus`, dto);
+  return httpClient.put<AssignMenuDto, void>(`/api/admin/roles/${dto.roleId}/menus`, dto);
 }
 
 /**
  * 获取角色
  */
 export function getRoleOptions() {
-  return httpClient.get<unknown, AppResponse<AppOption[]>>('/api/admin/roles/options');
+  return httpClient.get<unknown, AppOption[]>('/api/admin/roles/options');
 }
 
 /**
@@ -53,7 +53,7 @@ export function getRoleOptions() {
  * @param id
  */
 export function getRoleMenuIds(id: string) {
-  return httpClient.get<string, AppResponse<string[]>>(`/api/admin/roles/${id}/menus`);
+  return httpClient.get<string, string[]>(`/api/admin/roles/${id}/menus`);
 }
 
 /**
@@ -61,7 +61,7 @@ export function getRoleMenuIds(id: string) {
  * @param dto
  */
 export function assignData(dto: AssignDataDto) {
-  return httpClient.put<AssignDataDto, AppResponse<boolean>>(`/api/admin/roles/${dto.roleId}/data`, dto);
+  return httpClient.put<AssignDataDto, void>(`/api/admin/roles/${dto.roleId}/data`, dto);
 }
 
 export interface RoleDto {
@@ -79,7 +79,7 @@ export interface RoleListDto {
   creationTime: string;
 }
 
-export interface RoleQueryDto extends PageSearch {
+export interface RoleQueryDto extends PagedResultRequest {
   roleName?: string | null;
 }
 

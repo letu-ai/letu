@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Letu.Core.Utils
+namespace Letu.Utils
 {
     /// <summary>
     /// 加密
@@ -16,7 +16,7 @@ namespace Letu.Core.Utils
         /// <param name="password">原密码</param>
         /// <param name="salt">盐码</param>
         /// <returns></returns>
-        public static string GenEncodingPassword(string password
+        public static string CalcPasswordHash(string password
             , string salt)
         {
             var bs = Encoding.UTF8.GetBytes(password + salt);

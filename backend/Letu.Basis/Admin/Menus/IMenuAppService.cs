@@ -1,37 +1,36 @@
 using Letu.Basis.Admin.Menus.Dtos;
-using Letu.Core.Interfaces;
 
 namespace Letu.Basis.Admin.Menus
 {
-    public interface IMenuAppService : IScopedDependency
+    public interface IMenuAppService
     {
         /// <summary>
         /// 新增菜单
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddMenuAsync(MenuDto dto);
+        Task AddMenuAsync(MenuCreateOrUpdateInput dto);
 
         /// <summary>
         /// 菜单树形列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<MenuListDto>> GetMenuListAsync(MenuQueryDto dto);
+        Task<List<MenuListOutput>> GetMenuListAsync(MenuQueryDto dto);
 
         /// <summary>
         /// 修改菜单
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdateMenuAsync(MenuDto dto);
+        Task UpdateMenuAsync(Guid id, MenuCreateOrUpdateInput dto);
 
         /// <summary>
         /// 删除菜单
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<bool> DeleteMenusAsync(Guid[] ids);
+        Task DeleteMenusAsync(Guid[] ids);
 
         /// <summary>
         /// 获取菜单组成的选项树

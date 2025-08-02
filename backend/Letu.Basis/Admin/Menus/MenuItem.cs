@@ -1,10 +1,10 @@
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
-using Letu.Shared.Enums;
 using FreeSql.DataAnnotations;
+using Letu.Basis.Admin.Roles.Dtos;
+using Letu.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Letu.Basis.Admin.Roles.Dtos;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Menus
 {
@@ -12,7 +12,7 @@ namespace Letu.Basis.Admin.Menus
     /// 菜单表
     /// </summary>
     [Table(Name = "sys_menu")]
-    public class MenuItem : AuditedEntity, ITenant
+    public class MenuItem : AuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 显示标题/名称
@@ -53,9 +53,8 @@ namespace Letu.Basis.Admin.Menus
         /// 授权码
         /// </summary>
         [NotNull]
-        [Required]
         [StringLength(128)]
-        [Column(IsNullable = false, StringLength = 128)]
+        [Column(StringLength = 128)]
         public string? Permission { get; set; }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace Letu.Basis.Admin.Menus
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
 
         /// <summary>
         /// 是否外链

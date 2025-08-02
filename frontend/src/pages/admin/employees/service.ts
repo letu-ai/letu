@@ -1,12 +1,12 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 新增员工
  * @param dto
  */
 export function addEmployee(dto: EmployeeDto) {
-  return httpClient.post<EmployeeDto, AppResponse<boolean>>('/api/admin/employees', dto);
+  return httpClient.post<EmployeeDto, void>('/api/admin/employees', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addEmployee(dto: EmployeeDto) {
  * @param dto
  */
 export function getEmployeePagedList(dto: EmployeeQueryDto) {
-  return httpClient.get<EmployeeQueryDto, AppResponse<PagedResult<EmployeeListDto>>>('/api/admin/employees', {
+  return httpClient.get<EmployeeQueryDto, PagedResult<EmployeeListDto>>('/api/admin/employees', {
     params: dto,
   });
 }
@@ -23,8 +23,8 @@ export function getEmployeePagedList(dto: EmployeeQueryDto) {
  * 员工列表
  * @param dto
  */
-export function getEmployeeList(dto: EmployeePureQueryDto) {
-  return httpClient.get<string, AppResponse<EmployeeDto[]>>('/api/admin/employees', {
+export function getAllEmployees(dto: EmployeePureQueryDto) {
+    return httpClient.get<string, EmployeeDto[]>('/api/admin/employees/all', {
     params: dto,
   });
 }
@@ -34,7 +34,7 @@ export function getEmployeeList(dto: EmployeePureQueryDto) {
  * @param dto
  */
 export function updateEmployee(dto: EmployeeDto) {
-  return httpClient.put<EmployeeDto, AppResponse<boolean>>('/api/admin/employees', dto);
+  return httpClient.put<EmployeeDto, void>('/api/admin/employees', dto);
 }
 
 /**
@@ -42,7 +42,7 @@ export function updateEmployee(dto: EmployeeDto) {
  * @param id
  */
 export function deleteEmployee(id: string) {
-  return httpClient.delete<AppResponse<boolean>>('/api/admin/employees/' + id);
+  return httpClient.delete<void>('/api/admin/employees/' + id);
 }
 
 /**
@@ -50,7 +50,7 @@ export function deleteEmployee(id: string) {
  * @param dto
  */
 export function bindUser(dto: EmployeeBindUserDto) {
-  return httpClient.post<AppResponse<boolean>>('/api/admin/employees/bind-user', dto);
+  return httpClient.post<void>('/api/admin/employees/bind-user', dto);
 }
 
 /**
@@ -58,7 +58,7 @@ export function bindUser(dto: EmployeeBindUserDto) {
  * @param id
  */
 export function getEmployeeInfo(id: string) {
-  return httpClient.get<string, AppResponse<EmployeeInfoDto>>(`/api/admin/employees/${id}/info`);
+  return httpClient.get<string, EmployeeInfoDto>(`/api/admin/employees/${id}/info`);
 }
 
 /**
@@ -67,7 +67,7 @@ export function getEmployeeInfo(id: string) {
  * @returns
  */
 export function getDeptEmployeeTree(dto?: DeptEmployeeTreeQueryDto) {
-  return httpClient.get<DeptEmployeeTreeQueryDto, AppResponse<DeptEmployeeTreeDto[]>>(
+  return httpClient.get<DeptEmployeeTreeQueryDto, DeptEmployeeTreeDto[]>(
     '/api/admin/employees/dept-employee-tree',
     {
       params: dto,
@@ -95,7 +95,7 @@ export interface EmployeeDto {
   isAddUser?: boolean;
 }
 
-export interface EmployeeQueryDto extends PageSearch {
+export interface EmployeeQueryDto extends PagedResultRequest {
   keyword?: string | null;
   deptId?: string;
 }

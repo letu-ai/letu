@@ -1,12 +1,12 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import httpClient from '@/utils/httpClient';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 新增定时任务
  * @param dto
  */
 export function addScheduledTask(dto: ScheduledTaskDto) {
-  return httpClient.post<ScheduledTaskDto, AppResponse<boolean>>('/api/admin/scheduled-tasks', dto);
+  return httpClient.post<ScheduledTaskDto, void>('/api/admin/scheduled-tasks', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addScheduledTask(dto: ScheduledTaskDto) {
  * @param dto
  */
 export function getScheduledTaskList(dto: ScheduledTaskQueryDto) {
-  return httpClient.get<ScheduledTaskQueryDto, AppResponse<PagedResult<ScheduledTaskListDto>>>(
+  return httpClient.get<ScheduledTaskQueryDto, PagedResult<ScheduledTaskListDto>>(
     '/api/admin/scheduled-tasks',
     { params: dto },
   );
@@ -25,7 +25,7 @@ export function getScheduledTaskList(dto: ScheduledTaskQueryDto) {
  * @param dto
  */
 export function updateScheduledTask(dto: ScheduledTaskDto) {
-  return httpClient.put<ScheduledTaskDto, AppResponse<boolean>>('/api/admin/scheduled-tasks', dto);
+  return httpClient.put<ScheduledTaskDto, void>('/api/admin/scheduled-tasks', dto);
 }
 
 /**
@@ -33,7 +33,7 @@ export function updateScheduledTask(dto: ScheduledTaskDto) {
  * @param id
  */
 export function deleteScheduledTask(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/scheduledTask/delete/${id}`);
+  return httpClient.delete<string, void>(`/api/scheduledTask/delete/${id}`);
 }
 
 /**
@@ -41,7 +41,7 @@ export function deleteScheduledTask(id: string) {
  * @param dto
  */
 export function getExecutionLogList(dto: TaskExecutionLogQueryDto) {
-  return httpClient.get<TaskExecutionLogQueryDto, AppResponse<PagedResult<TaskExecutionLogListDto>>>(
+  return httpClient.get<TaskExecutionLogQueryDto, PagedResult<TaskExecutionLogListDto>>(
     '/api/admin/scheduled-tasks/logs',
     { params: dto },
   );
@@ -65,7 +65,7 @@ export interface ScheduledTaskListDto {
   lastModificationTime?: string;
 }
 
-export interface ScheduledTaskQueryDto extends PageSearch {
+export interface ScheduledTaskQueryDto extends PagedResultRequest {
   taskKey?: string;
   description?: string;
 }

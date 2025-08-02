@@ -1,9 +1,10 @@
-﻿using Letu.Basis.Admin.Loggings.Dtos;
-using Letu.Core.Interfaces;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Loggings.Dtos;
+using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public interface IBusinessLogAppService : IScopedDependency
+    public interface IBusinessLogAppService
     {
         /// <summary>
         /// 业务日志分页列表

@@ -2,12 +2,10 @@
   "profiles": {
     "Letu.Server": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_PORT": "5000"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:2220;http://localhost:2221"
+      "applicationUrl": ""
     }
   }
 }

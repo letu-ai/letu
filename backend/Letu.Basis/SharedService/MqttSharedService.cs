@@ -1,10 +1,9 @@
-﻿using Letu.Core.Interfaces;
+﻿
 using MQTTnet.Protocol;
 using MQTTnet.Server;
 using MQTTnet;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
 using FreeRedis;
+using Volo.Abp.DependencyInjection;
 
 namespace Letu.Basis.SharedService
 {
@@ -43,22 +42,22 @@ namespace Letu.Basis.SharedService
         /// <returns></returns>
         public async Task<bool> PushAsync<T>(string topic, T? payload = default)
         {
-            var payloadString = string.Empty;
-            if (payload != null)
-            {
-                var settings = new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                };
-                payloadString = JsonConvert.SerializeObject(payload, settings);
-            }
-            var message = new MqttApplicationMessageBuilder().WithTopic(topic).WithPayload(payloadString).Build();
+            //var payloadString = string.Empty;
+            //if (payload != null)
+            //{
+            //    var settings = new JsonSerializerSettings
+            //    {
+            //        ContractResolver = new CamelCasePropertyNamesContractResolver()
+            //    };
+            //    payloadString = JsonConvert.SerializeObject(payload, settings);
+            //}
+            //var message = new MqttApplicationMessageBuilder().WithTopic(topic).WithPayload(payloadString).Build();
 
-            await mqttServer.InjectApplicationMessage(
-                new InjectedMqttApplicationMessage(message)
-                {
-                    SenderClientId = clientId
-                });
+            //await mqttServer.InjectApplicationMessage(
+            //    new InjectedMqttApplicationMessage(message)
+            //    {
+            //        SenderClientId = clientId
+            //    });
 
             return true;
         }

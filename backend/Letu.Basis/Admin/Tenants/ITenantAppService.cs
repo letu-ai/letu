@@ -1,15 +1,15 @@
-﻿using Letu.Basis.Admin.Tenants.Dtos;
-using Letu.Core.Interfaces;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Tenants.Dtos;
 
 namespace Letu.Basis.Admin.Tenants
 {
-    public interface ITenantAppService : IScopedDependency
+    public interface ITenantAppService
     {
-        Task AddTenantAsync(TenantDto dto);
+        Task AddTenantAsync(TenantCreateOrUpdateInput dto);
 
-        Task<PagedResult<TenantResultDto>> GetTenantListAsync(TenantSearchDto dto);
+        Task<PagedResult<TenantListOutput>> GetTenantListAsync(TenantListInput dto);
 
-        Task UpdateTenantAsync(TenantDto dto);
+        Task UpdateTenantAsync(Guid id, TenantCreateOrUpdateInput dto);
 
         Task DeleteTenantAsync(Guid id);
     }

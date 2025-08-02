@@ -1,8 +1,8 @@
-using Letu.Repository.BaseEntity;
-using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -10,7 +10,7 @@ namespace Letu.Basis.Admin.Positions
     /// 职位表
     /// </summary>
     [Table(Name = "org_position")]
-    public class Position : FullAuditedEntity, ITenant
+    public class Position : FullAuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 职位编号
@@ -60,6 +60,6 @@ namespace Letu.Basis.Admin.Positions
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

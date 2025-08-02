@@ -1,6 +1,5 @@
 import { Form, Input, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import { addDictType, type DictTypeDto, updateDictType } from './service';
 import useApp from 'antd/es/app/useApp';
 
@@ -43,22 +42,21 @@ const DictTypeForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: DictTypeDto,
-    apiAction: (params: DictTypeDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: DictTypeDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateDictType : addDictType, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: DictTypeDto) => {
+    if (row?.id) {
+      await updateDictType({ ...values, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addDictType(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

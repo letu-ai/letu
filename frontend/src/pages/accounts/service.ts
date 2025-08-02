@@ -1,12 +1,11 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse } from '@/types/api';
 
 /**
  * 登录
  * @param dto
  */
-export function login(dto: LoginDto) {
-  return httpClient.post<LoginDto, AppResponse<LoginResultDto>>('/api/account/login', dto);
+export function login(dto: ILoginInput) {
+  return httpClient.post<ILoginInput, IUserTokenOutput>('/api/account/login', dto);
 }
 
 /**
@@ -14,14 +13,14 @@ export function login(dto: LoginDto) {
  * @param dto
  */
 export function smsLogin(dto: SmsLoginDto) {
-  return httpClient.post<SmsLoginDto, AppResponse<LoginResultDto>>('/api/account/SmsLogin', dto);
+  return httpClient.post<SmsLoginDto, IUserTokenOutput>('/api/account/SmsLogin', dto);
 }
 
 /**
  * 注销
  */
 export function logout() {
-  return httpClient.post<AppResponse<boolean>>('/api/account/logout');
+  return httpClient.post<void>('/api/account/logout');
 }
 
 /**
@@ -29,7 +28,7 @@ export function logout() {
  * @param phone
  */
 export function sendLoginSmsCode(phone: string) {
-  return httpClient.post<string, AppResponse<string>>('/api/account/SendLoginSmsCode?phone=' + phone);
+  return httpClient.post<string, string>('/api/account/SendLoginSmsCode?phone=' + phone);
 }
 
 /**
@@ -38,7 +37,7 @@ export function sendLoginSmsCode(phone: string) {
  * @returns
  */
 export function refreshToken(refreshToken: string) {
-  return httpClient.post<string, AppResponse<TokenResultDto>>('/api/account/refreshToken?refreshToken=' + refreshToken);
+  return httpClient.post<string, IUserTokenOutput>('/api/account/refresh-token', { refreshToken });
 }
 
 /**
@@ -46,7 +45,7 @@ export function refreshToken(refreshToken: string) {
  * @param info
  */
 export function updateInfo(info: PersonalInfoDto) {
-  return httpClient.put<PersonalInfoDto, AppResponse<boolean>>('/api/account/updateInfo', info);
+  return httpClient.put<PersonalInfoDto, void>('/api/account/updateInfo', info);
 }
 
 /**
@@ -54,31 +53,31 @@ export function updateInfo(info: PersonalInfoDto) {
  * @param dto
  */
 export function updatePwd(dto: UserPwdDto) {
-  return httpClient.put<UserPwdDto, AppResponse<boolean>>('/api/account/updatePwd', dto);
+  return httpClient.put<UserPwdDto, void>('/api/account/updatePwd', dto);
 }
 
 /**
  * 用户权限信息
  */
 export function getUserAuth() {
-  return httpClient.get<unknown, AppResponse<UserAuthInfoDto>>('/api/account/userAuth');
+  return httpClient.get<unknown, UserAuthInfoDto>('/api/account/userAuth');
 }
 
-export interface LoginDto {
+export interface ILoginInput {
   userName: string;
   password: string;
 }
 
-interface TokenResultDto {
-  accessToken: string;
-  refreshToken: string;
-  expiredTime: Date;
+
+export interface IRefreshTokenInput {
+    refreshToken: string;
 }
 
-interface LoginResultDto extends TokenResultDto {
-  sessionId: string;
-  userId: string;
-  userName: string;
+export interface IUserTokenOutput {
+    type: string;
+    accessToken: string;
+    refreshToken?: string;
+    expiredTime: Date;
 }
 
 export interface PersonalInfoDto {
@@ -103,23 +102,24 @@ interface UserInfoDto {
   phone?: string | null;
 }
 
-export interface FrontendMenu {
+export interface IFrontendMenu {
   id: string;
   title: string;
   icon: string | null;
   display: boolean;
   path: string;
   component: string | null;
-  children: FrontendMenu[] | null;
+  children: IFrontendMenu[] | null;
   layerName: string;
   menuType: number;
   isExternal: boolean;
 }
 
 interface UserAuthInfoDto {
-  user: UserInfoDto;
-  permissions: string[];
-  menus: FrontendMenu[];
+    sessionId: string;
+    user: UserInfoDto;
+    permissions: string[];
+    menus: IFrontendMenu[];
 }
 
 export interface SmsLoginDto {

@@ -1,9 +1,10 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Roles.Dtos;
-using Letu.Core.Interfaces;
+using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.Roles
 {
-    public interface IRoleAppService : IScopedDependency
+    public interface IRoleAppService
     {
         /// <summary>
         /// 新增角色

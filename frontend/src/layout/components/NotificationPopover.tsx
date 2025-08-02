@@ -23,9 +23,9 @@ const NotificationPopover = observer(() => {
   const [api, contextHolder] = notification.useNotification();
 
   const fetchNotifications = () => {
-    getMyNotificationNavbarInfo().then((res) => {
-      setNotifications(res.data.items);
-      setUnreadCount(res.data.noReadedCount);
+    getMyNotificationNavbarInfo().then((data) => {
+      setNotifications(data.items);
+      setUnreadCount(data.noReadedCount);
     });
   };
 

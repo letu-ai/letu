@@ -7,7 +7,7 @@ import Permission from '@/components/Permission';
 import PositionForm, { type PositionModalRef } from './_PositionForm';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
-import SysDict from '@/components/SysDict';
+import DataDictionarySelect from '@/components/DataDictionarySelect';
 import { DictType } from '@/utils/globalValue';
 import useApp from 'antd/es/app/useApp';
 
@@ -24,7 +24,7 @@ const Position: React.FC = () => {
       title: '职位职级',
       dataIndex: 'level',
       render: (text: number) => {
-        return <SysDict dictType={DictType.PositionLevel} value={text.toString()} isPlainText />;
+        return <DataDictionarySelect dictType={DictType.PositionLevel} value={text.toString()} isPlainText />;
       },
     },
     {
@@ -106,7 +106,7 @@ const Position: React.FC = () => {
         columns={columns}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getPositionList(params);
+          const data = await getPositionList(params);
           return data;
         }}
         searchItems={[
@@ -114,7 +114,7 @@ const Position: React.FC = () => {
             <Input placeholder="请输入职位名称/编号" />
           </Form.Item>,
           <Form.Item label="职级" name="level">
-            <SysDict
+            <DataDictionarySelect
               dictType={DictType.PositionLevel}
               placeholder="请选择职位职级"
               style={{

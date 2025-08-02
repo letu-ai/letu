@@ -1,5 +1,4 @@
-﻿using Letu.Core.Interfaces;
-
+﻿
 namespace Letu.Job
 {
     public interface IJobControl

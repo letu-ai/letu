@@ -4,26 +4,30 @@ using FreeSql;
 using System.Data;
 using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Positions.Dtos;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
+using Letu.Applications;
+using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.Positions
 {
-    public class PositionAppService : IPositionAppService
+    public class PositionAppService : ApplicationService, IPositionAppService
     {
-        private readonly IRepository<Position> _positionRepository;
-        private readonly IRepository<PositionGroup> _positionGroupRepository;
-        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IFreeSqlRepository<Position> _positionRepository;
+        private readonly IFreeSqlRepository<PositionGroup> _positionGroupRepository;
+        private readonly IFreeSqlRepository<Employee> _employeeRepository;
 
-        public PositionAppService(IRepository<Position> positionRepository, IRepository<PositionGroup> positionGroupRepository
-            , IRepository<Employee> employeeRepository)
+        public PositionAppService(IFreeSqlRepository<Position> positionRepository, IFreeSqlRepository<PositionGroup> positionGroupRepository
+            , IFreeSqlRepository<Employee> employeeRepository)
         {
             _positionRepository = positionRepository;
             _positionGroupRepository = positionGroupRepository;
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<bool> AddPositionGroupAsync(PositionGroupDto dto)
+        public async Task<bool> AddPositionGroupAsync(PositionGroupCreateOrUpdateInput dto)
         {
-            var entity = AutoMapperHelper.Instance.Map<PositionGroupDto, PositionGroup>(dto);
+            var entity = ObjectMapper.Map<PositionGroupCreateOrUpdateInput, PositionGroup>(dto);
             entity.ParentId = dto.ParentId;
             if (entity.ParentId.HasValue)
             {
@@ -52,20 +56,19 @@ namespace Letu.Basis.Admin.Positions
             return true;
         }
 
-        public async Task<List<PositionGroupListDto>> GetPositionGroupListAsync(PositionGroupQueryDto dto)
+        public async Task<List<PositionGroupListOutput>> GetPositionGroupListAsync(PositionGroupListInput dto)
         {
             var rawTree = await _positionGroupRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.GroupName), x => x.GroupName.Contains(dto.GroupName!))
                 .OrderBy(x => x.Sort)
                 .ToTreeListAsync();
 
-            return AutoMapperHelper.Instance.Map<List<PositionGroup>, List<PositionGroupListDto>>(rawTree);
+            return ObjectMapper.Map<List<PositionGroup>, List<PositionGroupListOutput>>(rawTree);
         }
 
-        public async Task<bool> UpdatePositionGroupAsync(PositionGroupDto dto)
+        public async Task<bool> UpdatePositionGroupAsync(Guid id, PositionGroupCreateOrUpdateInput dto)
         {
-            if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
-            var entity = await _positionGroupRepository.Where(x => x.Id == dto.Id).FirstAsync();
+            var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
             if (dto.ParentId == entity.Id)
             {
                 throw new BusinessException(message: "不能选择自己为父级");
@@ -112,13 +115,13 @@ namespace Letu.Basis.Admin.Positions
             return list;
         }
 
-        public async Task<bool> AddPositionAsync(PositionDto dto)
+        public async Task<bool> AddPositionAsync(PositionCreateOrUpdateInput dto)
         {
             if (_positionRepository.Select.Any(x => x.Code.ToLower() == dto.Code!.ToLower()))
             {
                 throw new BusinessException(message: "职位编号已存在");
             }
-            var entity = AutoMapperHelper.Instance.Map<PositionDto, Position>(dto);
+            var entity = ObjectMapper.Map<PositionCreateOrUpdateInput, Position>(dto);
             await _positionRepository.InsertAsync(entity);
             return true;
         }
@@ -131,7 +134,7 @@ namespace Letu.Basis.Admin.Positions
             return true;
         }
 
-        public async Task<PagedResult<PositionListDto>> GetPositionListAsync(PositionQueryDto dto)
+        public async Task<PagedResult<PositionListOutput>> GetPositionListAsync(PositionListInput dto)
         {
             var rows = await _positionRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!) || x.Code.Contains(dto.Keyword!))
@@ -144,20 +147,19 @@ namespace Letu.Basis.Admin.Positions
                 .Page(dto.Current, dto.PageSize)
                 .ToListAsync();
             var ids = rows.Select(x => x.Id).ToList();
-            var list = AutoMapperHelper.Instance.Map<List<Position>, List<PositionListDto>>(rows);
+            var list = ObjectMapper.Map<List<Position>, List<PositionListOutput>>(rows);
             var names = await GetPosistionGroupNameAsync(ids);
             foreach (var item in list)
             {
                 var tmp = names.FirstOrDefault(x => x.Id == item.Id);
                 item.LayerName = tmp?.LayerName;
             }
-            return new PagedResult<PositionListDto>(total, list);
+            return new PagedResult<PositionListOutput>(total, list);
         }
 
-        public async Task<bool> UpdatePositionAsync(PositionDto dto)
+        public async Task<bool> UpdatePositionAsync(Guid id, PositionCreateOrUpdateInput dto)
         {
-            if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
-            var entity = await _positionRepository.Where(x => x.Id == dto.Id).FirstAsync()
+            var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync()
                 ?? throw new BusinessException(message: "数据不存在");
             string code = dto.Code!.ToLower();
             if (entity.Code.ToLower() != code && _positionRepository.Select.Any(x => x.Code.ToLower() == code))

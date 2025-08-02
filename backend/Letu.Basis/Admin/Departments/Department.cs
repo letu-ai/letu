@@ -1,9 +1,9 @@
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Departments
 {
@@ -11,7 +11,7 @@ namespace Letu.Basis.Admin.Departments
     /// 部门表
     /// </summary>
     [Table(Name = "sys_dept")]
-    public class Department : FullAuditedEntity, ITenant
+    public class Department : FullAuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 部门编号
@@ -90,7 +90,7 @@ namespace Letu.Basis.Admin.Departments
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
 
         [Navigate(nameof(ParentId))]
         public Department? Parent { get; set; }

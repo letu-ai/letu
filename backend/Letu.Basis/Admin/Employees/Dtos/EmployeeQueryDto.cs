@@ -1,6 +1,8 @@
+using Letu.Applications;
+
 namespace Letu.Basis.Admin.Employees.Dtos
 {
-    public class EmployeeQueryDto : PageSearch
+    public class EmployeeQueryDto : PagedResultRequest
     {
         /// <summary>
         /// 姓名/手机号/工号

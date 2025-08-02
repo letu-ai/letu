@@ -1,7 +1,6 @@
 import { Form, Input, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { addRole, type RoleDto, updateRole } from './service';
-import type { AppResponse } from '@/types/api';
 import useApp from 'antd/es/app/useApp';
 
 interface ModalProps {
@@ -43,22 +42,21 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: RoleDto,
-    apiAction: (params: RoleDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: RoleDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateRole : addRole, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: RoleDto) => {
+    if (row?.id) {
+      await updateRole({ ...values, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addRole(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

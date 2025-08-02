@@ -1,9 +1,9 @@
 using Letu.Basis.Admin.Departments.Dtos;
-using Letu.Core.Interfaces;
+
 
 namespace Letu.Basis.Admin.Departments
 {
-    public interface IDepartmentAppService : IScopedDependency
+    public interface IDepartmentAppService
     {
         /// <summary>
         /// 新增部门

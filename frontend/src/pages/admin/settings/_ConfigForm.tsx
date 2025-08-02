@@ -1,6 +1,5 @@
 import { Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import { addConfig, type ConfigDto, updateConfig } from './service';
 import useApp from 'antd/es/app/useApp';
 import TextArea from 'antd/es/input/TextArea';
@@ -43,22 +42,21 @@ const ConfigForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: ConfigDto,
-    apiAction: (params: ConfigDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: ConfigDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateConfig : addConfig, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: ConfigDto) => {
+    if (row?.id) {
+      await updateConfig({ ...values, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addConfig(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

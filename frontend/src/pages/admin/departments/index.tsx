@@ -90,7 +90,7 @@ const DepartmentList: React.FC = () => {
         columns={columns}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getDeptList(params);
+          const data = await getDeptList(params);
           return {
             items: data,
             totalCount: data.length,

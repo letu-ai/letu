@@ -5,7 +5,7 @@ namespace Letu.Core.Utils
 {
     public static class TemplateUtils
     {
-        public static string Render(string template, Dictionary<string, object>? variables)
+        public static string Render(string template, IDictionary<string, object>? variables)
         {
             if (string.IsNullOrWhiteSpace(template)) return template;
             if (variables == null) return template;
@@ -17,7 +17,7 @@ namespace Letu.Core.Utils
             });
         }
 
-        private static object? GetNestedValue(string path, Dictionary<string, object> variables)
+        private static object? GetNestedValue(string path, IDictionary<string, object> variables)
         {
             string[] parts = path.Split('.');
             if (parts.Length == 0 || !variables.TryGetValue(parts[0], out var current))

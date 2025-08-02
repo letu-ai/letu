@@ -85,7 +85,7 @@ const TenantList: React.FC = () => {
         ref={tableRef}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getTenantList(params);
+          const data = await getTenantList(params);
           return data;
         }}
         searchItems={[

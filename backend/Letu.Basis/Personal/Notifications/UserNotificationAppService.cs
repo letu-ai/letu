@@ -1,22 +1,21 @@
-﻿using Letu.Basis.Admin.Employees;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Notifications;
 using Letu.Basis.Personal.Notifications.Dtos;
-using Letu.Core.Interfaces;
 using Letu.Repository;
+using Volo.Abp.Application.Services;
 
-namespace Letu.Basis.Personal
+namespace Letu.Basis.Personal.Notifications
 {
-    public class UserNotificationAppService : IUserNotificationAppService, IScopedDependency
+    public class UserNotificationAppService : ApplicationService, IUserNotificationAppService
     {
-        private readonly IRepository<Notification> _repository;
-        private readonly IRepository<Employee> _employeeRepository;
-        private readonly ICurrentUser _currentUser;
+        private readonly IFreeSqlRepository<Notification> _repository;
+        private readonly IFreeSqlRepository<Employee> _employeeRepository;
 
-        public UserNotificationAppService(IRepository<Notification> repository, IRepository<Employee> employeeRepository, ICurrentUser currentUser)
+        public UserNotificationAppService(IFreeSqlRepository<Notification> repository, IFreeSqlRepository<Employee> employeeRepository)
         {
             _repository = repository;
             _employeeRepository = employeeRepository;
-            _currentUser = currentUser;
         }
 
         public async Task<PagedResult<UserNotificationListDto>> GetMyNotificationListAsync(UserNotificationQueryDto dto)
@@ -64,7 +63,7 @@ namespace Letu.Basis.Personal
 
         private async Task<Guid?> GetCurrentEmployeeIdAsync()
         {
-            return await _employeeRepository.Where(x => x.UserId.HasValue && x.UserId == _currentUser.Id).ToOneAsync(x => x.Id);
+            return await _employeeRepository.Where(x => x.UserId.HasValue && x.UserId == CurrentUser.Id).ToOneAsync(x => x.Id);
         }
     }
 }

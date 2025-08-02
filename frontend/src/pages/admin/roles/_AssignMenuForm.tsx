@@ -28,9 +28,9 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
   const openModal = (row: RoleListDto) => {
     setCurrentRow(row);
     getMenuOptions(false).then(async (menuRes) => {
-      setMenuOptions(menuRes.data.tree);
-      setAllKeys(menuRes.data.keys);
-      const { data } = await getRoleMenuIds(row!.id);
+      setMenuOptions(menuRes.tree);
+      setAllKeys(menuRes.keys);
+      const data = await getRoleMenuIds(row!.id);
       setRoleMenuIds(data);
       setIsOpenModal(true);
     });
@@ -45,15 +45,18 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
     form.submit();
   };
 
-  const onFinish = () => {
-    assignMenu({
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+  };
+
+  const onFinish = async () => {
+    await assignMenu({
       menuIds: roleMenuIds ?? [],
       roleId: currentRow!.id!,
-    }).then(() => {
-      message.success('分配成功');
-      setIsOpenModal(false);
-      form.resetFields();
     });
+    handleSuccess('分配成功');
   };
   const treeCheck = (checkKeys: string[]) => {
     setRoleMenuIds(checkKeys);

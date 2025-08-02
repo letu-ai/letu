@@ -1,13 +1,12 @@
-﻿using Letu.Repository.BaseEntity;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Letu.Basis.Admin.Tenants
 {
-    [Index("uk_tenant_id", nameof(TenantId), true)]
     [Table(Name = "sys_tenant")]
-    public class Tenant : AuditedEntity
+    public class Tenant : AuditedEntity<Guid>
     {
         /// <summary>
         /// 租户名称
@@ -15,16 +14,7 @@ namespace Letu.Basis.Admin.Tenants
         [NotNull]
         [Required]
         [Column(IsNullable = false, StringLength = 64)]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// 租户标识
-        /// </summary>
-        [NotNull]
-        [Required]
-        [MaxLength(18)]
-        [Column(IsNullable = false, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// 备注

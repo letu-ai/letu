@@ -3,7 +3,7 @@ import { Card, Form, Input, Upload, Avatar, Divider, Row, Col, Typography, Menu,
 import { UserOutlined, CameraOutlined, LockOutlined } from '@ant-design/icons';
 import './style/profile.scss';
 import { type PersonalInfoDto, updateInfo, updatePwd, type UserPwdDto } from './service';
-import { ErrorCode, Patterns } from '@/utils/globalValue.ts';
+import { Patterns } from '@/utils/globalValue.ts';
 import { useApplication } from '@/components/Application';
 import { uploadFile } from '@/api/oss';
 import useApp from 'antd/es/app/useApp';
@@ -94,15 +94,13 @@ const Profile = observer(() => {
                   showUploadList={false}
                   beforeUpload={beforeUpload}
                   customRequest={({ file, onSuccess }) => {
-                    uploadFile(file as File).then(async (res) => {
-                      if (res.code === ErrorCode.Success) {
-                        setAvatar(res.data);
-                        const updateRes = await updateInfo({ avatar: res.data });
-                        if (updateRes.code === ErrorCode.Success) {
-                          message.success('新头像上传成功');
-                          refreshUserAuthInfo?.();
-                          onSuccess?.(res.data);
-                        }
+                    uploadFile(file as File).then(async (data) => {
+                      if (data) {
+                        setAvatar(data);
+                        await updateInfo({ avatar: data });
+                        message.success('新头像上传成功');
+                        refreshUserAuthInfo?.();
+                        onSuccess?.(data);
                       }
                     });
                   }}

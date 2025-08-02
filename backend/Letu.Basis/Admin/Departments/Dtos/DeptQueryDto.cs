@@ -1,6 +1,8 @@
+using Letu.Applications;
+
 namespace Letu.Basis.Admin.Departments.Dtos
 {
-    public class DeptQueryDto : PageSearch
+    public class DeptQueryDto : PagedResultRequest
     {
         /// <summary>
         /// 用户ID

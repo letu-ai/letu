@@ -1,5 +1,4 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse } from '@/types/api';
+import httpClient from '@/utils/httpClient';
 
 /**
  * 文件上传
@@ -8,7 +7,7 @@ import type { AppResponse } from '@/types/api';
 export function uploadFile(file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  return httpClient.post<File, AppResponse<string>>('/api/oss/upload', formData, {
+  return httpClient.post<File, string>('/api/oss/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }
@@ -18,7 +17,7 @@ export function uploadFile(file: File) {
  * @param key
  */
 export function deleteFile(key: string) {
-  return httpClient.delete<string, AppResponse<boolean>>('/api/oss/delete', {
+  return httpClient.delete<string, void>('/api/oss/delete', {
     params: { key },
   });
 }

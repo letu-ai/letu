@@ -1,4 +1,4 @@
-﻿import { getOnlineUsers, onlineUserLogout, type OnlineUserResultDto } from './service';
+﻿import { getOnlineUsers, onlineUserLogout, type OnlineUserResultDto, type ISessionRevokeInput } from './service';
 import { Button, Form, Input, Tag } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
@@ -57,7 +57,7 @@ const OnlineUserList: React.FC = () => {
               type="link"
               icon={<ProIcon icon="iconify:hugeicons:logout-04" />}
               onClick={() => {
-                onlineUserLogout(record.userId + ':' + record.sessionId).then(() => {
+                onlineUserLogout({ userId: record.userId, sessionId: record.sessionId } as ISessionRevokeInput).then(() => {
                   message.success('注销成功');
                   tableRef.current?.reload();
                 });
@@ -77,7 +77,7 @@ const OnlineUserList: React.FC = () => {
       columns={columns}
       rowKey="sessionId"
       request={async (params) => {
-        const { data } = await getOnlineUsers(params);
+        const data = await getOnlineUsers(params);
         return data;
       }}
       searchItems={

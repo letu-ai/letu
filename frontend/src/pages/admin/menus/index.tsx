@@ -131,7 +131,7 @@ const MenuTable = () => {
         rowKey="id"
         selection
         request={async (params) => {
-          const { data } = await getMenuList(params);
+          const data = await getMenuList(params);
           return {
             items: data,
             totalCount: data.length,

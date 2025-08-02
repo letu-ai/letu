@@ -1,12 +1,12 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 新增用户
  * @param dto
  */
 export function addUser(dto: UserDto) {
-  return httpClient.post<UserDto, AppResponse<boolean>>('/api/admin/users', dto);
+  return httpClient.post<UserDto, void>('/api/admin/users', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addUser(dto: UserDto) {
  * @param dto
  */
 export function getUserList(dto: UserQueryDto) {
-  return httpClient.get<UserQueryDto, AppResponse<PagedResult<UserListDto>>>('/api/admin/users', { params: dto });
+  return httpClient.get<UserQueryDto, PagedResult<UserListDto>>('/api/admin/users', { params: dto });
 }
 
 /**
@@ -22,15 +22,15 @@ export function getUserList(dto: UserQueryDto) {
  * @param id
  */
 export function deleteUser(id: string) {
-  return httpClient.delete<UserDto, AppResponse<boolean>>('/api/admin/users/' + id);
+  return httpClient.delete<UserDto, void>(`/api/admin/users/${id}`);
 }
 
 /**
  * 分配角色
  * @param dto
  */
-export function assignRole(dto: AssignRoleDto) {
-  return httpClient.post<AssignRoleDto, AppResponse<boolean>>('/api/admin/users/assignRole', dto);
+export function assignRole(userId: string, dto: AssignRoleDto) {
+  return httpClient.post<AssignRoleDto, void>(`/api/admin/users/${userId}/assign-role`, dto);
 }
 
 /**
@@ -38,7 +38,7 @@ export function assignRole(dto: AssignRoleDto) {
  * @param id
  */
 export function switchUserEnabledStatus(id: string) {
-  return httpClient.put<string, AppResponse<boolean>>('/api/admin/users/changeEnabled/' + id);
+  return httpClient.put<string, void>(`/api/admin/users/changeEnabled/${id}`);
 }
 
 /**
@@ -46,7 +46,7 @@ export function switchUserEnabledStatus(id: string) {
  * @param uid
  */
 export function getUserRoleIds(uid: string) {
-  return httpClient.get<string, AppResponse<string[]>>('/api/admin/users/roles/' + uid);
+  return httpClient.get<string, string[]>(`/api/admin/users/${uid}/roles`);
 }
 
 /**
@@ -54,7 +54,7 @@ export function getUserRoleIds(uid: string) {
  * @param dto
  */
 export function resetUserPwd(dto: ResetUserPwdDto) {
-  return httpClient.put<string, AppResponse<boolean>>('/api/admin/users/reset-password', dto);
+  return httpClient.put<string, void>('/api/admin/users/reset-password', dto);
 }
 
 /**
@@ -62,7 +62,7 @@ export function resetUserPwd(dto: ResetUserPwdDto) {
  * @param keyword 账号/昵称
  */
 export function getUserSimpleInfos(keyword?: string) {
-  return httpClient.get<string, AppResponse<UserSimpleInfoDto[]>>('/api/admin/users/simple', {
+  return httpClient.get<string, UserSimpleInfoDto[]>('/api/admin/users/simple', {
     params: {
       keyword,
     },
@@ -80,7 +80,7 @@ export interface UserDto {
   phone?: string;
 }
 
-export interface UserQueryDto extends PageSearch {
+export interface UserQueryDto extends PagedResultRequest {
   userName?: string | null;
 }
 

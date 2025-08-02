@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\common.props" />
+
+	<PropertyGroup>
+		<RootNamespace>Letu.Abp</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FreeSql.DbContext" />
+		<PackageReference Include="Volo.Abp.AuditLogging.Domain" />
+		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Domain" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Letu.Core\Letu.Core.csproj" />
+	  <ProjectReference Include="..\Letu.Repository\Letu.Repository.csproj" />
+	</ItemGroup>
+</Project>

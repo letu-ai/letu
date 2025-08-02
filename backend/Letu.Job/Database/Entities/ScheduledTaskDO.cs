@@ -1,6 +1,6 @@
-﻿using Letu.Repository.BaseEntity;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Letu.Job.Database.Entities
 {
@@ -9,7 +9,7 @@ namespace Letu.Job.Database.Entities
     /// </summary>
     [Table(Name = "scheduled_tasks")]
     [Index("uk_task_key", "task_key", true)]
-    public class ScheduledTaskDO : AuditedEntity
+    public class ScheduledTaskDO : AuditedEntity<Guid>
     {
         /// <summary>
         /// 任务KEY（唯一标识）

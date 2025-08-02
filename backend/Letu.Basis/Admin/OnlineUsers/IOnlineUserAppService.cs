@@ -1,12 +1,10 @@
-﻿using Letu.Basis.Admin.OnlineUsers.Dtos;
-using Letu.Core.Interfaces;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.OnlineUsers.Dtos;
 
 namespace Letu.Basis.Admin.OnlineUsers
 {
-    public interface IOnlineUserAppService : IScopedDependency
+    public interface IOnlineUserAppService
     {
         Task<PagedResult<OnlineUserResultDto>> GetOnlineUserListAsync(OnlineUserSearchDto dto);
-
-        Task LogoutAsync(string key);
     }
 }

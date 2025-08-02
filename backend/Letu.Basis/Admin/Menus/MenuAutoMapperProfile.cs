@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Letu.Basis.Admin.Menus.Dtos;
+using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.Menus
 {
@@ -6,6 +8,9 @@ namespace Letu.Basis.Admin.Menus
     {
         public MenuAutoMapperProfile()
         {
+            CreateMap<MenuCreateOrUpdateInput, MenuItem>();
+            CreateMap<MenuItem, MenuListOutput>();
+            CreateMap<MenuItem, FrontendMenu>();
         }
     }
 }

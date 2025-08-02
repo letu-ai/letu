@@ -1,6 +1,8 @@
-﻿namespace Letu.Basis.Admin.Notifications.Dtos
+﻿using Letu.Applications;
+
+namespace Letu.Basis.Admin.Notifications.Dtos
 {
-    public class NotificationQueryDto : PageSearch
+    public class NotificationQueryDto : PagedResultRequest
     {
         public string? Title { get; set; }
 

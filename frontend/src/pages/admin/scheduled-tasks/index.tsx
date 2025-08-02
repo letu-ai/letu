@@ -1,4 +1,4 @@
-﻿import Permission from '@/components/Permission';
+﻿﻿import Permission from '@/components/Permission';
 import {
   deleteScheduledTask,
   getScheduledTaskList,
@@ -108,7 +108,7 @@ const ScheduledTaskList: React.FC = () => {
         ref={tableRef}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getScheduledTaskList(params);
+          const data = await getScheduledTaskList(params);
           return data;
         }}
         searchItems={[

@@ -45,7 +45,7 @@ const LoginLogList: React.FC = () => {
         columns={columns}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getLoginLogList(params);
+          const data = await getLoginLogList(params);
           return data;
         }}
         searchItems={

@@ -1,12 +1,12 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import httpClient from '@/utils/httpClient';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 新增通知
  * @param dto
  */
 export function addNotification(dto: NotificationDto) {
-  return httpClient.post<NotificationDto, AppResponse<boolean>>('/api/admin/notifications', dto);
+  return httpClient.post<NotificationDto, void>('/api/admin/notifications', dto);
 }
 
 /**
@@ -14,17 +14,17 @@ export function addNotification(dto: NotificationDto) {
  * @param dto
  */
 export function getNotificationList(dto: NotificationQueryDto) {
-  return httpClient.get<NotificationQueryDto, AppResponse<PagedResult<NotificationListDto>>>('/api/admin/notifications', {
+  return httpClient.get<NotificationQueryDto, PagedResult<NotificationListDto>>('/api/admin/notifications', {
     params: dto,
   });
 }
 
 /**
  * 修改通知
- * @param dto
+ * @param input
  */
-export function updateNotification(dto: NotificationDto) {
-  return httpClient.put<NotificationDto, AppResponse<boolean>>('/api/admin/notifications', dto);
+export function updateNotification(id: string, input: NotificationDto) {
+  return httpClient.put<NotificationDto, void>(`/api/admin/notifications/${id}`, input);
 }
 
 /**
@@ -32,7 +32,7 @@ export function updateNotification(dto: NotificationDto) {
  * @param ids
  */
 export function deleteNotifications(ids: string[]) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/notification/BatchDelete`, {
+  return httpClient.delete<string, void>(`/api/notification/BatchDelete`, {
     data: ids,
   });
 }
@@ -55,7 +55,7 @@ export interface NotificationListDto {
   employeeName: string;
 }
 
-export interface NotificationQueryDto extends PageSearch {
+export interface NotificationQueryDto extends PagedResultRequest {
   keyword?: string;
   isReaded?: boolean;
 }

@@ -1,30 +1,31 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Positions.Dtos;
-using Letu.Core.Interfaces;
+using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.Positions
 {
-    public interface IPositionAppService : IScopedDependency
+    public interface IPositionAppService
     {
         /// <summary>
         /// 新增职位
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddPositionAsync(PositionDto dto);
+        Task<bool> AddPositionAsync(PositionCreateOrUpdateInput dto);
 
         /// <summary>
         /// 职位分页列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<PositionListDto>> GetPositionListAsync(PositionQueryDto dto);
+        Task<PagedResult<PositionListOutput>> GetPositionListAsync(PositionListInput dto);
 
         /// <summary>
         /// 修改职位
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdatePositionAsync(PositionDto dto);
+        Task<bool> UpdatePositionAsync(Guid id, PositionCreateOrUpdateInput dto);
 
         /// <summary>
         /// 删除职位
@@ -44,21 +45,21 @@ namespace Letu.Basis.Admin.Positions
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddPositionGroupAsync(PositionGroupDto dto);
+        Task<bool> AddPositionGroupAsync(PositionGroupCreateOrUpdateInput dto);
 
         /// <summary>
         /// 职位分组分页列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<PositionGroupListDto>> GetPositionGroupListAsync(PositionGroupQueryDto dto);
+        Task<List<PositionGroupListOutput>> GetPositionGroupListAsync(PositionGroupListInput dto);
 
         /// <summary>
         /// 修改职位分组
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdatePositionGroupAsync(PositionGroupDto dto);
+        Task<bool> UpdatePositionGroupAsync(Guid id, PositionGroupCreateOrUpdateInput dto);
 
         /// <summary>
         /// 删除职位分组

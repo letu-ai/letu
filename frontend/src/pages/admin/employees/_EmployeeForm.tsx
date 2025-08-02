@@ -8,7 +8,7 @@ import {
   getEmployeeInfo,
   updateEmployee,
 } from '@/pages/admin/employees/service';
-import type { AppOptionTree, AppResponse } from '@/types/api';
+import type { AppOptionTree } from '@/types/api';
 import { type DeptListDto, getDeptList } from '@/pages/admin/departments/service';
 import { getPositionOptions } from '../positions/service';
 import { Patterns } from '@/utils/globalValue';
@@ -46,13 +46,13 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
   }, [isOpenModal]);
 
   const fetchDeptData = () => {
-    getDeptList({}).then((res) => {
-      setDeptData(res.data!);
+    getDeptList({}).then((data) => {
+      setDeptData(data);
     });
   };
   const fetchPositionData = () => {
-    getPositionOptions().then((res) => {
-      setPositionData(res.data!);
+    getPositionOptions().then((data) => {
+      setPositionData(data);
     });
   };
 
@@ -60,10 +60,10 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
     setIsOpenModal(true);
     if (row) {
       setLoading(true);
-      getEmployeeInfo(row.id).then((res) => {
+      getEmployeeInfo(row.id).then((data) => {
         setLoading(false);
-        setRow(res.data);
-        form.setFieldsValue(res.data);
+        setRow(data);
+        form.setFieldsValue(data);
       });
     } else {
       setRow(null);
@@ -82,26 +82,26 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: EmployeeDto,
-    apiAction: (params: EmployeeDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: EmployeeDto) => {
-    const isEdit = !!row?.id;
+
+  const onFinish = async (values: EmployeeDto) => {
     let params = values;
-    if (!isEdit) {
+    if (!row?.id) {
       params = { ...params, isAddUser: isAddUser };
     }
 
-    execute(params, isEdit ? updateEmployee : addEmployee, isEdit ? '编辑成功' : '新增成功');
+    if (row?.id) {
+      await updateEmployee({ ...params, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addEmployee(params);
+      handleSuccess('新增成功');
+    }
   };
   const pwdPatternValidateItem = {
     pattern: Patterns.LoginPassword,
