@@ -1,6 +1,8 @@
-﻿namespace Letu.Basis.Admin.OnlineUsers.Dtos
+﻿using Letu.Applications;
+
+namespace Letu.Basis.Admin.OnlineUsers.Dtos
 {
-    public class ExceptionLogQueryDto : PageSearch
+    public class ExceptionLogQueryDto : PagedResultRequest
     {
         public string? UserName { get; set; }
 

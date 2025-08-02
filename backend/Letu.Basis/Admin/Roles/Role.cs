@@ -1,9 +1,9 @@
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
+using Letu.Basis.Admin.Roles.Dtos;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Letu.Basis.Admin.Roles.Dtos;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Roles
 {
@@ -11,7 +11,7 @@ namespace Letu.Basis.Admin.Roles
     /// 角色表
     /// </summary>
     [Table(Name = "sys_role")]
-    public class Role : FullAuditedEntity, ITenant
+    public class Role : FullAuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 角色名
@@ -47,7 +47,7 @@ namespace Letu.Basis.Admin.Roles
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
 
         /// <summary>
         /// 是否启用

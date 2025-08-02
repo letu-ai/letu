@@ -1,6 +1,5 @@
 import { Form, Input, InputNumber, Modal, Radio, Switch, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import {
   addMenu,
   getMenuOptions,
@@ -32,10 +31,8 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     openModal,
   }));
   const fetchMenuOptions = (keywords?: string) => {
-    getMenuOptions(true, keywords).then((res) => {
-      if (res.data) {
-        setTreeData(res.data.tree);
-      }
+    getMenuOptions(true, keywords).then((data) => {
+      setTreeData(data.tree);
     });
   };
   useEffect(() => {
@@ -76,22 +73,21 @@ const MenuForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: MenuDto,
-    apiAction: (params: MenuDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: MenuDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateMenu : addMenu, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: MenuDto) => {
+    if (row?.id) {
+      await updateMenu(row.id, values);
+      handleSuccess('编辑成功');
+    } else {
+      await addMenu(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

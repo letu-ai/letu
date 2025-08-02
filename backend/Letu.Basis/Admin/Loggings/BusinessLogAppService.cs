@@ -1,14 +1,17 @@
-﻿using Letu.Basis.Admin.Loggings.Dtos;
-using Letu.Logger.Entities;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Loggings.Dtos;
+using Letu.Logging.Entities;
 using Letu.Repository;
+using Letu.Shared.Models;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public class BusinessLogAppService : IBusinessLogAppService
+    public class BusinessLogAppService : ApplicationService, IBusinessLogAppService
     {
-        private readonly IRepository<LogRecordDO> _logRecordRepository;
+        private readonly IFreeSqlRepository<LogRecord> _logRecordRepository;
 
-        public BusinessLogAppService(IRepository<LogRecordDO> logRecordRepository)
+        public BusinessLogAppService(IFreeSqlRepository<LogRecord> logRecordRepository)
         {
             _logRecordRepository = logRecordRepository;
         }

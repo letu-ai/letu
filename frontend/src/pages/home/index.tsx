@@ -76,8 +76,8 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/letu-ai/letu').then(async (res) => {
-      const json = await res.json();
+    fetch('https://api.github.com/repos/letu-ai/letu').then(async (data) => {
+      const json = await data.json();
       if (json instanceof Object) {
         setGithubRepoInfo({
           starCount: json['stargazers_count'],

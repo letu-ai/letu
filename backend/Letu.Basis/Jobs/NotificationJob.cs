@@ -1,44 +1,42 @@
-﻿using Letu.Basis.SharedService;
-using Letu.Core.AutoInject;
+﻿using FreeRedis;
+using Letu.Basis.Admin.Notifications;
+using Letu.Basis.SharedService;
 using Letu.Job;
 using Letu.Repository;
-using FreeRedis;
 using Quartz;
-using RedLockNet.SERedis;
-using Letu.Basis.Admin.Notifications;
+using Volo.Abp.DependencyInjection;
+using Volo.Abp.DistributedLocking;
 
 namespace Letu.Basis.Jobs
 {
-    [DenpendencyInject(AsSelf = true)]
     [JobKey("NotificationJob")]
-    public class NotificationJob : IJob
+    public class NotificationJob : IJob, ISingletonDependency
     {
         private readonly ILogger<NotificationJob> _logger;
-        private readonly IRepository<Notification> _repository;
+        private readonly IFreeSqlRepository<Notification> _repository;
         private readonly MqttSharedService _mqttService;
         private readonly IRedisClient _database;
-        private readonly RedLockFactory redLockFactory;
+        private readonly IAbpDistributedLock distributedLock;
 
-        public NotificationJob(ILogger<NotificationJob> logger, IRepository<Notification> repository, MqttSharedService mqttService, IRedisClient database
-            , RedLockFactory redLockFactory)
+        public NotificationJob(ILogger<NotificationJob> logger, IFreeSqlRepository<Notification> repository, MqttSharedService mqttService, IRedisClient database, IAbpDistributedLock distributedLock)
         {
             _logger = logger;
             _repository = repository;
             _mqttService = mqttService;
             _database = database;
-            this.redLockFactory = redLockFactory;
+            this.distributedLock = distributedLock;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
             try
             {
-                var expiry = TimeSpan.FromSeconds(30);
+                var timeout = TimeSpan.FromSeconds(30);
                 var wait = TimeSpan.FromSeconds(10);
                 var retry = TimeSpan.FromSeconds(1);
 
-                using var redLock = await redLockFactory.CreateLockAsync(nameof(NotificationJob), expiry, wait, retry);
-                if (redLock.IsAcquired)
+                await using var handle = await distributedLock.TryAcquireAsync(nameof(NotificationJob), timeout);
+                if (handle != null)
                 {
                     var notis = await _repository.Where(x => !x.IsReaded).ToListAsync();
                     var groupMap = notis.GroupBy(x => x.EmployeeId).ToDictionary(k => k.Key, v => v.Count());

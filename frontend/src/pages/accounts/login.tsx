@@ -34,8 +34,8 @@ const LoginPage = () => {
       return;
     }
 
-    sendLoginSmsCode!(phone).then((res) => {
-      message.success(`【测试】您的验证码是：${res.data}，5分钟内有效`, 3);
+    sendLoginSmsCode!(phone).then((data) => {
+      message.success(`【测试】您的验证码是：${data}，5分钟内有效`, 3);
       let seconds = 60;
       setCountdown(seconds);
       const timer = setInterval(() => {

@@ -1,12 +1,11 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse } from '@/types/api';
 
 /**
  * 新增部门
  * @param dto
  */
 export function addDept(dto: DeptDto) {
-  return httpClient.post<DeptDto, AppResponse<boolean>>('/api/admin/departments', dto);
+  return httpClient.post<DeptDto, void>('/api/admin/departments', dto);
 }
 
 /**
@@ -14,7 +13,7 @@ export function addDept(dto: DeptDto) {
  * @param dto
  */
 export function getDeptList(dto: DeptQueryDto) {
-  return httpClient.get<DeptQueryDto, AppResponse<DeptListDto[]>>('/api/admin/departments', { params: dto });
+  return httpClient.get<DeptQueryDto, DeptListDto[]>('/api/admin/departments', { params: dto });
 }
 
 /**
@@ -22,7 +21,7 @@ export function getDeptList(dto: DeptQueryDto) {
  * @param dto
  */
 export function updateDept(dto: DeptDto) {
-  return httpClient.put<DeptDto, AppResponse<boolean>>('/api/admin/departments', dto);
+  return httpClient.put<DeptDto, void>('/api/admin/departments', dto);
 }
 
 /**
@@ -30,7 +29,7 @@ export function updateDept(dto: DeptDto) {
  * @param id 部门ID
  */
 export function deleteDept(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>('/api/admin/departments/' + id);
+  return httpClient.delete<string, void>('/api/admin/departments/' + id);
 }
 
 export interface DeptDto {

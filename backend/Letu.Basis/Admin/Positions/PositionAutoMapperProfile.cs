@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using Letu.Basis.Admin.Departments;
-using Letu.Basis.Admin.Employees;
-using Letu.Basis.Admin.Employees.Dtos;
 using Letu.Basis.Admin.Positions.Dtos;
 
 namespace Letu.Basis.Admin.Positions
@@ -10,11 +7,16 @@ namespace Letu.Basis.Admin.Positions
     {
         public PositionAutoMapperProfile()
         {
-            CreateMap<PositionGroupDto, PositionGroup>();
-            CreateMap<PositionGroup, PositionGroupListDto>()
-                .ForMember(d => d.Rawchildren, o => o.MapFrom(s => s.Children));
-            CreateMap<Position, PositionListDto>();
-            CreateMap<PositionDto, Position>();
+            CreateMap<PositionGroupCreateOrUpdateInput, PositionGroup>();
+            CreateMap<PositionGroup, PositionGroupListOutput>()
+                .ForMember(d => d.Children, opt =>
+                {
+                    opt.Condition(src => src.Children != null && src.Children.Count > 0); // 没有Children时不映射
+                    opt.MapFrom(src => src.Children);
+                });
+
+            CreateMap<Position, PositionListOutput>();
+            CreateMap<PositionCreateOrUpdateInput, Position>();
         }
     }
 }

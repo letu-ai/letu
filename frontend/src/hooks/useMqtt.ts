@@ -111,8 +111,8 @@ export const useMqtt = (
       // 开始新的token获取
       const browserCode = await BrowserUtils.getBrowserCode();
       const tokenPromise = getMqttToken(browserCode)
-        .then((res) => {
-          const { expired, token } = res.data;
+        .then((data) => {
+          const { expired, token } = data;
           const tokenInfo = {
             token,
             expiresAt: Date.now() + expired * 1000, // 转换为毫秒

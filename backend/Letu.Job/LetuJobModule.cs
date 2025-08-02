@@ -1,18 +1,18 @@
-﻿using Letu.Core.AutoInject;
-using Letu.Core.Context;
-using Letu.Job.Database;
+﻿using Letu.Job.Database;
 using Letu.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
+using Volo.Abp;
+using Volo.Abp.Modularity;
 
 namespace Letu.Job
 {
     [DependsOn(
         typeof(LetuRepositoryModule)
         )]
-    public class LetuJobModule : ModuleBase
+    public class LetuJobModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
@@ -23,15 +23,15 @@ namespace Letu.Job
             context.Services.AddScoped<IJobControl, JobService>();
         }
 
-        public override void Configure(ApplicationInitializationContext context)
+        public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
-            IScheduler? scheduler = context.ServiceProvider.GetService<IScheduler>();
-            if (scheduler != null)
-            {
-                scheduler.JobFactory = new JobFactory(context.ServiceProvider);
-                scheduler.ListenerManager.AddJobListener(new GlobalJobListener(context.ServiceProvider), EverythingMatcher<JobKey>.AllJobs());
-                scheduler.Start().ConfigureAwait(true);
-            }
+            //IScheduler? scheduler = context.ServiceProvider.GetService<IScheduler>();
+            //if (scheduler != null)
+            //{
+            //    scheduler.JobFactory = new JobFactory(context.ServiceProvider);
+            //    scheduler.ListenerManager.AddJobListener(new GlobalJobListener(context.ServiceProvider), EverythingMatcher<JobKey>.AllJobs());
+            //    scheduler.Start().ConfigureAwait(true);
+            //}
         }
     }
 }

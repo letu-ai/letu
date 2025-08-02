@@ -24,10 +24,10 @@ const BindUserForm = forwardRef<BindUserFormRef, ModalProps>((props, ref) => {
   }));
 
   const fetchUserSimpleInfos = (key?: string) => {
-    getUserSimpleInfos(key).then((res) => {
-      if (res.data && res.data.length > 0) {
+    getUserSimpleInfos(key).then((data) => {
+      if (data && data.length > 0) {
         setUserOptions(
-          res.data.map((x) => {
+          data.map((x) => {
             return {
               label: `${x.nickName}\t(${x.userName})`,
               value: x.id,
@@ -59,13 +59,16 @@ const BindUserForm = forwardRef<BindUserFormRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const onFinish = (values: EmployeeBindUserDto) => {
-    bindUser({ ...values, employeeId: currentRow!.id }).then(() => {
-      message.success('绑定成功');
-      props?.refresh();
-      setIsOpenModal(false);
-      form.resetFields();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    props?.refresh();
+    setIsOpenModal(false);
+    form.resetFields();
+  };
+
+  const onFinish = async (values: EmployeeBindUserDto) => {
+    await bindUser({ ...values, employeeId: currentRow!.id });
+    handleSuccess('绑定成功');
   };
 
   return (

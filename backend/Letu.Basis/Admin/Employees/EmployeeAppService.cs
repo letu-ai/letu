@@ -1,29 +1,31 @@
 using AutoMapper;
+using Letu.Applications;
 using Letu.Basis.Admin.Departments;
 using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Admin.Employees.Dtos;
 using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Admin.Users.Dtos;
-using Letu.Basis.IService.System.Dtos;
-using Letu.Core.Interfaces;
 using Letu.Core.Utils;
 using Letu.Repository;
-using Letu.Repository.Aop;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Entities;
+using Volo.Abp.Uow;
 
 namespace Letu.Basis.Admin.Employees
 {
-    public class EmployeeAppService : IScopedDependency, IEmployeeAppService
+    public class EmployeeAppService : ApplicationService, IEmployeeAppService
     {
-        private readonly IRepository<Employee> _employeeRepository;
-        private readonly IRepository<Department> _deptRepository;
+        private readonly IFreeSqlRepository<Employee> _employeeRepository;
+        private readonly IFreeSqlRepository<Department> _deptRepository;
         private readonly IFreeSql _freeSql;
         private readonly IMapper _mapper;
         private readonly IUserAppService _userService;
-        private readonly IRepository<User> _userRepository;
+        private readonly IFreeSqlRepository<User> _userRepository;
 
-        public EmployeeAppService(IRepository<Employee> employeeRepository, IRepository<Department> deptRepository, IRepository<Position> orgPositionRepository
-            , IFreeSql freeSql, IMapper mapper, IUserAppService userService, IRepository<User> userRepository)
+        public EmployeeAppService(IFreeSqlRepository<Employee> employeeRepository, IFreeSqlRepository<Department> deptRepository, IFreeSqlRepository<Position> orgPositionRepository
+            , IFreeSql freeSql, IMapper mapper, IUserAppService userService, IFreeSqlRepository<User> userRepository)
         {
             _employeeRepository = employeeRepository;
             _deptRepository = deptRepository;
@@ -33,7 +35,7 @@ namespace Letu.Basis.Admin.Employees
             _userRepository = userRepository;
         }
 
-        [AsyncTransactional]
+        [UnitOfWork]
         public async Task<bool> AddEmployeeAsync(EmployeeDto dto)
         {
             if (await _employeeRepository.Select.AnyAsync(x => x.Code.ToLower() == dto.Code.ToLower()))

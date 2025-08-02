@@ -1,12 +1,12 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import httpClient from '@/utils/httpClient';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 新增租户
  * @param dto
  */
 export function addTenant(dto: TenantDto) {
-  return httpClient.post<TenantDto, AppResponse<boolean>>('/api/admin/tenants', dto);
+  return httpClient.post<TenantDto, void>('/api/admin/tenants', dto);
 }
 
 /**
@@ -14,15 +14,15 @@ export function addTenant(dto: TenantDto) {
  * @param dto
  */
 export function getTenantList(dto: TenantQueryDto) {
-  return httpClient.get<TenantQueryDto, AppResponse<PagedResult<TenantListDto>>>('/api/admin/tenants', { params: dto });
+  return httpClient.get<TenantQueryDto, PagedResult<TenantListDto>>('/api/admin/tenants', { params: dto });
 }
 
 /**
  * 修改租户
- * @param dto
+ * @param input
  */
-export function updateTenant(dto: TenantDto) {
-  return httpClient.put<TenantDto, AppResponse<boolean>>('/api/admin/tenants', dto);
+export function updateTenant(id: string, input: TenantDto) {
+  return httpClient.put<TenantDto, void>(`/api/admin/tenants/${id}`, input);
 }
 
 /**
@@ -30,26 +30,27 @@ export function updateTenant(dto: TenantDto) {
  * @param id
  */
 export function deleteTenant(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/admin/tenants/${id}`);
+  return httpClient.delete<string, void>('/api/admin/tenants/' + id);
 }
 
 export interface TenantDto {
-  id?: string;
+  id?: string | null;
   name: string;
-  tenantId: string;
-  remark?: string;
-  domain?: string;
+  code: string;
+  description?: string | null;
+  isEnabled: boolean;
+}
+
+export interface TenantQueryDto extends PagedResultRequest {
+  name?: string | null;
+  code?: string | null;
 }
 
 export interface TenantListDto {
   id: string;
   name: string;
-  tenantId: string;
-  remark?: string;
-  domain?: string;
-  lastModificationTime: string;
-}
-
-export interface TenantQueryDto extends PageSearch {
-  keyword?: string;
+  code: string;
+  description: string | null;
+  isEnabled: boolean;
+  creationTime: string;
 }

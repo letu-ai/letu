@@ -1,10 +1,10 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users.Dtos;
-using Letu.Core.Interfaces;
 
 namespace Letu.Basis.Admin.Users
 {
-    public interface IUserAppService : IScopedDependency
+    public interface IUserAppService
     {
         /// <summary>
         /// 新增用户
@@ -30,9 +30,10 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 分配角色
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="userId"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        Task<bool> AssignRoleAsync(AssignRoleDto dto);
+        Task<bool> AssignRoleAsync(Guid userId, AssignRoleDto input);
 
         /// <summary>
         /// 切换用户启用状态

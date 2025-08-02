@@ -1,8 +1,8 @@
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.DataDictionary
 {
@@ -10,7 +10,7 @@ namespace Letu.Basis.Admin.DataDictionary
     /// 字典数据表
     /// </summary>
     [Table(Name = "sys_dict_data")]
-    public class DictionaryItem : AuditedEntity, ITenant
+    public class DictionaryItem : AuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 字典值
@@ -61,6 +61,6 @@ namespace Letu.Basis.Admin.DataDictionary
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

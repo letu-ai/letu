@@ -1,24 +1,23 @@
-using Letu.Basis.SharedService;
-using Letu.Core.Helpers;
+using FreeSql;
+using Letu.Basis.Admin.Menus.Dtos;
 using Letu.Core.Utils;
 using Letu.Repository;
 using Letu.Shared.Enums;
-
-using FreeSql;
-using Letu.Basis.Admin.Menus.Dtos;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Menus
 {
-    public class MenuAppService : IMenuAppService
+    public class MenuAppService : ApplicationService, IMenuAppService
     {
-        private readonly IRepository<MenuItem> _menuRepository;
+        private readonly IFreeSqlRepository<MenuItem> _menuRepository;
 
-        public MenuAppService(IRepository<MenuItem> menuRepository)
+        public MenuAppService(IFreeSqlRepository<MenuItem> menuRepository)
         {
             _menuRepository = menuRepository;
         }
 
-        public async Task<bool> AddMenuAsync(MenuDto dto)
+        public async Task AddMenuAsync(MenuCreateOrUpdateInput dto)
         {
             if (dto.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
             {
@@ -41,18 +40,16 @@ namespace Letu.Basis.Admin.Menus
             {
                 throw new BusinessException(message: $"已存在【{dto.Path}】菜单路由");
             }
-            var entity = AutoMapperHelper.Instance.Map<MenuDto, MenuItem>(dto);
+            var entity = ObjectMapper.Map<MenuCreateOrUpdateInput, MenuItem>(dto);
             await _menuRepository.InsertAsync(entity);
-            return true;
         }
 
-        public async Task<bool> DeleteMenusAsync(Guid[] ids)
+        public async Task DeleteMenusAsync(Guid[] ids)
         {
             await _menuRepository.DeleteAsync(x => ids.Contains(x.Id));
-            return true;
         }
 
-        public async Task<List<MenuListDto>> GetMenuListAsync(MenuQueryDto dto)
+        public async Task<List<MenuListOutput>> GetMenuListAsync(MenuQueryDto dto)
         {
             //是否过滤
             var isFilter = !string.IsNullOrEmpty(dto.Title) || !string.IsNullOrEmpty(dto.Path);
@@ -61,18 +58,18 @@ namespace Letu.Basis.Admin.Menus
                 .WhereIf(!string.IsNullOrEmpty(dto.Path), x => !string.IsNullOrEmpty(x.Path) && x.Path.Contains(dto.Path!))
                 .ToListAsync();
             var top = all.Where(x => isFilter || !x.ParentId.HasValue || x.ParentId == Guid.Empty).OrderBy(x => x.Sort).ToList();
-            var topMap = AutoMapperHelper.Instance.Map<List<MenuItem>, List<MenuListDto>>(top);
+            var topMap = ObjectMapper.Map<List<MenuItem>, List<MenuListOutput>>(top);
             if (isFilter) return topMap;
             foreach (var item in topMap)
             {
                 item.Children = getChildren(item.Id);
             }
 
-            List<MenuListDto>? getChildren(Guid currentId)
+            List<MenuListOutput>? getChildren(Guid currentId)
             {
                 var children = all.Where(x => x.ParentId == currentId).OrderBy(x => x.Sort).ToList();
                 if (children.Count == 0) return null;
-                var childrenMap = AutoMapperHelper.Instance.Map<List<MenuItem>, List<MenuListDto>>(children);
+                var childrenMap = ObjectMapper.Map<List<MenuItem>, List<MenuListOutput>>(children);
                 foreach (var item in childrenMap)
                 {
                     item.Children = getChildren(item.Id);
@@ -131,50 +128,48 @@ namespace Letu.Basis.Admin.Menus
             return (keys, topMap);
         }
 
-        public async Task<bool> UpdateMenuAsync(MenuDto dto)
+        public async Task UpdateMenuAsync(Guid id, MenuCreateOrUpdateInput input)
         {
-            if (dto.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
+            if (input.MenuType == (int)MenuType.Menu && string.IsNullOrWhiteSpace(input.Path))
             {
                 throw new BusinessException(message: "菜单的路由不能为空");
             }
-            if (dto.IsExternal && !StringUtils.IsValidUrlStrict(dto.Path))
+            if (input.IsExternal && !StringUtils.IsValidUrlStrict(input.Path))
             {
                 throw new BusinessException(message: "外链地址不合法");
             }
-            if (dto.ParentId.HasValue)
+            if (input.ParentId.HasValue)
             {
-                var parentMenu = await _menuRepository.Where(x => x.ParentId == dto.ParentId).FirstAsync();
+                var parentMenu = await _menuRepository.Where(x => x.ParentId == input.ParentId).FirstAsync();
                 if (parentMenu.MenuType == MenuType.Button)
                 {
                     throw new BusinessException(message: "菜单父级不能是按钮");
                 }
             }
-            var isExist = await _menuRepository.Select.AnyAsync(x => x.Path != null && dto.Path != null && x.Path.ToLower() == dto.Path.ToLower());
-            var entity = await _menuRepository.Where(x => x.Id == dto.Id).FirstAsync() ?? throw new BusinessException(message: "数据不存在");
-            if (isExist && entity.Path != null && dto.Path!.ToLower() != entity.Path.ToLower())
+            var isExist = await _menuRepository.Select.AnyAsync(x => x.Path != null && input.Path != null && x.Path.ToLower() == input.Path.ToLower());
+            var entity = await _menuRepository.Where(x => x.Id == id).FirstAsync() ?? throw new BusinessException(message: "数据不存在");
+            if (isExist && entity.Path != null && input.Path!.ToLower() != entity.Path.ToLower())
             {
-                throw new BusinessException(message: $"已存在【{dto.Path}】菜单路由");
+                throw new BusinessException(message: $"已存在【{input.Path}】菜单路由");
             }
-            if (dto.ParentId == entity.Id)
+            if (input.ParentId == entity.Id)
             {
                 throw new BusinessException(message: "不能选择自己为父级");
             }
 
-            bool updatePermission = dto.Permission != entity.Permission;
+            bool updatePermission = input.Permission != entity.Permission;
 
-            entity.Title = dto.Title;
-            entity.Icon = dto.Icon;
-            entity.Path = dto.Path;
-            entity.MenuType = (MenuType)dto.MenuType;
-            entity.Permission = dto.Permission;
-            entity.ParentId = dto.ParentId;
-            entity.Sort = dto.Sort;
-            entity.Display = dto.Display;
-            entity.Component = dto.Component;
-            entity.IsExternal = dto.IsExternal;
+            entity.Title = input.Title;
+            entity.Icon = input.Icon;
+            entity.Path = input.Path;
+            entity.MenuType = (MenuType)input.MenuType;
+            entity.Permission = input.Permission;
+            entity.ParentId = input.ParentId;
+            entity.Sort = input.Sort;
+            entity.Display = input.Display;
+            entity.Component = input.Component;
+            entity.IsExternal = input.IsExternal;
             await _menuRepository.UpdateAsync(entity);
-
-            return true;
         }
     }
 }

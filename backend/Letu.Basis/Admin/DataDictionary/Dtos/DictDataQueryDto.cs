@@ -1,6 +1,8 @@
+using Letu.Applications;
+
 namespace Letu.Basis.Admin.DataDictionary.Dtos
 {
-    public class DictDataQueryDto : PageSearch
+    public class DictDataQueryDto : PagedResultRequest
     {
         /// <summary>
         /// 字典标签

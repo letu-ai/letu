@@ -1,26 +1,22 @@
-﻿using System.Reflection;
-
-using Letu.Core.AutoInject;
-using Letu.Job.Database.Entities;
+﻿using Letu.Job.Database.Entities;
 using Letu.Job.Database.Models;
 using Letu.Repository;
-using Letu.Repository.Aop;
-
 using Microsoft.Extensions.Caching.Memory;
-
 using Quartz;
+using System.Reflection;
+using Volo.Abp.DependencyInjection;
+using Volo.Abp.Uow;
 
 namespace Letu.Job.Database
 {
-    [DenpendencyInject(AsSelf = true)]
-    internal class JobService : IJobControl
+    public class JobService : IJobControl, ITransientDependency
     {
-        private readonly IRepository<ScheduledTaskDO> _scheduledTaskRepository;
-        private readonly IRepository<TaskExecutionLogDO> _taskExecutionLogRepository;
+        private readonly IFreeSqlRepository<ScheduledTaskDO> _scheduledTaskRepository;
+        private readonly IFreeSqlRepository<TaskExecutionLogDO> _taskExecutionLogRepository;
         private readonly IScheduler _scheduler;
         private readonly IMemoryCache _memoryCache;
 
-        public JobService(IRepository<ScheduledTaskDO> scheduledTaskRepository, IRepository<TaskExecutionLogDO> taskExecutionLogRepository, IScheduler scheduler, IMemoryCache memoryCache)
+        public JobService(IFreeSqlRepository<ScheduledTaskDO> scheduledTaskRepository, IFreeSqlRepository<TaskExecutionLogDO> taskExecutionLogRepository, IScheduler scheduler, IMemoryCache memoryCache)
         {
             _scheduledTaskRepository = scheduledTaskRepository;
             _taskExecutionLogRepository = taskExecutionLogRepository;
@@ -79,14 +75,15 @@ namespace Letu.Job.Database
                 .ExecuteAffrowsAsync();
         }
 
-        [AsyncTransactional]
+        [UnitOfWork]
         public async Task DeleteJobAsync(string key)
         {
             await _taskExecutionLogRepository.DeleteAsync(x => x.TaskKey == key);
             await _scheduledTaskRepository.DeleteAsync(x => x.TaskKey == key);
 
             var jobMap = this.GetJobInfos();
-            if (!jobMap.TryGetValue(key, out var taskType)) return;
+            if (!jobMap.TryGetValue(key, out var taskType))
+                return;
 
             await _scheduler.DeleteJob(new JobKey(JobKeyUtils.GetJobKey(key)));
         }

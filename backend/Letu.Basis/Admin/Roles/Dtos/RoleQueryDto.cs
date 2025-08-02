@@ -1,6 +1,8 @@
+using Letu.Applications;
+
 namespace Letu.Basis.Admin.Roles.Dtos
 {
-    public class RoleQueryDto : PageSearch
+    public class RoleQueryDto : PagedResultRequest
     {
         /// <summary>
         /// 角色名

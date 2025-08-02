@@ -1,6 +1,4 @@
-﻿using Letu.Core.Authorization;
-using Letu.Core.Interfaces;
-using IP2Region.Net.XDB;
+﻿using IP2Region.Net.XDB;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 
@@ -8,16 +6,6 @@ namespace Letu.Core.Utils
 {
     public class RequestUtils
     {
-        public static ICurrentUser ResolveUser(HttpContext? context)
-        {
-            return context?.Features.Get<CurrentUser>() ?? CurrentUser.Default();
-        }
-
-        public static ICurrentTenant ResolveTenant(HttpContext? context)
-        {
-            return context?.Features.Get<CurrentTenant>() ?? new CurrentTenant(null);
-        }
-
         public static string? GetIp(HttpContext context)
         {
             var header = context.Request.Headers;

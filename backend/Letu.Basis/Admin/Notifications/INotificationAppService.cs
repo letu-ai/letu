@@ -1,15 +1,15 @@
-﻿using Letu.Basis.Admin.Notifications.Dtos;
-using Letu.Core.Interfaces;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Notifications.Dtos;
 
 namespace Letu.Basis.Admin.Notifications
 {
-    public interface INotificationAppService : IScopedDependency
+    public interface INotificationAppService
     {
         Task AddNotificationAsync(NotificationDto dto);
 
         Task<PagedResult<NotificationResultDto>> GetNotificationListAsync(NotificationQueryDto dto);
 
-        Task UpdateNotificationAsync(NotificationDto dto);
+        Task UpdateNotificationAsync(Guid id, NotificationDto dto);
 
         Task DeleteNotificationAsync(Guid[] ids);
     }

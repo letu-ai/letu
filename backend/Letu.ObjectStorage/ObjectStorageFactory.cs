@@ -1,10 +1,11 @@
 ﻿using Letu.ObjectStorage.Aliyun;
 using Letu.ObjectStorage.Local;
 using Microsoft.Extensions.Configuration;
+using Volo.Abp.DependencyInjection;
 
 namespace Letu.ObjectStorage
 {
-    internal class ObjectStorageFactory : IObjectStorageFactory
+    internal class ObjectStorageFactory : IObjectStorageFactory, ISingletonDependency
     {
         private readonly IConfiguration configuration;
 

@@ -5,8 +5,6 @@ namespace Letu.Basis.Admin.Notifications.Dtos
 {
     public class NotificationDto
     {
-        public Guid? Id { get; set; }
-
         /// <summary>
         /// 通知标题
         /// </summary>

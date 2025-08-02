@@ -50,7 +50,7 @@ const TaskExecutionLogModal = ({
         rowKey="id"
         ref={logTableRef}
         request={async (params) => {
-          const { data } = await getExecutionLogList({ ...params, taskKey });
+          const data = await getExecutionLogList({ ...params, taskKey });
           return data;
         }}
         searchItems={

@@ -22,9 +22,9 @@ namespace Letu.Core.Middlewares
                 await next(context);
                 return;
             }
-            string? userName = context.User.FindFirst(x => x.Type == ClaimTypes.Name)?.Value;
-            context.Features.Set(new CurrentUser(Guid.Parse(subId), userName, context.User.Claims));
-            UserManager.SetCurrent(subId);
+            //string? userName = context.User.FindFirst(x => x.Type == ClaimTypes.Name)?.Value;
+            //context.Features.Set(new CurrentUser(Guid.Parse(subId), userName, context.User.Claims));
+            //UserManager.SetCurrent(subId);
 
             await next(context);
         }

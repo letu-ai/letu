@@ -103,7 +103,7 @@ const Role = () => {
         rowKey="id"
         columns={columns}
         request={async (params) => {
-          const { data } = await getRoleList(params);
+          const data = await getRoleList(params);
           return data;
         }}
         searchItems={

@@ -1,6 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
 import React, { lazy } from 'react';
-import type { FrontendMenu } from '@/pages/accounts/service';
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 动态路由的逻辑：
@@ -9,18 +8,18 @@ import type { FrontendMenu } from '@/pages/accounts/service';
 3. 排除components目录下所有文件
 4. layout.tsx 作为该目录下的布局页面
 5. index.tsx作为默认页面
-6. 如果目录中有route.ts文件，则直接使用route导出的路由，不再搜索这个目录
+6. 如果目录中有route.tsx文件，则直接使用route导出的路由，不再搜索这个目录
 7. 文件名中包含$的文件，作为动态路由，例如items.$dictType.tsx，则作为动态路由，路径为/items/:dictType
 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  */
 
 // 获取所有页面文件
-const PageKeys = Object.keys(import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx'], { eager: true }));
-const PagesList = import.meta.glob(['@/pages/**/index.tsx', '@/pages/**/*.tsx']);
+const PageKeys = Object.keys(import.meta.glob(['/src/pages/**/index.tsx', '/src/pages/**/*.tsx'], { eager: true }));
+const PagesList = import.meta.glob(['/src/pages/**/index.tsx', '/src/pages/**/*.tsx']);
 
 // 获取所有自定义路由文件
-const RouteKeys = Object.keys(import.meta.glob(['@/pages/**/route.ts'], { eager: true }));
-const RoutesList = import.meta.glob(['@/pages/**/route.ts']);
+const RouteKeys = Object.keys(import.meta.glob(['/src/pages/**/route.tsx'], { eager: true }));
+const RoutesList = import.meta.glob(['/src/pages/**/route.tsx']);
 
 const createElementFromPath = (componentPath: string) => {
   if (!PageKeys.includes(componentPath)) return undefined;
@@ -102,7 +101,7 @@ const extractRoutePathFromFile = (filePath: string): string => {
 }
 
 /**
- * 检查文件是否应该被排除
+ * 检查文件是否应该被排除（用于初始过滤）
  * @param filePath 文件路径
  * @returns 是否应该排除
  */
@@ -117,8 +116,8 @@ const shouldExcludeFile = (filePath: string): boolean => {
     return true;
   }
 
-  // 排除 layout.tsx 文件（布局文件单独处理）
-  if (filePath.endsWith('/layout.tsx')) {
+  // 排除 route.tsx 文件（自定义路由文件）
+  if (filePath.endsWith('/route.tsx')) {
     return true;
   }
 
@@ -126,14 +125,20 @@ const shouldExcludeFile = (filePath: string): boolean => {
 };
 
 /**
- * 获取目录的布局组件
- * @param dirPath 目录路径
- * @returns 布局组件路径或undefined
+ * 检查文件是否应该作为页面路由（排除layout文件）
+ * @param filePath 文件路径
+ * @returns 是否应该作为页面路由
  */
-const getLayoutForDirectory = (dirPath: string): string | undefined => {
-  const layoutPath = `@/pages${dirPath}/layout.tsx`;
-  return PageKeys.includes(layoutPath) ? layoutPath : undefined;
+const shouldBePageRoute = (filePath: string): boolean => {
+  // layout.tsx 文件不作为页面路由，但需要用于构建layout结构
+  if (filePath.endsWith('/layout.tsx')) {
+    return false;
+  }
+  
+  return true;
 };
+
+
 
 /**
  * 检查目录是否有自定义路由文件
@@ -141,7 +146,7 @@ const getLayoutForDirectory = (dirPath: string): string | undefined => {
  * @returns 是否有自定义路由
  */
 const hasCustomRoute = (dirPath: string): boolean => {
-  const routePath = `@/pages${dirPath}/route.ts`;
+  const routePath = `/src/pages${dirPath}/route.tsx`;
   return RouteKeys.includes(routePath);
 };
 
@@ -151,14 +156,14 @@ const hasCustomRoute = (dirPath: string): boolean => {
  * @returns 自定义路由配置或undefined
  */
 const loadCustomRoute = async (dirPath: string): Promise<RouteObject[] | undefined> => {
-  const routePath = `@/pages${dirPath}/route.ts`;
+  const routePath = `/src/pages${dirPath}/route.tsx`;
   if (!RouteKeys.includes(routePath)) {
     return undefined;
   }
   
   try {
     const routeModule = await RoutesList[routePath]() as any;
-    // 假设 route.ts 文件导出一个名为 routes 的数组或者默认导出
+    // 假设 route.tsx 文件导出一个名为 routes 的数组或者默认导出
     return routeModule.routes || routeModule.default || [];
   } catch (error) {
     console.warn(`加载自定义路由失败: ${routePath}`, error);
@@ -175,7 +180,10 @@ const getDirectories = (filePaths: string[]): string[] => {
   const directories = new Set<string>();
   
   filePaths.forEach(filePath => {
-    const dirPath = filePath.replace('@/pages', '').replace(/\/[^/]+\.(tsx|ts)$/, '');
+    const dirPath = filePath
+      .replace('/src/pages', '')
+      .replace('@/pages', '')
+      .replace(/\/[^/]+\.(tsx|ts)$/, '');
     if (dirPath) {
       // 添加所有层级的目录
       const parts = dirPath.split('/').filter(Boolean);
@@ -190,122 +198,238 @@ const getDirectories = (filePaths: string[]): string[] => {
 };
 
 /**
- * 根据文件路径生成路由对象
+ * 构建层级结构的路由树
  * @param filePaths 文件路径数组
  * @returns 路由对象数组
  */
 const generateRoutesFromFiles = async (filePaths: string[]): Promise<RouteObject[]> => {
-  const routes: RouteObject[] = [];
-  const routeMap = new Map<string, RouteObject>();
-  const processedDirs = new Set<string>();
-  
-  // 获取所有目录并检查是否有自定义路由
+  const finalRoutes: RouteObject[] = [];
+  const customRouteDirs = new Set<string>();
+
+  // 1. Load all custom routes first and mark their directories.
   const directories = getDirectories(filePaths);
-  
-  // 首先处理有自定义路由的目录
   for (const dirPath of directories) {
     if (hasCustomRoute(dirPath)) {
+      customRouteDirs.add(dirPath);
       const customRoutes = await loadCustomRoute(dirPath);
-      if (customRoutes && customRoutes.length > 0) {
-        routes.push(...customRoutes);
-        processedDirs.add(dirPath);
-        
-        // 标记该目录的所有子目录也已处理（不再搜索）
-        directories.forEach(dir => {
-          if (dir.startsWith(dirPath + '/')) {
-            processedDirs.add(dir);
-          }
-        });
+      if (customRoutes) {
+        finalRoutes.push(...customRoutes);
       }
     }
   }
-  
-  // 过滤并处理文件路径
-  const validFiles = filePaths.filter(path => {
+
+  // 2. Filter out files handled by custom routes or should be excluded
+  const routableFiles = filePaths.filter(path => {
     if (shouldExcludeFile(path)) {
       return false;
     }
-    
-    // 检查文件所在目录是否已被自定义路由处理
-    const fileDirPath = path.replace('@/pages', '').replace(/\/[^/]+\.tsx$/, '');
-    return !processedDirs.has(fileDirPath);
-  });
-  
-  validFiles.forEach(filePath => {
-    const routePath = extractRoutePathFromFile(filePath);
-    const element = createElementFromPath(filePath);
-    
-    if (element) {
-      const route: RouteObject = {
-        path: routePath,
-        element: element,
-      };
-      
-      // 检查是否有布局文件
-      const dirPath = filePath.replace('@/pages', '').replace(/\/[^/]+\.tsx$/, '');
-      const layoutPath = getLayoutForDirectory(dirPath);
-      
-      if (layoutPath && !processedDirs.has(dirPath)) {
-        const layoutElement = createElementFromPath(layoutPath);
-        if (layoutElement) {
-          // 如果有布局，将当前路由作为子路由
-          const existingLayoutRoute = routeMap.get(dirPath);
-          if (existingLayoutRoute) {
-            if (!existingLayoutRoute.children) {
-              existingLayoutRoute.children = [];
-            }
-            existingLayoutRoute.children.push(route);
-          } else {
-            const layoutRoute: RouteObject = {
-              path: dirPath || '/',
-              element: layoutElement,
-              children: [route]
-            };
-            routeMap.set(dirPath, layoutRoute);
-            routes.push(layoutRoute);
-          }
-        } else {
-          routes.push(route);
-        }
-      } else {
-        routes.push(route);
+
+    const fileDir = path.substring(0, path.lastIndexOf('/'));
+    for (const customDir of customRouteDirs) {
+      const customDirPath = `/src/pages${customDir}`;
+      if (fileDir.startsWith(customDirPath)) {
+        return false;
       }
     }
+    
+    return true;
   });
-  
-  return routes;
+
+  // 3. Build hierarchical route structure
+  const routeTree = buildRouteTree(routableFiles);
+  finalRoutes.push(...routeTree);
+
+  return finalRoutes;
+};
+
+/**
+ * 构建层级路由树
+ * @param filePaths 文件路径数组
+ * @returns 路由树
+ */
+const buildRouteTree = (filePaths: string[]): RouteObject[] => {
+  // 按目录分组文件
+  const dirToFileMap = new Map<string, string[]>();
+  filePaths.forEach(path => {
+    const dir = path.substring(0, path.lastIndexOf('/'));
+    if (!dirToFileMap.has(dir)) {
+      dirToFileMap.set(dir, []);
+    }
+    dirToFileMap.get(dir)!.push(path);
+  });
+
+  // 收集所有layout信息
+  const layoutInfo = new Map<string, {
+    layoutPath: string;
+    dirPath: string;
+    depth: number;
+  }>();
+
+  dirToFileMap.forEach((files, dir) => {
+    const layoutPath = files.find(f => f.endsWith('/layout.tsx'));
+    if (layoutPath) {
+      const dirPath = dir.replace('/src/pages', '') || '/';
+      const depth = dirPath === '/' ? 0 : dirPath.split('/').length - 1;
+      layoutInfo.set(dir, {
+        layoutPath,
+        dirPath,
+        depth
+      });
+    }
+  });
+
+  // 按深度排序，确保父layout先处理
+  const sortedLayouts = Array.from(layoutInfo.entries())
+    .sort(([, a], [, b]) => a.depth - b.depth);
+
+  // 构建层级结构
+  const routeMap = new Map<string, RouteObject>();
+  const rootRoutes: RouteObject[] = [];
+
+  // 处理所有layout，建立层级关系
+  sortedLayouts.forEach(([dir, info]) => {
+    const layoutElement = createElementFromPath(info.layoutPath);
+    if (!layoutElement) return;
+
+    // 找到父layout
+    const parentDir = findParentLayoutDir(dir, layoutInfo);
+    
+    // 计算layout的路径
+    let layoutRoutePath: string;
+    if (!parentDir) {
+      // 没有父layout，使用完整路径（作为根layout）
+      layoutRoutePath = info.dirPath;
+    } else {
+      // 有父layout，计算相对路径（作为子layout）
+      const parentDirPath = layoutInfo.get(parentDir)!.dirPath;
+      layoutRoutePath = calculateRelativePath(info.dirPath, parentDirPath);
+    }
+
+    const route: RouteObject = {
+      path: layoutRoutePath,
+      element: layoutElement,
+      children: []
+    };
+
+    routeMap.set(dir, route);
+    if (parentDir && routeMap.has(parentDir)) {
+      // 添加到父layout的children中
+      routeMap.get(parentDir)!.children!.push(route);
+    } else {
+      // 根level的layout
+      rootRoutes.push(route);
+    }
+  });
+
+  // 处理非layout文件，分配到对应的layout下
+  dirToFileMap.forEach((files, dir) => {
+    const pageFiles = files.filter(f => shouldBePageRoute(f));
+    
+    pageFiles.forEach(filePath => {
+      const targetDir = findNearestLayoutDir(dir, layoutInfo);
+      const routePath = extractRoutePathFromFile(filePath);
+
+      if (targetDir && routeMap.has(targetDir)) {
+        // 计算相对于目标layout的相对路径
+        const layoutDirPath = layoutInfo.get(targetDir)!.dirPath;
+        const relativePath = calculateRelativePath(routePath, layoutDirPath);
+        
+        routeMap.get(targetDir)!.children!.push({
+          path: relativePath,
+          element: createElementFromPath(filePath)
+        });
+      } else {
+        // 没有layout的页面，添加到根级别
+        rootRoutes.push({
+          path: routePath,
+          element: createElementFromPath(filePath)
+        });
+      }
+    });
+  });
+
+  return rootRoutes;
 };
 
 
+
 /**
- * 从文件路径提取组件名称
- * @param filePath 文件路径
- * @returns 组件名称
+ * 查找最近的父layout目录
+ * @param currentDir 当前目录
+ * @param layoutInfo layout信息映射
+ * @returns 父layout目录或undefined
  */
-const extractComponentNameFromPath = (filePath: string): string => {
-  if (!filePath) return 'Unknown';
-  
-  // 移除 @/pages 前缀
-  let componentName = filePath.replace('@/pages', '');
-  
-  // 移除文件扩展名
-  componentName = componentName.replace(/\.(tsx|ts)$/, '');
-  
-  // 处理 index 文件，使用目录名
-  if (componentName.endsWith('/index')) {
-    componentName = componentName.replace('/index', '');
+const findParentLayoutDir = (
+  currentDir: string, 
+  layoutInfo: Map<string, any>
+): string | undefined => {
+  const currentDirPath = currentDir.replace('/src/pages', '');
+  const currentSegments = currentDirPath.split('/').filter(Boolean);
+
+  // 从当前目录向上查找，寻找父layout
+  for (let i = currentSegments.length - 1; i >= 0; i--) {
+    const parentPath = '/' + currentSegments.slice(0, i).join('/');
+    const parentDir = `/src/pages${parentPath === '/' ? '' : parentPath}`;
+    
+    if (layoutInfo.has(parentDir) && parentDir !== currentDir) {
+      return parentDir;
+    }
   }
-  
-  // 移除开头的斜杠
-  componentName = componentName.replace(/^\//, '');
-  
-  // 将路径转换为组件名格式
-  componentName = componentName
-    .split('/')
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
-  
-  return componentName || 'Root';
+
+  return undefined;
+};
+
+/**
+ * 查找最近的layout目录（包括当前目录和父目录）
+ * @param currentDir 当前目录
+ * @param layoutInfo layout信息映射
+ * @returns layout目录或undefined
+ */
+const findNearestLayoutDir = (
+  currentDir: string,
+  layoutInfo: Map<string, any>
+): string | undefined => {
+  // 首先检查当前目录是否有layout
+  if (layoutInfo.has(currentDir)) {
+    return currentDir;
+  }
+
+  // 向上查找父目录的layout
+  const currentDirPath = currentDir.replace('/src/pages', '');
+  const currentSegments = currentDirPath.split('/').filter(Boolean);
+
+  for (let i = currentSegments.length - 1; i >= 0; i--) {
+    const parentPath = '/' + currentSegments.slice(0, i).join('/');
+    const parentDir = `/src/pages${parentPath === '/' ? '' : parentPath}`;
+    
+    if (layoutInfo.has(parentDir)) {
+      return parentDir;
+    }
+  }
+
+  return undefined;
+};
+
+/**
+ * 计算相对于layout的相对路径
+ * @param fullPath 完整路径
+ * @param layoutPath layout路径
+ * @returns 相对路径
+ */
+const calculateRelativePath = (fullPath: string, layoutPath: string): string => {
+  if (layoutPath === '/') {
+    return fullPath.substring(1); // 去掉开头的 /
+  }
+
+  if (fullPath.startsWith(layoutPath + '/')) {
+    return fullPath.substring(layoutPath.length + 1);
+  }
+
+  if (fullPath === layoutPath) {
+    return '';
+  }
+
+  return fullPath;
 };
 
 /**
@@ -313,29 +437,53 @@ const extractComponentNameFromPath = (filePath: string): string => {
  * @param routes 路由对象数组
  * @param level 缩进级别
  */
-const debugPrintRoutes = (routes: RouteObject[], level: number = 0): void => {
+const debugPrintRoutes = (routes: RouteObject[], level: number = 0, parentPath: string = ''): void => {
   const indent = '  '.repeat(level);
-  
+
   routes.forEach(route => {
-    const routePath = route.path || '/';
+    const currentPathSegment = route.path || '';
     
+    let fullPath: string;
+    if (level === 0) {
+      // 根级路由，直接使用当前路径段
+      fullPath = currentPathSegment;
+    } else {
+      // 子路由，需要拼接
+      const basePath = parentPath === '/' ? '' : parentPath;
+      fullPath = currentPathSegment ? `${basePath}/${currentPathSegment}` : basePath;
+    }
+    
+    // 清理多余的斜杠，例如 '//' 或者结尾的 '/' (根路径除外)
+    fullPath = fullPath.replace(/\/+/g, '/');
+    if (fullPath !== '/' && fullPath.endsWith('/')) {
+      fullPath = fullPath.slice(0, -1);
+    }
+    
+    // 检查是否是layout路由
+    const isLayoutRoute = route.children && route.children.length > 0;
+    const layoutIndicator = isLayoutRoute ? ' 📁' : '';
+    
+    let logMessage = `${indent}${fullPath || '/'}${layoutIndicator}`;
+
     if (route.element) {
-      // 尝试获取文件路径
       const elementType = (route.element as any)?.type;
       
       if (elementType?._componentPath) {
-        // 简化文件路径显示，移除 @/pages/ 前缀
-        const filePath = elementType._componentPath.replace('@/pages/', '');
-        console.log(`${indent}${routePath} (${filePath})`);
-      } else {
-        console.log(`${indent}${routePath}`);
+        // 文件约定路由: 显示源文件路径
+        const filePath = elementType._componentPath.replace('/src/pages/', '');
+        logMessage += ` (${filePath})`;
+      } else if (elementType) {
+        // 自定义路由: 显示组件名称
+        const componentName = elementType.displayName || elementType.name || 'Component';
+        logMessage += ` (${componentName})`;
       }
-    } else {
-      console.log(`${indent}${routePath}`);
     }
     
+    console.log(logMessage);
+    
     if (route.children && route.children.length > 0) {
-      debugPrintRoutes(route.children, level + 1);
+      // 传递当前计算出的完整路径给子节点
+      debugPrintRoutes(route.children, level + 1, fullPath);
     }
   });
 };

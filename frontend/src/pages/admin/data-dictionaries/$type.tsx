@@ -107,7 +107,7 @@ const DictDataList: React.FC = () => {
         rowKey="id"
         ref={tableRef}
         request={async (params) => {
-          const { data } = await getDictDataList({ ...params, dictType: urlParams?.type });
+          const data = await getDictDataList({ ...params, dictType: urlParams?.type });
           return data;
         }}
         searchItems={[

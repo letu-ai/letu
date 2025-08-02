@@ -1,9 +1,8 @@
 import { Form, Input, InputNumber, Modal, Switch, TreeSelect, Select } from 'antd'; // ++
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { addDept, getDeptList, type DeptDto, type DeptListDto, updateDept } from './service';
-import type { AppResponse } from '@/types/api';
 import useApp from 'antd/es/app/useApp';
-import { getEmployeeList } from '../employees/service'; // ++
+import { getAllEmployees } from '../employees/service'; // ++
 
 interface ModalProps {
   refresh?: () => void;
@@ -26,19 +25,18 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
   }));
 
   // ++
-  const fetchDeptEmployeeList = (deptId?: string, name?: string) => {
-    getEmployeeList({ deptId: deptId, keyword: name }).then((res) => {
-      if (res.data && res.data.length > 0) {
+  const fetchDeptEmployeeList = async (deptId?: string, name?: string) => {
+    const data = await getAllEmployees({ deptId: deptId, keyword: name });
+      if (data && data.length > 0) {
         setDeptEmployeeOptions(
-          res.data.map((x) => {
+          data.map((x) => {
             return {
               label: `${x.name}`,
               value: x.id || '',
             };
-          }),
-        );
-      }
-    });
+        }),
+      );
+    }
   };
 
   useEffect(() => {
@@ -49,8 +47,8 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
   }, [isOpenModal]);
 
   const fetchTreeData = (deptName?: string) => {
-    getDeptList({ name: deptName }).then((res) => {
-      setTreeData(res.data!);
+    getDeptList({ name: deptName }).then((data) => {
+      setTreeData(data);
     });
   };
 
@@ -75,22 +73,21 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: DeptDto,
-    apiAction: (params: DeptDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: DeptDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateDept : addDept, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: DeptDto) => {
+    if (row?.id) {
+      await updateDept({ ...values, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addDept(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

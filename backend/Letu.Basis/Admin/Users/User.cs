@@ -1,11 +1,11 @@
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
-using Letu.Shared.Enums;
 using FreeSql.DataAnnotations;
+using Letu.Basis.Admin.Roles.Dtos;
+using Letu.Shared.Enums;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Letu.Basis.Admin.Roles.Dtos;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Users
 {
@@ -13,7 +13,7 @@ namespace Letu.Basis.Admin.Users
     /// 用户表
     /// </summary>
     [Table(Name = "sys_user")]
-    public class User : FullAuditedEntity, ITenant
+    public class User : FullAuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 用户名
@@ -80,7 +80,7 @@ namespace Letu.Basis.Admin.Users
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
 
         /// <summary>
         /// 手机号码

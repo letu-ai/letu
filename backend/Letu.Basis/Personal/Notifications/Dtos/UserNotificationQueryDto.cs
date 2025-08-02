@@ -1,6 +1,8 @@
-﻿namespace Letu.Basis.Personal.Notifications.Dtos
+﻿using Letu.Applications;
+
+namespace Letu.Basis.Personal.Notifications.Dtos
 {
-    public class UserNotificationQueryDto : PageSearch
+    public class UserNotificationQueryDto : PagedResultRequest
     {
         public string? Title { get; set; }
 

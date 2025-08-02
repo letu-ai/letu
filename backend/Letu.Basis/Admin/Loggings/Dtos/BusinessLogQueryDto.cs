@@ -1,6 +1,8 @@
-﻿namespace Letu.Basis.Admin.Loggings.Dtos
+﻿using Letu.Applications;
+
+namespace Letu.Basis.Admin.Loggings.Dtos
 {
-    public class BusinessLogQueryDto : PageSearch
+    public class BusinessLogQueryDto : PagedResultRequest
     {
         /// <summary>
         /// 业务类型

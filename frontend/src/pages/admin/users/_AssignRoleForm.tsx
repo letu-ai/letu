@@ -28,8 +28,8 @@ const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
     form.setFieldValue('userName', row.userName);
     form.setFieldValue('nickName', row.nickName);
     getRoleOptions().then(async (roleRes) => {
-      setRoleOptions(roleRes.data);
-      const { data } = await getUserRoleIds(row.id);
+      setRoleOptions(roleRes);
+      const data = await getUserRoleIds(row.id);
       form.setFieldsValue({
         roleIds: data,
       });
@@ -47,12 +47,15 @@ const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
     form.submit();
   };
 
-  const onFinish = (values: AssignRoleDto) => {
-    assignRole({ ...values, userId: currentRow!.id }).then(() => {
-      message.success('分配成功');
-      setIsOpenModal(false);
-      form.resetFields();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+  };
+
+  const onFinish = async (values: AssignRoleDto) => {
+    await assignRole(currentRow!.id, values);
+    handleSuccess('分配成功');
   };
 
   return (

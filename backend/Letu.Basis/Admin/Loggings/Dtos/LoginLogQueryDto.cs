@@ -1,6 +1,8 @@
+using Letu.Applications;
+
 namespace Letu.Basis.Admin.Loggings.Dtos
 {
-    public class LoginLogQueryDto : PageSearch
+    public class LoginLogQueryDto : PagedResultRequest
     {
         /// <summary>
         /// 账号

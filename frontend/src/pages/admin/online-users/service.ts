@@ -1,12 +1,12 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 在线用户列表
  * @param dto
  */
 export function getOnlineUsers(dto: OnlineUserSearchDto) {
-  return httpClient.get<OnlineUserSearchDto, AppResponse<PagedResult<OnlineUserResultDto>>>(
+  return httpClient.get<OnlineUserSearchDto, PagedResult<OnlineUserResultDto>>(
     '/api/admin/online-users',
     {
       params: dto,
@@ -18,11 +18,11 @@ export function getOnlineUsers(dto: OnlineUserSearchDto) {
  * 注销当前会话
  * @param key
  */
-export function onlineUserLogout(key: string) {
-  return httpClient.post<string, AppResponse<boolean>>('/api/admin/online-users/logout?key=' + key);
+export function onlineUserLogout(input: ISessionRevokeInput) {
+  return httpClient.post<ISessionRevokeInput, void>('/api/admin/online-users/revoke', input);
 }
 
-export interface OnlineUserSearchDto extends PageSearch {
+export interface OnlineUserSearchDto extends PagedResultRequest {
   userName?: string;
 }
 
@@ -33,5 +33,10 @@ export interface OnlineUserResultDto {
   address?: string;
   os: string | null;
   creationTime: string;
+  sessionId: string;
+}
+
+export interface ISessionRevokeInput {
+  userId: string;
   sessionId: string;
 }

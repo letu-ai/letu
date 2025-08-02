@@ -134,7 +134,7 @@ const UserTable = () => {
         columns={columns}
         ref={tableRef}
         request={async (params) => {
-          const { data } = await getUserList(params);
+          const data = await getUserList(params);
           return data;
         }}
         searchItems={

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\common.props" />
 
@@ -8,6 +8,9 @@
 		<PackageReference Include="FreeSql.DbContext" />
 		<PackageReference Include="FreeSql.Provider.PostgreSQL" />
 		<PackageReference Include="FreeSql.Cloud" />
+		<PackageReference Include="Volo.Abp.Core" />
+		<PackageReference Include="Volo.Abp.Ddd.Domain" />
+		<PackageReference Include="Volo.Abp.MultiTenancy" />
 	</ItemGroup>
 
 	<ItemGroup>

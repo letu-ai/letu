@@ -1,30 +1,35 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users.Dtos;
 using Letu.Basis.SharedService;
-using Letu.Core.Interfaces;
-using Letu.Core.Utils;
-using Letu.Logger;
+using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Letu.Shared.Enums;
 using Letu.Shared.Generated;
+using Letu.Utils;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
+using Volo.Abp.Guids;
 
 namespace Letu.Basis.Admin.Users
 {
-    public class UserAppService : IUserAppService
+    public class UserAppService : ApplicationService, IUserAppService
     {
-        private readonly IRepository<User> _userRepository;
-        private readonly IRepository<UserInRole> _userRoleRepository;
+        private readonly IFreeSqlRepository<User> _userRepository;
+        private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
         private readonly IdentitySharedService _identityDomainService;
-        private readonly ICurrentUser _currentUser;
+        private readonly IOperationLogManager operationLogManager;
 
-        public UserAppService(IRepository<User> userRepository, IRepository<UserInRole> userRoleRepository
-            , IdentitySharedService identityDomainService, ICurrentUser currentUser)
+        public UserAppService(IFreeSqlRepository<User> userRepository,
+            IFreeSqlRepository<UserInRole> userRoleRepository,
+            IdentitySharedService identityDomainService,
+            IOperationLogManager operationLogManager)
         {
             _userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
             _identityDomainService = identityDomainService;
-            _currentUser = currentUser;
+            this.operationLogManager = operationLogManager;
         }
 
         public async Task<Guid> AddUserAsync(UserDto dto)
@@ -38,9 +43,8 @@ namespace Letu.Basis.Admin.Users
             {
                 throw new BusinessException(message: "密码格式不正确");
             }
-            var user = new User
+            var user = new User()
             {
-                Id = Guid.NewGuid(),
                 UserName = dto.UserName,
                 PasswordSalt = EncryptionUtils.GetPasswordSalt(),
                 Avatar = dto.Avatar,
@@ -53,22 +57,22 @@ namespace Letu.Basis.Admin.Users
             {
                 user.Avatar = user.Sex == SexType.Male ? AdminConsts.AvatarMale : AdminConsts.AvatarFemale;
             }
-            user.Password = EncryptionUtils.GenEncodingPassword(dto.Password, user.PasswordSalt);
-            await _userRepository.InsertAsync(user);
+            user.Password = EncryptionUtils.CalcPasswordHash(dto.Password, user.PasswordSalt);
+            user = await _userRepository.InsertAsync(user);
             return user.Id;
         }
 
-        public async Task<bool> AssignRoleAsync(AssignRoleDto dto)
+        public async Task<bool> AssignRoleAsync(Guid userId, AssignRoleDto input)
         {
-            await _userRoleRepository.DeleteAsync(x => x.UserId == dto.UserId);
-            if (dto.RoleIds != null)
+            await _userRoleRepository.DeleteAsync(x => x.UserId == userId);
+            if (input.RoleIds != null)
             {
                 var items = new List<UserInRole>();
-                foreach (var item in dto.RoleIds)
+                foreach (var item in input.RoleIds)
                 {
                     items.Add(new UserInRole
                     {
-                        UserId = dto.UserId,
+                        UserId = userId,
                         RoleId = item
                     });
                 }
@@ -82,7 +86,7 @@ namespace Letu.Basis.Admin.Users
 
         public async Task<bool> DeleteUserAsync(Guid id)
         {
-            if (_currentUser.Id == id)
+            if (CurrentUser.Id == id)
             {
                 throw new BusinessException(message: "不能删除自己");
             }
@@ -122,7 +126,7 @@ namespace Letu.Basis.Admin.Users
             return true;
         }
 
-        [AsyncLogRecord(LogRecordConsts.SysUser, LogRecordConsts.SysUserResetPwdSubType, "{{id}}", LogRecordConsts.SysUserResetPwdContent)]
+        [OperationLog(LogRecordConsts.SysUser, LogRecordConsts.SysUserResetPwdSubType, "{{id}}", LogRecordConsts.SysUserResetPwdContent)]
         public async Task ResetUserPasswordAsync(ResetUserPwdDto dto)
         {
             var user = await _userRepository.Where(x => x.Id == dto.UserId).FirstAsync();
@@ -132,11 +136,11 @@ namespace Letu.Basis.Admin.Users
             }
 
             user.PasswordSalt = EncryptionUtils.GetPasswordSalt();
-            user.Password = EncryptionUtils.GenEncodingPassword(dto.Password!, user.PasswordSalt);
+            user.Password = EncryptionUtils.CalcPasswordHash(dto.Password!, user.PasswordSalt);
             await _userRepository.UpdateAsync(user);
 
-            LogRecordContext.PutVariable("id", user.Id);
-            LogRecordContext.PutVariable("userName", user.UserName);
+            operationLogManager.Current?.AddVariable("id", user.Id);
+            operationLogManager.Current?.AddVariable("userName", user.UserName);
         }
 
         public Task<List<UserSimpleInfoDto>> GetUserSimpleInfosAsync(string? keyword)

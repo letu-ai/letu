@@ -154,8 +154,8 @@ const BusinessLogList: React.FC = () => {
         columns={columns}
         rowKey="id"
         ref={tableRef}
-        request={async (params) => {
-          const { data } = await getExceptionLogList(params);
+      request={async (params) => {
+          const data = await getExceptionLogList(params);
           return data;
         }}
         searchItems={

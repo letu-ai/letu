@@ -1,4 +1,4 @@
-﻿import { readed, getMyNotificationList, type MyNotificationListDto } from './service';
+﻿﻿import { readed, getMyNotificationList, type MyNotificationListDto } from './service';
 import { CheckOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Select, Tag } from 'antd';
 import React, { useRef } from 'react';
@@ -54,11 +54,9 @@ const NotificationList: React.FC = () => {
   ];
 
   const batchReaded = (ids: string[]) => {
-    readed(ids).then((res) => {
-      if (res.code === ErrorCode.Success) {
-        message.success('已读成功');
-        tableRef?.current?.reload();
-      }
+    readed(ids).then(() => {
+      message.success('已读成功');
+      tableRef?.current?.reload();
     });
   };
 
@@ -70,7 +68,7 @@ const NotificationList: React.FC = () => {
         selection
         rowKey="id"
         request={async (params) => {
-          const { data } = await getMyNotificationList(params);
+          const data = await getMyNotificationList(params);
           return data;
         }}
         searchItems={[

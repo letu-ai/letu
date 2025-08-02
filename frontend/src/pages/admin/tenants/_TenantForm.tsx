@@ -1,6 +1,5 @@
 import { Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import { addTenant, type TenantDto, updateTenant } from './service';
 import useApp from 'antd/es/app/useApp';
 
@@ -42,22 +41,21 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: TenantDto,
-    apiAction: (params: TenantDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: TenantDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateTenant : addTenant, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: TenantDto) => {
+    if (row?.id) {
+      await updateTenant(row.id, values);
+      handleSuccess('编辑成功');
+    } else {
+      await addTenant(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

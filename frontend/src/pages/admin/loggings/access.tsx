@@ -172,7 +172,7 @@ const BusinessLogList: React.FC = () => {
         columns={columns}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getApiAccessLogList(params);
+          const data = await getApiAccessLogList(params);
           return data;
         }}
         searchItems={

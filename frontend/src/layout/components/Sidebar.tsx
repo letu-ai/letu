@@ -1,6 +1,6 @@
 import { Menu } from 'antd';
 import UserStore from '@/store/userStore.ts';
-import type { FrontendMenu } from '@/pages/accounts/service';
+import type { IFrontendMenu } from '@/pages/accounts/service';
 import { Link } from 'react-router-dom';
 import React, { useMemo } from 'react';
 import ProIcon from '@/components/ProIcon';
@@ -23,11 +23,11 @@ const Sidebar = observer(() => {
   const activeKey = useSelector(selectActiveKey);
   const collapsed = useSelector(selectCollapsed);
 
-  const addTab = (menu: FrontendMenu) => {
+  const addTab = (menu: IFrontendMenu) => {
     dispatch(open(menu.path));
   };
 
-  function convertToAntdMenuItems(menus: FrontendMenu[]) {
+  function convertToAntdMenuItems(menus: IFrontendMenu[]) {
     return menus
       .filter((menu) => menu.display)
       .map((menu) => {

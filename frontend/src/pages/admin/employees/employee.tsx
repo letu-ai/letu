@@ -102,7 +102,7 @@ const EmployeeList: React.FC = () => {
         rowKey="id"
         ref={tableRef}
         request={async (params) => {
-          const { data } = await getEmployeePagedList(params);
+          const data = await getEmployeePagedList(params);
           return data;
         }}
         searchItems={[

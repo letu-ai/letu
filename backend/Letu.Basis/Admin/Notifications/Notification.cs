@@ -1,13 +1,13 @@
-﻿using Letu.Repository.BaseEntity;
-using Letu.Core.Interfaces;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Notifications
 {
     [Table(Name = "sys_notification")]
-    public class Notification : AuditedEntity, ITenant
+    public class Notification : AuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 通知标题
@@ -51,6 +51,6 @@ namespace Letu.Basis.Admin.Notifications
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

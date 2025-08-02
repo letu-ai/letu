@@ -1,17 +1,17 @@
 import httpClient from '@/utils/httpClient';
-import type { AppOption, AppResponse, PageSearch, PagedResult } from '@/types/api';
+import type { AppOption, PagedResultRequest, PagedResult } from '@/types/api';
 
 /**
  * 登录日志分页列表
  * @param dto
  */
 export function getLoginLogList(dto: LoginLogQueryDto) {
-  return httpClient.get<LoginLogQueryDto, AppResponse<PagedResult<LoginLogListDto>>>('/api/admin/logs/security', {
+  return httpClient.get<LoginLogQueryDto, PagedResult<LoginLogListDto>>('/api/admin/logs/security', {
     params: dto,
   });
 }
 
-export interface LoginLogQueryDto extends PageSearch {
+export interface LoginLogQueryDto extends PagedResultRequest {
   userName?: string | null;
   status?: number;
   address?: string | null;
@@ -36,7 +36,7 @@ export interface LoginLogListDto {
  * @param dto
  */
 export function getBusinessLogList(dto: BusinessLogQueryDto) {
-  return httpClient.get<BusinessLogQueryDto, AppResponse<PagedResult<BusinessLogListDto>>>('/api/admin/logs/business', {
+  return httpClient.get<BusinessLogQueryDto, PagedResult<BusinessLogListDto>>('/api/admin/logs/business', {
     params: dto,
   });
 }
@@ -46,12 +46,12 @@ export function getBusinessLogList(dto: BusinessLogQueryDto) {
  * @param type
  */
 export function getBusinessTypeOptions(type?: string | null) {
-  return httpClient.get<string, AppResponse<AppOption[]>>('/api/admin/logs/business/type-options', {
+  return httpClient.get<string, AppOption[]>('/api/admin/logs/business/type-options', {
     params: type,
   });
 }
 
-export interface BusinessLogQueryDto extends PageSearch {
+export interface BusinessLogQueryDto extends PagedResultRequest {
   type?: string;
   subType?: string;
   content?: string;
@@ -75,7 +75,7 @@ export interface BusinessLogListDto {
  * @param dto
  */
 export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
-  return httpClient.get<ApiAccessLogQueryDto, AppResponse<PagedResult<ApiAccessLogListDto[]>>>(
+  return httpClient.get<ApiAccessLogQueryDto, PagedResult<ApiAccessLogListDto[]>>(
     '/api/admin/logs/access',
     {
       params: dto,
@@ -88,7 +88,7 @@ export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
  * @param dto
  */
 export function getExceptionLogList(dto: ExceptionLogQueryDto) {
-  return httpClient.get<ExceptionLogQueryDto, AppResponse<PagedResult<ExceptionLogListDto[]>>>(
+  return httpClient.get<ExceptionLogQueryDto, PagedResult<ExceptionLogListDto[]>>(
     '/api/admin/logs/exception',
     {
       params: dto,
@@ -101,10 +101,10 @@ export function getExceptionLogList(dto: ExceptionLogQueryDto) {
  * @param exceptionId
  */
 export function handleException(exceptionId: string) {
-  return httpClient.post<string, AppResponse<boolean>>(`/api/admin/logs/exception/${exceptionId}/handled`);
+  return httpClient.post<string, void>(`/api/admin/logs/exception/${exceptionId}/handled`);
 }
 
-export interface ApiAccessLogQueryDto extends PageSearch {
+export interface ApiAccessLogQueryDto extends PagedResultRequest {
   userName?: string;
   path?: string;
 }
@@ -147,6 +147,6 @@ export interface ExceptionLogListDto {
   creationTime: string;
 }
 
-export interface ExceptionLogQueryDto extends PageSearch {
+export interface ExceptionLogQueryDto extends PagedResultRequest {
   userName?: string;
 }

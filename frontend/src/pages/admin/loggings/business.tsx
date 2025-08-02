@@ -79,8 +79,8 @@ const BusinessLogList: React.FC = () => {
   ];
 
   const fetchTypeOptions = (type?: string | null) => {
-    getBusinessTypeOptions(type).then((res) => {
-      setTypeOptions(res.data);
+    getBusinessTypeOptions(type).then((data) => {
+      setTypeOptions(data);
     });
   };
 
@@ -92,8 +92,8 @@ const BusinessLogList: React.FC = () => {
     <SmartTable
       columns={columns}
       rowKey="id"
-      request={async (params) => {
-        const { data } = await getBusinessLogList(params);
+        request={async (params) => {
+        const data = await getBusinessLogList(params);
         return data;
       }}
       searchItems={

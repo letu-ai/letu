@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Letu.Logger;
+using Letu.Logging;
 
 namespace Letu.Basis.Admin.OnlineUsers.Dtos
 {

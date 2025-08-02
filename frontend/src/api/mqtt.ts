@@ -1,12 +1,11 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse } from '@/types/api';
+import httpClient from '@/utils/httpClient';
 
 /**
  * 获取MQTT访问令牌
  * @param code
  */
 export function getMqttToken(code: string) {
-  return httpClient.post<string, AppResponse<MqttToken>>('/api/mqtt/getMqttToken?code=' + code);
+  return httpClient.post<string, MqttToken>('/api/mqtt/getMqttToken?code=' + code);
 }
 
 export interface MqttToken {

@@ -1,21 +1,21 @@
-﻿using Letu.Basis.Admin.OnlineUsers.Dtos;
-using Letu.Core.Interfaces;
-using Letu.Logger.Entities;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.OnlineUsers.Dtos;
+using Letu.Logging.Entities;
 using Letu.Repository;
+using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Entities;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public class MonitorLogService : IMonitorLogService, IScopedDependency
+    public class MonitorLogService : ApplicationService, IMonitorLogService
     {
-        private readonly IRepository<ApiAccessLogDO> _apiAccessRepository;
-        private readonly IRepository<ExceptionLogDO> _exceptionLogRepository;
-        private readonly ICurrentUser _currentUser;
+        private readonly IFreeSqlRepository<ApiAccessLog> _apiAccessRepository;
+        private readonly IFreeSqlRepository<ExceptionLog> _exceptionLogRepository;
 
-        public MonitorLogService(IRepository<ApiAccessLogDO> apiAccessRepository, IRepository<ExceptionLogDO> exceptionLogRepository, ICurrentUser currentUser)
+        public MonitorLogService(IFreeSqlRepository<ApiAccessLog> apiAccessRepository, IFreeSqlRepository<ExceptionLog> exceptionLogRepository)
         {
             _apiAccessRepository = apiAccessRepository;
             _exceptionLogRepository = exceptionLogRepository;
-            _currentUser = currentUser;
         }
 
         public async Task<PagedResult<ApiAccessLogListDto>> GetApiAccessLogListAsync(ApiAccessLogQueryDto dto)
@@ -46,7 +46,7 @@ namespace Letu.Basis.Admin.Loggings
             var entity = await _exceptionLogRepository.OneAsync(x => x.Id == exceptionId);
             if (entity == null) throw new EntityNotFoundException();
             entity.IsHandled = true;
-            entity.HandledBy = _currentUser.UserName;
+            entity.HandledBy = CurrentUser.UserName;
             entity.HandledTime = DateTime.Now;
             await _exceptionLogRepository.UpdateAsync(entity);
         }

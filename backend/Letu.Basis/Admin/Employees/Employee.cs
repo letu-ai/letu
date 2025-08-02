@@ -1,10 +1,10 @@
-using Letu.Repository.BaseEntity;
-using Letu.Core.Interfaces;
 using FreeSql.DataAnnotations;
+using Letu.Shared.Enums;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Letu.Shared.Enums;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Employees
 {
@@ -12,7 +12,7 @@ namespace Letu.Basis.Admin.Employees
     /// 员工表
     /// </summary>
     [Table(Name = "org_employee")]
-    public class Employee : FullAuditedEntity, ITenant
+    public class Employee : FullAuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 工号
@@ -123,6 +123,6 @@ namespace Letu.Basis.Admin.Employees
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

@@ -122,7 +122,7 @@ const DictList: React.FC = () => {
         rowKey="id"
         selection
         request={async (params) => {
-          const { data } = await getDictTypeList(params);
+          const data = await getDictTypeList(params);
           return data;
         }}
         searchItems={[

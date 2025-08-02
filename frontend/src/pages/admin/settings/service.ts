@@ -1,12 +1,12 @@
-import httpClient from '@/utils/httpClient.ts';
-import type { AppResponse, PagedResult, PageSearch } from '@/types/api';
+import httpClient from '@/utils/httpClient';
+import type { PagedResult, PagedResultRequest } from '@/types/api';
 
 /**
  * 新增配置
  * @param dto
  */
 export function addConfig(dto: ConfigDto) {
-  return httpClient.post<ConfigDto, AppResponse<boolean>>('/api/admin/settings', dto);
+  return httpClient.post<ConfigDto, void>('/api/admin/settings', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addConfig(dto: ConfigDto) {
  * @param dto
  */
 export function getConfigList(dto: ConfigQueryDto) {
-  return httpClient.get<ConfigQueryDto, AppResponse<PagedResult<ConfigListDto>>>('/api/admin/settings', { params: dto });
+  return httpClient.get<ConfigQueryDto, PagedResult<ConfigListDto>>('/api/admin/settings', { params: dto });
 }
 
 /**
@@ -22,7 +22,7 @@ export function getConfigList(dto: ConfigQueryDto) {
  * @param dto
  */
 export function updateConfig(dto: ConfigDto) {
-  return httpClient.put<ConfigDto, AppResponse<boolean>>('/api/admin/settings', dto);
+  return httpClient.put<ConfigDto, void>('/api/admin/settings', dto);
 }
 
 /**
@@ -30,7 +30,7 @@ export function updateConfig(dto: ConfigDto) {
  * @param id
  */
 export function deleteConfig(id: string) {
-  return httpClient.delete<string, AppResponse<boolean>>(`/api/config/delete/${id}`);
+  return httpClient.delete<string, void>(`/api/config/delete/${id}`);
 }
 
 export interface ConfigDto {
@@ -53,6 +53,6 @@ export interface ConfigListDto {
   lastModificationTime: string;
 }
 
-export interface ConfigQueryDto extends PageSearch {
+export interface ConfigQueryDto extends PagedResultRequest {
   key?: string;
 }

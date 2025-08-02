@@ -1,6 +1,8 @@
-﻿namespace Letu.Basis.Admin.OnlineUsers.Dtos
+﻿using Letu.Applications;
+
+namespace Letu.Basis.Admin.OnlineUsers.Dtos
 {
-    public class ApiAccessLogQueryDto : PageSearch
+    public class ApiAccessLogQueryDto : PagedResultRequest
     {
         public string? UserName { get; set; }
         public string? Path { get; set; }

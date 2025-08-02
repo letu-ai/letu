@@ -16,7 +16,7 @@ namespace Letu.Basis.Filters
                 var error = context.ModelState.Where(x => x.Value != null && x.Value.Errors != null && x.Value.Errors.Count > 0).FirstOrDefault().Value!.Errors.FirstOrDefault();
                 if (error != null)
                 {
-                    context.Result = new ObjectResult(Result.Fail(error.ErrorMessage));
+                    //context.Result = new ObjectResult(Result.Fail(error.ErrorMessage));
                     return;
                 }
             }

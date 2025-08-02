@@ -1,36 +1,43 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Letu.Core.Authorization;
-using Letu.Core.Interfaces;
-using Letu.Redis;
+﻿using FreeSql;
+using Letu.Basis.Admin.Menus;
+using Letu.Basis.Admin.Roles;
+using Letu.Basis.Admin.Roles.Dtos;
+using Letu.Basis.Admin.Users;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Letu.Shared.Enums;
 using Letu.Shared.Keys;
-
-using FreeSql;
-
+using Letu.Shared.Models;
 using Microsoft.IdentityModel.Tokens;
-using Letu.Basis.Admin.Roles;
-using Letu.Basis.Admin.Users;
-using Letu.Basis.Admin.Menus;
-using Letu.Basis.Admin.Roles.Dtos;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Volo.Abp.Caching;
+using Volo.Abp.DependencyInjection;
 
 namespace Letu.Basis.SharedService
 {
-    public class IdentitySharedService : IScopedDependency
+    public class IdentitySharedService : ITransientDependency
     {
-        private readonly IRepository<UserInRole> _userRoleRepository;
-        private readonly IRepository<MenuInRole> _roleMenuRepository;
-        private readonly IRepository<Role> _roleRepository;
-        private readonly IRepository<MenuItem> _menuRepository;
+        private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
+        private readonly IFreeSqlRepository<MenuInRole> _roleMenuRepository;
+        private readonly IFreeSqlRepository<Role> _roleRepository;
+        private readonly IFreeSqlRepository<MenuItem> _menuRepository;
         private readonly IConfiguration _configuration;
-        private readonly IRepository<User> _userRepository;
-        private readonly IHybridCache _hybridCache;
+        private readonly IFreeSqlRepository<User> _userRepository;
+        private readonly IDistributedCache<UserPermission> permissionCache;
+        private readonly IDistributedCache<string> _accessTokenCache;
+        private readonly IDistributedCache<string> _refreshTokenCache;
 
-        public IdentitySharedService(IRepository<UserInRole> userRoleRepository, IRepository<MenuInRole> roleMenuRepository, IRepository<Role> roleRepository,
-            IRepository<MenuItem> menuRepository, IConfiguration configuration, IRepository<User> userRepository, IHybridCache hybridCache)
+        public IdentitySharedService(IFreeSqlRepository<UserInRole> userRoleRepository,
+            IFreeSqlRepository<MenuInRole> roleMenuRepository,
+            IFreeSqlRepository<Role> roleRepository,
+            IFreeSqlRepository<MenuItem> menuRepository,
+            IConfiguration configuration,
+            IFreeSqlRepository<User> userRepository,
+            IDistributedCache<UserPermission> permissionCache,
+            IDistributedCache<string> accessTokenCache,
+            IDistributedCache<string> refreshTokenCache)
         {
             _userRoleRepository = userRoleRepository;
             _roleMenuRepository = roleMenuRepository;
@@ -38,7 +45,9 @@ namespace Letu.Basis.SharedService
             _menuRepository = menuRepository;
             _configuration = configuration;
             _userRepository = userRepository;
-            _hybridCache = hybridCache;
+            this.permissionCache = permissionCache;
+            _accessTokenCache = accessTokenCache;
+            _refreshTokenCache = refreshTokenCache;
         }
 
         /// <summary>
@@ -49,9 +58,9 @@ namespace Letu.Basis.SharedService
         public async Task<UserPermission> GetUserPermissionAsync(Guid userId)
         {
             var key = SystemCacheKey.UserPermission(userId);
-            if (await _hybridCache.ExistsAsync(key))
+            var cacheValue = await permissionCache.GetAsync(key);
+            if (cacheValue != null)
             {
-                var cacheValue = await _hybridCache.GetAsync<UserPermission>(key);
                 return cacheValue!;
             }
 
@@ -73,7 +82,7 @@ namespace Letu.Basis.SharedService
                 MenuIds = [.. menuIds],
                 IsSuperAdmin = isSuperAdmin
             };
-            await _hybridCache.SetAsync(key, rs);
+            await permissionCache.SetAsync(key, rs);
             return rs;
         }
 
@@ -98,21 +107,7 @@ namespace Letu.Basis.SharedService
         /// <returns></returns>
         public Task DelUserPermissionCacheByUserIdAsync(Guid userId)
         {
-            return _hybridCache.RemoveAsync(SystemCacheKey.UserPermission(userId));
-        }
-
-        /// <summary>
-        /// 检查Token是否存在
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="sessionId"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckTokenAsync(string userId, string sessionId, string token)
-        {
-            string key = SystemCacheKey.AccessToken(userId, sessionId);
-            var existToken = await _hybridCache.GetAsync<string>(key);
-            return existToken == token;
+            return permissionCache.RemoveAsync(SystemCacheKey.UserPermission(userId));
         }
 
         /// <summary>
@@ -186,7 +181,7 @@ namespace Letu.Basis.SharedService
         /// <returns></returns>
         public Task<bool> UserIsFromMainDbAsync(string id)
         {
-            TenantManager.SetCurrent("");
+            // TODO: 需要将当前租户切换到Host
             return _userRepository.Select.AnyAsync(x => x.Id.ToString() == id);
         }
     }

@@ -1,28 +1,27 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse } from '@/types/api';
 
 /**
  * 新增菜单
- * @param dto
+ * @param input
  */
-export function addMenu(dto: MenuDto) {
-  return httpClient.post<MenuDto, AppResponse<boolean>>('/api/admin/menus', dto);
+export function addMenu(input: MenuDto) {
+  return httpClient.post<MenuDto, void>('/api/admin/menus', input);
 }
 
 /**
  * 菜单树形列表
- * @param dto
+ * @param input
  */
-export function getMenuList(dto: MenuQueryDto) {
-  return httpClient.get<MenuQueryDto, AppResponse<MenuListDto[]>>('/api/admin/menus', { params: dto });
+export function getMenuList(input: MenuQueryDto) {
+  return httpClient.get<MenuQueryDto, MenuListDto[]>('/api/admin/menus', { params: input });
 }
 
 /**
  * 修改菜单
- * @param dto
+ * @param input
  */
-export function updateMenu(dto: MenuDto) {
-  return httpClient.put<MenuDto, AppResponse<boolean>>('/api/admin/menus', dto);
+export function updateMenu(id: string, input: MenuDto) {
+  return httpClient.put<MenuDto, void>(`/api/admin/menus/${id}`, input);
 }
 
 /**
@@ -30,7 +29,7 @@ export function updateMenu(dto: MenuDto) {
  * @param ids
  */
 export function deleteMenu(ids: string[]) {
-  return httpClient.delete<string[], AppResponse<boolean>>('/api/admin/menus', {
+  return httpClient.delete<string[], void>('/api/admin/menus', {
     data: ids,
   });
 }
@@ -41,7 +40,7 @@ export function deleteMenu(ids: string[]) {
  * @param keyword
  */
 export function getMenuOptions(onlyMenu: boolean, keyword?: string) {
-  return httpClient.get<number, AppResponse<MenuOptionResultDto>>('/api/admin/menus/menu-options', {
+  return httpClient.get<number, MenuOptionResultDto>('/api/admin/menus/menu-options', {
     params: {
       onlyMenu: onlyMenu,
       keyword: keyword,

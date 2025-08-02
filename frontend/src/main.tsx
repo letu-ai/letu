@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './store';
 import { PersistGate } from 'redux-persist/integration/react';
 
+// 屏蔽Ant Design 组件的findDOMNode警告
 // 保存原始 console.error
 const originalError = window.console.error;
 // 覆盖 console.error

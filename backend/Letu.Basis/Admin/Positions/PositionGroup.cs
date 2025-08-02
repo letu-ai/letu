@@ -1,10 +1,8 @@
+using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
-
-using FreeSql.DataAnnotations;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -12,7 +10,7 @@ namespace Letu.Basis.Admin.Positions
     /// 职位分组
     /// </summary>
     [Table(Name = "org_position_group")]
-    public class PositionGroup : AuditedEntity, ITenant
+    public class PositionGroup : AuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 分组名
@@ -53,7 +51,7 @@ namespace Letu.Basis.Admin.Positions
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
 
         [Navigate(nameof(ParentId))]
         public PositionGroup? Parent { get; set; }

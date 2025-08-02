@@ -1,15 +1,9 @@
-export type AppResponse<T> = {
-  code: string;
-  message: string;
-  data: T
-}
-
 export type PagedResult<T> = {
   items: T[];
   totalCount: number;
 }
 
-export type PageSearch = {
+export type PagedResultRequest = {
   pageSize: number;
   current: number;
 }

@@ -1,6 +1,8 @@
-﻿namespace Letu.Basis.Admin.DataDictionary.Dtos;
+﻿using Letu.Applications;
 
-public class DictTypeSearchDto : PageSearch
+namespace Letu.Basis.Admin.DataDictionary.Dtos;
+
+public class DictTypeSearchDto : PagedResultRequest
 {
     public string? Name { get; set; }
 

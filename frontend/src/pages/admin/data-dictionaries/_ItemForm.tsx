@@ -1,6 +1,5 @@
 import { Form, Input, InputNumber, Modal, Switch } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import { addDictData, type DictDataDto, updateDictData } from './service';
 import { useParams } from 'react-router-dom';
 import useApp from 'antd/es/app/useApp';
@@ -46,27 +45,28 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: DictDataDto,
-    apiAction: (params: DictDataDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: DictDataDto) => {
+
+  const onFinish = async (values: DictDataDto) => {
     if (!urlParams?.type) {
       message.error('字典类型不能为空');
       return;
     }
-    const isEdit = !!row?.id;
 
-    values.dictType = urlParams!.type;
-    execute(values, isEdit ? updateDictData : addDictData, isEdit ? '编辑成功' : '新增成功');
+    values.dictType = urlParams.type;
+    
+    if (row?.id) {
+      await updateDictData({ ...values, id: row.id });
+      handleSuccess('编辑成功');
+    } else {
+      await addDictData(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

@@ -1,12 +1,12 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse, AppOptionTree, PageSearch, PagedResult } from '@/types/api';
+import type { AppOptionTree, PagedResultRequest, PagedResult } from '@/types/api';
 
 /**
  * 新增职位分组
  * @param dto
  */
 export function addPositionGroup(dto: PositionGroupDto) {
-  return httpClient.post<PositionGroupDto, AppResponse<boolean>>('/api/admin/positions/groups', dto);
+  return httpClient.post<PositionGroupDto, void>('/api/admin/positions/groups', dto);
 }
 
 /**
@@ -14,7 +14,7 @@ export function addPositionGroup(dto: PositionGroupDto) {
  * @param dto
  */
 export function getPositionGroupList(dto?: PositionGroupQueryDto) {
-  return httpClient.get<PositionGroupQueryDto, AppResponse<PositionGroupListDto[]>>('/api/admin/positions/groups', {
+  return httpClient.get<PositionGroupQueryDto, PositionGroupListDto[]>('/api/admin/positions/groups', {
     params: dto,
   });
 }
@@ -23,8 +23,8 @@ export function getPositionGroupList(dto?: PositionGroupQueryDto) {
  * 修改职位分组
  * @param dto
  */
-export function updatePositionGroup(dto: PositionGroupDto) {
-  return httpClient.put<PositionGroupDto, AppResponse<boolean>>('/api/admin/positions/groups', dto);
+export function updatePositionGroup(id: string, dto: PositionGroupDto) {
+  return httpClient.put<PositionGroupDto, void>(`/api/admin/positions/groups/${id}`, dto);
 }
 
 /**
@@ -32,7 +32,7 @@ export function updatePositionGroup(dto: PositionGroupDto) {
  * @param id
  */
 export function deletePositionGroup(id: string) {
-  return httpClient.delete<AppResponse<boolean>>(`/api/admin/positions/groups/${id}`);
+  return httpClient.delete<void>(`/api/admin/positions/groups/${id}`);
 }
 
 export interface PositionGroupDto {
@@ -56,13 +56,12 @@ export interface PositionGroupListDto {
   positionGroupListDto: PositionGroupDto[];
 }
 
-
 /**
  * 新增职位
  * @param dto
  */
 export function addPosition(dto: PositionDto) {
-  return httpClient.post<PositionDto, AppResponse<boolean>>('/api/admin/positions', dto);
+  return httpClient.post<PositionDto, void>('/api/admin/positions', dto);
 }
 
 /**
@@ -70,7 +69,7 @@ export function addPosition(dto: PositionDto) {
  * @param dto
  */
 export function getPositionList(dto: PositionQueryDto) {
-  return httpClient.get<PositionQueryDto, AppResponse<PagedResult<PositionListDto>>>('/api/admin/positions', {
+  return httpClient.get<PositionQueryDto, PagedResult<PositionListDto>>('/api/admin/positions', {
     params: dto,
   });
 }
@@ -79,8 +78,8 @@ export function getPositionList(dto: PositionQueryDto) {
  * 编辑职位
  * @param dto
  */
-export function updatePosition(dto: PositionDto) {
-  return httpClient.put<PositionDto, AppResponse<boolean>>('/api/admin/positions', dto);
+export function updatePosition(id: string, dto: PositionDto) {
+  return httpClient.put<PositionDto, void>(`/api/admin/positions/${id}`, dto);
 }
 
 /**
@@ -95,7 +94,7 @@ export function deletePosition(id: string) {
  * 职位分组+职位树
  */
 export function getPositionOptions() {
-  return httpClient.get<unknown, AppResponse<AppOptionTree[]>>('/api/admin/positions/tree');
+  return httpClient.get<unknown, AppOptionTree[]>('/api/admin/positions/tree');
 }
 
 export interface PositionDto {
@@ -108,7 +107,7 @@ export interface PositionDto {
   groupId?: string | null;
 }
 
-export interface PositionQueryDto extends PageSearch {
+export interface PositionQueryDto extends PagedResultRequest {
   keyword?: string | null;
   level?: string | null;
   status?: number | null;

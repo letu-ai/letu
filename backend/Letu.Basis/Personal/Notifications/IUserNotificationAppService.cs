@@ -1,6 +1,7 @@
-﻿using Letu.Basis.Personal.Notifications.Dtos;
+﻿using Letu.Applications;
+using Letu.Basis.Personal.Notifications.Dtos;
 
-namespace Letu.Basis.Personal
+namespace Letu.Basis.Personal.Notifications
 {
     public interface IUserNotificationAppService
     {

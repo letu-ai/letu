@@ -9,6 +9,7 @@
 
     <ItemGroup>
 	    <PackageReference Include="Aliyun.OSS.SDK.NetCore" />
+	    <PackageReference Include="Volo.Abp.Core" />
     </ItemGroup>
 
 </Project>

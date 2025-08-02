@@ -1,9 +1,10 @@
-﻿using Letu.Basis.Admin.DataDictionary.Dtos;
-using Letu.Core.Interfaces;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.DataDictionary.Dtos;
+using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.DataDictionary
 {
-    public interface IDataDictionaryAppService : IScopedDependency
+    public interface IDataDictionaryAppService
     {
         Task AddDictTypeAsync(DictTypeDto dto);
 

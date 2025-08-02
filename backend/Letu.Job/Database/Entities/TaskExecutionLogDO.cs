@@ -1,5 +1,5 @@
-﻿using Letu.Repository.BaseEntity;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Letu.Job.Database.Entities
 {
@@ -9,7 +9,7 @@ namespace Letu.Job.Database.Entities
     [Table(Name = "task_execution_logs")]
     [Index("idx_task_key", "task_key")]
     [Index("idx_execution_time", "execution_time")]
-    public class TaskExecutionLogDO : CreationEntity
+    public class TaskExecutionLogDO : CreationAuditedEntity<Guid>
     {
         /// <summary>
         /// 任务KEY

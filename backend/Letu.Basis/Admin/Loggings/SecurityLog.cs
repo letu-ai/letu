@@ -1,8 +1,9 @@
-using Letu.Core.Interfaces;
-using Letu.Repository.BaseEntity;
 using FreeSql.DataAnnotations;
+
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Loggings
 {
@@ -10,7 +11,7 @@ namespace Letu.Basis.Admin.Loggings
     /// 登录日志
     /// </summary>
     [Table(Name = "sys_login_log")]
-    public class SecurityLog : CreationEntity, ITenant
+    public class SecurityLog : CreationAuditedEntity<Guid>, IMultiTenant
     {
         /// <summary>
         /// 账号
@@ -65,6 +66,6 @@ namespace Letu.Basis.Admin.Loggings
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
-        public string? TenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

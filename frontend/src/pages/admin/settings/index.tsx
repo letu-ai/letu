@@ -89,7 +89,7 @@ const ConfigList: React.FC = () => {
         ref={tableRef}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getConfigList(params);
+          const data = await getConfigList(params);
           return data;
         }}
         searchItems={[

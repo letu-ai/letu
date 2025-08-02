@@ -88,8 +88,8 @@ const PositionGroupList: React.FC = () => {
         ref={tableRef}
         columns={columns}
         rowKey="id"
-        request={async (params) => {
-          const { data } = await getPositionGroupList(params);
+      request={async (params) => {
+          const data = await getPositionGroupList(params);
           return {
             items: data,
             totalCount: data.length,

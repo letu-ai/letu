@@ -1,19 +1,19 @@
 import httpClient from '@/utils/httpClient';
-import type { AppResponse, PageSearch, AppOption, PagedResult } from '@/types/api';
+import type { PagedResultRequest, AppOption, PagedResult } from '@/types/api';
 
 /**
  * 新增字典类型
  * @param dto
  */
 export function addDictType(dto: DictTypeDto) {
-  return httpClient.post<DictTypeDto, AppResponse<boolean>>('/api/admin/data-dictionaries/types', dto);
+  return httpClient.post<DictTypeDto, void>('/api/admin/data-dictionaries/types', dto);
 }
 
 /**
  * 分页查询字典类型列表
  */
 export function getDictTypeList(dto: DictTypeSearchDto) {
-  return httpClient.get<DictTypeSearchDto, AppResponse<PagedResult<DictTypeResultDto>>>(
+  return httpClient.get<DictTypeSearchDto, PagedResult<DictTypeResultDto>>(
     '/api/admin/data-dictionaries/types',
     { params: dto },
   );
@@ -24,7 +24,7 @@ export function getDictTypeList(dto: DictTypeSearchDto) {
  * @param dto
  */
 export function updateDictType(dto: DictTypeDto) {
-  return httpClient.put<DictTypeDto, AppResponse<boolean>>('/api/admin/data-dictionaries/types', dto);
+  return httpClient.put<DictTypeDto, void>('/api/admin/data-dictionaries/types', dto);
 }
 
 /**
@@ -32,7 +32,7 @@ export function updateDictType(dto: DictTypeDto) {
  * @param dictType
  */
 export function deleteDictType(dictType: string) {
-  return httpClient.delete<string, AppResponse<boolean>>('/api/admin/data-dictionaries/types/' + dictType);
+  return httpClient.delete<string, void>('/api/admin/data-dictionaries/types/' + dictType);
 }
 
 /**
@@ -40,7 +40,7 @@ export function deleteDictType(dictType: string) {
  * @param ids
  */
 export function deleteDictTypes(ids: string[]) {
-  return httpClient.delete<string[], AppResponse<boolean>>('/api/admin/data-dictionaries/types', {
+  return httpClient.delete<string[], void>('/api/admin/data-dictionaries/types', {
     data: ids,
   });
 }
@@ -51,7 +51,7 @@ export function deleteDictTypes(ids: string[]) {
  * @returns
  */
 export function getDictDataOptions(type: string) {
-  return httpClient.get<string, AppResponse<AppOption[]>>('/api/admin/data-dictionaries/types/type-options?type=' + type);
+  return httpClient.get<string, AppOption[]>('/api/admin/data-dictionaries/types/type-options?type=' + type);
 }
 
 export interface DictTypeDto {
@@ -62,7 +62,7 @@ export interface DictTypeDto {
   remark?: string | null;
 }
 
-export interface DictTypeSearchDto extends PageSearch {
+export interface DictTypeSearchDto extends PagedResultRequest {
   name?: string | null;
   dictType?: string | null;
 }
@@ -75,12 +75,11 @@ export interface DictTypeResultDto {
   remark?: string;
 }
 
-
 /**
  * 新增字典数据
  */
 export function addDictData(dto: DictDataDto) {
-  return httpClient.post<DictDataDto, AppResponse<boolean>>('/api/admin/data-dictionaries', dto);
+  return httpClient.post<DictDataDto, void>('/api/admin/data-dictionaries', dto);
 }
 
 /**
@@ -89,7 +88,7 @@ export function addDictData(dto: DictDataDto) {
  * @returns
  */
 export function getDictDataList(dto: DictDataQueryDto) {
-  return httpClient.get<DictDataQueryDto, AppResponse<PagedResult<DictDataListDto>>>('/api/admin/data-dictionaries', {
+  return httpClient.get<DictDataQueryDto, PagedResult<DictDataListDto>>('/api/admin/data-dictionaries', {
     params: dto,
   });
 }
@@ -98,7 +97,7 @@ export function getDictDataList(dto: DictDataQueryDto) {
  * 修改字典数据
  */
 export function updateDictData(dto: DictDataDto) {
-  return httpClient.put<DictDataDto, AppResponse<boolean>>('/api/admin/data-dictionaries', dto);
+  return httpClient.put<DictDataDto, void>('/api/admin/data-dictionaries', dto);
 }
 
 /**
@@ -107,7 +106,7 @@ export function updateDictData(dto: DictDataDto) {
  * @returns
  */
 export function deleteDictData(ids: string[]) {
-  return httpClient.delete<string[], AppResponse<boolean>>('/api/admin/data-dictionaries', {
+  return httpClient.delete<string[], void>('/api/admin/data-dictionaries', {
     data: ids,
   });
 }
@@ -132,7 +131,7 @@ export interface DictDataListDto {
   isEnabled: boolean;
 }
 
-export interface DictDataQueryDto extends PageSearch {
+export interface DictDataQueryDto extends PagedResultRequest {
   key?: string | null;
   label?: string | null;
   dictType?: string | null;

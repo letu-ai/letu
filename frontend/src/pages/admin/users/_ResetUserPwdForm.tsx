@@ -35,12 +35,15 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
     form.submit();
   };
 
-  const onFinish = (values: ResetUserPwdDto) => {
-    resetUserPwd({ ...values, userId: currentRow!.id }).then(() => {
-      message.success('重置成功');
-      setIsOpenModal(false);
-      form.resetFields();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+  };
+
+  const onFinish = async (values: ResetUserPwdDto) => {
+    await resetUserPwd({ ...values, userId: currentRow!.id });
+    handleSuccess('重置成功');
   };
   const pwdPatternValidateItem = {
     pattern: Patterns.LoginPassword,

@@ -4,6 +4,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Quartz" />
+		<PackageReference Include="Volo.Abp.Ddd.Domain" />
 	</ItemGroup>
 
 	<ItemGroup>

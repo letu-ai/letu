@@ -1,13 +1,15 @@
+using Letu.Applications;
 using Letu.Basis.Admin.Loggings.Dtos;
 using Letu.Repository;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public class SecurityLogAppService : ISecurityLogAppService
+    public class SecurityLogAppService : ApplicationService, ISecurityLogAppService
     {
-        private readonly IRepository<SecurityLog> _loginLogRepository;
+        private readonly IFreeSqlRepository<SecurityLog> _loginLogRepository;
 
-        public SecurityLogAppService(IRepository<SecurityLog> loginLogRepository)
+        public SecurityLogAppService(IFreeSqlRepository<SecurityLog> loginLogRepository)
         {
             _loginLogRepository = loginLogRepository;
         }

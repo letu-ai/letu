@@ -1,6 +1,5 @@
 import { Form, Input, Modal, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import type { AppResponse } from '@/types/api';
 import { addNotification, type NotificationDto, updateNotification } from './service';
 import useApp from 'antd/es/app/useApp';
 import { getDeptEmployeeTree, type DeptEmployeeTreeDto } from '../employees/service';
@@ -32,8 +31,8 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   }, [isOpenModal]);
 
   const fetchTreeData = (employeeName?: string) => {
-    getDeptEmployeeTree({ employeeName: employeeName }).then((res) => {
-      setTreeData(res.data!);
+    getDeptEmployeeTree({ employeeName: employeeName }).then((data) => {
+      setTreeData(data);
     });
   };
 
@@ -57,22 +56,21 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     form.submit();
   };
 
-  const execute = (
-    values: NotificationDto,
-    apiAction: (params: NotificationDto) => Promise<AppResponse<boolean>>,
-    successMsg: string,
-  ) => {
-    apiAction({ ...values, id: row?.id }).then(() => {
-      message.success(successMsg);
-      setIsOpenModal(false);
-      form.resetFields();
-      props?.refresh?.();
-    });
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+    props?.refresh?.();
   };
-  const onFinish = (values: NotificationDto) => {
-    const isEdit = !!row?.id;
 
-    execute(values, isEdit ? updateNotification : addNotification, isEdit ? '编辑成功' : '新增成功');
+  const onFinish = async (values: NotificationDto) => {
+    if (row?.id) {
+      await updateNotification(row.id, values);
+      handleSuccess('编辑成功');
+    } else {
+      await addNotification(values);
+      handleSuccess('新增成功');
+    }
   };
 
   return (

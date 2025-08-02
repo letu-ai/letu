@@ -1,15 +1,18 @@
-﻿using Letu.Basis.Admin.Employees;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Notifications.Dtos;
 using Letu.Repository;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Notifications
 {
-    public class NotificationAppService : INotificationAppService
+    public class NotificationAppService : ApplicationService, INotificationAppService
     {
-        private readonly IRepository<Notification> _repository;
-        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IFreeSqlRepository<Notification> _repository;
+        private readonly IFreeSqlRepository<Employee> _employeeRepository;
 
-        public NotificationAppService(IRepository<Notification> repository, IRepository<Employee> employeeRepository)
+        public NotificationAppService(IFreeSqlRepository<Notification> repository, IFreeSqlRepository<Employee> employeeRepository)
         {
             _repository = repository;
             _employeeRepository = employeeRepository;
@@ -54,9 +57,9 @@ namespace Letu.Basis.Admin.Notifications
             return new PagedResult<NotificationResultDto>(dto, total, list);
         }
 
-        public async Task UpdateNotificationAsync(NotificationDto dto)
+        public async Task UpdateNotificationAsync(Guid id, NotificationDto dto)
         {
-            var entity = await _repository.Where(x => x.Id == dto.Id).FirstAsync();
+            var entity = await _repository.Where(x => x.Id == id).FirstAsync();
             if (entity.IsReaded)
             {
                 throw new BusinessException(message: "已读消息不能修改");

@@ -1,71 +1,74 @@
-﻿using Letu.Basis.Admin.Tenants.Dtos;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.Tenants.Dtos;
 using Letu.Repository;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Tenants
 {
-    public class TenantAppService : ITenantAppService
+    public class TenantAppService : ApplicationService, ITenantAppService
     {
-        private readonly IRepository<Tenant> _tenantRepository;
+        private readonly IFreeSqlRepository<Tenant> tenantRepository;
 
-        public TenantAppService(IRepository<Tenant> tenantRepository)
+        public TenantAppService(IFreeSqlRepository<Tenant> tenantRepository)
         {
-            _tenantRepository = tenantRepository;
+            this.tenantRepository = tenantRepository;
         }
 
-        public async Task AddTenantAsync(TenantDto dto)
+        public async Task AddTenantAsync(TenantCreateOrUpdateInput input)
         {
-            if (await _tenantRepository.Select.AnyAsync(x => x.TenantId.ToLower() == dto.TenantId.ToLower()))
+            if (await tenantRepository.Select.AnyAsync(x => x.Name == input.Name))
             {
-                throw new BusinessException($"租户标识[{dto.TenantId}]已存在");
+                throw new BusinessException($"租户名称[{input.Name}]已存在");
             }
 
             var entity = new Tenant()
             {
-                Name = dto.Name,
-                TenantId = dto.TenantId,
-                Remark = dto.Remark,
-                Domain = dto.Domain,
+                Name = input.Name,
+                Remark = input.Remark,
+                Domain = input.Domain,
             };
-            await _tenantRepository.InsertAsync(entity);
+            await tenantRepository.InsertAsync(entity);
         }
 
         public async Task DeleteTenantAsync(Guid tenantId)
         {
-            await _tenantRepository.DeleteAsync(x => x.Id == tenantId);
+            await tenantRepository.DeleteAsync(x => x.Id == tenantId);
         }
 
-        public async Task<PagedResult<TenantResultDto>> GetTenantListAsync(TenantSearchDto dto)
+        public async Task<PagedResult<TenantListOutput>> GetTenantListAsync(TenantListInput dto)
         {
-            var items = await _tenantRepository.Select
-                .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!) || x.TenantId.Contains(dto.Keyword!))
+            var items = await tenantRepository.Select
+                .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!))
                 .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync<TenantResultDto>();
-            return new PagedResult<TenantResultDto>(dto)
+                .ToListAsync<TenantListOutput>();
+            return new PagedResult<TenantListOutput>(dto)
             {
                 TotalCount = total,
                 Items = items
             };
         }
 
-        public async Task UpdateTenantAsync(TenantDto dto)
+        public async Task UpdateTenantAsync(Guid id, TenantCreateOrUpdateInput input)
         {
-            var entity = await _tenantRepository.Where(x => x.Id == dto.Id).FirstAsync();
-
-            var tenantIdLower = dto.TenantId.ToLower();
-            if (await _tenantRepository.Select.AnyAsync(x => x.TenantId.ToLower() == tenantIdLower) 
-                && !tenantIdLower.Equals(entity.TenantId, StringComparison.CurrentCultureIgnoreCase))
+            var entity = await tenantRepository.Where(x => x.Id == id).FirstAsync();
+            if (entity == null)
             {
-                throw new BusinessException($"租户标识[{dto.TenantId}]已存在");
+                throw new BusinessException(message: $"租户不存在");
             }
 
-            entity.Name = dto.Name;
-            entity.TenantId = dto.TenantId;
-            entity.Remark = dto.Remark;
-            entity.Domain = dto.Domain;
+            if (await tenantRepository.Select.AnyAsync(x => x.Id != id && x.Name == input.Name))
+            {
+                throw new BusinessException(message: $"租户名称[{input.Name}]已存在");
+            }
 
-            await _tenantRepository.UpdateAsync(entity);
+            entity.Name = input.Name;
+            entity.Remark = input.Remark;
+            entity.Domain = input.Domain;
+
+            await tenantRepository.UpdateAsync(entity);
         }
     }
 }

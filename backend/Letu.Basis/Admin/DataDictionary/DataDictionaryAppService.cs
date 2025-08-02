@@ -1,23 +1,33 @@
-﻿using Letu.Basis.Admin.DataDictionary.Dtos;
+﻿using Letu.Applications;
+using Letu.Basis.Admin.DataDictionary.Dtos;
 using Letu.Core.Helpers;
-using Letu.Logger;
+using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
+using Letu.Shared.Models;
+using Volo.Abp;
+using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Entities;
 
 namespace Letu.Basis.Admin.DataDictionary;
 
-public class DataDictionaryAppService : IDataDictionaryAppService
+public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppService
 {
-    private readonly IRepository<DictionaryType> _dictTypeRepository;
-    private readonly IRepository<DictionaryItem> _dictDataRepository;
+    private readonly IFreeSqlRepository<DictionaryType> _dictTypeRepository;
+    private readonly IFreeSqlRepository<DictionaryItem> _dictDataRepository;
+    private readonly IOperationLogManager operationLogManager;
 
-    public DataDictionaryAppService(IRepository<DictionaryType> dictTypeRepository, IRepository<DictionaryItem> dictDataRepository)
+    public DataDictionaryAppService(
+        IFreeSqlRepository<DictionaryType> dictTypeRepository,
+        IFreeSqlRepository<DictionaryItem> dictDataRepository,
+        IOperationLogManager operationLogManager)
     {
         _dictTypeRepository = dictTypeRepository;
         _dictDataRepository = dictDataRepository;
+        this.operationLogManager = operationLogManager;
     }
 
-    [AsyncLogRecord(LogRecordConsts.SysDictType, LogRecordConsts.SysDictAddSubType, "{{dict.Id}}", LogRecordConsts.SysDictAddContent)]
+    [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictAddSubType, "{{dict.Id}}", LogRecordConsts.SysDictAddContent)]
     public async Task AddDictTypeAsync(DictTypeDto dto)
     {
         if (await _dictTypeRepository.Select.AnyAsync(x => x.DictType.ToLower() == dto.DictType.ToLower()))
@@ -33,19 +43,19 @@ public class DataDictionaryAppService : IDataDictionaryAppService
             Remark = dto.Remark
         };
 
-        LogRecordContext.PutVariable("dict", entity);
+        operationLogManager.Current?.AddVariable("dict", entity);
 
         await _dictTypeRepository.InsertAsync(entity);
     }
 
-    [AsyncLogRecord(LogRecordConsts.SysDictType, LogRecordConsts.SysDictDeleteSubType, "{{dict.Id}}", LogRecordConsts.SysDictDeleteContent)]
+    [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictDeleteSubType, "{{dict.Id}}", LogRecordConsts.SysDictDeleteContent)]
     public async Task DeleteDictTypeAsync(string dictType)
     {
         var dict = await _dictDataRepository.OneAsync(x => x.DictType.ToLower() == dictType.ToLower()) ?? throw new EntityNotFoundException();
         await _dictDataRepository.DeleteAsync(x => x.DictType == dictType);
         await _dictTypeRepository.DeleteAsync(x => x.DictType == dictType);
 
-        LogRecordContext.PutVariable("dict", dict);
+        operationLogManager.Current?.AddVariable("dict", dict);
     }
 
     public async Task<PagedResult<DictTypeResultDto>> GetDictTypeListAsync(DictTypeSearchDto dto)
@@ -96,14 +106,14 @@ public class DataDictionaryAppService : IDataDictionaryAppService
             .ToListAsync(x => new AppOption(x.Label, x.Value));
     }
 
-    [AsyncLogRecord(LogRecordConsts.SysDictType, LogRecordConsts.SysDictBatchDeleteSubType, "{{ids}}", LogRecordConsts.SysDictBatchDeleteContent)]
+    [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictBatchDeleteSubType, "{{ids}}", LogRecordConsts.SysDictBatchDeleteContent)]
     public async Task DeleteDictTypesAsync(Guid[] ids)
     {
         var dictTypes = await _dictTypeRepository.Where(x => ids.Contains(x.Id)).ToListAsync(x => x.DictType);
         _dictDataRepository.Delete(x => dictTypes.Contains(x.DictType));
         await _dictTypeRepository.DeleteAsync(x => ids.Contains(x.Id));
 
-        LogRecordContext.PutVariable("ids", string.Join(',', ids));
+        operationLogManager.Current?.AddVariable("ids", string.Join(',', ids));
     }
 
 
@@ -114,20 +124,20 @@ public class DataDictionaryAppService : IDataDictionaryAppService
         {
             throw new BusinessException(message: "字典值已存在");
         }
-        var entity = AutoMapperHelper.Instance.Map<DictDataDto, DictionaryItem>(dto);
+        var entity = ObjectMapper.Map<DictDataDto, DictionaryItem>(dto);
         await _dictDataRepository.InsertAsync(entity);
 
         return true;
     }
 
-    [AsyncLogRecord(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataDeleteSubType, "{{ids}}", LogRecordConsts.SysDictDataDeleteContent)]
+    [OperationLog(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataDeleteSubType, "{{ids}}", LogRecordConsts.SysDictDataDeleteContent)]
     public async Task<bool> DeleteDictDataAsync(Guid[] ids)
     {
         var entity = await _dictDataRepository.Where(x => ids.Contains(x.Id)).FirstAsync()
             ?? throw new BusinessException(message: "数据不存在");
         await _dictDataRepository.DeleteAsync(entity);
 
-        LogRecordContext.PutVariable("ids", string.Join(',', ids));
+        operationLogManager.Current?.AddVariable("ids", string.Join(',', ids));
 
         return true;
     }
@@ -145,7 +155,7 @@ public class DataDictionaryAppService : IDataDictionaryAppService
         return new PagedResult<DictDataListDto>(total, rows);
     }
 
-    [AsyncLogRecord(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataUpdateSubType, "{{id}}", LogRecordConsts.SysDictDataUpdateContent)]
+    [OperationLog(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataUpdateSubType, "{{id}}", LogRecordConsts.SysDictDataUpdateContent)]
     public async Task<bool> UpdateDictDataAsync(DictDataDto dto)
     {
         if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
@@ -165,8 +175,8 @@ public class DataDictionaryAppService : IDataDictionaryAppService
         entity.IsEnabled = dto.IsEnabled;
         await _dictDataRepository.UpdateAsync(entity);
 
-        LogRecordContext.PutVariable("id", entity.Id);
-        LogRecordContext.PutVariable("after", entity);
+        operationLogManager.Current?.AddVariable("id", entity.Id);
+        operationLogManager.Current?.AddVariable("after", entity);
         return true;
     }
 }

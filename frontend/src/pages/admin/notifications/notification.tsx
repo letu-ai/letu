@@ -89,7 +89,7 @@ const NotificationList: React.FC = () => {
         ref={tableRef}
         rowKey="id"
         request={async (params) => {
-          const { data } = await getNotificationList(params);
+          const data = await getNotificationList(params);
           return data;
         }}
         searchItems={[

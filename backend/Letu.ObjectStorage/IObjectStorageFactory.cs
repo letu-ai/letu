@@ -1,8 +1,6 @@
-﻿using Letu.Core.Interfaces;
-
-namespace Letu.ObjectStorage
+﻿namespace Letu.ObjectStorage
 {
-    public interface IObjectStorageFactory : ISingletonDependency
+    public interface IObjectStorageFactory
     {
         IObjectStorageService GetService(StorageType storageType, StorageOptions? options = null);
     }
