@@ -7,7 +7,7 @@ using Volo.Abp.Domain.Entities;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public class MonitorLogService : ApplicationService, IMonitorLogService
+    public class MonitorLogService : BasisAppService, IMonitorLogService
     {
         private readonly IFreeSqlRepository<ApiAccessLog> _apiAccessRepository;
         private readonly IFreeSqlRepository<ExceptionLog> _exceptionLogRepository;

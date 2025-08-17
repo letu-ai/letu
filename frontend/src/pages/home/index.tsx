@@ -1,4 +1,4 @@
-import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider, Image } from 'antd';
+import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider, Image, ColorPicker, ConfigProvider, theme } from 'antd';
 import {
   GithubOutlined,
   BookOutlined,
@@ -10,65 +10,84 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import './index.scss';
-import AliPay from '@/assets/alipay.jpg';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import useThemeStore from '@/store/themeStore';
 
 const { Title, Text, Paragraph } = Typography;
+// 更新日志数据
+const changelog = [
+  {
+    date: '2025-07-18',
+    items: ['通知管理、我的通知、动态管理定时任务'],
+  },
+  {
+    date: '2025-07-15',
+    items: ['租户管理、菜单支持外链'],
+  },
+  {
+    date: '2025-07-14',
+    items: ['创建sqlite分支，内置letu-admin.db文件、配置管理、修复已知BUG'],
+  },
+  {
+    date: '2025-07-10',
+    items: ['头像上传功能、使用mobx进行状态同步、修复已知BUG'],
+  },
+  {
+    date: '2025-07-09',
+    items: ['访问日志,异常日志增加详情、登录页样式优化，增加备案号'],
+  },
+  {
+    date: '2025-07-05',
+    items: ['增加员工绑定用户、样式调整、消除React警告'],
+  },
+  {
+    date: '2025-07-02',
+    items: ['系统雏形、建立仓库，代码开源'],
+  },
+];
+
+// 技术栈数据
+const techStack = [
+  { name: '.NET Core' },
+  { name: 'PostgreSQL' },
+  { name: 'FreeSql' },
+  { name: 'Aop' },
+  { name: 'Redis' },
+  { name: 'EventBus' },
+  { name: 'AutoMapper' },
+  { name: 'Serilog' },
+  { name: 'React' },
+  { name: 'Ant Design' },
+  { name: 'Vite' },
+  { name: 'Sass/SCSS' },
+];
+
+// 仓库地址
+const repoLinks = [
+  { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/letu-ai/letu' },
+  { name: '文档', icon: <BookOutlined />, url: 'https://docs.letu.run' },
+];
+
+
+const ThemeTest = () => {
+  const setTheme = useThemeStore(state => state.setTheme);
+
+  const changePrimaryColor = (color: string) => {
+    setTheme({ token: { colorPrimary: color } });
+  };
+  
+  return (
+    <div className="flex gap-2 ">
+      <Button type="primary">ANTD</Button>
+      <button className="px-2 py-1 bg-primary rounded-corner text-text">Tailwind CSS</button>
+      <ColorPicker defaultValue="#463a8f" onChange={(value) => changePrimaryColor(value.toHexString())} />
+    </div>
+  )
+
+}
 
 const HomePage = () => {
-  // 更新日志数据
-  const changelog = [
-    {
-      date: '2025-07-18',
-      items: ['通知管理、我的通知、动态管理定时任务'],
-    },
-    {
-      date: '2025-07-15',
-      items: ['租户管理、菜单支持外链'],
-    },
-    {
-      date: '2025-07-14',
-      items: ['创建sqlite分支，内置letu-admin.db文件、配置管理、修复已知BUG'],
-    },
-    {
-      date: '2025-07-10',
-      items: ['头像上传功能、使用mobx进行状态同步、修复已知BUG'],
-    },
-    {
-      date: '2025-07-09',
-      items: ['访问日志,异常日志增加详情、登录页样式优化，增加备案号'],
-    },
-    {
-      date: '2025-07-05',
-      items: ['增加员工绑定用户、样式调整、消除React警告'],
-    },
-    {
-      date: '2025-07-02',
-      items: ['系统雏形、建立仓库，代码开源'],
-    },
-  ];
-
-  // 技术栈数据
-  const techStack = [
-    { name: '.NET Core' },
-    { name: 'PostgreSQL' },
-    { name: 'FreeSql' },
-    { name: 'Aop' },
-    { name: 'Redis' },
-    { name: 'EventBus' },
-    { name: 'AutoMapper' },
-    { name: 'Serilog' },
-    { name: 'React' },
-    { name: 'Ant Design' },
-    { name: 'Vite' },
-    { name: 'Sass/SCSS' },
-  ];
-
-  // 仓库地址
-  const repoLinks = [
-    { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/letu-ai/letu' },
-    { name: '文档', icon: <BookOutlined />, url: 'https://docs.letu.run' },
-  ];
   const [githubRepoInfo, setGithubRepoInfo] = useState<any>({
     starCount: 26,
     forkCount: 6,
@@ -88,6 +107,7 @@ const HomePage = () => {
     });
   }, []);
 
+
   return (
     <div className="home-page">
       {/* 主要内容区域 */}
@@ -96,6 +116,22 @@ const HomePage = () => {
         <Col xs={24} md={16}>
           <Row gutter={[24, 24]}>
             {/* 开源项目介绍 */}
+            <Col span={24}>
+              <Card
+                title={
+                  <Space>
+                    <BookOutlined />
+                    <Title level={5} style={{ margin: 0 }}>
+                      主题测试
+                    </Title>
+                  </Space>
+                }
+                className="dashboard-card"
+              >
+                <ThemeTest />
+              </Card>
+            </Col>
+
             <Col span={24}>
               <Card
                 title={
@@ -210,21 +246,7 @@ const HomePage = () => {
                 }
                 className="dashboard-card"
               >
-                <div className="donation-container">
-                  <div className="qrcode-placeholder">
-                    <div className="qrcode-icon">
-                      <Image src={AliPay} />
-                    </div>
-                  </div>
-                  <div className="donation-text">
-                    <Paragraph type="secondary" style={{ textAlign: 'center' }}>
-                      请使用支付宝扫一扫
-                    </Paragraph>
-                    <Paragraph style={{ textAlign: 'center' }}>
-                      <Text strong>如果您觉得这个项目对您有帮助，就请作者喝杯咖啡吧！</Text>
-                    </Paragraph>
-                  </div>
-                </div>
+                <Link type='primary' to="/admin/users">系统设置</Link>
               </Card>
             </Col>
 

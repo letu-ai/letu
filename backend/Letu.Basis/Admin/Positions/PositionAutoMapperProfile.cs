@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Letu.Basis.Admin.Positions.Dtos;
+using Volo.Abp.AutoMapper;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -7,7 +8,9 @@ namespace Letu.Basis.Admin.Positions
     {
         public PositionAutoMapperProfile()
         {
-            CreateMap<PositionGroupCreateOrUpdateInput, PositionGroup>();
+            CreateMap<PositionGroupCreateOrUpdateInput, PositionGroup>(MemberList.Source)
+                .Ignore(d => d.Id);
+
             CreateMap<PositionGroup, PositionGroupListOutput>()
                 .ForMember(d => d.Children, opt =>
                 {
@@ -15,8 +18,10 @@ namespace Letu.Basis.Admin.Positions
                     opt.MapFrom(src => src.Children);
                 });
 
-            CreateMap<Position, PositionListOutput>();
-            CreateMap<PositionCreateOrUpdateInput, Position>();
+            CreateMap<Position, PositionListOutput>()
+                .Ignore(dest=>dest.LayerName);
+
+            CreateMap<PositionCreateOrUpdateInput, Position>(MemberList.Source);
         }
     }
 }

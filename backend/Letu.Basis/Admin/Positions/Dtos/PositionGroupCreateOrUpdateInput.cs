@@ -4,9 +4,6 @@ namespace Letu.Basis.Admin.Positions.Dtos
 {
     public class PositionGroupCreateOrUpdateInput
     {
-        /// <summary>
-        /// �ϼ�����ID
-        /// </summary>
         public Guid? ParentId { get; set; }
 
         /// <summary>

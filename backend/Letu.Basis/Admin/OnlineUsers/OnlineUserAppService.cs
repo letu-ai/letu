@@ -11,7 +11,7 @@ using Volo.Abp.Caching;
 
 namespace Letu.Basis.Admin.OnlineUsers;
 
-public class OnlineUserAppService : ApplicationService, IOnlineUserAppService
+public class OnlineUserAppService : BasisAppService, IOnlineUserAppService
 {
     private readonly IFreeSqlRepository<SecurityLog> _loginLogRepository;
     private readonly IFreeSqlRepository<User> _userRepository;

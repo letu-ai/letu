@@ -61,7 +61,7 @@ const DictDataForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     values.dictType = urlParams.type;
     
     if (row?.id) {
-      await updateDictData({ ...values, id: row.id });
+      await updateDictData(row.id, values);
       handleSuccess('编辑成功');
     } else {
       await addDictData(values);

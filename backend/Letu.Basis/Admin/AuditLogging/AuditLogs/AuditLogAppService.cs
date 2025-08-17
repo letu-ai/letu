@@ -9,7 +9,7 @@ using Volo.Abp.Domain.Entities;
 namespace Letu.Basis.Admin.AuditLogging.AuditLogs;
 
 [DisableAuditing]
-public class AuditLogAppService : ApplicationService, IAuditLogAppService
+public class AuditLogAppService : BasisAppService, IAuditLogAppService
 {
     private IFreeSqlRepository<AuditLog> auditLogRepository;
     public AuditLogAppService(

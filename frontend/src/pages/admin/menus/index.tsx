@@ -8,6 +8,7 @@ import SmartTable from '@/components/SmartTable';
 import { MenuType } from '@/utils/globalValue';
 import useApp from 'antd/es/app/useApp';
 import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 
 const MenuTable = () => {
   const modalRef = useRef<ModalRef>(null);
@@ -60,18 +61,18 @@ const MenuTable = () => {
       render: (_: any, record: MenuListDto) => (
         <Space>
           {(record.menuType === MenuType.Folder || record.menuType === MenuType.Menu) && (
-            <Permission permissions={'Sys.Menu.Add'}>
+            <Permission permissions={BasisPermissions.MenuItem.Create}>
               <Button type="link" icon={<PlusOutlined />} onClick={() => addSubItem(record)}>
                 新增
               </Button>
             </Permission>
           )}
-          <Permission permissions={'Sys.Menu.Update'}>
+          <Permission permissions={BasisPermissions.MenuItem.Update}>
             <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.Menu.Delete'}>
+          <Permission permissions={BasisPermissions.MenuItem.Delete}>
             <Button type="link" icon={<DeleteOutlined />} danger onClick={() => dataDelete([record.id])}>
               删除
             </Button>
@@ -147,12 +148,12 @@ const MenuTable = () => {
         ]}
         toolbar={
           <Space size="middle">
-            <Permission permissions={'Sys.Menu.Add'}>
+            <Permission permissions={BasisPermissions.MenuItem.Create}>
               <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
                 新增
               </Button>
             </Permission>
-            <Permission permissions={'Sys.Menu.Delete'}>
+            <Permission permissions={BasisPermissions.MenuItem.Delete}>
               <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={batchDelete}>
                 删除
               </Button>

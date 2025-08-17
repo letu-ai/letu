@@ -4,6 +4,7 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import PositionForm, { type PositionModalRef } from './_PositionForm';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
@@ -53,7 +54,7 @@ const Position: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: PositionListDto) => (
         <Space>
-          <Permission permissions={'Org.Position.Update'}>
+          <Permission permissions={BasisPermissions.Position.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -65,7 +66,7 @@ const Position: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Org.Position.Delete'}>
+          <Permission permissions={BasisPermissions.Position.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -127,11 +128,13 @@ const Position: React.FC = () => {
           </Form.Item>,
         ]}
         toolbar={
-          <Permission permissions={'Org.Position.Add'}>
-            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-              新增
-            </Button>
-          </Permission>
+          <>
+            <Permission permissions={BasisPermissions.Position.Create}>
+              <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+                新增
+              </Button>
+            </Permission>
+          </>
         }
       />
       {/* 职位新增/编辑弹窗 */}

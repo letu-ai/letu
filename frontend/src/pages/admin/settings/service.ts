@@ -1,58 +1,97 @@
 import httpClient from '@/utils/httpClient';
-import type { PagedResult, PagedResultRequest } from '@/types/api';
 
-/**
- * 新增配置
- * @param dto
- */
-export function addConfig(dto: ConfigDto) {
-  return httpClient.post<ConfigDto, void>('/api/admin/settings', dto);
+export interface ITimeZone {
+    name: string;
+    value: string;
 }
 
-/**
- * 配置分页列表
- * @param dto
- */
-export function getConfigList(dto: ConfigQueryDto) {
-  return httpClient.get<ConfigQueryDto, PagedResult<ConfigListDto>>('/api/admin/settings', { params: dto });
+export interface ITimeZoneSettings {
+    timeZoneId: string;
+    concurrencyStamp: string;
 }
 
-/**
- * 修改配置
- * @param dto
- */
-export function updateConfig(dto: ConfigDto) {
-  return httpClient.put<ConfigDto, void>('/api/admin/settings', dto);
+export function fetchTimeZones(): Promise<ITimeZone[]> {
+    return httpClient.get<void, ITimeZone[]>("/api/admin/setting-management/timezone/timezones");
 }
 
-/**
- * 删除配置
- * @param id
- */
-export function deleteConfig(id: string) {
-  return httpClient.delete<string, void>(`/api/config/delete/${id}`);
+export function fetchTimeZoneSettings(): Promise<string> {
+    return httpClient.get<void, string>("/api/admin/setting-management/timezone");
 }
 
-export interface ConfigDto {
-  id?: string;
-  name: string;
-  key: string;
-  value: string;
-  groupKey?: string;
-  remark?: string;
+export function updateTimeZoneSettings(data: string): Promise<void> {
+    return httpClient.post<string, void>("/api/admin/setting-management/timezone", JSON.stringify(data));
 }
 
-export interface ConfigListDto {
-  id: string;
-  name: string;
-  key: string;
-  value: string;
-  groupKey?: string;
-  remark?: string;
-  creationTime: string;
-  lastModificationTime: string;
+export interface IEmailSettings {
+    smtpHost: string;
+    smtpPort: number;
+    smtpUserName: string;
+    smtpPassword: string;
+    smtpDomain: string;
+    smtpEnableSsl?: boolean;
+    smtpUseDefaultCredentials?: boolean;
+    defaultFromAddress: string;
+    defaultFromDisplayName: string;
 }
 
-export interface ConfigQueryDto extends PagedResultRequest {
-  key?: string;
+export interface ISendTestEmailInput {
+    senderEmailAddress: string;
+    targetEmailAddress: string;
+    subject: string;
+    body: string;
 }
+
+export function fetchEmailSettings(): Promise<IEmailSettings> {
+    return httpClient.get<void, IEmailSettings>("/api/admin/setting-management/emailing");
+}
+
+export function updateEmailSettings(data: IEmailSettings): Promise<void> {
+    return httpClient.post<IEmailSettings, void>("/api/admin/setting-management/emailing", data);
+}
+
+export function sendTestEmail(data: ISendTestEmailInput): Promise<void> {
+    return httpClient.post<ISendTestEmailInput, void>("/api/admin/setting-management/emailing/send-test-email", data);
+}
+
+
+export interface IAccountSettings {
+    // Account
+    isSelfRegistrationEnabled?: boolean;
+    enableLocalLogin?: boolean;
+    allowPasswordRecovery?: boolean;
+    
+    // Password
+    passwordRequiredLength: number;
+    passwordRequiredUniqueChars: number;
+    passwordRequireNonAlphanumeric?: boolean;
+    passwordRequireLowercase?: boolean;
+    passwordRequireUppercase?: boolean;
+    passwordRequireDigit?: boolean;
+    forceUsersToPeriodicallyChangePassword?: boolean;
+    passwordChangePeriodDays: number;
+
+    // Lockout
+    allowedForNewUsers?: boolean;
+    lockoutDuration: number;
+    maxFailedAccessAttempts: number;
+
+    // SignIn
+    signInRequireConfirmedEmail?: boolean;
+    signInEnablePhoneNumberConfirmation?: boolean;
+    signInRequireConfirmedPhoneNumber?: boolean;
+    signInAllowMultipleLogin?: boolean;
+
+    // User
+    isUserNameUpdateEnabled?: boolean;
+    isEmailUpdateEnabled?: boolean;
+
+}
+
+export function fetchAccountSettings(): Promise<IAccountSettings> {
+    return httpClient.get<void, IAccountSettings>("/api/admin/setting-management/account");
+}
+
+export function updateAccountSettings(data: IAccountSettings): Promise<void> {
+    return httpClient.post<IAccountSettings, void>("/api/admin/setting-management/account", data);
+}
+

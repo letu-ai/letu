@@ -2,7 +2,7 @@
 using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Admin.Loggings.Dtos;
 using Letu.Basis.Admin.OnlineUsers.Dtos;
-using Letu.Core.Attributes;
+
 using Letu.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("access")]
-        [HasPermission("Monitor.ApiAccessLogList")]
+        // [HasPermission("Monitor.ApiAccessLogList")]
         public async Task<PagedResult<ApiAccessLogListDto>> GetApiAccessLogListAsync([FromQuery] ApiAccessLogQueryDto dto)
         {
             return await _monitorLogService.GetApiAccessLogListAsync(dto);
@@ -43,7 +43,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("exception")]
-        [HasPermission("Monitor.ExceptionLogList")]
+        // [HasPermission("Monitor.ExceptionLogList")]
         public async Task<PagedResult<ExceptionLogListDto>> GetExceptionLogListAsync([FromQuery] ExceptionLogQueryDto dto)
         {
             return await _monitorLogService.GetExceptionLogListAsync(dto);
@@ -55,7 +55,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="exceptionId">异常日志ID</param>
         /// <returns></returns>
         [HttpPost("exception/{exceptionId}/handled")]
-        [HasPermission("Monitor.ExceptionLog.HandleException")]
+        // [HasPermission("Monitor.ExceptionLog.HandleException")]
         public async Task HandleExceptionAsync(Guid exceptionId)
         {
             await _monitorLogService.HandleExceptionAsync(exceptionId);
@@ -89,7 +89,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("security")]
-        [HasPermission("Monitor.SecurityLogList")]
+        // [HasPermission("Monitor.SecurityLogList")]
         public async Task<PagedResult<LoginLogListDto>> GetLoginLogListAsync([FromQuery] LoginLogQueryDto dto)
         {
             return await _securityLogService.GetLoginLogListAsync(dto);

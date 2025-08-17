@@ -4,6 +4,7 @@ import { Button, Form, Input, Select, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import DeptForm, { type DeptModalRef } from './_DeptForm';
+import { BasisPermissions } from '@/application/permissions';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
 import useApp from 'antd/es/app/useApp';
@@ -40,7 +41,7 @@ const DepartmentList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: DeptListDto) => (
         <Space>
-          <Permission permissions={'Org.Dept.Update'}>
+          <Permission permissions={BasisPermissions.Department.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -52,7 +53,7 @@ const DepartmentList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Org.Dept.Delete'}>
+          <Permission permissions={BasisPermissions.Department.Delete}>
             <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
               删除
             </Button>
@@ -117,7 +118,7 @@ const DepartmentList: React.FC = () => {
           </>
         }
         toolbar={
-          <Permission permissions={'Org.Dept.Add'}>
+          <Permission permissions={BasisPermissions.Department.Create}>
             <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
               新增
             </Button>

@@ -24,9 +24,11 @@ using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Authorization;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
 using Volo.Abp.Modularity;
 
@@ -39,6 +41,7 @@ namespace Letu;
     typeof(AbpAutofacModule),
     typeof(AbpAutoMapperModule),
     typeof(AbpAspNetCoreSerilogModule),
+    typeof(AbpEmailingModule),
     typeof(AbpEventBusModule),
     typeof(AbpDistributedLockingModule),
     typeof(AbpCachingStackExchangeRedisModule),
@@ -75,10 +78,13 @@ public class LetuServerModule : AbpModule
 
     private void ConfigureDistributedCaching(IServiceCollection services, IConfiguration configuration)
     {
+        Configure<AbpDistributedCacheOptions>(options =>
+        {
+            options.KeyPrefix = "Letu:";
+        });
 
         Configure<RedisCacheOptions>(options =>
         {
-            //...
         });
     }
 

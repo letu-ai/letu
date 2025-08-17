@@ -9,10 +9,11 @@ using Volo.Abp.Auditing;
 
 namespace Letu.Basis.Controllers.Admin;
 
-[Authorize]
+[Authorize()]
 [ApiController]
 [Route("api/admin/auditlog")]
 [DisableAuditing]
+
 public class AuditLogController : ControllerBase
 {
     protected IAuditLogAppService AuditLogsAppService { get; }

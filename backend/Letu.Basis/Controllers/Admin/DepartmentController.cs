@@ -1,6 +1,7 @@
 using Letu.Basis.Admin.Departments;
 using Letu.Basis.Admin.Departments.Dtos;
-using Letu.Core.Attributes;
+using Letu.Basis.Permissions;
+
 using Letu.Logging;
 using Letu.Shared.Consts;
 
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Letu.Basis.Controllers.Admin
 {
-    [Authorize]
+    [Authorize(BasisPermissions.Department.Default)]
     [ApiController]
     [Route("api/admin/departments")]
     public class DepartmentController : ControllerBase
@@ -28,9 +29,9 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [HasPermission("Org.Dept.Add")]
+        [Authorize(BasisPermissions.Department.Create)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
-        public async Task AddDeptAsync([FromBody] DeptDto dto)
+        public async Task AddDeptAsync([FromBody] DepartmentCreateOrUpdateInput dto)
         {
             await _deptService.AddDeptAsync(dto);
         }
@@ -41,8 +42,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        [HasPermission("Org.Dept.List")]
-        public async Task<List<DeptListDto>> GetDeptListAsync([FromQuery] DeptQueryDto dto)
+        public async Task<List<DepartmentListOutput>> GetDeptListAsync([FromQuery] DeptQueryDto dto)
         {
             return await _deptService.GetDeptListAsync(dto);
         }
@@ -50,13 +50,15 @@ namespace Letu.Basis.Controllers.Admin
         /// <summary>
         /// 修改部门
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [HasPermission("Org.Dept.Update")]
-        public async Task UpdateDeptAsync([FromBody] DeptDto dto)
+        [HttpPut("{id}")]
+        [Authorize(BasisPermissions.Department.Update)]
+        public async Task UpdateDeptAsync(Guid id, [FromBody] DepartmentCreateOrUpdateInput input)
         {
-            await _deptService.UpdateDeptAsync(dto);
+            await _deptService.UpdateDeptAsync(id, input);
         }
 
         /// <summary>
@@ -65,7 +67,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        [HasPermission("Org.Dept.Delete")]
+        [Authorize(BasisPermissions.Department.Delete)]
         [ApiAccessLog(operateName: "删除部门", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteDeptAsync(Guid id)
         {

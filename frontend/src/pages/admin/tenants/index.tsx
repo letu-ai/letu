@@ -1,118 +1,178 @@
-﻿import Permission from '@/components/Permission';
-import { deleteTenant, getTenantList, type TenantDto, type TenantListDto } from './service';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Popconfirm, Space } from 'antd';
-import React, { useRef } from 'react';
-import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
-import SmartTable from '@/components/SmartTable';
+import { Space, Form, Input, Button, Tag, Avatar, Select } from 'antd';
+import { useRef, useState } from 'react';
+import { PlusOutlined, ExclamationCircleFilled, EditOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
+import { deleteTenant, getTenantList, type TenantListOutput } from './service';
 import TenantForm, { type ModalRef } from './_TenantForm';
+import FeatureEditor from '@/pages/admin/components/FeatureEditor';
+import SmartTable from '@/components/SmartTable';
+import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import useApp from 'antd/es/app/useApp';
+import Permission from '@/components/Permission';
+import { useApplication } from '@/components/Application';
+import { BasisPermissions } from '@/application/permissions';
 
-const TenantList: React.FC = () => {
-  const tableRef = useRef<SmartTableRef>(null);
+const Tenant = () => {
   const modalRef = useRef<ModalRef>(null);
-  const { message } = useApp();
+  const tableRef = useRef<SmartTableRef>(null);
+  const { message, modal } = useApp();
+  const { ossDomain } = useApplication();
+  const [featureEditorVisible, setFeatureEditorVisible] = useState(false);
+  const [currentTenantId, setCurrentTenantId] = useState<string | null>(null);
+  
   const columns: SmartTableColumnType[] = [
     {
-      title: '租户名称',
+      title: '租户信息',
       dataIndex: 'name',
+      key: 'name',
+      render: (name: string, record: TenantListOutput) => {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {record.logo ? 
+              <Avatar src={ossDomain + record.logo} style={{ marginRight: 12 }} /> : 
+              <Avatar style={{ marginRight: 12 }}>T</Avatar>}
+            <span>{name}</span>
+          </div>
+        );
+      }
     },
     {
-      title: '租户标识',
-      dataIndex: 'tenantId',
+      title: '版本',
+      dataIndex: 'editionName',
+      key: 'editionName',
+      render: (text: string) => {
+        return text || '未分配';
+      }
     },
     {
       title: '绑定域名',
-      dataIndex: 'domain',
+      dataIndex: 'bindDomain',
+      key: 'bindDomain',
+      render: (text: string) => text || '-'
     },
     {
-      title: '备注',
-      dataIndex: 'Remark',
+      title: '状态',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      render: (isActive: boolean) => {
+        if (isActive) {
+          return <Tag color="success">启用</Tag>;
+        }
+        return <Tag>禁用</Tag>;
+      },
     },
     {
-      title: '创建时间',
-      dataIndex: 'creationTime',
-    },
-    {
-      title: '上次修改时间',
-      dataIndex: 'lastModificationTime',
+      title: '失效日期',
+      dataIndex: 'expireDate',
+      key: 'expireDate',
+      render: (text: string) => text || '-'
     },
     {
       title: '操作',
-      dataIndex: 'option',
-      width: 210,
+      key: 'action',
+      width: 150,
       fixed: 'right',
-      render: (_: any, record: TenantListDto) => (
-        <Space>
-          <Permission permissions={'Sys.Tenant.Update'}>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              key="edit"
-              onClick={() => {
-                modalRef?.current?.openModal(record as TenantDto);
-              }}
-            >
-              编辑
+      render: (_: any, record: TenantListOutput) => {
+        return (
+          <Space>
+            <Button type="link" icon={<SettingOutlined />} onClick={() => rowSetFeature(record.id)}>
+              功能
             </Button>
-          </Permission>
-          <Permission permissions={'Sys.Tenant.Delete'}>
-            <Popconfirm
-              key="delete"
-              title="确定删除吗？"
-              description="删除后无法撤销"
-              onConfirm={() => {
-                deleteTenant(record.id!).then(() => {
-                  message.success('删除成功');
-                  tableRef.current?.reload();
-                });
-              }}
-            >
-              <Button type="link" danger icon={<DeleteOutlined />}>
+            <Permission permissions={BasisPermissions.Tenant.Update}>
+              <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
+                编辑
+              </Button>
+            </Permission>
+            <Permission permissions={BasisPermissions.Tenant.Delete}>
+              <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
                 删除
               </Button>
-            </Popconfirm>
-          </Permission>
-        </Space>
-      ),
+            </Permission>
+          </Space>
+        );
+      },
     },
   ];
+
+  const handleOpenModal = () => {
+    if (modalRef.current) {
+      modalRef.current.openModal();
+    }
+  };
+
+  const rowDelete = (id: string) => {
+    modal.confirm({
+      title: '确认删除？',
+      icon: <ExclamationCircleFilled />,
+      content: '删除租户将会移除所有相关数据，且无法恢复，确认删除？',
+      onOk() {
+        deleteTenant(id).then(() => {
+          message.success('删除成功');
+          tableRef?.current?.reload();
+        });
+      },
+    });
+  };
+  
+  const rowEdit = (record: TenantListOutput) => {
+    modalRef.current?.openModal(record);
+  };
+
+  const rowSetFeature = (tenantId: string) => {
+    setCurrentTenantId(tenantId);
+    setFeatureEditorVisible(true);
+  };
 
   return (
     <>
       <SmartTable
-        columns={columns}
         ref={tableRef}
         rowKey="id"
+        columns={columns}
         request={async (params) => {
           const data = await getTenantList(params);
           return data;
         }}
-        searchItems={[
-          <Form.Item label="关键词" name="keyword">
-            <Input placeholder="请输入租户名称/标识" />
-          </Form.Item>,
-        ]}
+        searchItems={
+          <>
+            <Form.Item label="租户名称" name="name">
+              <Input placeholder="请输入租户名称" />
+            </Form.Item>
+            <Form.Item label="状态" name="isActive">
+              <Select
+                placeholder="请选择状态"
+                allowClear
+                options={[
+                  { label: '启用', value: true },
+                  { label: '禁用', value: false },
+                ]}
+              />
+            </Form.Item>
+          </>
+        }
         toolbar={
-          <Space size="middle">
-            <Permission permissions={'Sys.Tenant.Add'}>
-              <Button
-                type="primary"
-                key="primary"
-                onClick={() => {
-                  modalRef?.current?.openModal();
-                }}
-              >
-                <PlusOutlined /> 新增
-              </Button>
-            </Permission>
-          </Space>
+          <Permission permissions={BasisPermissions.Tenant.Create}>
+            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+              新增
+            </Button>
+          </Permission>
         }
       />
-      {/** 新增/编辑租户弹窗 */}
+      {/* 租户新增/编辑弹窗 */}
       <TenantForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
+      
+      {/* 功能编辑器 */}
+      {featureEditorVisible && currentTenantId && (
+        <FeatureEditor
+          providerName="T"
+          providerKey={currentTenantId}
+          onClose={() => {
+            setFeatureEditorVisible(false);
+            setCurrentTenantId(null);
+          }}
+        />
+      )}
     </>
   );
 };
 
-export default TenantList;
+export default Tenant; 

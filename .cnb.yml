@@ -1,0 +1,32 @@
+# .cnb.yml
+$:
+  vscode:
+    - docker:
+        build: .ide/Dockerfile
+      services:
+        - vscode
+        - docker
+      # 开发环境启动后会执行的任务
+      stages:
+        - name: dotnet-restore
+          script: | 
+            cd /workspace/backend/Letu.Server
+            dotnet restore
+
+            cd /workspace/frontend
+            pnpm install
+        - name: copy-dev-settings
+          # ./ 是工作目录，默认为 /workspace
+          script: |
+            echo "运行 copy-dev-settings"
+            if [ -e "/root/.cnb/.env.development.local" ]; then
+              cp -f /root/.cnb/.env.development.local ./frontend/
+            else
+              echo ".env.development.local文件不存在"
+            fi
+
+            if [ -e "/root/.cnb/appsettings.Development.json" ]; then
+              cp -f /root/.cnb/appsettings.Development.json ./backend/Letu.Server/
+            else
+              echo "appsettings.Development.json文件不存在"
+            fi

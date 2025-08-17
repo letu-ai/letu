@@ -1,7 +1,8 @@
 using Letu.Applications;
 using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.Positions.Dtos;
-using Letu.Core.Attributes;
+using Letu.Basis.Permissions;
+
 using Letu.Logging;
 using Letu.Shared.Consts;
 using Letu.Shared.Models;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Letu.Basis.Controllers.Admin
 {
-    [Authorize]
+    [Authorize(BasisPermissions.Position.Default)]
     [ApiController]
     [Route("api/admin/positions")]
     public class PositionController : ControllerBase
@@ -31,7 +32,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [HasPermission("Org.Position.Add")]
+        [Authorize(BasisPermissions.Position.Create)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task CreatePositionAsync([FromBody] PositionCreateOrUpdateInput dto)
         {
@@ -44,7 +45,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        [HasPermission("Org.Position.List")]
         public async Task<PagedResult<PositionListOutput>> GetPositionsAsync([FromQuery] PositionListInput dto)
         {
             return await _positionService.GetPositionListAsync(dto);
@@ -57,7 +57,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        [HasPermission("Org.Position.Update")]
+        [Authorize(BasisPermissions.Position.Update)]
         public async Task UpdatePositionAsync(Guid id, [FromBody] PositionCreateOrUpdateInput dto)
         {
             await _positionService.UpdatePositionAsync(id, dto);
@@ -69,7 +69,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [HasPermission("Org.Position.Delete")]
+        [Authorize(BasisPermissions.Position.Delete)]
         [ApiAccessLog(operateName: "删除职位", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeletePositionAsync(Guid id)
         {
@@ -96,7 +96,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("groups")]
-        [HasPermission("Org.PositionGroup.Add")]
+        [Authorize(BasisPermissions.Position.Update)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task CreatePositionGroupAsync([FromBody] PositionGroupCreateOrUpdateInput dto)
         {
@@ -109,7 +109,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet("groups")]
-        [HasPermission("Org.PositionGroup.List")]
         public async Task<List<PositionGroupListOutput>> GetPositionGroupsAsync([FromQuery] PositionGroupListInput dto)
         {
             return await _positionService.GetPositionGroupListAsync(dto);
@@ -122,7 +121,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("groups/{id}")]
-        [HasPermission("Org.PositionGroup.Update")]
+        [Authorize(BasisPermissions.Position.Update)]
         public async Task UpdatePositionGroupAsync(Guid id, [FromBody] PositionGroupCreateOrUpdateInput dto)
         {
             await _positionService.UpdatePositionGroupAsync(id, dto);
@@ -134,7 +133,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("groups/{id}")]
-        [HasPermission("Org.PositionGroup.Delete")]
+        [Authorize(BasisPermissions.Position.Update)]
         [ApiAccessLog(operateName: "删除职位分组", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeletePositionGroupAsync(Guid id)
         {

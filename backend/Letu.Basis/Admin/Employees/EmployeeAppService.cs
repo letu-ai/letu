@@ -1,4 +1,3 @@
-using AutoMapper;
 using Letu.Applications;
 using Letu.Basis.Admin.Departments;
 using Letu.Basis.Admin.Departments.Dtos;
@@ -9,34 +8,29 @@ using Letu.Basis.Admin.Users.Dtos;
 using Letu.Core.Utils;
 using Letu.Repository;
 using Volo.Abp;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Uow;
 
 namespace Letu.Basis.Admin.Employees
 {
-    public class EmployeeAppService : ApplicationService, IEmployeeAppService
+    public class EmployeeAppService : BasisAppService, IEmployeeAppService
     {
         private readonly IFreeSqlRepository<Employee> _employeeRepository;
         private readonly IFreeSqlRepository<Department> _deptRepository;
-        private readonly IFreeSql _freeSql;
-        private readonly IMapper _mapper;
         private readonly IUserAppService _userService;
         private readonly IFreeSqlRepository<User> _userRepository;
 
         public EmployeeAppService(IFreeSqlRepository<Employee> employeeRepository, IFreeSqlRepository<Department> deptRepository, IFreeSqlRepository<Position> orgPositionRepository
-            , IFreeSql freeSql, IMapper mapper, IUserAppService userService, IFreeSqlRepository<User> userRepository)
+            , IUserAppService userService, IFreeSqlRepository<User> userRepository)
         {
             _employeeRepository = employeeRepository;
             _deptRepository = deptRepository;
-            _freeSql = freeSql;
-            _mapper = mapper;
             _userService = userService;
             _userRepository = userRepository;
         }
 
         [UnitOfWork]
-        public async Task<bool> AddEmployeeAsync(EmployeeDto dto)
+        public async Task<bool> AddEmployeeAsync(EmployeeCreateOrUpdateInput dto)
         {
             if (await _employeeRepository.Select.AnyAsync(x => x.Code.ToLower() == dto.Code.ToLower()))
             {
@@ -62,7 +56,7 @@ namespace Letu.Basis.Admin.Employees
                 {
                     throw new BusinessException(message: "用户密码不能为空");
                 }
-                userId = await _userService.AddUserAsync(new UserDto
+                userId = await _userService.AddUserAsync(new UserCreateOrUpdateInput
                 {
                     NickName = dto.Name,
                     Sex = dto.Sex,
@@ -72,7 +66,7 @@ namespace Letu.Basis.Admin.Employees
                 });
             }
 
-            var entity = _mapper.Map<EmployeeDto, Employee>(dto);
+            var entity = ObjectMapper.Map<EmployeeCreateOrUpdateInput, Employee>(dto);
             entity.UserId = userId;
             await _employeeRepository.InsertAsync(entity);
 
@@ -85,14 +79,14 @@ namespace Letu.Basis.Admin.Employees
             return true;
         }
 
-        public async Task<PagedResult<EmployeeListDto>> GetEmployeePagedListAsync(EmployeeQueryDto dto)
+        public async Task<PagedResult<EmployeeListOutput>> GetEmployeePagedListAsync(EmployeeListInput dto)
         {
-            var list = await _freeSql.Select<Employee>().From<Department, Position>((e, d, p) => e.LeftJoin(e1 => e1.DeptId == d.Id).LeftJoin(e2 => e2.PositionId == p.Id))
+            var list = await _employeeRepository.Select.From<Department, Position>((e, d, p) => e.LeftJoin(e1 => e1.DeptId == d.Id).LeftJoin(e2 => e2.PositionId == p.Id))
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), (x, d, p) => x.Code!.Contains(dto.Keyword!) || x.Name!.Contains(dto.Keyword!) || x.Phone!.Contains(dto.Keyword!))
                 .WhereIf(dto.DeptId.HasValue, (x, d, p) => x.DeptId == dto.DeptId!.Value)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync((e, d, p) => new EmployeeListDto
+                .ToListAsync((e, d, p) => new EmployeeListOutput
                 {
                     Id = e.Id,
                     Code = e.Code,
@@ -115,41 +109,40 @@ namespace Letu.Basis.Admin.Employees
                     PositionName = p.Name,
                 });
 
-            return new PagedResult<EmployeeListDto>(dto) { Items = list, TotalCount = total };
+            return new PagedResult<EmployeeListOutput>(dto) { Items = list, TotalCount = total };
         }
 
-        public async Task<List<EmployeeDto>> GetEmployeeListAsync(EmployeeQueryDto dto)
+        public async Task<List<EmployeeCreateOrUpdateInput>> GetEmployeeListAsync(EmployeeListInput dto)
         {
             return await _employeeRepository.Where(x => x.Status == 1)
                 .WhereIf(dto.DeptId != null, x => x.DeptId == dto.DeptId!.Value)
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name!.Contains(dto.Keyword!))
-                .ToListAsync<EmployeeDto>();
+                .ToListAsync<EmployeeCreateOrUpdateInput>();
         }
 
-        public async Task<bool> UpdateEmployeeAsync(EmployeeDto dto)
+        public async Task<bool> UpdateEmployeeAsync(Guid id, EmployeeCreateOrUpdateInput input)
         {
-            ArgumentNullException.ThrowIfNull(dto.Id);
-            var entity = await _employeeRepository.Where(x => x.Id == dto.Id.Value).FirstAsync();
-            if (entity.Code.ToLower() != dto.Code.ToLower() && await _employeeRepository.Select.AnyAsync(x => x.Code.ToLower() == dto.Code.ToLower()))
+            var entity = await _employeeRepository.Where(x => x.Id == id).FirstAsync() ?? throw new EntityNotFoundException(typeof(Employee), id);
+            if (entity.Code.ToLower() != input.Code.ToLower() && await _employeeRepository.Select.AnyAsync(x => x.Code.ToLower() == input.Code.ToLower()))
             {
                 throw new BusinessException(message: "工号已存在");
             }
-            if (entity.Phone != dto.Phone && await _employeeRepository.Select.AnyAsync(x => x.Phone == dto.Phone))
+            if (entity.Phone != input.Phone && await _employeeRepository.Select.AnyAsync(x => x.Phone == input.Phone))
             {
                 throw new BusinessException(message: "手机号已存在");
             }
-            if (!string.IsNullOrEmpty(dto.Email) && !StringUtils.IgnoreCaseEquals(entity.Email, dto.Email)
-                && await _employeeRepository.Select.AnyAsync(x => dto.Email.Equals(x.Email, StringComparison.OrdinalIgnoreCase)))
+            if (!string.IsNullOrEmpty(input.Email) && !StringUtils.IgnoreCaseEquals(entity.Email, input.Email)
+                && await _employeeRepository.Select.AnyAsync(x => input.Email.Equals(x.Email, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new BusinessException(message: "邮箱已存在");
             }
-            if (!string.IsNullOrEmpty(dto.IdNo) && !StringUtils.IgnoreCaseEquals(entity.IdNo, dto.IdNo)
-                && await _employeeRepository.Select.AnyAsync(x => dto.IdNo.Equals(x.IdNo, StringComparison.OrdinalIgnoreCase)))
+            if (!string.IsNullOrEmpty(input.IdNo) && !StringUtils.IgnoreCaseEquals(entity.IdNo, input.IdNo)
+                && await _employeeRepository.Select.AnyAsync(x => input.IdNo.Equals(x.IdNo, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new BusinessException(message: "身份证号已存在");
             }
 
-            ReflectionUtils.CopyTo(dto, entity, "Id");
+            ObjectMapper.Map(input, entity);
             await _employeeRepository.UpdateAsync(entity);
             return true;
         }
@@ -164,7 +157,7 @@ namespace Letu.Basis.Admin.Employees
         public async Task<EmployeeInfoDto> GetEmployeeInfoAsync(Guid id)
         {
             var employee = await _employeeRepository.Where(x => x.Id == id).FirstAsync() ?? throw new EntityNotFoundException();
-            var result = _mapper.Map<EmployeeInfoDto>(employee);
+            var result = ObjectMapper.Map<Employee, EmployeeInfoDto>(employee);
 
             if (employee.UserId.HasValue)
             {
@@ -179,11 +172,11 @@ namespace Letu.Basis.Admin.Employees
             return result;
         }
 
-        public async Task<List<DeptEmployeeTreeDto>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeQueryDto dto)
+        public async Task<List<DeptEmployeeTreeOutput>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeInput dto)
         {
             if (!string.IsNullOrEmpty(dto.EmployeeName))
             {
-                return await _employeeRepository.Where(x => x.Status == 1).ToListAsync(x => new DeptEmployeeTreeDto
+                return await _employeeRepository.Where(x => x.Status == 1).ToListAsync(x => new DeptEmployeeTreeOutput
                 {
                     Label = x.Name,
                     Value = x.Id.ToString(),
@@ -192,7 +185,7 @@ namespace Letu.Basis.Admin.Employees
             }
             var employees = await _employeeRepository.Where(x => x.Status == 1).ToListAsync();
             var depts = await _deptRepository.Where(x => x.Status == 1).ToListAsync();
-            var list = depts.Where(x => !x.ParentId.HasValue).OrderBy(x => x.Sort).Select(x => new DeptEmployeeTreeDto
+            var list = depts.Where(x => !x.ParentId.HasValue).OrderBy(x => x.Sort).Select(x => new DeptEmployeeTreeOutput
             {
                 Label = x.Name,
                 Value = x.Id.ToString(),
@@ -203,9 +196,9 @@ namespace Letu.Basis.Admin.Employees
                 item.Children = GetSubItems(item);
             }
 
-            List<DeptEmployeeTreeDto>? GetSubItems(DeptEmployeeTreeDto parent)
+            List<DeptEmployeeTreeOutput>? GetSubItems(DeptEmployeeTreeOutput parent)
             {
-                var children = depts.Where(x => x.ParentId.HasValue && x.ParentId.ToString() == parent.Value).OrderBy(x => x.Sort).Select(x => new DeptEmployeeTreeDto
+                var children = depts.Where(x => x.ParentId.HasValue && x.ParentId.ToString() == parent.Value).OrderBy(x => x.Sort).Select(x => new DeptEmployeeTreeOutput
                 {
                     Label = x.Name,
                     Value = x.Id.ToString(),
@@ -216,7 +209,7 @@ namespace Letu.Basis.Admin.Employees
                     item.Children = GetSubItems(item);
                 }
 
-                var subItemEmployees = employees.Where(x => x.DeptId.ToString() == parent.Value).Select(x => new DeptEmployeeTreeDto
+                var subItemEmployees = employees.Where(x => x.DeptId.ToString() == parent.Value).Select(x => new DeptEmployeeTreeOutput
                 {
                     Label = x.Name,
                     Value = x.Id.ToString(),

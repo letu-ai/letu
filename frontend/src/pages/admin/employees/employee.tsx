@@ -1,8 +1,9 @@
 ﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import { DeleteOutlined, EditOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
-import { deleteEmployee, getEmployeePagedList, type EmployeeListDto } from '@/api/organization/employee';
+import { deleteEmployee, getEmployeePagedList, type EmployeeListDto } from './service';
 import SmartTable from '@/components/SmartTable';
 import EmployeeForm, { type EmployeeModalRef } from '@/pages/admin/employees/_EmployeeForm';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
@@ -50,7 +51,7 @@ const EmployeeList: React.FC = () => {
       width: 210,
       render: (_: any, record: EmployeeListDto) => (
         <Space>
-          <Permission permissions={'Org.Employee.Update'}>
+          <Permission permissions={BasisPermissions.Employee.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -62,7 +63,7 @@ const EmployeeList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Org.Employee.BindUser'}>
+          <Permission permissions={BasisPermissions.Employee.BindUser}>
             <Button
               type="link"
               icon={<UserAddOutlined />}
@@ -73,7 +74,7 @@ const EmployeeList: React.FC = () => {
               绑定用户
             </Button>
           </Permission>
-          <Permission permissions={'Org.Employee.Delete'}>
+          <Permission permissions={BasisPermissions.Employee.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -111,18 +112,20 @@ const EmployeeList: React.FC = () => {
           </Form.Item>,
         ]}
         toolbar={
-          <Permission permissions={'Org.Employee.Add'}>
-            <Button
-              color="primary"
-              variant="solid"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                modalRef?.current?.openModal();
-              }}
-            >
-              新增
-            </Button>
-          </Permission>
+          <>
+            <Permission permissions={BasisPermissions.Employee.Create}>
+              <Button
+                color="primary"
+                variant="solid"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  modalRef?.current?.openModal();
+                }}
+              >
+                新增
+              </Button>
+            </Permission>
+          </>
         }
       />
       {/* 新增/编辑员工弹窗 */}

@@ -6,11 +6,11 @@ namespace Letu.Basis.Admin.DataDictionary
 {
     public interface IDataDictionaryAppService
     {
-        Task AddDictTypeAsync(DictTypeDto dto);
+        Task AddDictTypeAsync(TypeCreateOrUpdateInput dto);
 
-        Task<PagedResult<DictTypeResultDto>> GetDictTypeListAsync(DictTypeSearchDto dto);
+        Task<PagedResult<TypeListOutput>> GetDictTypeListAsync(TypeListInput dto);
 
-        Task UpdateDictTypeAsync(DictTypeDto dto);
+        Task UpdateDictTypeAsync(Guid id, TypeCreateOrUpdateInput dto);
 
         Task DeleteDictTypeAsync(string dictType);
 
@@ -23,21 +23,21 @@ namespace Letu.Basis.Admin.DataDictionary
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddDictDataAsync(DictDataDto dto);
+        Task<bool> AddDictDataAsync(ItemCreateOrUpdateInput dto);
 
         /// <summary>
         /// 字典分页列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<DictDataListDto>> GetDictDataListAsync(DictDataQueryDto dto);
+        Task<PagedResult<ItemListOutput>> GetDataItemListAsync(ItemListInput dto);
 
         /// <summary>
         /// 修改字典
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdateDictDataAsync(DictDataDto dto);
+        Task<bool> UpdateDictDataAsync(Guid id, ItemCreateOrUpdateInput dto);
 
         /// <summary>
         /// 删除字典

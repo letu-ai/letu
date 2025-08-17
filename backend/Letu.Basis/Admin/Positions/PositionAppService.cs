@@ -11,7 +11,7 @@ using Letu.Shared.Models;
 
 namespace Letu.Basis.Admin.Positions
 {
-    public class PositionAppService : ApplicationService, IPositionAppService
+    public class PositionAppService : BasisAppService, IPositionAppService
     {
         private readonly IFreeSqlRepository<Position> _positionRepository;
         private readonly IFreeSqlRepository<PositionGroup> _positionGroupRepository;

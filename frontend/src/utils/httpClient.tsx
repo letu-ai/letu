@@ -2,7 +2,6 @@ import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type Ax
 import UserStore from '@/store/userStore';
 import { StaticRoutes } from '@/utils/globalValue.ts';
 import { message } from 'antd';
-import dayjs from 'dayjs';
 import { refreshToken } from '@/pages/accounts/service';
 import ResponseErrorMessage from './ResponseErrorMessage';
 
@@ -55,7 +54,7 @@ const getValidateError = (response: AxiosResponse): IResponseError | undefined =
     if (response.data && response.data.type === "https://tools.ietf.org/html/rfc9110#section-15.5.1" && response.data.errors) {
         // 处理验证错误
         const errors = response.data.errors;
-        
+
         // 将错误对象转换为字符串数组
         const errorDetails: string[] = [];
         for (const field in errors) {
@@ -66,7 +65,7 @@ const getValidateError = (response: AxiosResponse): IResponseError | undefined =
                 });
             }
         }
-        
+
         return {
             message: '数据验证错误，请检查输入内容',
             details: errorDetails,
@@ -114,9 +113,9 @@ const getErrorInfo = async (error: AxiosError): Promise<IResponseError> => {
         case 'ERR_BAD_RESPONSE':
             if (error.response) {
                 // 尝试按顺序处理不同类型的错误
-                errorInfo = (await getAbpError(error.response)) || 
-                           getValidateError(error.response) || 
-                           getHttpStatusError(error.response.status);
+                errorInfo = (await getAbpError(error.response)) ||
+                    getValidateError(error.response) ||
+                    getHttpStatusError(error.response.status);
             }
             break;
         default:
@@ -131,6 +130,7 @@ class HttpClient {
     private readonly instance: AxiosInstance;
     allowAnonymousApis: string[] = ['/api/account/login']; //允许匿名访问接口
     refreshTokenWhiteApis: string[] = ['/api/account/refresh-token', '/api/account/logout']; //不需要刷新token接口
+    private refreshTokenPromise: Promise<any> | null = null; // 防止并发刷新token
 
     constructor(config?: AxiosRequestConfig) {
         this.instance = axios.create(config);
@@ -144,33 +144,45 @@ class HttpClient {
                 //添加token
                 const token = UserStore.token?.accessToken;
                 const expired = UserStore.token?.expiredTime;
-                const now = new Date().toISOString(); // 使用ISO格式的UTC时间进行比较
-                if (token && expired && dayjs(expired).isAfter(now)) {
+                const now = new Date();
+                const expiredTime = expired ? new Date(expired) : null;
+
+                if (token && expiredTime && expiredTime.getTime() > now.getTime()) {
                     config.headers.Authorization = `Bearer ${token}`;
                     //过期时间小于10分钟进行刷新token
-                    if (dayjs(expired).subtract(10, 'minute').isBefore(now)) {
+                    const tenMinutesFromNow = new Date(now.getTime() + 10 * 60 * 1000);
+                    if (expiredTime.getTime() < tenMinutesFromNow.getTime()) {
                         // 打印token剩余过期时间
-                        if (expired) {
-                            const leftSeconds = dayjs(expired).diff(now, "second");
-                            console.log(`token剩余过期时间：${leftSeconds}秒（UTC时间比较）`);
-                        }
+                        const leftSeconds = Math.floor((expiredTime.getTime() - now.getTime()) / 1000);
+                        console.log(`token剩余过期时间：${leftSeconds}秒（统一时间戳比较）`);
                         //如果当前是刷新token接口就不调用，避免循环调用
                         const refreshTokenValue = UserStore.token?.refreshToken;
                         const currentUrl = config.url?.toLowerCase() || '';
                         const isRefreshTokenApi = this.refreshTokenWhiteApis.some(
                             (x) => currentUrl.endsWith(x.toLowerCase())
                         );
-                        
+
                         if (!isRefreshTokenApi && refreshTokenValue) {
                             try {
-                                const refreshTokenRes = await refreshToken(refreshTokenValue);
-                                if (refreshTokenRes) {
-                                    UserStore.refreshToken(
-                                        refreshTokenRes.accessToken,
-                                        refreshTokenRes.refreshToken,
-                                        refreshTokenRes.expiredTime,
-                                    );
+                                // 防止并发刷新token
+                                if (!this.refreshTokenPromise) {
+                                    this.refreshTokenPromise = refreshToken(refreshTokenValue)
+                                        .then((refreshTokenRes) => {
+                                            if (refreshTokenRes) {
+                                                UserStore.refreshToken(
+                                                    refreshTokenRes.accessToken,
+                                                    refreshTokenRes.refreshToken,
+                                                    refreshTokenRes.expiredTime,
+                                                );
+                                            }
+                                            return refreshTokenRes;
+                                        })
+                                        .finally(() => {
+                                            // 刷新完成后清除Promise，允许下次刷新
+                                            this.refreshTokenPromise = null;
+                                        });
                                 }
+                                await this.refreshTokenPromise;
                             } catch (error) {
                                 if (axios.isAxiosError(error) && error.response?.status === 401) {
                                     UserStore.logout();
@@ -263,9 +275,17 @@ class HttpClient {
 
 // 默认配置
 const defaultConfig: AxiosRequestConfig = {
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-    timeout: 10000,
+    baseURL: getBaseUrl(),
+    headers: {
+        'Content-Type': 'application/json',
+    },
 };
+
+function getBaseUrl(){
+    const urlTemplate = import.meta.env.VITE_API_BASE_URL;
+    const port = import.meta.env.VITE_API_BASE_PORT;
+    return urlTemplate.replace(/{{port}}/g, port);
+}
 
 // 创建默认实例
 const httpClient = new HttpClient(defaultConfig);

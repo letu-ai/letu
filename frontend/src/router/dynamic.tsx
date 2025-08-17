@@ -71,9 +71,10 @@ const processDynamicRouteSegment = (segment: string): string => {
 /**
  * 从文件路径提取路由路径
  * @param filePath 文件路径
+ * @param pathPrefix 路径前缀，用于生成相对路径
  * @returns 路由路径
  */
-const extractRoutePathFromFile = (filePath: string): string => {
+const extractRoutePathFromFile = (filePath: string, pathPrefix?: string): string => {
   // 移除各种可能的前缀和文件扩展名
   let routePath = filePath
     .replace('@/pages', '')
@@ -84,6 +85,18 @@ const extractRoutePathFromFile = (filePath: string): string => {
   // 将 /index 替换为空字符串（作为默认页面）
   routePath = routePath.replace(/\/index$/, '');
 
+  // 如果指定了路径前缀，移除前缀部分，生成相对路径
+  if (pathPrefix) {
+    const prefixToRemove = `/${pathPrefix}`;
+    if (routePath.startsWith(prefixToRemove)) {
+      routePath = routePath.substring(prefixToRemove.length);
+      // 如果移除前缀后路径为空，返回空字符串（表示默认路由）
+      if (!routePath) {
+        return '';
+      }
+    }
+  }
+
   // 处理动态路由：将文件名中的 $paramName 转换为 :paramName
   const segments = routePath.split('/');
   const processedSegments = segments.map(processDynamicRouteSegment);
@@ -91,13 +104,17 @@ const extractRoutePathFromFile = (filePath: string): string => {
   // 重新组合路径
   routePath = processedSegments.join('/');
 
-  // 确保路径以 / 开头
-  if (!routePath.startsWith('/')) {
-    routePath = '/' + routePath;
+  // 如果没有路径前缀，确保路径以 / 开头
+  if (!pathPrefix) {
+    if (!routePath.startsWith('/')) {
+      routePath = '/' + routePath;
+    }
+    // 如果是根路径，返回 /
+    return routePath === '' ? '/' : routePath;
   }
 
-  // 如果是根路径，返回 /
-  return routePath === '' ? '/' : routePath;
+  // 有路径前缀时，返回相对路径（不以 / 开头）
+  return routePath.startsWith('/') ? routePath.substring(1) : routePath;
 }
 
 /**
@@ -153,9 +170,10 @@ const hasCustomRoute = (dirPath: string): boolean => {
 /**
  * 加载自定义路由配置
  * @param dirPath 目录路径
+ * @param pathPrefix 路径前缀，用于转换绝对路径为相对路径
  * @returns 自定义路由配置或undefined
  */
-const loadCustomRoute = async (dirPath: string): Promise<RouteObject[] | undefined> => {
+const loadCustomRoute = async (dirPath: string, pathPrefix?: string): Promise<RouteObject[] | undefined> => {
   const routePath = `/src/pages${dirPath}/route.tsx`;
   if (!RouteKeys.includes(routePath)) {
     return undefined;
@@ -164,11 +182,52 @@ const loadCustomRoute = async (dirPath: string): Promise<RouteObject[] | undefin
   try {
     const routeModule = await RoutesList[routePath]() as any;
     // 假设 route.tsx 文件导出一个名为 routes 的数组或者默认导出
-    return routeModule.routes || routeModule.default || [];
+    let routes = routeModule.routes || routeModule.default || [];
+    
+    // 如果有路径前缀，需要将自定义路由中的绝对路径转换为相对路径
+    if (pathPrefix && Array.isArray(routes)) {
+      routes = transformCustomRoutePaths(routes, pathPrefix);
+    }
+    
+    return routes;
   } catch (error) {
     console.warn(`加载自定义路由失败: ${routePath}`, error);
     return undefined;
   }
+};
+
+/**
+ * 转换自定义路由中的路径，将绝对路径转换为相对路径
+ * @param routes 路由配置数组
+ * @param pathPrefix 路径前缀
+ * @returns 转换后的路由配置数组
+ */
+const transformCustomRoutePaths = (routes: RouteObject[], pathPrefix: string): RouteObject[] => {
+  const prefixToRemove = `/${pathPrefix}`;
+  
+  return routes.map(route => {
+    const newRoute = { ...route };
+    
+    // 转换当前路由的路径
+    if (newRoute.path && newRoute.path.startsWith(prefixToRemove)) {
+      newRoute.path = newRoute.path.substring(prefixToRemove.length);
+      // 如果移除前缀后路径为空，设置为空字符串（表示默认路由）
+      if (!newRoute.path) {
+        newRoute.path = '';
+      }
+      // 确保相对路径不以 / 开头
+      if (newRoute.path.startsWith('/')) {
+        newRoute.path = newRoute.path.substring(1);
+      }
+    }
+    
+    // 递归处理子路由
+    if (newRoute.children && Array.isArray(newRoute.children)) {
+      newRoute.children = transformCustomRoutePaths(newRoute.children, pathPrefix);
+    }
+    
+    return newRoute;
+  });
 };
 
 /**
@@ -200,18 +259,27 @@ const getDirectories = (filePaths: string[]): string[] => {
 /**
  * 构建层级结构的路由树
  * @param filePaths 文件路径数组
+ * @param pathPrefix 路径前缀，用于过滤自定义路由
  * @returns 路由对象数组
  */
-const generateRoutesFromFiles = async (filePaths: string[]): Promise<RouteObject[]> => {
+const generateRoutesFromFiles = async (filePaths: string[], pathPrefix?: string): Promise<RouteObject[]> => {
   const finalRoutes: RouteObject[] = [];
   const customRouteDirs = new Set<string>();
 
   // 1. Load all custom routes first and mark their directories.
   const directories = getDirectories(filePaths);
   for (const dirPath of directories) {
+    // 如果指定了路径前缀，只处理匹配前缀的目录
+    if (pathPrefix) {
+      const expectedPrefix = `/${pathPrefix}`;
+      if (!dirPath.startsWith(expectedPrefix)) {
+        continue;
+      }
+    }
+    
     if (hasCustomRoute(dirPath)) {
       customRouteDirs.add(dirPath);
-      const customRoutes = await loadCustomRoute(dirPath);
+      const customRoutes = await loadCustomRoute(dirPath, pathPrefix);
       if (customRoutes) {
         finalRoutes.push(...customRoutes);
       }
@@ -236,8 +304,17 @@ const generateRoutesFromFiles = async (filePaths: string[]): Promise<RouteObject
   });
 
   // 3. Build hierarchical route structure
-  const routeTree = buildRouteTree(routableFiles);
+  const routeTree = buildRouteTree(routableFiles, pathPrefix);
   finalRoutes.push(...routeTree);
+
+  // 4. Add catch-all 404 route at the end
+  finalRoutes.push({
+    path: '*',
+    element: React.createElement(() => {
+      const NotFound = React.lazy(() => import('@/pages/error/notFound'));
+      return React.createElement(NotFound);
+    })
+  });
 
   return finalRoutes;
 };
@@ -245,9 +322,10 @@ const generateRoutesFromFiles = async (filePaths: string[]): Promise<RouteObject
 /**
  * 构建层级路由树
  * @param filePaths 文件路径数组
+ * @param pathPrefix 路径前缀，用于生成相对路径
  * @returns 路由树
  */
-const buildRouteTree = (filePaths: string[]): RouteObject[] => {
+const buildRouteTree = (filePaths: string[], pathPrefix?: string): RouteObject[] => {
   // 按目录分组文件
   const dirToFileMap = new Map<string, string[]>();
   filePaths.forEach(path => {
@@ -268,8 +346,21 @@ const buildRouteTree = (filePaths: string[]): RouteObject[] => {
   dirToFileMap.forEach((files, dir) => {
     const layoutPath = files.find(f => f.endsWith('/layout.tsx'));
     if (layoutPath) {
-      const dirPath = dir.replace('/src/pages', '') || '/';
-      const depth = dirPath === '/' ? 0 : dirPath.split('/').length - 1;
+      let dirPath = dir.replace('/src/pages', '') || '/';
+      
+      // 如果有路径前缀，生成相对于前缀的路径
+      if (pathPrefix) {
+        const prefixToRemove = `/${pathPrefix}`;
+        if (dirPath.startsWith(prefixToRemove)) {
+          dirPath = dirPath.substring(prefixToRemove.length);
+          // 如果移除前缀后路径为空，表示是前缀的根目录
+          if (!dirPath) {
+            dirPath = '';
+          }
+        }
+      }
+      
+      const depth = dirPath === '/' || dirPath === '' ? 0 : dirPath.split('/').filter(Boolean).length;
       layoutInfo.set(dir, {
         layoutPath,
         dirPath,
@@ -327,7 +418,7 @@ const buildRouteTree = (filePaths: string[]): RouteObject[] => {
     
     pageFiles.forEach(filePath => {
       const targetDir = findNearestLayoutDir(dir, layoutInfo);
-      const routePath = extractRoutePathFromFile(filePath);
+      const routePath = extractRoutePathFromFile(filePath, pathPrefix);
 
       if (targetDir && routeMap.has(targetDir)) {
         // 计算相对于目标layout的相对路径
@@ -417,15 +508,19 @@ const findNearestLayoutDir = (
  * @returns 相对路径
  */
 const calculateRelativePath = (fullPath: string, layoutPath: string): string => {
-  if (layoutPath === '/') {
-    return fullPath.substring(1); // 去掉开头的 /
+  // 标准化路径，确保一致性
+  const normalizedFullPath = fullPath.startsWith('/') ? fullPath : '/' + fullPath;
+  const normalizedLayoutPath = layoutPath.startsWith('/') ? layoutPath : '/' + layoutPath;
+  
+  if (normalizedLayoutPath === '/') {
+    return normalizedFullPath.substring(1);
   }
 
-  if (fullPath.startsWith(layoutPath + '/')) {
-    return fullPath.substring(layoutPath.length + 1);
+  if (normalizedFullPath.startsWith(normalizedLayoutPath + '/')) {
+    return normalizedFullPath.substring(normalizedLayoutPath.length + 1);
   }
 
-  if (fullPath === layoutPath) {
+  if (normalizedFullPath === normalizedLayoutPath) {
     return '';
   }
 
@@ -436,8 +531,10 @@ const calculateRelativePath = (fullPath: string, layoutPath: string): string => 
  * 调试函数：打印路由结构
  * @param routes 路由对象数组
  * @param level 缩进级别
+ * @param parentPath 父路径
+ * @param pathPrefix 路径前缀，用于显示完整路径
  */
-const debugPrintRoutes = (routes: RouteObject[], level: number = 0, parentPath: string = ''): void => {
+const debugPrintRoutes = (routes: RouteObject[], level: number = 0, parentPath: string = '', pathPrefix?: string): void => {
   const indent = '  '.repeat(level);
 
   routes.forEach(route => {
@@ -459,11 +556,27 @@ const debugPrintRoutes = (routes: RouteObject[], level: number = 0, parentPath: 
       fullPath = fullPath.slice(0, -1);
     }
     
+    // 如果有路径前缀，显示完整的绝对路径
+    let displayPath = fullPath;
+    if (pathPrefix && level === 0) {
+      // 对于根级路由，添加前缀显示完整路径
+      displayPath = fullPath ? `/${pathPrefix}/${fullPath}` : `/${pathPrefix}`;
+    } else if (pathPrefix && level > 0) {
+      // 对于子路由，也显示完整路径
+      displayPath = `/${pathPrefix}${fullPath}`;
+    }
+    
+    // 清理路径
+    displayPath = displayPath.replace(/\/+/g, '/');
+    if (displayPath !== '/' && displayPath.endsWith('/')) {
+      displayPath = displayPath.slice(0, -1);
+    }
+    
     // 检查是否是layout路由
     const isLayoutRoute = route.children && route.children.length > 0;
     const layoutIndicator = isLayoutRoute ? ' 📁' : '';
     
-    let logMessage = `${indent}${fullPath || '/'}${layoutIndicator}`;
+    let logMessage = `${indent}${displayPath || '/'}${layoutIndicator}`;
 
     if (route.element) {
       const elementType = (route.element as any)?.type;
@@ -483,28 +596,38 @@ const debugPrintRoutes = (routes: RouteObject[], level: number = 0, parentPath: 
     
     if (route.children && route.children.length > 0) {
       // 传递当前计算出的完整路径给子节点
-      debugPrintRoutes(route.children, level + 1, fullPath);
+      debugPrintRoutes(route.children, level + 1, fullPath, pathPrefix);
     }
   });
 };
 
 /**
  * 生成动态路由
+ * @param pathPrefix 路径前缀，用于限制动态路由的范围，例如 "admin" 表示只处理 pages/admin 下的文件
  * @returns 路由对象数组的Promise
  */
-export const generateDynamicRoutes = async (): Promise<RouteObject[]> => {
+export const generateDynamicRoutes = async (pathPrefix?: string): Promise<RouteObject[]> => {
+  // 根据路径前缀过滤文件
+  let filteredPageKeys = PageKeys;
+  if (pathPrefix) {
+    const prefixPattern = `/src/pages/${pathPrefix}/`;
+    filteredPageKeys = PageKeys.filter(key => key.includes(prefixPattern));
+  }
+  
   // 基于文件系统生成路由
-  const routes = await generateRoutesFromFiles(PageKeys);
+  const routes = await generateRoutesFromFiles(filteredPageKeys, pathPrefix);
   
   // 调试模式下打印路由结构
   if (process.env.NODE_ENV === 'development') {
-    console.group('🚀 动态路由生成结果:');
-    console.log(`📁 扫描到的页面文件数量: ${PageKeys.length}`);
-    console.log(`📁 扫描到的自定义路由文件数量: ${RouteKeys.length}`);
-    console.log(`🛣️  生成的路由数量: ${routes.length}`);
-    console.log('🗂️  路由结构:');
-    debugPrintRoutes(routes);
-    console.groupEnd();
+    // console.group('🚀 动态路由生成结果:');
+    // console.log(`📁 扫描到的页面文件数量: ${PageKeys.length}`);
+    // console.log(`📁 过滤后的页面文件数量: ${filteredPageKeys.length}`);
+    // console.log(`📁 扫描到的自定义路由文件数量: ${RouteKeys.length}`);
+    // console.log(`🛣️  生成的路由数量: ${routes.length}`);
+    // console.log(`🎯 路径前缀: ${pathPrefix || 'none'}`);
+    // console.log('🗂️  路由结构:');
+    // debugPrintRoutes(routes, 0, '', pathPrefix);
+    // console.groupEnd();
   }
   
   return routes;
@@ -512,9 +635,10 @@ export const generateDynamicRoutes = async (): Promise<RouteObject[]> => {
 
 /**
  * 手动调试函数：随时打印当前路由结构
+ * @param pathPrefix 路径前缀，用于限制调试范围
  */
-export const debugRoutes = async (): Promise<void> => {
-  const routes = await generateDynamicRoutes();
+export const debugRoutes = async (pathPrefix?: string): Promise<void> => {
+  const routes = await generateDynamicRoutes(pathPrefix);
   console.group('🔍 手动调试 - 当前路由结构:');
   debugPrintRoutes(routes);
   console.groupEnd();

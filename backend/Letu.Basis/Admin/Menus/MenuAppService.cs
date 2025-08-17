@@ -8,7 +8,7 @@ using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Menus
 {
-    public class MenuAppService : ApplicationService, IMenuAppService
+    public class MenuAppService : BasisAppService, IMenuAppService
     {
         private readonly IFreeSqlRepository<MenuItem> _menuRepository;
 

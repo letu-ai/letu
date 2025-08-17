@@ -1,6 +1,7 @@
 using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Menus.Dtos;
-using Letu.Core.Attributes;
+using Letu.Basis.Permissions;
+
 using Letu.Logging;
 using Letu.Shared.Consts;
 
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Letu.Basis.Controllers.Admin
 {
-    [Authorize]
+    [Authorize(BasisPermissions.MenuItem.Default)]
     [ApiController]
     [Route("api/admin/menus")]
     public class MenuController : ControllerBase
@@ -28,7 +29,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [HasPermission("Sys.Menu.Add")]
+        [Authorize(BasisPermissions.MenuItem.Create)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         public async Task AddMenuAsync([FromBody] MenuCreateOrUpdateInput dto)
         {
@@ -41,7 +42,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        [HasPermission("Sys.Menu.List")]
         [ApiAccessLog(operateType: [OperateType.Query])]
         public async Task<List<MenuListOutput>> GetMenuListAsync([FromQuery] MenuQueryDto dto)
         {
@@ -54,7 +54,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="input"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        [HasPermission("Sys.Menu.Update")]
+        [Authorize(BasisPermissions.MenuItem.Update)]
         [ApiAccessLog(operateName: "修改菜单", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task UpdateMenuAsync(Guid id, [FromBody] MenuCreateOrUpdateInput input)
         {
@@ -67,7 +67,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [HasPermission("Sys.Menu.Delete")]
+        [Authorize(BasisPermissions.MenuItem.Delete)]
         [ApiAccessLog(operateName: "删除菜单", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteMenusAsync([FromBody] Guid[] ids)
         {

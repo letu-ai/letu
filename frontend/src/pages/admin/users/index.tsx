@@ -17,6 +17,7 @@ import ResetUserPwdForm, { type ResetUserPwdFormRef } from './_ResetUserPwdForm'
 import ProIcon from '@/components/ProIcon';
 import { useApplication } from '@/components/Application';
 import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 
 const UserTable = () => {
   const tableRef = useRef<SmartTableRef>(null);
@@ -76,7 +77,7 @@ const UserTable = () => {
       fixed: 'right',
       render: (_: any, record: UserListDto) => (
         <Space>
-          <Permission permissions={'Sys.User.ResetPwd'}>
+          <Permission permissions={BasisPermissions.User.ResetPassword}>
             <Button
               type="link"
               icon={<KeyOutlined />}
@@ -87,7 +88,7 @@ const UserTable = () => {
               重置密码
             </Button>
           </Permission>
-          <Permission permissions={'Sys.User.AssignRole'}>
+          <Permission permissions={BasisPermissions.Role.ManagePermission}>
             <Button
               type="link"
               onClick={() => {
@@ -98,7 +99,7 @@ const UserTable = () => {
               分配角色
             </Button>
           </Permission>
-          <Permission permissions={'Sys.User.Delete'}>
+          <Permission permissions={BasisPermissions.User.Delete}>
             <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
               删除
             </Button>
@@ -143,7 +144,7 @@ const UserTable = () => {
           </Form.Item>
         }
         toolbar={
-          <Permission permissions={'Sys.User.Add'}>
+          <Permission permissions={BasisPermissions.User.Create}>
             <Button
               color="primary"
               variant="solid"

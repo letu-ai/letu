@@ -1,4 +1,5 @@
 ﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import { deletePositionGroup, getPositionGroupList, type PositionGroupListDto } from './service';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space } from 'antd';
@@ -32,7 +33,7 @@ const PositionGroupList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: PositionGroupListDto) => (
         <Space>
-          <Permission permissions={'Org.PositionGroup.Update'}>
+            <Permission permissions={BasisPermissions.Position.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -43,7 +44,7 @@ const PositionGroupList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Org.PositionGroup.Delete'}>
+          <Permission permissions={BasisPermissions.Position.Delete}>
             <Popconfirm
               title="确定删除吗？"
               description="删除后无法撤销"
@@ -101,11 +102,13 @@ const PositionGroupList: React.FC = () => {
           </Form.Item>
         }
         toolbar={
-          <Permission permissions={'Org.PositionGroup.Add'}>
-            <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
-              新增
-            </Button>
-          </Permission>
+          <>
+            <Permission permissions={BasisPermissions.Position.Create}>
+              <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+                新增
+              </Button>
+            </Permission>
+          </>
         }
       />
       {/* 职位分组新增/编辑弹窗 */}

@@ -5,7 +5,7 @@ using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public class SecurityLogAppService : ApplicationService, ISecurityLogAppService
+    public class SecurityLogAppService : BasisAppService, ISecurityLogAppService
     {
         private readonly IFreeSqlRepository<SecurityLog> _loginLogRepository;
 

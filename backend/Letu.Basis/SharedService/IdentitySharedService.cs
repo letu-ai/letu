@@ -66,7 +66,7 @@ namespace Letu.Basis.SharedService
 
             var roleIds = await _userRoleRepository.Where(x => x.UserId == userId).ToListAsync(x => x.RoleId);
             var roles = await _roleRepository.Where(x => roleIds.Contains(x.Id) && x.IsEnabled).ToListAsync();
-            var isSuperAdmin = roles.Any(r => r.RoleName == AdminConsts.SuperAdminRole);
+            var isSuperAdmin = roles.Any(r => r.Name == AdminConsts.SuperAdminRole);
             var menuIds = await _roleMenuRepository.Where(x => roleIds.Contains(x.RoleId)).ToListAsync(x => x.MenuId);
             var menus = await _menuRepository.Select.Where(x => menuIds.Contains(x.Id) || isSuperAdmin).ToListAsync(x => new { x.Permission, x.Id, x.MenuType });
             if (isSuperAdmin)
@@ -76,7 +76,7 @@ namespace Letu.Basis.SharedService
             var rs = new UserPermission
             {
                 UserId = userId,
-                Roles = roles.Select(c => c.RoleName).ToArray(),
+                Roles = roles.Select(c => c.Name).ToArray(),
                 Auths = menus.Where(c => !string.IsNullOrEmpty(c.Permission) && c.MenuType == MenuType.Button).Select(c => c.Permission!).Distinct().ToArray(),
                 RoleIds = [.. roleIds],
                 MenuIds = [.. menuIds],
@@ -91,12 +91,12 @@ namespace Letu.Basis.SharedService
         /// </summary>
         /// <param name="roleId"></param>
         /// <returns></returns>
-        public async Task DelUserPermissionCacheByRoleIdAsync(Guid roleId)
+        public async Task RemoveUserPermissionCacheByRoleIdAsync(Guid roleId)
         {
             var userRoles = await _userRoleRepository.Where(x => x.RoleId == roleId).ToListAsync();
             foreach (var item in userRoles)
             {
-                await DelUserPermissionCacheByUserIdAsync(item.UserId);
+                await RemoveUserPermissionCacheByUserIdAsync(item.UserId);
             }
         }
 
@@ -105,9 +105,9 @@ namespace Letu.Basis.SharedService
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public Task DelUserPermissionCacheByUserIdAsync(Guid userId)
+        public async Task RemoveUserPermissionCacheByUserIdAsync(Guid userId)
         {
-            return permissionCache.RemoveAsync(SystemCacheKey.UserPermission(userId));
+            await permissionCache.RemoveAsync(SystemCacheKey.UserPermission(userId));
         }
 
         /// <summary>

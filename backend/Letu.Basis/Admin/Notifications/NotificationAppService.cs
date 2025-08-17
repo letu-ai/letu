@@ -7,7 +7,7 @@ using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Notifications
 {
-    public class NotificationAppService : ApplicationService, INotificationAppService
+    public class NotificationAppService : BasisAppService, INotificationAppService
     {
         private readonly IFreeSqlRepository<Notification> _repository;
         private readonly IFreeSqlRepository<Employee> _employeeRepository;

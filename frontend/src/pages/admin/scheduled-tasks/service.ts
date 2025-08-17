@@ -24,8 +24,8 @@ export function getScheduledTaskList(dto: ScheduledTaskQueryDto) {
  * 修改定时任务
  * @param dto
  */
-export function updateScheduledTask(dto: ScheduledTaskDto) {
-  return httpClient.put<ScheduledTaskDto, void>('/api/admin/scheduled-tasks', dto);
+export function updateScheduledTask(id: string, dto: ScheduledTaskDto) {
+  return httpClient.put<ScheduledTaskDto, void>(`/api/admin/scheduled-tasks/${id}`, dto);
 }
 
 /**

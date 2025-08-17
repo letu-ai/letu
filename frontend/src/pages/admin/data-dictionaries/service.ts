@@ -23,8 +23,8 @@ export function getDictTypeList(dto: DictTypeSearchDto) {
  * 修改字典类型
  * @param dto
  */
-export function updateDictType(dto: DictTypeDto) {
-  return httpClient.put<DictTypeDto, void>('/api/admin/data-dictionaries/types', dto);
+export function updateDictType(id: string, dto: DictTypeDto) {
+  return httpClient.put<DictTypeDto, void>(`/api/admin/data-dictionaries/types/${id}`, dto);
 }
 
 /**
@@ -96,8 +96,8 @@ export function getDictDataList(dto: DictDataQueryDto) {
 /**
  * 修改字典数据
  */
-export function updateDictData(dto: DictDataDto) {
-  return httpClient.put<DictDataDto, void>('/api/admin/data-dictionaries', dto);
+export function updateDictData(id: string, dto: DictDataDto) {
+  return httpClient.put<DictDataDto, void>(`/api/admin/data-dictionaries/${id}`, dto);
 }
 
 /**

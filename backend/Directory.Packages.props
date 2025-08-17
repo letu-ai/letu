@@ -3,27 +3,31 @@
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageVersion Include="Volo.Abp.Auditing" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.AuditLogging.Domain" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.Autofac" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.AutoMapper" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.AspNetCore" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.AspNetCore.Serilog" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.AspNetCore.MultiTenancy" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.AspNetCore.Mvc" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.Core" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.Ddd.Domain" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.DistributedLocking" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.EventBus" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.ExceptionHandling" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.ObjectMapping" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.MultiTenancy" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.Threading" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.PermissionManagement.Domain" Version="9.2.2" />
-		<PackageVersion Include="Volo.Abp.BackgroundJobs.Domain"  Version="9.2.2"/>
-		<PackageVersion Include="Volo.Abp.FeatureManagement.Domain"  Version="9.2.2"/>
-		<PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="9.2.2"/>
+		<PackageVersion Include="Volo.Abp.Auditing" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.AuditLogging.Domain" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Autofac" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.AutoMapper" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.AspNetCore" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.AspNetCore.Serilog" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.AspNetCore.MultiTenancy" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.AspNetCore.Mvc" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Core" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Ddd.Domain" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.DistributedLocking" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.EventBus" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.ExceptionHandling" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.ObjectMapping" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.MultiTenancy" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Threading" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Identity.Domain"  Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Identity.Application.Contracts"  Version="9.2.3"/>
+		<PackageVersion Include="Volo.Abp.PermissionManagement.Domain" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.BackgroundJobs.Domain"  Version="9.2.3"/>
+		<PackageVersion Include="Volo.Abp.FeatureManagement.Domain"  Version="9.2.3"/>
+		<PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="9.2.3"/>
+		<PackageVersion Include="Volo.Abp.Emailing" Version="9.2.3"/>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageVersion Include="AutoMapper" Version="14.0.0" />

@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using Letu.Basis.Admin.Departments.Dtos;
-using Letu.Basis.Admin.Employees;
-using Letu.Basis.Admin.Employees.Dtos;
-using Letu.Basis.Admin.Positions;
-using Letu.Basis.Admin.Positions.Dtos;
+using Volo.Abp.AutoMapper;
 
 namespace Letu.Basis.Admin.Departments
 {
@@ -11,8 +8,11 @@ namespace Letu.Basis.Admin.Departments
     {
         public DepartmentAutoMapperProfile()
         {
-            CreateMap<DeptDto, Department>();
-            CreateMap<Department, DeptListDto>();
+            CreateMap<DepartmentCreateOrUpdateInput, Department>(MemberList.Source)
+                .Ignore(dest=>dest.Id);
+
+            CreateMap<Department, DepartmentListOutput>()
+                .Ignore(dest=>dest.CuratorName);
         }
     }
 }

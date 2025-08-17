@@ -10,21 +10,22 @@ namespace Letu.Basis.Admin.Departments
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddDeptAsync(DeptDto dto);
+        Task<bool> AddDeptAsync(DepartmentCreateOrUpdateInput dto);
 
         /// <summary>
         /// 部门树形列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<DeptListDto>> GetDeptListAsync(DeptQueryDto dto);
+        Task<List<DepartmentListOutput>> GetDeptListAsync(DeptQueryDto dto);
 
         /// <summary>
         /// 修改部门
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="id"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        Task<bool> UpdateDeptAsync(DeptDto dto);
+        Task<bool> UpdateDeptAsync(Guid id, DepartmentCreateOrUpdateInput input);
 
         /// <summary>
         /// 删除部门

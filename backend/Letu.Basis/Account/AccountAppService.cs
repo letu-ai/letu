@@ -14,7 +14,7 @@ using Volo.Abp.Users;
 
 namespace Letu.Basis.Account
 {
-    public class AccountAppService : ApplicationService, IAccountAppService
+    public class AccountAppService : BasisAppService, IAccountAppService
     {
         private readonly IFreeSqlRepository<User> userRepository;
         private readonly IFreeSqlRepository<MenuItem> menuRepository;
@@ -57,10 +57,10 @@ namespace Letu.Basis.Account
         {
             var uid = CurrentUser.Id!.Value;
             var permission = await identitySharedService.GetUserPermissionAsync(uid);
-            if (permission.MenuIds == null || permission.MenuIds.Length <= 0) return [];
+            //if (permission.MenuIds == null || permission.MenuIds.Length <= 0) return [];
 
             var all = await menuRepository
-                .Where(x => permission.MenuIds.Contains(x.Id) && (x.MenuType == MenuType.Menu || x.MenuType == MenuType.Folder)).ToListAsync();
+                .Where(x =>(x.MenuType == MenuType.Menu || x.MenuType == MenuType.Folder)).ToListAsync();
             var top = all.Where(x => !x.ParentId.HasValue || x.ParentId == Guid.Empty).OrderBy(x => x.Sort).ToList();
             var topMap = new List<FrontendMenu>();
             foreach (var item in top)

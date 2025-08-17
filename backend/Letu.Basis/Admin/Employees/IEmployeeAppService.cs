@@ -11,21 +11,21 @@ namespace Letu.Basis.Admin.Employees
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddEmployeeAsync(EmployeeDto dto);
+        Task<bool> AddEmployeeAsync(EmployeeCreateOrUpdateInput dto);
 
         /// <summary>
         /// 员工列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<EmployeeListDto>> GetEmployeePagedListAsync(EmployeeQueryDto dto);
+        Task<PagedResult<EmployeeListOutput>> GetEmployeePagedListAsync(EmployeeListInput dto);
 
         /// <summary>
         /// 修改员工
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdateEmployeeAsync(EmployeeDto dto);
+        Task<bool> UpdateEmployeeAsync(Guid id, EmployeeCreateOrUpdateInput dto);
 
         /// <summary>
         /// 删除员工
@@ -53,13 +53,13 @@ namespace Letu.Basis.Admin.Employees
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<EmployeeDto>> GetEmployeeListAsync(EmployeeQueryDto dto);
+        Task<List<EmployeeCreateOrUpdateInput>> GetEmployeeListAsync(EmployeeListInput dto);
 
         /// <summary>
         /// 部门+员工树形
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<DeptEmployeeTreeDto>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeQueryDto dto);
+        Task<List<DeptEmployeeTreeOutput>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeInput dto);
     }
 }

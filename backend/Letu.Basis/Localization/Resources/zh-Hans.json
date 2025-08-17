@@ -1,0 +1,49 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+
+    "TestEmailSubject": "测试邮件 {0}",
+    "TestEmailBody": "测试邮件内容",
+    "SentSuccessfully": "发送成功",
+    "MailSendingFailed": "邮件发送失败，请检查您的电子邮件配置并重试。",
+    "DefaultTimeZone": "默认时区",
+
+
+    "Permission:Admin.BaseData": "基础数据",
+    "Permission:Admin.Setting": "系统设置",
+    "Permission:Admin.Saas": "SaaS",
+
+    "Permission:Create": "创建",
+    "Permission:Edit": "编辑",
+    "Permission:Delete": "删除",
+    "Permission:View": "查看",
+    "Permission:ChangePermissions": "修改权限",
+    "Permission:ManageFeatures": "管理功能",
+    "Permission:ManageConnectionStrings": "管理连接字符串",
+    "Permission:ManageHostFeatures": "管理主机功能",
+    "Permission:Emailling": "邮件设置",
+    "Permission:EmailingTest": "发送邮件测试",
+    "Permission:TimeZone": "时区设置",
+    "Permission:BindUser": "绑定用户",
+    "Permission:BindEmployee": "绑定员工",
+    "Permission:Log": "日志",
+    "Permission:Revoke": "注销登录",
+    "Permission:ResetPassword": "重置密码",
+
+    "Permission:RoleManagement": "角色管理",
+    "Permission:UserManagement": "用户管理",
+    "Permission:ClientManagement": "客户端管理",
+    "Permission:MenuItemManagement": "菜单管理",
+    "Permission:OrganizationManagement": "机构管理",
+    "Permission:DepartmentManagement": "部门管理",
+    "Permission:DataDictionaryManagement": "数据字典",
+    "Permission:SettingManagement": "系统设置",
+    "Permission:FeatureManagement": "功能管理",
+    "Permission:TenantManagement": "租户管理",
+    "Permission:EditionManagement": "版本管理",
+    "Permission:EmployeeManagement": "员工管理",
+    "Permission:PositionManagement": "职位管理",
+    "Permission:NotificationManagement": "通知管理",
+    "Permission:ScheduledTaskManagement": "定时任务管理"
+  }
+}

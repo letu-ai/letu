@@ -1,5 +1,4 @@
 using FreeSql.DataAnnotations;
-using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Shared.Enums;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +14,18 @@ namespace Letu.Basis.Admin.Users
     [Table(Name = "sys_user")]
     public class User : FullAuditedEntity<Guid>, IMultiTenant
     {
+        //public User()
+        //{
+        //}
+
+        protected User()
+        {
+        }
+        
+        public User(Guid id) : base(id)
+        {
+        }
+
         /// <summary>
         /// 用户名
         /// </summary>
@@ -74,7 +85,7 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 用户角色
         /// </summary>
-        public virtual ICollection<UserInRole>? UserRoles { get; set; }
+        public virtual ICollection<UserInRole>? Roles { get; set; }
 
         /// <summary>
         /// 租户ID

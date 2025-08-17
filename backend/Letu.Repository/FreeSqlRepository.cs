@@ -1,7 +1,6 @@
 ﻿using FreeSql;
 using System.Linq.Expressions;
 using Volo.Abp.Domain.Entities;
-using Volo.Abp.MultiTenancy;
 
 namespace Letu.Repository
 {

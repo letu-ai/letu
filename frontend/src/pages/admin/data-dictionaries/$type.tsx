@@ -1,4 +1,5 @@
 ﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import { deleteDictData, getDictDataList, type DictDataDto, type DictDataListDto } from './service';
 import { ArrowLeftOutlined, CopyOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Switch } from 'antd';
@@ -51,7 +52,7 @@ const DictDataList: React.FC = () => {
       dataIndex: 'option',
       render: (_: any, record: DictDataListDto) => (
         <Space>
-          <Permission permissions={'Sys.DictData.Update'}>
+          <Permission permissions={BasisPermissions.DataDictionary.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -63,7 +64,7 @@ const DictDataList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.DictData.Update'}>
+          <Permission permissions={BasisPermissions.DataDictionary.Update}>
             <Button
               key="copy"
               type="link"
@@ -77,7 +78,7 @@ const DictDataList: React.FC = () => {
               复制
             </Button>
           </Permission>
-          <Permission permissions={'Sys.DictData.Delete'}>
+          <Permission permissions={BasisPermissions.DataDictionary.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -122,7 +123,7 @@ const DictDataList: React.FC = () => {
                 返回
               </Button>
             </Link>
-            <Permission permissions={'Sys.DictData.Add'}>
+            <Permission permissions={BasisPermissions.DataDictionary.Create}>
               <Button
                 type="primary"
                 key="primary"

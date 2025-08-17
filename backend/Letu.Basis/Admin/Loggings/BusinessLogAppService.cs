@@ -7,7 +7,7 @@ using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Loggings
 {
-    public class BusinessLogAppService : ApplicationService, IBusinessLogAppService
+    public class BusinessLogAppService : BasisAppService, IBusinessLogAppService
     {
         private readonly IFreeSqlRepository<LogRecord> _logRecordRepository;
 

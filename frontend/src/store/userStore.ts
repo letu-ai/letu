@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import type { IFrontendMenu } from '@/pages/accounts/service';
 import { makeAutoObservable, runInAction } from 'mobx';
 
@@ -59,7 +58,10 @@ class UserStore {
   isAuthenticated(): boolean {
     const tokenInfo = this.token;
     if (!tokenInfo || !tokenInfo.accessToken) return false;
-    return dayjs(tokenInfo.expiredTime).isAfter(new Date());
+    // 统一使用UTC时间进行比较
+    const now = new Date();
+    const expiredTime = new Date(tokenInfo.expiredTime);
+    return expiredTime.getTime() > now.getTime();
   }
 
   /**

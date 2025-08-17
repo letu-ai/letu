@@ -51,7 +51,7 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
 
   const onFinish = async (values: RoleDto) => {
     if (row?.id) {
-      await updateRole({ ...values, id: row.id });
+      await updateRole(row.id, values);
       handleSuccess('编辑成功');
     } else {
       await addRole(values);
@@ -76,7 +76,7 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="角色名" name="roleName" rules={[{ required: true }, { max: 64 }]}>
+        <Form.Item label="角色名" name="name" rules={[{ required: true }, { max: 64 }]}>
           <Input placeholder="请输入角色名" />
         </Form.Item>
         <Form.Item label="状态" name="isEnabled" rules={[{ required: true, message: '请选择角色状态' }]}>

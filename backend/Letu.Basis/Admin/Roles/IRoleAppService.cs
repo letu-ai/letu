@@ -11,21 +11,21 @@ namespace Letu.Basis.Admin.Roles
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> AddRoleAsync(RoleDto dto);
+        Task<bool> AddRoleAsync(RoleCreateOrUpdateInput dto);
 
         /// <summary>
         /// 角色分页列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<RoleListDto>> GetRoleListAsync(RoleQueryDto dto);
+        Task<PagedResult<RoleListOutput>> GetRoleListAsync(RoleListInput dto);
 
         /// <summary>
         /// 修改角色
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdateRoleAsync(RoleDto dto);
+        Task<bool> UpdateRoleAsync(Guid id, RoleCreateOrUpdateInput dto);
 
         /// <summary>
         /// 删除角色

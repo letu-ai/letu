@@ -11,7 +11,7 @@ using Volo.Abp.Domain.Entities;
 namespace Letu.Basis.Admin.AuditLogging.EntityChangeLogs;
 
 [DisableAuditing]
-public class EntityChangeLogAppService : ApplicationService, IEntityChangeLogAppService
+public class EntityChangeLogAppService : BasisAppService, IEntityChangeLogAppService
 {
     private readonly IFreeSql _freeSql;
     private readonly IPermissionChecker _permissionChecker;

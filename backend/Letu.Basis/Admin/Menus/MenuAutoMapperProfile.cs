@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Letu.Basis.Admin.Menus.Dtos;
 using Letu.Shared.Models;
+using Volo.Abp.AutoMapper;
 
 namespace Letu.Basis.Admin.Menus
 {
@@ -8,9 +9,16 @@ namespace Letu.Basis.Admin.Menus
     {
         public MenuAutoMapperProfile()
         {
-            CreateMap<MenuCreateOrUpdateInput, MenuItem>();
-            CreateMap<MenuItem, MenuListOutput>();
-            CreateMap<MenuItem, FrontendMenu>();
+            CreateMap<MenuCreateOrUpdateInput, MenuItem>(MemberList.Source)
+                .Ignore(d=>d.Id);
+
+            CreateMap<MenuItem, MenuListOutput>()
+                .Ignore(dest=>dest.Children);
+
+            CreateMap<MenuItem, FrontendMenu>()
+                .Ignore(dest=>dest.LayerName)
+                .Ignore(dest=>dest.Children);
+            
         }
     }
 }

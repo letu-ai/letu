@@ -18,10 +18,10 @@ export function getDeptList(dto: DeptQueryDto) {
 
 /**
  * 修改部门
- * @param dto
+ * @param input
  */
-export function updateDept(dto: DeptDto) {
-  return httpClient.put<DeptDto, void>('/api/admin/departments', dto);
+export function updateDept(id: string, input: DeptDto) {
+  return httpClient.put<DeptDto, void>(`/api/admin/departments/${id}`, input);
 }
 
 /**
@@ -29,7 +29,7 @@ export function updateDept(dto: DeptDto) {
  * @param id 部门ID
  */
 export function deleteDept(id: string) {
-  return httpClient.delete<string, void>('/api/admin/departments/' + id);
+  return httpClient.delete<string, void>(`/api/admin/departments/${id}`);
 }
 
 export interface DeptDto {

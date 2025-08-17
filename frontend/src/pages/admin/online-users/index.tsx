@@ -2,6 +2,7 @@
 import { Button, Form, Input, Tag } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type';
 import ProIcon from '@/components/ProIcon';
@@ -52,7 +53,7 @@ const OnlineUserList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: OnlineUserResultDto) => {
         return (
-          <Permission permissions={'Monitor.Logout'}>
+          <Permission permissions={BasisPermissions.User.Revoke}>
             <Button
               type="link"
               icon={<ProIcon icon="iconify:hugeicons:logout-04" />}

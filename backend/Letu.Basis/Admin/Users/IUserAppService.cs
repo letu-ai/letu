@@ -11,14 +11,14 @@ namespace Letu.Basis.Admin.Users
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Guid> AddUserAsync(UserDto dto);
+        Task<Guid> AddUserAsync(UserCreateOrUpdateInput dto);
 
         /// <summary>
         /// 用户分页列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<UserListDto>> GetUserListAsync(UserQueryDto dto);
+        Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto);
 
         /// <summary>
         /// 删除用户

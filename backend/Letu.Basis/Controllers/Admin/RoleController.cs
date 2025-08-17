@@ -1,7 +1,8 @@
 using Letu.Applications;
 using Letu.Basis.Admin.Roles;
 using Letu.Basis.Admin.Roles.Dtos;
-using Letu.Core.Attributes;
+using Letu.Basis.Permissions;
+
 using Letu.Logging;
 using Letu.Shared.Consts;
 using Letu.Shared.Models;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Letu.Basis.Controllers.Admin
 {
-    [Authorize]
+    [Authorize(BasisPermissions.Role.Default)]
     [ApiController]
     [Route("/api/admin/roles")]
     public class RoleController : ControllerBase
@@ -29,9 +30,9 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [HasPermission("Sys.Role.Add")]
+        [Authorize(BasisPermissions.Role.Create)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
-        public async Task AddRoleAsync([FromBody] RoleDto dto)
+        public async Task AddRoleAsync([FromBody] RoleCreateOrUpdateInput dto)
         {
             await _roleService.AddRoleAsync(dto);
         }
@@ -42,8 +43,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        [HasPermission("Sys.Role.List")]
-        public async Task<PagedResult<RoleListDto>> GetRoleListAsync([FromQuery] RoleQueryDto dto)
+        public async Task<PagedResult<RoleListOutput>> GetRoleListAsync([FromQuery] RoleListInput dto)
         {
             return await _roleService.GetRoleListAsync(dto);
         }
@@ -55,12 +55,11 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id:Guid}")]
-        [HasPermission("Sys.Role.Update")]
+        [Authorize(BasisPermissions.Role.Update)]
         [ApiAccessLog(operateName: "修改角色", operateType: [OperateType.Update], reponseEnable: true)]
-        public async Task UpdateRoleAsync(Guid id, [FromBody] RoleDto dto)
+        public async Task UpdateRoleAsync(Guid id, [FromBody] RoleCreateOrUpdateInput dto)
         {
-            dto.Id = id; // 确保ID一致
-            await _roleService.UpdateRoleAsync(dto);
+            await _roleService.UpdateRoleAsync(id, dto);
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id:Guid}")]
-        [HasPermission("Sys.Role.Delete")]
+        [Authorize(BasisPermissions.Role.Delete)]
         [ApiAccessLog(operateName: "删除角色", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteRoleAsync(Guid id)
         {
@@ -83,7 +82,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id:Guid}/menus")]
-        [HasPermission("Sys.Role.AssignMenu")]
         [ApiAccessLog(operateName: "分配菜单权限", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task AssignMenuAsync(Guid id, [FromBody] AssignMenuDto dto)
         {

@@ -1,4 +1,5 @@
 ﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import {
   deleteDictType,
   getDictTypeList,
@@ -51,7 +52,7 @@ const DictList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: DictTypeResultDto) => (
         <Space>
-          <Permission permissions={'Sys.DictType.Update'}>
+          <Permission permissions={BasisPermissions.DataDictionary.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -63,7 +64,7 @@ const DictList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.DictData.List'}>
+          <Permission permissions={BasisPermissions.DataDictionary.Default}>
             <Link to={`/admin/data-dictionaries/${record.dictType}`}>
             <Button
               type="link"
@@ -74,7 +75,7 @@ const DictList: React.FC = () => {
               </Button>
             </Link>
           </Permission>
-          <Permission permissions={'Sys.DictType.Delete'}>
+          <Permission permissions={BasisPermissions.DataDictionary.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -135,7 +136,7 @@ const DictList: React.FC = () => {
         ]}
         toolbar={
           <Space size="middle">
-            <Permission permissions={'Sys.DictType.Add'}>
+            <Permission permissions={BasisPermissions.DataDictionary.Create}>
               <Button
                 type="primary"
                 key="primary"
@@ -146,7 +147,7 @@ const DictList: React.FC = () => {
                 <PlusOutlined /> 新增
               </Button>
             </Permission>
-            <Permission permissions={'Sys.DictType.Delete'}>
+            <Permission permissions={BasisPermissions.DataDictionary.Delete}>
               <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={batchDelete}>
                 删除
               </Button>

@@ -1,6 +1,6 @@
 ﻿namespace Letu.Basis.Admin.Employees.Dtos
 {
-    public class EmployeeInfoDto : EmployeeListDto
+    public class EmployeeInfoDto : EmployeeListOutput
     {
         public string? UserName { get; set; }
 

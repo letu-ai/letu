@@ -3,9 +3,10 @@ import React, { type ForwardedRef, forwardRef, useEffect, useImperativeHandle, u
 import type { SmartTableProps, SmartTableRef } from './type';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
-import { selectSize } from '@/store/themeStore.ts';
 import type { TableProps } from 'antd';
+import useThemeStore from '@/store/themeStore';
+import type { SizeType } from '@/store/layoutStore';
+import useLayoutStore, { isSizeType } from '@/store/layoutStore';
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
@@ -20,7 +21,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
     });
     const [total, setTotal] = useState<number>(0);
     const [dataSource, setDataSource] = useState<T[]>([]);
-    const size = useSelector(selectSize);
+    const size = useLayoutStore(state=>state.size);
     const [tableSize, setTableSize] = useState(props.size);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -78,7 +79,8 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
       },
     ];
     const columnWidthItemClick = ({ key }: { key: string }) => {
-      setTableSize(key as 'large' | 'middle' | 'small');
+      if(isSizeType(key))
+        setTableSize(key);
     };
 
     const handleTableChange = (pagination: TablePaginationConfig) => {
@@ -133,7 +135,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
 
         <Card>
           {/* 新增/编辑等操作栏 */}
-          <div className="flex space-between">
+          <div className="flex justify-between">
             <div className="custom-toolbar mb-2">
               {Array.isArray(props.toolbar)
                 ? React.Children.map(props.toolbar, (child, index) => {

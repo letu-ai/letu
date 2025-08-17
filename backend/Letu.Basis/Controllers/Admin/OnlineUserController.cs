@@ -2,7 +2,8 @@
 using Letu.Basis.Admin.OnlineUsers;
 using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Basis.Identity;
-using Letu.Core.Attributes;
+using Letu.Basis.Permissions;
+
 using Letu.Logging;
 
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Letu.Basis.Controllers.Admin
 {
+    // TODO:完善权限点
     [Authorize]
     [ApiController]
     [Route("api/admin/online-users")]
@@ -30,24 +32,23 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        [HasPermission("Monitor.OnlineUser")]
         [ApiAccessLog(operateName: "在线用户列表", operateType: [OperateType.Query])]
         public async Task<PagedResult<OnlineUserResultDto>> GetOnlineUsersAsync([FromQuery] OnlineUserSearchDto dto)
         {
             return await onlineUserService.GetOnlineUserListAsync(dto);
         }
 
-      
-    /// <summary>
-    /// 注销用户会话
-    /// </summary>
-    /// <returns></returns>
-    [HttpPost("revoke")]
-    [HasPermission("Monitor.Logout")]
-    [ApiAccessLog(operateName: "注销用户会话", operateType: [OperateType.Delete])]
-    public async Task LogoutAsync(SessionRevokeInput input)
-    {
-        await identityAppService.LogoutAsync(input.UserId, input.SessionId);
-    }
+
+        /// <summary>
+        /// 注销用户会话
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("revoke")]
+        [Authorize(BasisPermissions.User.Revoke)]
+        [ApiAccessLog(operateName: "注销用户会话", operateType: [OperateType.Delete])]
+        public async Task LogoutAsync(SessionRevokeInput input)
+        {
+            await identityAppService.LogoutAsync(input.UserId, input.SessionId);
+        }
     }
 }

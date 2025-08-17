@@ -1,17 +1,15 @@
 ﻿using Letu.Applications;
 using Letu.Basis.Admin.DataDictionary.Dtos;
-using Letu.Core.Helpers;
 using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Letu.Shared.Models;
 using Volo.Abp;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 
 namespace Letu.Basis.Admin.DataDictionary;
 
-public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppService
+public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppService
 {
     private readonly IFreeSqlRepository<DictionaryType> _dictTypeRepository;
     private readonly IFreeSqlRepository<DictionaryItem> _dictDataRepository;
@@ -28,7 +26,7 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
     }
 
     [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictAddSubType, "{{dict.Id}}", LogRecordConsts.SysDictAddContent)]
-    public async Task AddDictTypeAsync(DictTypeDto dto)
+    public async Task AddDictTypeAsync(TypeCreateOrUpdateInput dto)
     {
         if (await _dictTypeRepository.Select.AnyAsync(x => x.DictType.ToLower() == dto.DictType.ToLower()))
         {
@@ -58,7 +56,7 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
         operationLogManager.Current?.AddVariable("dict", dict);
     }
 
-    public async Task<PagedResult<DictTypeResultDto>> GetDictTypeListAsync(DictTypeSearchDto dto)
+    public async Task<PagedResult<TypeListOutput>> GetDictTypeListAsync(TypeListInput dto)
     {
         var rows = await _dictTypeRepository.Select
             .WhereIf(!string.IsNullOrEmpty(dto.Name), x => x.Name.Contains(dto.Name!))
@@ -66,7 +64,7 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
             .OrderByDescending(x => x.CreationTime)
             .Count(out var total)
             .Page(dto.Current, dto.PageSize)
-            .ToListAsync(x => new DictTypeResultDto
+            .ToListAsync(x => new TypeListOutput
             {
                 Name = x.Name,
                 Id = x.Id,
@@ -75,25 +73,24 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
                 Remark = x.Remark,
                 CreationTime = x.CreationTime
             });
-        return new PagedResult<DictTypeResultDto>(dto)
+        return new PagedResult<TypeListOutput>(dto)
         {
             TotalCount = total,
             Items = rows
         };
     }
 
-    public async Task UpdateDictTypeAsync(DictTypeDto dto)
+    public async Task UpdateDictTypeAsync(Guid id, TypeCreateOrUpdateInput input)
     {
-        var entity = await _dictTypeRepository.Where(x => x.Id == dto.Id).FirstAsync();
-        if (!entity.DictType.Equals(dto.DictType, StringComparison.CurrentCultureIgnoreCase) && await _dictTypeRepository.Select.AnyAsync(x => x.DictType.ToLower() == dto.DictType.ToLower()))
+        var entity = await _dictTypeRepository.Where(x => x.Id == id).FirstAsync() 
+            ?? throw new EntityNotFoundException(typeof(DictionaryType), id);
+            
+        if (!entity.DictType.Equals(input.DictType, StringComparison.CurrentCultureIgnoreCase) && await _dictTypeRepository.Select.AnyAsync(x => x.DictType.ToLower() == input.DictType.ToLower()))
         {
             throw new BusinessException(message: "字典类型已存在");
         }
 
-        entity.Name = dto.Name;
-        entity.IsEnabled = dto.IsEnabled;
-        entity.DictType = dto.DictType;
-        entity.Remark = dto.Remark;
+        ObjectMapper.Map(input, entity);
 
         await _dictTypeRepository.UpdateAsync(entity);
     }
@@ -117,14 +114,14 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
     }
 
 
-    public async Task<bool> AddDictDataAsync(DictDataDto dto)
+    public async Task<bool> AddDictDataAsync(ItemCreateOrUpdateInput dto)
     {
         var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == dto.Value.ToLower());
         if (isExist)
         {
             throw new BusinessException(message: "字典值已存在");
         }
-        var entity = ObjectMapper.Map<DictDataDto, DictionaryItem>(dto);
+        var entity = ObjectMapper.Map<ItemCreateOrUpdateInput, DictionaryItem>(dto);
         await _dictDataRepository.InsertAsync(entity);
 
         return true;
@@ -142,7 +139,7 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
         return true;
     }
 
-    public async Task<PagedResult<DictDataListDto>> GetDictDataListAsync(DictDataQueryDto dto)
+    public async Task<PagedResult<ItemListOutput>> GetDataItemListAsync(ItemListInput dto)
     {
         var rows = await _dictDataRepository.Select
             .WhereIf(!string.IsNullOrEmpty(dto.Label), x => x.Label != null && x.Label.Contains(dto.Label!))
@@ -150,29 +147,21 @@ public class DataDictionaryAppService : ApplicationService, IDataDictionaryAppSe
             .OrderBy(x => x.Sort).OrderByDescending(x => x.CreationTime)
             .Count(out var total)
             .Page(dto.Current, dto.PageSize)
-            .ToListAsync<DictDataListDto>();
+            .ToListAsync<ItemListOutput>();
 
-        return new PagedResult<DictDataListDto>(total, rows);
+        return new PagedResult<ItemListOutput>(total, rows);
     }
 
     [OperationLog(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataUpdateSubType, "{{id}}", LogRecordConsts.SysDictDataUpdateContent)]
-    public async Task<bool> UpdateDictDataAsync(DictDataDto dto)
+    public async Task<bool> UpdateDictDataAsync(Guid id, ItemCreateOrUpdateInput input)
     {
-        if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
-        var entity = await _dictDataRepository.Where(x => x.Id == dto.Id).FirstAsync()
-            ?? throw new BusinessException(message: "数据不存在");
-        var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == dto.Value.ToLower());
-        if (entity.Value.ToLower() != dto.Value.ToLower() && isExist)
+        var entity = await _dictDataRepository.Where(x => x.Id == id).FirstAsync() ?? throw new EntityNotFoundException(typeof(DictionaryItem), id);
+        var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == input.Value.ToLower());
+        if (entity.Value.ToLower() != input.Value.ToLower() && isExist)
         {
             throw new BusinessException(message: "字典值已存在");
         }
-
-        entity.Value = dto.Value;
-        entity.DictType = dto.DictType;
-        entity.Label = dto.Label;
-        entity.Sort = dto.Sort;
-        entity.Remark = dto.Remark;
-        entity.IsEnabled = dto.IsEnabled;
+        ObjectMapper.Map(input, entity);
         await _dictDataRepository.UpdateAsync(entity);
 
         operationLogManager.Current?.AddVariable("id", entity.Id);

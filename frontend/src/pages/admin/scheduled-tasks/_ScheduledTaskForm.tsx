@@ -50,7 +50,7 @@ const ScheduledTaskForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
 
   const onFinish = async (values: ScheduledTaskDto) => {
     if (row?.id) {
-      await updateScheduledTask({ ...values, id: row.id });
+      await updateScheduledTask(row.id, values);
       handleSuccess('编辑成功');
     } else {
       await addScheduledTask(values);

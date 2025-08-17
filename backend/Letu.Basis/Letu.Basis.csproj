@@ -4,10 +4,22 @@
 
 	<PropertyGroup>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<UserSecretsId>01209eb2-a139-4e3a-b3fc-5c56b5a81471</UserSecretsId>
+		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<Compile Remove="ApplicationConfigurations\**" />
+		<Content Remove="ApplicationConfigurations\**" />
+		<content Remove="Localization\Resources\*.json" />
+		<EmbeddedResource Include="Localization\Resources\*.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Remove="ApplicationConfigurations\**" />
+	  <None Remove="ApplicationConfigurations\**" />
+	</ItemGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\Letu.Core\Letu.Core.csproj" />
 		<ProjectReference Include="..\Letu.Job\Letu.Job.csproj" />
@@ -28,12 +40,13 @@
 		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" />
 		<PackageReference Include="Volo.Abp.AspNetCore.MultiTenancy" />
 		<PackageReference Include="Volo.Abp.DistributedLocking" />
+		<PackageReference Include="Volo.Abp.Emailing" />
 		<PackageReference Include="Volo.Abp.EventBus" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Domain" />
+		<PackageReference Include="Volo.Abp.MultiTenancy" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain" />
 		<PackageReference Include="DistributedLock.Redis" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Admin\Settings\" />
 	</ItemGroup>
 
 </Project>

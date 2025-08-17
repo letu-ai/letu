@@ -2,7 +2,7 @@
 {
     public class SessionRevokeInput
     {
-        public required string UserId { get; set; }
+        public required Guid UserId { get; set; }
 
         public required string SessionId { get; set; }
     }

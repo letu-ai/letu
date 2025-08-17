@@ -1,0 +1,15 @@
+@layer reset, base, components, theme, utilities;
+
+@import "tailwindcss";
+
+
+@theme {
+ 
+  --color-primary: #7E57C2;  /* 主色调 */
+  --color-link: #7E57C2;
+  --color-success: #3CB371;
+  --color-warning: #ffcd30;
+  --color-error: #dc3545;
+  --color-background: #FFFFFF;
+  --color-text: #4A4A4A;
+}

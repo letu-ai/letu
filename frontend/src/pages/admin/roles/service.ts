@@ -21,8 +21,8 @@ export function getRoleList(dto: RoleQueryDto) {
  * 修改角色
  * @param dto
  */
-export function updateRole(dto: RoleDto) {
-  return httpClient.put<RoleDto, void>(`/api/admin/roles/${dto.id}`, dto);
+export function updateRole(id: string, dto: RoleDto) {
+  return httpClient.put<RoleDto, void>(`/api/admin/roles/${id}`, dto);
 }
 
 /**
@@ -64,23 +64,45 @@ export function assignData(dto: AssignDataDto) {
   return httpClient.put<AssignDataDto, void>(`/api/admin/roles/${dto.roleId}/data`, dto);
 }
 
+/**
+ * 获取角色权限列表
+ * @param roleId 角色ID
+ */
+export function getRolePermissions(roleId: string) {
+  return httpClient.get<unknown, GetPermissionListResultDto>('/api/admin/permission-management/permissions', {
+    params: { providerName: 'R', providerKey: roleId }
+  });
+}
+
+/**
+ * 更新角色权限
+ * @param roleId 角色ID
+ * @param permissions 权限列表
+ */
+export function updateRolePermissions(roleId: string, permissions: UpdatePermissionDto[]) {
+  return httpClient.put<UpdatePermissionsDto, void>('/api/admin/permission-management/permissions', 
+    { permissions }, 
+    { params: { providerName: 'R', providerKey: roleId } }
+  );
+}
+
 export interface RoleDto {
   id?: string | null;
-  roleName: string;
+  name: string;
   remark?: string | null;
   isEnabled: boolean;
 }
 
 export interface RoleListDto {
   id: string;
-  roleName: string;
+  name: string;
   remark: string | null;
   isEnabled: boolean;
   creationTime: string;
 }
 
 export interface RoleQueryDto extends PagedResultRequest {
-  roleName?: string | null;
+  name?: string | null;
 }
 
 export interface AssignMenuDto {
@@ -92,4 +114,31 @@ export interface AssignDataDto {
   roleId: string;
   powerDataType: number;
   deptIds: string[] | null;
+}
+
+export interface GetPermissionListResultDto {
+  entityDisplayName: string;
+  groups: PermissionGroupDto[];
+}
+
+export interface PermissionGroupDto {
+  name: string;
+  displayName: string;
+  permissions: PermissionDto[];
+}
+
+export interface PermissionDto {
+  name: string;
+  displayName: string;
+  parentName: string | null;
+  isGranted: boolean;
+}
+
+export interface UpdatePermissionDto {
+  name: string;
+  isGranted: boolean;
+}
+
+export interface UpdatePermissionsDto {
+  permissions: UpdatePermissionDto[];
 }

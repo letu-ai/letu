@@ -1,40 +1,51 @@
 using Letu.Applications;
 using Letu.Basis.Admin.Roles.Dtos;
+using Letu.Basis.Admin.Users;
 using Letu.Basis.SharedService;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Letu.Shared.Models;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Events.Distributed;
+using Volo.Abp.EventBus.Distributed;
 
 namespace Letu.Basis.Admin.Roles
 {
-    public class RoleAppService : ApplicationService, IRoleAppService
+    public class RoleAppService : BasisAppService, IRoleAppService
     {
         private readonly IFreeSqlRepository<Role> _roleRepository;
         private readonly IFreeSqlRepository<MenuInRole> _roleMenuRepository;
         private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
         private readonly IdentitySharedService _identitySharedService;
+        private readonly IDistributedEventBus eventBus;
 
-        public RoleAppService(IFreeSqlRepository<Role> roleRepository, IFreeSqlRepository<MenuInRole> roleMenuRepository
-            , IFreeSqlRepository<UserInRole> userRoleRepository, IdentitySharedService identitySharedService)
+        public RoleAppService(
+            IFreeSqlRepository<Role> roleRepository,
+            IFreeSqlRepository<MenuInRole> roleMenuRepository,
+            IFreeSqlRepository<UserInRole> userRoleRepository,
+            IdentitySharedService identitySharedService,
+            IDistributedEventBus eventBus
+            )
         {
             _roleRepository = roleRepository;
             _roleMenuRepository = roleMenuRepository;
             _userRoleRepository = userRoleRepository;
             _identitySharedService = identitySharedService;
+            this.eventBus = eventBus;
         }
 
-        public async Task<bool> AddRoleAsync(RoleDto dto)
+        public async Task<bool> AddRoleAsync(RoleCreateOrUpdateInput dto)
         {
-            var isExist = await _roleRepository.Select.AnyAsync(x => x.RoleName.ToLower() == dto.RoleName.ToLower());
+            var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == dto.Name.ToLower());
             if (isExist)
             {
                 throw new BusinessException(message: "角色名已存在");
             }
             var entity = new Role
             {
-                RoleName = dto.RoleName,
+                Name = dto.Name,
                 Remark = dto.Remark
             };
             await _roleRepository.InsertAsync(entity);
@@ -61,7 +72,7 @@ namespace Letu.Basis.Admin.Roles
                 }
             }
 
-            await _identitySharedService.DelUserPermissionCacheByRoleIdAsync(dto.RoleId);
+            await _identitySharedService.RemoveUserPermissionCacheByRoleIdAsync(dto.RoleId);
             return true;
         }
 
@@ -71,58 +82,83 @@ namespace Letu.Basis.Admin.Roles
             if (hasUsers) throw new BusinessException(message: "角色已分配给用户，不能删除");
 
             var role = await _roleRepository.Where(x => x.Id == id).FirstAsync();
-            if (role.RoleName == AdminConsts.SuperAdminRole)
+            if (role.Name == AdminConsts.SuperAdminRole)
             {
-                throw new BusinessException(message: $"{role.RoleName}不能删除");
+                throw new BusinessException(message: $"{role.Name}不能删除");
             }
             await _roleRepository.DeleteAsync(x => x.Id == id);
-            await _identitySharedService.DelUserPermissionCacheByRoleIdAsync(id);
+            await _identitySharedService.RemoveUserPermissionCacheByRoleIdAsync(id);
+
+            var roleDeleteEto = new EntityDeletedEto<RoleEto>(new RoleEto()
+            {
+                Id = role.Id,
+                Name = role.Name,
+                TenantId = role.TenantId,
+            });
+            await eventBus.PublishAsync(roleDeleteEto);
+
             return true;
         }
 
-        public async Task<PagedResult<RoleListDto>> GetRoleListAsync(RoleQueryDto dto)
+        public async Task<PagedResult<RoleListOutput>> GetRoleListAsync(RoleListInput dto)
         {
             var rows = await _roleRepository.Select
-                .WhereIf(!string.IsNullOrEmpty(dto.RoleName), x => x.RoleName.Contains(dto.RoleName!))
+                .WhereIf(!string.IsNullOrEmpty(dto.Name), x => x.Name.Contains(dto.Name!))
                 .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync<RoleListDto>();
+                .ToListAsync<RoleListOutput>();
 
-            return new PagedResult<RoleListDto>(total, rows);
+            return new PagedResult<RoleListOutput>(total, rows);
         }
 
         public async Task<List<AppOption>> GetRoleOptionsAsync()
         {
             return await _roleRepository.Select.ToListAsync(x => new AppOption
             {
-                Label = x.RoleName,
+                Label = x.Name,
                 Value = x.Id.ToString()
             });
         }
 
-        public async Task<bool> UpdateRoleAsync(RoleDto dto)
+        public async Task<bool> UpdateRoleAsync(Guid id, RoleCreateOrUpdateInput input)
         {
-            if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
-            var entity = await _roleRepository.Where(x => x.Id == dto.Id).FirstAsync()
-                ?? throw new BusinessException(message: "数据不存在");
-            var isExist = await _roleRepository.Select.AnyAsync(x => x.RoleName.ToLower() == dto.RoleName.ToLower());
-            if (entity.RoleName.ToLower() != dto.RoleName.ToLower() && isExist)
+            var entity = await _roleRepository.Where(x => x.Id == id).FirstAsync()
+                ?? throw new EntityNotFoundException(typeof(Role), id);
+                
+            var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == input.Name.ToLower());
+            if (entity.Name.ToLower() != input.Name.ToLower() && isExist)
             {
                 throw new BusinessException(message: "角色名已存在");
             }
-            if (entity.RoleName == AdminConsts.SuperAdminRole)
+            if (entity.Name == AdminConsts.SuperAdminRole)
             {
-                throw new BusinessException(message: $"{entity.RoleName}不允许编辑");
+                throw new BusinessException(message: $"{entity.Name}不允许编辑");
             }
-            entity.RoleName = dto.RoleName;
-            entity.Remark = dto.Remark;
-            entity.IsEnabled = dto.IsEnabled;
+
+            RoleNameChangedEto? roleNameChangedEto = null;
+            if (entity.Name != input.Name)
+            {
+                roleNameChangedEto = new RoleNameChangedEto
+                {
+                    Id = entity.Id,
+                    OldName = entity.Name,
+                    Name = input.Name,
+                    TenantId = entity.TenantId
+                };
+            }
+
+            entity.Name = input.Name;
+            entity.Remark = input.Remark;
+            entity.IsEnabled = input.IsEnabled;
             await _roleRepository.UpdateAsync(entity);
+
+            if (roleNameChangedEto != null)
+                await eventBus.PublishAsync(roleNameChangedEto);
 
             if (!entity.IsEnabled)
             {
-                await _identitySharedService.DelUserPermissionCacheByRoleIdAsync(entity.Id);
+                await _identitySharedService.RemoveUserPermissionCacheByRoleIdAsync(entity.Id);
             }
             return true;
         }

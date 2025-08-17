@@ -1,4 +1,5 @@
 ﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import { DeleteOutlined, EditOutlined, PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
@@ -50,7 +51,7 @@ const EmployeeList: React.FC = () => {
       width: 210,
       render: (_: any, record: EmployeeListDto) => (
         <Space>
-          <Permission permissions={'Org.Employee.Update'}>
+          <Permission permissions={BasisPermissions.OrganizationUnit.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -62,7 +63,7 @@ const EmployeeList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Org.Employee.BindUser'}>
+          <Permission permissions={BasisPermissions.User.ManagePermission}>
             <Button
               type="link"
               icon={<UserAddOutlined />}
@@ -73,7 +74,7 @@ const EmployeeList: React.FC = () => {
               绑定用户
             </Button>
           </Permission>
-          <Permission permissions={'Org.Employee.Delete'}>
+          <Permission permissions={BasisPermissions.OrganizationUnit.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -111,18 +112,20 @@ const EmployeeList: React.FC = () => {
           </Form.Item>,
         ]}
         toolbar={
-          <Permission permissions={'Org.Employee.Add'}>
-            <Button
-              color="primary"
-              variant="solid"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                modalRef?.current?.openModal();
-              }}
-            >
-              新增
-            </Button>
-          </Permission>
+          <>
+            <Permission permissions={BasisPermissions.OrganizationUnit.Create}>
+              <Button
+                color="primary"
+                variant="solid"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  modalRef?.current?.openModal();
+                }}
+              >
+                新增
+              </Button>
+            </Permission>
+          </>
         }
       />
       {/* 新增/编辑员工弹窗 */}

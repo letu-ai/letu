@@ -23,7 +23,7 @@ namespace Letu.Basis.Identity
         /// <param name="userId"></param>
         /// <param name="sessionId"></param>
         /// <returns></returns>
-        Task LogoutAsync(string userId, string sessionId);
+        Task LogoutAsync(Guid userId, string sessionId);
 
         /// <summary>
         /// 刷新token
@@ -33,4 +33,4 @@ namespace Letu.Basis.Identity
         Task<UserTokenOutput> RefreshTokenAsync(string refreshToken);
         Task<bool> ValidateTokenAsync(string userId, string sessionId, string token);
     }
-} 
+}

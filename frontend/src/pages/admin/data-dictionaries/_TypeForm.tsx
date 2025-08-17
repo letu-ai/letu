@@ -51,7 +51,7 @@ const DictTypeForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
 
   const onFinish = async (values: DictTypeDto) => {
     if (row?.id) {
-      await updateDictType({ ...values, id: row.id });
+      await updateDictType(row.id, values);
       handleSuccess('编辑成功');
     } else {
       await addDictType(values);

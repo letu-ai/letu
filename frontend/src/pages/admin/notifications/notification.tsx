@@ -1,4 +1,5 @@
 ﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import {
   deleteNotifications,
   getNotificationList,
@@ -48,7 +49,7 @@ const NotificationList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: NotificationListDto) => (
         <Space>
-          <Permission permissions={'Sys.Notification.Update'}>
+          <Permission permissions={BasisPermissions.Notification.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -60,7 +61,7 @@ const NotificationList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.Notification.Delete'}>
+          <Permission permissions={BasisPermissions.Notification.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -109,7 +110,7 @@ const NotificationList: React.FC = () => {
         ]}
         toolbar={
           <Space size="middle">
-            <Permission permissions={'Sys.Notification.Add'}>
+            <Permission permissions={BasisPermissions.Notification.Create}>
               <Button
                 type="primary"
                 key="primary"

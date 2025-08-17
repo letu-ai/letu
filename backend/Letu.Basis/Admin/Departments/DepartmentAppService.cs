@@ -2,11 +2,11 @@ using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Admin.Employees;
 using Letu.Repository;
 using Volo.Abp;
-using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Entities;
 
 namespace Letu.Basis.Admin.Departments
 {
-    public class DepartmentAppService : ApplicationService, IDepartmentAppService
+    public class DepartmentAppService : BasisAppService, IDepartmentAppService
     {
         private readonly IFreeSqlRepository<Department> _deptRepository;
         private readonly IFreeSqlRepository<Employee> _employeeRepository;
@@ -17,14 +17,14 @@ namespace Letu.Basis.Admin.Departments
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<bool> AddDeptAsync(DeptDto dto)
+        public async Task<bool> AddDeptAsync(DepartmentCreateOrUpdateInput dto)
         {
             if (await _deptRepository.Where(x => x.Code.ToLower() == dto.Code!.ToLower()).AnyAsync())
             {
                 throw new BusinessException(message: "部门编号已存在");
             }
 
-            var entity = ObjectMapper.Map<DeptDto, Department>(dto);
+            var entity = ObjectMapper.Map<DepartmentCreateOrUpdateInput, Department>(dto);
             entity.ParentId = dto.ParentId;
             entity.Code = dto.Code;
             if (entity.ParentId.HasValue)
@@ -54,7 +54,7 @@ namespace Letu.Basis.Admin.Departments
             return true;
         }
 
-        public async Task<List<DeptListDto>> GetDeptListAsync(DeptQueryDto dto)
+        public async Task<List<DepartmentListOutput>> GetDeptListAsync(DeptQueryDto dto)
         {
             bool hasFilter = !string.IsNullOrEmpty(dto.Name) || !string.IsNullOrEmpty(dto.Code)
                 || dto.Status > 0;
@@ -65,7 +65,7 @@ namespace Letu.Basis.Admin.Departments
                     .WhereIf(!string.IsNullOrEmpty(dto.Code), x => x.Code.Contains(dto.Code!)) // ==
                     .WhereIf(dto.Status > 0, x => x.Status == dto.Status) // ==
                     .OrderBy(x => x.Sort).ToListAsync();
-                var result = ObjectMapper.Map<List<Department>, List<DeptListDto>>(filter);
+                var result = ObjectMapper.Map<List<Department>, List<DepartmentListOutput>>(filter);
 
                 // Add curator names for filtered results
                 await AddCuratorNames(result); // ++
@@ -73,7 +73,7 @@ namespace Letu.Basis.Admin.Departments
                 return result;
             }
             var all = await _deptRepository.Select.OrderBy(x => x.ParentIds).ToListAsync();
-            var tree = ObjectMapper.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
+            var tree = ObjectMapper.Map<List<Department>, List<DepartmentListOutput>>(all.Where(x => x.ParentId == null).OrderBy(t => t.Sort).ToList());
 
             // Add curator names for all departments
             await AddCuratorNames(tree); // ++
@@ -83,9 +83,9 @@ namespace Letu.Basis.Admin.Departments
                 item.Children = getChildren(item.Id)?.OrderBy(x => x.Sort).ToList();
             }
 
-            List<DeptListDto>? getChildren(Guid id)
+            List<DepartmentListOutput>? getChildren(Guid id)
             {
-                var children = ObjectMapper.Map<List<Department>, List<DeptListDto>>(all.Where(x => x.ParentId == id).ToList());
+                var children = ObjectMapper.Map<List<Department>, List<DepartmentListOutput>>(all.Where(x => x.ParentId == id).ToList());
                 if (children.Count <= 0) return null;
 
                 // Add curator names for child departments
@@ -102,7 +102,7 @@ namespace Letu.Basis.Admin.Departments
             return tree;
         }
 
-        private async Task AddCuratorNames(List<DeptListDto> depts)
+        private async Task AddCuratorNames(List<DepartmentListOutput> depts)
         {
             var curatorIds = depts.Select(d => d.CuratorId).Where(id => id.HasValue).Distinct().ToList();
 
@@ -124,29 +124,24 @@ namespace Letu.Basis.Admin.Departments
             }
         }
 
-        public async Task<bool> UpdateDeptAsync(DeptDto dto)
+        public async Task<bool> UpdateDeptAsync(Guid id, DepartmentCreateOrUpdateInput input)
         {
-            if (!dto.Id.HasValue) throw new ArgumentNullException(nameof(dto.Id));
+            var entity = await _deptRepository.Where(x => x.Id == id).FirstAsync();
+            if (entity == null)
+            {
+                throw new EntityNotFoundException(typeof(Department), id);
+            }
 
-            var entity = await _deptRepository.Where(x => x.Id == dto.Id).FirstAsync();
-            if (!entity.Code.Equals(dto.Code, StringComparison.CurrentCultureIgnoreCase) && await _deptRepository.Select.AnyAsync(x => x.Code.ToLower() == dto.Code!.ToLower()))
+            if (!entity.Code.Equals(input.Code, StringComparison.CurrentCultureIgnoreCase) && await _deptRepository.Select.AnyAsync(x => x.Code.ToLower() == input.Code!.ToLower()))
             {
                 throw new BusinessException(message: "部门编号已存在");
             }
-            if (dto.ParentId == entity.Id)
+            if (input.ParentId == entity.Id)
             {
                 throw new BusinessException(message: "不能选择自己为上级部门");
             }
 
-            entity.Name = dto.Name;
-            entity.Code = dto.Code;
-            entity.Sort = dto.Sort;
-            entity.Description = dto.Description;
-            entity.Status = dto.Status;
-            entity.CuratorId = dto.CuratorId;
-            entity.Email = dto.Email;
-            entity.Phone = dto.Phone;
-            entity.ParentId = dto.ParentId;
+            ObjectMapper.Map(input, entity);
             if (entity.ParentId.HasValue)
             {
                 var parentIsSub = await _deptRepository.Where(x => x.Id == entity.ParentId.Value && x.ParentId == entity.Id).AnyAsync();

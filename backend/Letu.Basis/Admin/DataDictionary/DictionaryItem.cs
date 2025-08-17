@@ -19,7 +19,7 @@ namespace Letu.Basis.Admin.DataDictionary
         [Required]
         [StringLength(256)]
         [Column(IsNullable = false, StringLength = 256)]
-        public string? Value { get; set; }
+        public required string Value { get; set; }
 
         /// <summary>
         /// 显示文本
@@ -28,7 +28,7 @@ namespace Letu.Basis.Admin.DataDictionary
         [Required]
         [StringLength(128)]
         [Column(IsNullable = false, StringLength = 128)]
-        public string? Label { get; set; }
+        public required string Label { get; set; }
 
         /// <summary>
         /// 字典类型
@@ -37,7 +37,7 @@ namespace Letu.Basis.Admin.DataDictionary
         [Required]
         [StringLength(128)]
         [Column(IsNullable = false, StringLength = 128)]
-        public string? DictType { get; set; }
+        public required string DictType { get; set; }
 
         /// <summary>
         /// 备注

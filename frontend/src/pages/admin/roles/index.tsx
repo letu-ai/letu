@@ -4,22 +4,25 @@ import { PlusOutlined, ExclamationCircleFilled, EditOutlined, HddOutlined, Delet
 import { deleteRole, getRoleList, type RoleListDto } from '@/pages/admin/roles/service';
 import RoleForm, { type ModalRef } from './_RoleForm';
 import AssignMenuForm, { type AssignMenuModalRef } from './_AssignMenuForm';
+import PermissionForm, { type PermissionModalRef } from './_PermissionForm';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type';
 import { PermissionConstant } from '@/utils/globalValue';
 import useApp from 'antd/es/app/useApp';
 import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 
 const Role = () => {
   const modalRef = useRef<ModalRef>(null);
   const assignMenuForRef = useRef<AssignMenuModalRef>(null);
+  const permissionForRef = useRef<PermissionModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
   const { message, modal } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '角色名',
-      dataIndex: 'roleName',
-      key: 'roleName',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: '状态',
@@ -46,20 +49,23 @@ const Role = () => {
       width: 210,
       fixed: 'right',
       render: (_: any, record: RoleListDto) => {
-        if (record.roleName === PermissionConstant.SuperAdmin) return <></>;
+        if (record.name === PermissionConstant.SuperAdmin) return <></>;
         return (
           <Space>
-            <Permission permissions={'Sys.Role.Update'}>
+            <Permission permissions={BasisPermissions.Role.Update}>
               <Button type="link" icon={<EditOutlined />} onClick={() => rowEdit(record)}>
                 编辑
               </Button>
             </Permission>
-            <Permission permissions={'Sys.Role.AssignMenu'}>
+              <Button type="link" icon={<HddOutlined />} onClick={() => openPermissionModal(record)}>
+                权限
+              </Button>
+            <Permission permissions={BasisPermissions.MenuItem.Default}>
               <Button type="link" icon={<HddOutlined />} onClick={() => openAssignModal(record)}>
                 菜单权限
               </Button>
             </Permission>
-            <Permission permissions={'Sys.Role.Delete'}>
+            <Permission permissions={BasisPermissions.Role.Delete}>
               <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
                 删除
               </Button>
@@ -72,6 +78,10 @@ const Role = () => {
 
   const openAssignModal = (row: RoleListDto) => {
     assignMenuForRef?.current?.openModal(row);
+  };
+
+  const openPermissionModal = (row: RoleListDto) => {
+    permissionForRef?.current?.openModal(row);
   };
 
   const handleOpenModal = () => {
@@ -107,12 +117,12 @@ const Role = () => {
           return data;
         }}
         searchItems={
-          <Form.Item label="角色" name="roleName">
+          <Form.Item label="角色" name="name">
             <Input placeholder="请输入角色名" />
           </Form.Item>
         }
         toolbar={
-          <Permission permissions={'Sys.Role.Add'}>
+          <Permission permissions={BasisPermissions.Role.Create}>
             <Button color="primary" variant="solid" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
               新增
             </Button>
@@ -123,6 +133,8 @@ const Role = () => {
       <RoleForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
       {/* 分配菜单 */}
       <AssignMenuForm ref={assignMenuForRef} />
+      {/* 分配权限 */}
+      <PermissionForm ref={permissionForRef} />
     </>
   );
 };

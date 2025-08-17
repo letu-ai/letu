@@ -1,4 +1,5 @@
 ﻿﻿import Permission from '@/components/Permission';
+import { BasisPermissions } from '@/application/permissions';
 import {
   deleteScheduledTask,
   getScheduledTaskList,
@@ -55,7 +56,7 @@ const ScheduledTaskList: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: ScheduledTaskListDto) => (
         <Space>
-          <Permission permissions={'Sys.ScheduledTask.Log'}>
+          <Permission permissions={BasisPermissions.ScheduledTask.Log}>
             <Button
               type="link"
               icon={<UnorderedListOutlined />}
@@ -67,7 +68,7 @@ const ScheduledTaskList: React.FC = () => {
               日志
             </Button>
           </Permission>
-          <Permission permissions={'Sys.ScheduledTask.Update'}>
+          <Permission permissions={BasisPermissions.ScheduledTask.Update}>
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -79,7 +80,7 @@ const ScheduledTaskList: React.FC = () => {
               编辑
             </Button>
           </Permission>
-          <Permission permissions={'Sys.ScheduledTask.Delete'}>
+          <Permission permissions={BasisPermissions.ScheduledTask.Delete}>
             <Popconfirm
               key="delete"
               title="确定删除吗？"
@@ -121,7 +122,7 @@ const ScheduledTaskList: React.FC = () => {
         ]}
         toolbar={
           <Space size="middle">
-            <Permission permissions={'Sys.ScheduledTask.Add'}>
+            <Permission permissions={BasisPermissions.ScheduledTask.Create}>
               <Button
                 type="primary"
                 key="primary"

@@ -10,29 +10,32 @@ using Letu.Shared.Generated;
 using Letu.Utils;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Guids;
+using Volo.Abp.Domain.Entities.Events.Distributed;
+using Volo.Abp.EventBus.Distributed;
 
 namespace Letu.Basis.Admin.Users
 {
-    public class UserAppService : ApplicationService, IUserAppService
+    public class UserAppService : BasisAppService, IUserAppService
     {
         private readonly IFreeSqlRepository<User> _userRepository;
         private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
         private readonly IdentitySharedService _identityDomainService;
         private readonly IOperationLogManager operationLogManager;
-
+        private readonly IDistributedEventBus eventBus;
         public UserAppService(IFreeSqlRepository<User> userRepository,
             IFreeSqlRepository<UserInRole> userRoleRepository,
             IdentitySharedService identityDomainService,
-            IOperationLogManager operationLogManager)
+            IOperationLogManager operationLogManager,
+            IDistributedEventBus eventBus)
         {
             _userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
             _identityDomainService = identityDomainService;
             this.operationLogManager = operationLogManager;
+            this.eventBus = eventBus;
         }
 
-        public async Task<Guid> AddUserAsync(UserDto dto)
+        public async Task<Guid> AddUserAsync(UserCreateOrUpdateInput dto)
         {
             var isExist = await _userRepository.Select.AnyAsync(x => x.UserName.ToLower() == dto.UserName.ToLower());
             if (isExist)
@@ -43,7 +46,7 @@ namespace Letu.Basis.Admin.Users
             {
                 throw new BusinessException(message: "密码格式不正确");
             }
-            var user = new User()
+            var user = new User(GuidGenerator.Create())
             {
                 UserName = dto.UserName,
                 PasswordSalt = EncryptionUtils.GetPasswordSalt(),
@@ -90,21 +93,34 @@ namespace Letu.Basis.Admin.Users
             {
                 throw new BusinessException(message: "不能删除自己");
             }
+            var user = await _userRepository.Where(x => x.Id == id).FirstAsync();
             await _userRepository.DeleteAsync(x => x.Id == id);
-            await _identityDomainService.DelUserPermissionCacheByUserIdAsync(id);
+            await _identityDomainService.RemoveUserPermissionCacheByUserIdAsync(id);
+
+            var userDeleteEto = new EntityDeletedEto<UserEto>(new UserEto()
+            {
+                Id = id,
+                UserName = user.UserName,
+                TenantId = user.TenantId,
+                Name = user.NickName,
+                IsActive = user.IsEnabled
+            });
+
+            await eventBus.PublishAsync(userDeleteEto);
+
             return true;
         }
 
-        public async Task<PagedResult<UserListDto>> GetUserListAsync(UserQueryDto dto)
+        public async Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto)
         {
             var rows = await _userRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
                 .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync<UserListDto>();
+                .ToListAsync<UserListOutput>();
 
-            return new PagedResult<UserListDto>(total, rows);
+            return new PagedResult<UserListOutput>(total, rows);
         }
 
         public async Task<Guid[]> GetUserRoleIdsAsync(Guid uid)
@@ -121,7 +137,7 @@ namespace Letu.Basis.Admin.Users
 
             if (!entity.IsEnabled)
             {
-                await _identityDomainService.DelUserPermissionCacheByUserIdAsync(id);
+                await _identityDomainService.RemoveUserPermissionCacheByUserIdAsync(id);
             }
             return true;
         }

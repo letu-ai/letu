@@ -72,8 +72,8 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
         colon={false}
         onFinish={onFinish}
       >
-        <Form.Item label="角色名称" name="roleName">
-          <Tag color="magenta">{currentRow?.roleName}</Tag>
+        <Form.Item label="角色名称" name="name">
+          <Tag color="magenta">{currentRow?.name}</Tag>
         </Form.Item>
         <Form.Item<AssignMenuDto> label="菜单权限" name="menuIds">
           <Card size="small">

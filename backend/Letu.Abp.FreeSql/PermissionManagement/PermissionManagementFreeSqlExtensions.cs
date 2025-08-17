@@ -58,5 +58,11 @@ public static class PermissionManagementFreeSqlExtensions
 
             entity.ConfigureExtraProperties();
         });
+
+        freeSql.CodeFirst.ConfigEntity<PermissionDefinitionRecord>(entity =>
+        {
+            entity.Property(x => x.MultiTenancySide)
+                .MapType(typeof(byte));
+        });
     }
 }

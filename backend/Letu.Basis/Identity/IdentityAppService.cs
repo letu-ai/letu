@@ -1,57 +1,68 @@
 using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Identity.Dtos;
+using Letu.Basis.Settings;
+using Letu.Basis.SharedService;
 using Letu.Core.Utils;
 using Letu.Identity.Jwt;
 using Letu.Repository;
-using Letu.Shared.Keys;
 using Letu.Utils;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using Volo.Abp;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Auditing;
 using Volo.Abp.Caching;
+using Volo.Abp.DistributedLocking;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Guids;
 using Volo.Abp.Security.Claims;
+using Volo.Abp.Settings;
 using Volo.Abp.Users;
 
 namespace Letu.Basis.Identity
 {
-    public class IdentityAppService : ApplicationService, IIdentityAppService
+    public class IdentityAppService : BasisAppService, IIdentityAppService
     {
         private readonly IGuidGenerator guidGenerator;
-        private readonly JwtAccessTokenOptions jwtAccessTokenOptions;
+        private readonly JwtOptions jwtOptions;
         private readonly IFreeSqlRepository<User> _userRepository;
         private readonly ILocalEventBus _localEventBus;
         private readonly HttpContext _httpContext;
         private readonly IJwtAccessTokenProvider jwtAccessTokenProvider;
+        private readonly IdentitySharedService identitySharedService;
         private readonly IDistributedCache<string> accessTokenCache;
         private readonly IDistributedCache<string> refreshTokenCache;
         private readonly IDistributedCache<HashSet<string>> _userSessionIdsCache;
+        private readonly IUserRoleFinder _userRoleFinder;
+        private readonly IAbpDistributedLock distributedLock;
 
         public IdentityAppService(
             IGuidGenerator guidGenerator,
             IFreeSqlRepository<User> userRepository,
             ILocalEventBus localEventBus,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<JwtAccessTokenOptions> jwtAccessTokenOptions,
+            IOptions<JwtOptions> jwtOptions,
             IJwtAccessTokenProvider jwtAccessTokenProvider,
+            IdentitySharedService identitySharedService,
             IDistributedCache<string> accessTokenCache,
             IDistributedCache<string> refreshTokenCache,
-            IDistributedCache<HashSet<string>> userSessionIdsCache)
+            IDistributedCache<HashSet<string>> userSessionIdsCache,
+            IUserRoleFinder userRoleFinder,
+            IAbpDistributedLock distributedLock)
         {
             this.guidGenerator = guidGenerator;
-            this.jwtAccessTokenOptions = jwtAccessTokenOptions.Value;
+            this.jwtOptions = jwtOptions.Value;
             this.jwtAccessTokenProvider = jwtAccessTokenProvider;
+            this.identitySharedService = identitySharedService;
             _userRepository = userRepository;
             _localEventBus = localEventBus;
             _httpContext = httpContextAccessor.HttpContext!;
             this.accessTokenCache = accessTokenCache;
             this.refreshTokenCache = refreshTokenCache;
             _userSessionIdsCache = userSessionIdsCache;
+            _userRoleFinder = userRoleFinder;
+            this.distributedLock = distributedLock;
         }
 
         [DisableAuditing]
@@ -68,7 +79,8 @@ namespace Letu.Basis.Identity
 
             try
             {
-                var user = await _userRepository.Where(x => x.UserName.Equals(input.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsEnabled).FirstAsync();
+                var user = await _userRepository.Where(x => x.UserName.Equals(input.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsEnabled)
+                    .FirstAsync();
 
                 if (user == null)
                     throw new BusinessException(message: "账号或密码不存在");
@@ -78,7 +90,7 @@ namespace Letu.Basis.Identity
 
                 var sessionId = guidGenerator.Create().ToString("N");
 
-                var claims = CreateUserClaims(user, sessionId);
+                var claims = await CreateUserClaims(user, sessionId);
                 var token = CreateToken(claims);
                 loginLog.SessionId = sessionId;
 
@@ -114,7 +126,7 @@ namespace Letu.Basis.Identity
             var userId = CurrentUser.GetId();
             var sessionId = CurrentUser.GetSessionId();
 
-            await LogoutAsync(userId.ToString(), sessionId);
+            await LogoutAsync(userId, sessionId);
         }
 
         /// <summary>
@@ -124,10 +136,11 @@ namespace Letu.Basis.Identity
         /// <param name="sessionId"></param>
         /// <returns></returns>
         // TODO：添加权限验证，确保只有管理员可以调用此方法
-        public async Task LogoutAsync(string userId, string sessionId)
+        public async Task LogoutAsync(Guid userId, string sessionId)
         {
             await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId));
             await refreshTokenCache.RemoveAsync(IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId));
+            await identitySharedService.RemoveUserPermissionCacheByUserIdAsync(userId);
         }
 
 
@@ -153,6 +166,14 @@ namespace Letu.Basis.Identity
             var sessionId = CurrentUser.GetSessionId();
             var userId = CurrentUser.GetId();
 
+            // 使用分布式锁防止并发刷新token
+
+            await using var handle = await distributedLock.TryAcquireAsync(nameof(IdentityAppService), TimeSpan.FromSeconds(10));
+            if (handle == null)
+            {
+                throw new BusinessException(message: "token刷新请求过于频繁，请稍后重试");
+            }
+
             // 创建安全日志记录
             var securityLog = new SecurityLog
             {
@@ -177,7 +198,7 @@ namespace Letu.Basis.Identity
                     throw new BusinessException(message: "用户不存在");
 
                 // 创建用户声明和生成令牌
-                var claims = CreateUserClaims(user, sessionId);
+                var claims = await CreateUserClaims(user, sessionId);
                 var token = CreateToken(claims);
 
                 // 保存用户登录信息到缓存
@@ -214,7 +235,7 @@ namespace Letu.Basis.Identity
         /// <returns></returns>
         private async Task SaveUserLoginInfoToCacheAsync(User user, JwtAccessToken token, string sessionId)
         {
-            if (!jwtAccessTokenOptions.AllowMultipleLogin)
+            if (await SettingProvider.GetAsync<bool>(IdentitySettingNames.SignIn.AllowMultipleLogin) != true)
             {
                 // 移除当前用户的其它登录会话
                 var existsSessionIds = await _userSessionIdsCache.GetAsync(IdentityCacheKeys.CalcUserSessionIdKey(user.Id));
@@ -229,9 +250,9 @@ namespace Letu.Basis.Identity
                 }
             }
 
-            var accessTokenExpired = TimeSpan.FromSeconds(jwtAccessTokenOptions.Expiration);
-            var refreshTokenExpired = TimeSpan.FromMinutes(jwtAccessTokenOptions.RefreshTokenExpiration);
-            
+            var accessTokenExpired = TimeSpan.FromSeconds(jwtOptions.Issuance.ExpirySeconds);
+            var refreshTokenExpired = TimeSpan.FromDays(30); // TODO: RefreshToken过期时间应该从Settings系统读取
+
             // 获取现有会话ID集合或创建新集合
             var userSessionIds = await _userSessionIdsCache.GetAsync(
                 IdentityCacheKeys.CalcUserSessionIdKey(user.Id)) ?? new HashSet<string>();
@@ -265,7 +286,7 @@ namespace Letu.Basis.Identity
             }
         }
 
-        private List<Claim> CreateUserClaims(User user, string sessionId)
+        private async Task<List<Claim>> CreateUserClaims(User user, string sessionId)
         {
             var claims = new List<Claim> {
                 new(AbpClaimTypes.UserId, user.Id.ToString()),
@@ -283,12 +304,19 @@ namespace Letu.Basis.Identity
                 claims.Add(new Claim(AbpClaimTypes.Name, user.NickName));
             }
 
+            // 获取用户角色并添加到claims中
+            var roleNames = await _userRoleFinder.GetRoleNamesAsync(user.Id);
+            foreach (var roleName in roleNames)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, roleName));
+            }
+
             return claims;
         }
 
         private JwtAccessToken CreateToken(List<Claim> claims)
         {
-            var token = jwtAccessTokenProvider.CreateToken(claims, jwtAccessTokenOptions.Expiration);
+            var token = jwtAccessTokenProvider.CreateToken(claims, jwtOptions.Issuance.ExpirySeconds);
             token.RefreshToken = guidGenerator.Create().ToString("N").ToLower();
             return token;
         }

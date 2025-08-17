@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Identity\**" />
+	  <EmbeddedResource Remove="Identity\**" />
+	  <None Remove="Identity\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="FreeSql.DbContext" />
 		<PackageReference Include="Volo.Abp.AuditLogging.Domain" />
 		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain" />

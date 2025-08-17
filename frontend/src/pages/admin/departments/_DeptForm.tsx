@@ -82,7 +82,7 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
 
   const onFinish = async (values: DeptDto) => {
     if (row?.id) {
-      await updateDept({ ...values, id: row.id });
+      await updateDept(row.id, values);
       handleSuccess('编辑成功');
     } else {
       await addDept(values);

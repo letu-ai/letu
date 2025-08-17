@@ -1,4 +1,5 @@
 ﻿using Letu.Applications;
+using Letu.Basis.Admin.Editions;
 using Letu.Basis.Admin.Tenants.Dtos;
 using Letu.Repository;
 using Volo.Abp;
@@ -8,42 +9,70 @@ namespace Letu.Basis.Admin.Tenants
 {
     public class TenantAppService : ApplicationService, ITenantAppService
     {
-        private readonly IFreeSqlRepository<Tenant> tenantRepository;
+        private readonly IFreeSqlRepository<Tenant> _tenantRepository;
+        private readonly IFreeSqlRepository<Edition> _editionRepository;
 
-        public TenantAppService(IFreeSqlRepository<Tenant> tenantRepository)
+        public TenantAppService(
+            IFreeSqlRepository<Tenant> tenantRepository,
+            IFreeSqlRepository<Edition> editionRepository)
         {
-            this.tenantRepository = tenantRepository;
+            _tenantRepository = tenantRepository;
+            _editionRepository = editionRepository;
         }
 
-        public async Task AddTenantAsync(TenantCreateOrUpdateInput input)
+        public async Task AddTenantAsync(TenantCreateOrUpdateInput dto)
         {
-            if (await tenantRepository.Select.AnyAsync(x => x.Name == input.Name))
+            if (await _tenantRepository.Select.AnyAsync(x => x.Name == dto.Name))
             {
-                throw new BusinessException($"租户名称[{input.Name}]已存在");
+                throw new BusinessException(message: $"租户[{dto.Name}]已存在");
             }
 
             var entity = new Tenant()
             {
-                Name = input.Name,
-                Remark = input.Remark,
-                Domain = input.Domain,
+                Name = dto.Name,
+                Remark = dto.Remark,
+                EditionId = dto.EditionId,
+                BindDomain = dto.BindDomain,
+                ExpireDate = dto.ExpireDate,
+                ContactName = dto.ContactName,
+                ContactPhone = dto.ContactPhone,
+                AdminEmail = dto.AdminEmail,
+                WebsiteName = dto.WebsiteName,
+                Logo = dto.Logo,
+                IcpNumber = dto.IcpNumber,
+                IsActive = dto.IsActive
             };
-            await tenantRepository.InsertAsync(entity);
+            await _tenantRepository.InsertAsync(entity);
         }
 
         public async Task DeleteTenantAsync(Guid tenantId)
         {
-            await tenantRepository.DeleteAsync(x => x.Id == tenantId);
+            await _tenantRepository.DeleteAsync(x => x.Id == tenantId);
         }
 
         public async Task<PagedResult<TenantListOutput>> GetTenantListAsync(TenantListInput dto)
         {
-            var items = await tenantRepository.Select
+            // 先查询所有的版本信息，放入字典中以提高性能
+            var editionsDict = await _editionRepository.Select
+                .ToListAsync(x => new { x.Id, x.Name })
+                .ContinueWith(t => t.Result.ToDictionary(k => k.Id, v => v.Name));
+
+            var tenants = await _tenantRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!))
-                .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync<TenantListOutput>();
+                .ToListAsync();
+
+            var items = tenants.Select(x =>
+            {
+                var item = ObjectMapper.Map<Tenant, TenantListOutput>(x);
+                // 设置版本名称
+                item.EditionName = item.EditionId.HasValue && editionsDict.ContainsKey(item.EditionId.Value)
+                    ? editionsDict[item.EditionId.Value]
+                    : null;
+                return item;
+            }).ToList();
+
             return new PagedResult<TenantListOutput>(dto)
             {
                 TotalCount = total,
@@ -51,24 +80,33 @@ namespace Letu.Basis.Admin.Tenants
             };
         }
 
-        public async Task UpdateTenantAsync(Guid id, TenantCreateOrUpdateInput input)
+        public async Task UpdateTenantAsync(Guid id, TenantCreateOrUpdateInput dto)
         {
-            var entity = await tenantRepository.Where(x => x.Id == id).FirstAsync();
+            var entity = await _tenantRepository.Where(x => x.Id == id).FirstAsync();
             if (entity == null)
             {
                 throw new BusinessException(message: $"租户不存在");
             }
 
-            if (await tenantRepository.Select.AnyAsync(x => x.Id != id && x.Name == input.Name))
+            if (await _tenantRepository.Select.AnyAsync(x => x.Id != id && x.Name == dto.Name))
             {
-                throw new BusinessException(message: $"租户名称[{input.Name}]已存在");
+                throw new BusinessException(message: $"租户名称[{dto.Name}]已存在");
             }
 
-            entity.Name = input.Name;
-            entity.Remark = input.Remark;
-            entity.Domain = input.Domain;
+            entity.Name = dto.Name;
+            entity.Remark = dto.Remark;
+            entity.EditionId = dto.EditionId;
+            entity.BindDomain = dto.BindDomain;
+            entity.ExpireDate = dto.ExpireDate;
+            entity.ContactName = dto.ContactName;
+            entity.ContactPhone = dto.ContactPhone;
+            entity.AdminEmail = dto.AdminEmail;
+            entity.WebsiteName = dto.WebsiteName;
+            entity.Logo = dto.Logo;
+            entity.IcpNumber = dto.IcpNumber;
+            entity.IsActive = dto.IsActive;
 
-            await tenantRepository.UpdateAsync(entity);
+            await _tenantRepository.UpdateAsync(entity);
         }
     }
 }

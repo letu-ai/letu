@@ -1,7 +1,8 @@
 ﻿using Letu.Applications;
 using Letu.Basis.IService.System;
 using Letu.Basis.IService.System.Dtos;
-using Letu.Core.Attributes;
+using Letu.Basis.Permissions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ namespace Letu.Basis.Controllers.Admin
         /// 创建定时任务
         /// </summary>
         [HttpPost]
-        [HasPermission("Sys.ScheduledTask.Add")]
+        [Authorize(BasisPermissions.ScheduledTask.Create)]
         public async Task CreateAsync([FromBody] ScheduledTaskDto dto)
         {
             await _scheduledTaskService.AddAsync(dto);
@@ -33,7 +34,6 @@ namespace Letu.Basis.Controllers.Admin
         /// 获取定时任务列表
         /// </summary>
         [HttpGet]
-        [HasPermission("Sys.ScheduledTask.List")]
         public async Task<PagedResult<ScheduledTaskListDto>> GetListAsync([FromQuery] ScheduledTaskQueryDto dto)
         {
             return await _scheduledTaskService.GetListAsync(dto);
@@ -42,18 +42,18 @@ namespace Letu.Basis.Controllers.Admin
         /// <summary>
         /// 更新定时任务
         /// </summary>
-        [HttpPut("{key}")]
-        [HasPermission("Sys.ScheduledTask.Update")]
-        public async Task UpdateAsync(string key, [FromBody] ScheduledTaskDto dto)
+        [HttpPut("{id}")]
+        [Authorize(BasisPermissions.ScheduledTask.Update)]
+        public async Task UpdateAsync(Guid id, [FromBody] ScheduledTaskDto dto)
         {
-            await _scheduledTaskService.UpdateAsync(dto);
+            await _scheduledTaskService.UpdateAsync(id, dto);
         }
 
         /// <summary>
         /// 删除定时任务
         /// </summary>
         [HttpDelete("{key}")]
-        [HasPermission("Sys.ScheduledTask.Delete")]
+        [Authorize(BasisPermissions.ScheduledTask.Delete)]
         public async Task DeleteAsync(string key)
         {
             await _scheduledTaskService.DeleteAsync(key);
@@ -63,7 +63,7 @@ namespace Letu.Basis.Controllers.Admin
         /// 获取定时任务执行日志
         /// </summary>
         [HttpGet("logs")]
-        [HasPermission("Sys.ScheduledTask.Log")]
+        [Authorize(BasisPermissions.ScheduledTask.Log)]
         public async Task<PagedResult<TaskExecutionLogListDto>> GetExecutionLogsAsync([FromQuery] TaskExecutionLogQueryDto dto)
         {
             return await _scheduledTaskService.GetExecutionLogListAsync(dto);

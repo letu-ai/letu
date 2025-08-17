@@ -1,98 +1,71 @@
 import { useRoutes } from 'react-router-dom';
 import { routes } from '@/router';
 import zhCN from 'antd/locale/zh_CN';
-import { ConfigProvider, Spin, theme } from 'antd';
-import { Suspense } from 'react';
-import { generateDynamicRoutes } from './router/dynamic';
-import UserStore from './store/userStore';
-import { useSelector } from 'react-redux';
-import { selectSize } from '@/store/themeStore.ts';
+import { ConfigProvider, Spin } from 'antd';
+import { Suspense, useMemo } from 'react';
 import { AuthProvider } from '@/components/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Application from '@/components/Application';
+import useThemeStore from '@/store/themeStore';
+import useLayoutStore from '@/store/layoutStore';
 
-// 清爽紫色主题配置
-const defaultTheme = {
-  algorithm: theme.defaultAlgorithm,
-  token: {
-    colorPrimary: '#7E57C2',
-    colorLink: '#7E57C2',
-    colorSuccess: '#66BB6A',
-    colorWarning: '#FFA726',
-    colorError: '#FF7043',
-    colorBgBase: '#FFFFFF',
-    colorTextBase: '#4A4A4A',
-    borderRadius: 4,
-    fontSize: 14,
-  },
-  components: {
-    Layout: {
-      siderBg: '#FFFFFF',
-      headerBg: '#FFFFFF',
-    },
-    Menu: {
-      itemBg: '#FFFFFF',
-      itemColor: '#4A4A4A',
-      itemSelectedBg: '#EDE7F6',
-      itemSelectedColor: '#7E57C2',
-      itemHoverBg: '#F5F3FF',
-      itemBorderRadius: 8,
-    },
-    Button: {
-      colorPrimary: '#7E57C2',
-      colorPrimaryHover: '#9575CD',
-      colorPrimaryActive: '#673AB7',
-    },
-    Table: {
-      headerBg: '#F5F3FF',
-      headerColor: '#4A4A4A',
-      borderColor: '#EDE7F6',
-    },
-  },
-};
 
-function App() {
-  const size = useSelector(selectSize);
-  const renderRoutes = routes;
-
-  if (UserStore.isAuthenticated()) {
-    generateDynamicRoutes().then((dyRoutes) => {
-      dyRoutes.forEach((dy) => {
-        renderRoutes[1].children?.push(dy);
-      });
-    });
-
-  }
-
-  const fallback = (
+const fallback = (
     <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-      }}
+        style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+        }}
     >
-      <Spin />
+        <Spin />
     </div>
-  );
+);
 
-  // 创建 QueryClient 实例（管理缓存和请求）
-  const queryClient = new QueryClient();
+const ThemedApp = () => {
+    const themeConfig = useThemeStore(state => state.theme);
+    const size = useLayoutStore(state => state.size);
 
-  return (
-    <>
-      <AuthProvider>
-        <ConfigProvider locale={zhCN} componentSize={size} theme={defaultTheme}>
-          <Application>
-            <QueryClientProvider client={queryClient}>
-              <Suspense fallback={fallback}>{useRoutes(renderRoutes)}</Suspense>
-            </QueryClientProvider>
-          </Application>
+    return (
+        <ConfigProvider locale={zhCN} componentSize={size} theme={themeConfig}>
+            <App />
         </ConfigProvider>
-      </AuthProvider>
-    </>
-  );
+    )
 }
 
-export default App;
+function App() {
+    const themeConfig = useThemeStore(state => state.theme);
+    const appStyle = useMemo(() => ({
+        '--color-primary': themeConfig.token?.colorPrimary,
+        "--color-link": themeConfig.token?.colorLink,
+        "--color-success": themeConfig.token?.colorSuccess,
+        "--color-warning": themeConfig.token?.colorWarning,
+        "--color-error": themeConfig.token?.colorError,
+        "--color-background": themeConfig.token?.colorBgBase,
+        "--color-text": themeConfig.token?.colorText,
+    }), [themeConfig]);
+
+
+    // 创建 QueryClient 实例（管理缓存和请求）
+    const queryClient = new QueryClient();
+
+    return (
+        <>
+            <AuthProvider>
+                <div style={appStyle}>
+                    <Application>
+                        <QueryClientProvider client={queryClient}>
+                            {/* 使用固定的基础路由结构，避免Hook调用数量变化 */}
+                            <Suspense fallback={fallback}>
+                                {useRoutes(routes)}
+                            </Suspense>
+                        </QueryClientProvider>
+                    </Application>
+                </div>
+            </AuthProvider>
+        </>
+    );
+}
+
+export default ThemedApp;
