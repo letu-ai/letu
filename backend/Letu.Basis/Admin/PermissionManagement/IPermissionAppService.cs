@@ -6,6 +6,9 @@ namespace Letu.Basis.Admin.PermissionManagement;
 
 public interface IPermissionAppService : IApplicationService
 {
+
+    Task<List<PermissionDefinitionDto>> GetPermissionDefinitionsAsync();
+
     Task<GetPermissionListResultDto> GetAsync([NotNull] string providerName, [NotNull] string providerKey);
 
 

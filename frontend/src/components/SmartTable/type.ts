@@ -7,7 +7,9 @@ export interface SmartTableProps<T> extends Omit<TableProps<T>, 'columns'> {
   request?: (params: any) => Promise<PagedResult<T>>;
   searchItems?: React.ReactNode | React.ReactNode[];
   toolbar?: React.ReactNode | React.ReactNode[];
+  extraContent?: React.ReactNode | React.ReactNode[];
   selection?: boolean;
+  params?: Record<string, any>;
 }
 
 export interface SmartTableRef {

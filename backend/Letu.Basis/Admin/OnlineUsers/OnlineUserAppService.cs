@@ -1,9 +1,9 @@
 ﻿using FreeSql;
-using Letu.Applications;
 using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Identity;
+using Letu.Core.Applications;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Volo.Abp.Application.Services;

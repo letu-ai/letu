@@ -1,0 +1,61 @@
+---
+description: 
+globs:
+alwaysApply: true
+---
+# 项目技术栈和目录结构
+
+## 1. 技术栈
+
+### 1.1 前端 (Frontend)
+
+- **核心框架**: React 18 + TypeScript
+- **构建工具**: Vite
+- **UI 框架**: Ant Design 5.x
+- **样式方案**: Tailwind CSS 
+- **状态管理**: Zustand 
+- **路由**: React Router 7.x
+- **HTTP客户端**:  Axios封装的httpClient
+
+
+### 1.2 后端 (Backend)
+
+- **核心框架**: .NET 9 + ASP.NET Core
+- **应用框架**: ABP Framework
+- **ORM**: FreeSql
+- **缓存**: Redis
+- **语言**: C#
+
+## 2. 目录结构
+
+```
+.
+├── backend/              # 后端 .NET 解决方案
+│   ├── Letu.Server/      # ABP 应用主宿主项目
+│   ├── Letu.Basis/       # 基础业务模块
+│   ├── Letu.Core/        # 核心工具和定义
+│   ├── Letu.Repository/  # 数据仓储层 (FreeSql 实现)
+│   └── ...               # 其他业务或基础设施模块
+├── frontend/             # 前端 React 项目
+│   ├── public/           # 静态资源
+│   └── src/              # 源代码
+│       ├── application/  # 应用级服务/逻辑
+│       ├── assets/       # 图片、字体等资源
+│       ├── components/   # 公共组件
+│       ├── hooks/        # 自定义 Hooks
+│       ├── layout/       # 布局组件
+│       ├── pages/        # 页面组件
+│       ├── router/       # 路由配置
+│       ├── store/        # 状态管理
+│       └── utils/        # 工具函数
+├── docs/                 # 项目文档
+├── dbscripts/            # 数据库脚本
+└── oss/                  # 模拟对象存储的静态文件
+```
+
+## 3. 开发规范
+
+- **组件开发**: 在 `frontend/src/components/` 目录下创建新组件，遵循现有组件的 props 定义和导出方式。
+- **API请求**: 在 `frontend/src/pages/` 目录下按模块创建 service.ts文件中编写请求函数。
+- **后端服务**: 在 `backend/` 对应模块中添加新的应用服务（Application Service），遵循 ABP 框架的开发模式。
+- **代码提交**: 遵循 Conventional Commits 规范。

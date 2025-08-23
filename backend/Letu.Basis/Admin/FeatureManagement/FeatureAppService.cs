@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Letu.Basis.Admin.FeatureManagement.Dtos;
 using Letu.Basis.Permissions;
+using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
@@ -72,7 +69,7 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
         return new FeatureGroupDto
         {
             Name = groupDefinition.Name,
-            DisplayName = groupDefinition.DisplayName?.Localize(StringLocalizerFactory),
+            DisplayName = groupDefinition.DisplayName?.Localize(StringLocalizerFactory) ?? groupDefinition.Name,
             Features = new List<FeatureDto>()
         };
     }
@@ -82,7 +79,7 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
         return new FeatureDto
         {
             Name = featureDefinition.Name,
-            DisplayName = featureDefinition.DisplayName?.Localize(StringLocalizerFactory),
+            DisplayName = featureDefinition.DisplayName?.Localize(StringLocalizerFactory) ?? featureDefinition.Name,
             Description = featureDefinition.Description?.Localize(StringLocalizerFactory),
 
             ValueType = featureDefinition.ValueType,
@@ -107,8 +104,42 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
         }
     }
 
+    public virtual async Task DeleteAsync([NotNull] string providerName, string? providerKey)
+    {
+        await CheckProviderPolicy(providerName, providerKey);
+        await FeatureManager.DeleteAsync(providerName, providerKey);
+    }
+
+    /// <summary>
+    /// 获取所有功能选项
+    /// </summary>
+    /// <param name="valueType">指定值类型。例如“BOOLEAN”，用于筛选开关型功能列表。</param>
+    /// <returns></returns>
+    public virtual async Task<List<SelectOption>> GetSelectOptionsAsync(string? valueType = null)
+    {
+        var options = new List<SelectOption>();
+        foreach (var group in await FeatureDefinitionManager.GetGroupsAsync())
+        {
+            foreach (var featureDefinition in group.GetFeaturesWithChildren())
+            {
+                if (featureDefinition.IsAvailableToHost && CurrentTenant.IsAvailable)
+                    continue;
+
+                if (valueType != null && featureDefinition.ValueType?.Validator.Name != valueType)
+                    continue;
+
+                options.Add(new SelectOption()
+                {
+                    Value = featureDefinition.Name,
+                    Label = featureDefinition.DisplayName?.Localize(StringLocalizerFactory) ?? featureDefinition.Name
+                });
+            }
+        }
+        return options;
+    }
+
     private void SetFeatureDepth(List<FeatureDto> features, string providerName, string? providerKey,
-        FeatureDto parentFeature = null, int depth = 0)
+        FeatureDto? parentFeature = null, int depth = 0)
     {
         foreach (var feature in features)
         {
@@ -122,7 +153,7 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
 
     private async Task CheckProviderPolicy(string providerName, string? providerKey)
     {
-        string policyName;
+        string? policyName;
         if (providerName == TenantFeatureValueProvider.ProviderName && CurrentTenant.Id == null && providerKey == null)
         {
             policyName = BasisPermissions.Feature.ManageHostFeatures;
@@ -137,11 +168,5 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
         }
 
         await AuthorizationService.CheckAsync(policyName);
-    }
-
-    public virtual async Task DeleteAsync([NotNull] string providerName, string? providerKey)
-    {
-        await CheckProviderPolicy(providerName, providerKey);
-        await FeatureManager.DeleteAsync(providerName, providerKey);
     }
 }

@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import useConfigStore from '@/application/configStore';
+﻿import React, { useMemo, useCallback } from 'react';
+import useAppConfigStore, { type IConfigStore } from '@/application/appConfigStore';
 
 // 权限检查条件接口
 interface IPermissionCondition {
@@ -23,7 +23,7 @@ interface SettingCondition {
 }
 
 // 无权限时的渲染策略
-type NoPermissionStrategy = 
+type NoPermissionStrategy =
   | 'fallback'      // 显示fallback内容（默认）
   | 'render'        // 渲染children但可能是禁用状态
   | 'hide'          // 完全不渲染（对于复杂组件）
@@ -38,6 +38,28 @@ interface PermissionProps extends IPermissionCondition {
   disabledProps?: Record<string, any>; // 当使用render策略时，传递给子组件的禁用属性
 }
 
+interface IContext {
+    // 状态属性
+    isLoading: boolean;
+    isReady: boolean;
+    error: Error | null;
+
+    // 权限
+    isAnyGranted: (...args: string[]) => boolean;
+    areAllGranted: (...args: string[]) => boolean;
+
+    // 设置
+    getSetting: (name: string) => string | undefined;
+    getSettingBoolean: (name: string) => boolean;
+    getSettingInt: (name: string) => number;
+
+    // 功能特性
+    isFeatureEnabled: (name: string) => boolean;
+
+    // 全局功能特性
+    isGlobalFeatureEnabled: (name: string) => boolean;
+}
+
 /**
  * 权限检查的核心逻辑函数
  * @param abp ABP Store 实例
@@ -45,17 +67,7 @@ interface PermissionProps extends IPermissionCondition {
  * @returns 是否有权限
  */
 function checkPermissions(
-  abp: {
-    hasError: () => boolean;
-    isReady: () => boolean;
-    areAllGranted: (...args: string[]) => boolean;
-    isAnyGranted: (...args: string[]) => boolean;
-    isFeatureEnabled: (name: string) => boolean;
-    isGlobalFeatureEnabled: (name: string) => boolean;
-    getSettingBoolean: (name: string) => boolean;
-    getSettingInt: (name: string) => number;
-    getSetting: (name: string) => string | undefined;
-  }, 
+  context: IContext,
   conditions: IPermissionCondition & { requireAll?: boolean }
 ) {
   const {
@@ -71,7 +83,7 @@ function checkPermissions(
   } = conditions;
 
   // 如果 ABP 配置加载失败或未准备好，出于安全考虑返回 false
-  if (abp.hasError() || !abp.isReady()) {
+  if (context.error || !context.isReady) {
     return false;
   }
 
@@ -81,13 +93,13 @@ function checkPermissions(
   if (permissions) {
     const permissionList = Array.isArray(permissions) ? permissions : [permissions];
     let hasPermission: boolean;
-    
+
     if (permissionMode === 'every') {
-      hasPermission = abp.areAllGranted(...permissionList);
+      hasPermission = context.areAllGranted(...permissionList);
     } else {
-      hasPermission = abp.isAnyGranted(...permissionList);
+      hasPermission = context.isAnyGranted(...permissionList);
     }
-    
+
     results.push(hasPermission);
   }
 
@@ -95,13 +107,13 @@ function checkPermissions(
   if (features) {
     const featureList = Array.isArray(features) ? features : [features];
     let hasFeature: boolean;
-    
+
     if (featureMode === 'every') {
-      hasFeature = featureList.every(feature => abp.isFeatureEnabled(feature));
+      hasFeature = featureList.every(feature => context.isFeatureEnabled(feature));
     } else {
-      hasFeature = featureList.some(feature => abp.isFeatureEnabled(feature));
+      hasFeature = featureList.some(feature => context.isFeatureEnabled(feature));
     }
-    
+
     results.push(hasFeature);
   }
 
@@ -109,30 +121,30 @@ function checkPermissions(
   if (globalFeatures) {
     const globalFeatureList = Array.isArray(globalFeatures) ? globalFeatures : [globalFeatures];
     let hasGlobalFeature: boolean;
-    
+
     if (globalFeatureMode === 'every') {
-      hasGlobalFeature = globalFeatureList.every(feature => abp.isGlobalFeatureEnabled(feature));
+      hasGlobalFeature = globalFeatureList.every(feature => context.isGlobalFeatureEnabled(feature));
     } else {
-      hasGlobalFeature = globalFeatureList.some(feature => abp.isGlobalFeatureEnabled(feature));
+      hasGlobalFeature = globalFeatureList.some(feature => context.isGlobalFeatureEnabled(feature));
     }
-    
+
     results.push(hasGlobalFeature);
   }
 
   // 检查设置
   if (settings) {
     const settingList = Array.isArray(settings) ? settings : [settings];
-    
+
     const checkSetting = (condition: SettingCondition): boolean => {
       const { name, value, boolValue, intValue, operator = 'equals' } = condition;
-      
+
       if (boolValue !== undefined) {
-        const actualValue = abp.getSettingBoolean(name);
+        const actualValue = context.getSettingBoolean(name);
         return actualValue === boolValue;
       }
-      
+
       if (intValue !== undefined) {
-        const actualValue = abp.getSettingInt(name);
+        const actualValue = context.getSettingInt(name);
         switch (operator) {
           case 'equals':
             return actualValue === intValue;
@@ -150,9 +162,9 @@ function checkPermissions(
             return actualValue === intValue;
         }
       }
-      
+
       if (value !== undefined) {
-        const actualValue = abp.getSetting(name);
+        const actualValue = context.getSetting(name);
         switch (operator) {
           case 'equals':
             return actualValue === value;
@@ -162,19 +174,19 @@ function checkPermissions(
             return actualValue === value;
         }
       }
-      
+
       // 如果没有指定值，检查设置是否存在
-      const actualValue = abp.getSetting(name);
+      const actualValue = context.getSetting(name);
       return actualValue !== undefined && actualValue !== null && actualValue !== '';
     };
-    
+
     let hasValidSetting: boolean;
     if (settingMode === 'every') {
       hasValidSetting = settingList.every(checkSetting);
     } else {
       hasValidSetting = settingList.some(checkSetting);
     }
-    
+
     results.push(hasValidSetting);
   }
 
@@ -210,8 +222,36 @@ function checkPermissions(
  * ```
  */
 export function usePermission(conditions: IPermissionCondition & { requireAll?: boolean } = {}) {
-  const abp = useConfigStore();
-  return checkPermissions(abp, conditions);
+  // 获取状态和方法
+  const error = useAppConfigStore(state => state.error);
+  const isReady = useAppConfigStore(state => state.isReady);
+  const isLoading = useAppConfigStore(state => state.isLoading);
+  const isAnyGranted = useAppConfigStore(state => state.isAnyGranted);
+  const areAllGranted = useAppConfigStore(state => state.areAllGranted);
+  const getSetting = useAppConfigStore(state => state.getSetting);
+  const getSettingBoolean = useAppConfigStore(state => state.getSettingBoolean);
+  const getSettingInt = useAppConfigStore(state => state.getSettingInt);
+  const isFeatureEnabled = useAppConfigStore(state => state.isFeatureEnabled);
+  const isGlobalFeatureEnabled = useAppConfigStore(state => state.isGlobalFeatureEnabled);
+
+  return useMemo(() => {
+    // 创建 context 对象
+    const context: IContext = {
+      isLoading,
+      isReady,
+      error,
+      isAnyGranted,
+      areAllGranted,
+      getSetting,
+      getSettingBoolean,
+      getSettingInt,
+      isFeatureEnabled,
+      isGlobalFeatureEnabled
+    };
+
+    // 使用统一的权限检查函数
+    return checkPermissions(context, conditions);
+  }, [error, isReady, isLoading, isAnyGranted, areAllGranted, getSetting, getSettingBoolean, getSettingInt, isFeatureEnabled, isGlobalFeatureEnabled, conditions]);
 }
 
 /**
@@ -239,26 +279,8 @@ const Permission: React.FC<PermissionProps> = ({
   noPermissionStrategy = 'fallback',
   disabledProps = {}
 }) => {
-  const abp = useConfigStore();
-
-  // 如果 ABP 配置还在加载中，显示加载状态
-  if (abp.isLoading()) {
-    return <>{loading}</>;
-  }
-
-  // 如果 ABP 配置加载失败，出于安全考虑不显示内容
-  if (abp.hasError()) {
-    console.warn('ABP配置加载失败，权限检查无法进行:', abp.getError());
-    return <>{fallback}</>;
-  }
-
-  // 如果 ABP 配置未准备好，出于安全考虑不显示内容
-  if (!abp.isReady()) {
-    return <>{fallback}</>;
-  }
-
-  // 使用统一的权限检查逻辑
-  const hasPermission = checkPermissions(abp, {
+  // 使用 usePermission hook 来检查权限
+  const hasPermission = usePermission({
     permissions,
     permissionMode,
     features,
@@ -269,7 +291,28 @@ const Permission: React.FC<PermissionProps> = ({
     settingMode,
     requireAll
   });
-  
+
+  // 分别获取状态
+  const isLoading = useAppConfigStore(state => state.isLoading);
+  const error = useAppConfigStore(state => state.error);
+  const isReady = useAppConfigStore(state => state.isReady);
+
+  // 如果 ABP 配置还在加载中，显示加载状态
+  if (isLoading) {
+    return <>{loading}</>;
+  }
+
+  // 如果 ABP 配置加载失败，出于安全考虑不显示内容
+  if (error) {
+    console.warn('ABP配置加载失败，权限检查无法进行:', error);
+    return <>{fallback}</>;
+  }
+
+  // 如果 ABP 配置未准备好，出于安全考虑不显示内容
+  if (!isReady) {
+    return <>{fallback}</>;
+  }
+
   // 如果有权限，直接渲染子组件
   if (hasPermission) {
     return <>{children}</>;
@@ -280,7 +323,7 @@ const Permission: React.FC<PermissionProps> = ({
     case 'hide':
       // 完全不渲染
       return null;
-      
+
     case 'render':
       // 渲染子组件但添加禁用属性
       try {
@@ -299,7 +342,7 @@ const Permission: React.FC<PermissionProps> = ({
         console.warn('Permission组件：克隆子组件失败，直接渲染原组件', error);
         return <>{children}</>;
       }
-      
+
     case 'fallback':
     default:
       // 显示fallback内容

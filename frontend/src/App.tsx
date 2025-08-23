@@ -3,11 +3,10 @@ import { routes } from '@/router';
 import zhCN from 'antd/locale/zh_CN';
 import { ConfigProvider, Spin } from 'antd';
 import { Suspense, useMemo } from 'react';
-import { AuthProvider } from '@/components/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Application from '@/components/Application';
-import useThemeStore from '@/store/themeStore';
-import useLayoutStore from '@/store/layoutStore';
+import useThemeStore from '@/application/themeStore';
+import useLayoutStore from '@/application/layoutStore';
+import { App as AntApp } from 'antd';
 
 
 const fallback = (
@@ -44,27 +43,22 @@ function App() {
         "--color-error": themeConfig.token?.colorError,
         "--color-background": themeConfig.token?.colorBgBase,
         "--color-text": themeConfig.token?.colorText,
-    }), [themeConfig]);
+    } as React.CSSProperties), [themeConfig]);
 
 
     // 创建 QueryClient 实例（管理缓存和请求）
     const queryClient = new QueryClient();
 
     return (
-        <>
-            <AuthProvider>
-                <div style={appStyle}>
-                    <Application>
-                        <QueryClientProvider client={queryClient}>
-                            {/* 使用固定的基础路由结构，避免Hook调用数量变化 */}
-                            <Suspense fallback={fallback}>
-                                {useRoutes(routes)}
-                            </Suspense>
-                        </QueryClientProvider>
-                    </Application>
-                </div>
-            </AuthProvider>
-        </>
+        <div style={appStyle}>
+            <QueryClientProvider client={queryClient}>
+                <AntApp>
+                    <Suspense fallback={fallback}>
+                        {useRoutes(routes)}
+                    </Suspense>
+                </AntApp>
+            </QueryClientProvider>
+        </div>
     );
 }
 

@@ -1,5 +1,5 @@
 import httpClient from '@/utils/httpClient';
-import type { AppOption, PagedResultRequest, PagedResult } from '@/types/api';
+import type { SelectOption, PagedResultRequest, PagedResult } from '@/types/api';
 
 /**
  * 登录日志分页列表
@@ -46,7 +46,7 @@ export function getBusinessLogList(dto: BusinessLogQueryDto) {
  * @param type
  */
 export function getBusinessTypeOptions(type?: string | null) {
-  return httpClient.get<string, AppOption[]>('/api/admin/logs/business/type-options', {
+  return httpClient.get<string, SelectOption[]>('/api/admin/logs/business/type-options', {
     params: type,
   });
 }

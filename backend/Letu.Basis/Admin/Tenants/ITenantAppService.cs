@@ -1,5 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.Tenants.Dtos;
+﻿using Letu.Basis.Admin.Tenants.Dtos;
+using Letu.Core.Applications;
 using Volo.Abp.DependencyInjection;
 
 

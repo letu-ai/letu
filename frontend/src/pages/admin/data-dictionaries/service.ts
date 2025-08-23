@@ -1,5 +1,5 @@
 import httpClient from '@/utils/httpClient';
-import type { PagedResultRequest, AppOption, PagedResult } from '@/types/api';
+import type { PagedResultRequest, SelectOption, PagedResult } from '@/types/api';
 
 /**
  * 新增字典类型
@@ -51,7 +51,7 @@ export function deleteDictTypes(ids: string[]) {
  * @returns
  */
 export function getDictDataOptions(type: string) {
-  return httpClient.get<string, AppOption[]>('/api/admin/data-dictionaries/types/type-options?type=' + type);
+  return httpClient.get<string, SelectOption[]>('/api/admin/data-dictionaries/types/type-options?type=' + type);
 }
 
 export interface DictTypeDto {

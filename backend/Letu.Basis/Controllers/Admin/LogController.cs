@@ -1,9 +1,7 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.Loggings;
+﻿using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Admin.Loggings.Dtos;
 using Letu.Basis.Admin.OnlineUsers.Dtos;
-
-using Letu.Shared.Models;
+using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,7 +76,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("business/type-options")]
-        public async Task<List<AppOption>> GetBusinessTypeOptionsAsync(string? type)
+        public async Task<List<SelectOption>> GetBusinessTypeOptionsAsync(string? type)
         {
             return await businessLogService.GetBusinessTypeOptionsAsync(type);
         }

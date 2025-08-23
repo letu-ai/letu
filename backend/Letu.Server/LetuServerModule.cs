@@ -16,6 +16,7 @@ using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using System.Diagnostics;
 using System.Threading.RateLimiting;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
@@ -92,6 +93,7 @@ public class LetuServerModule : AbpModule
     {
         // 绑定配置
         var jwtOptions = configuration.GetSection("Jwt").Get<JwtOptions>();
+        Debug.Assert(jwtOptions != null, "JwtOptions cannot be null. Please check your configuration.");
 
         Configure<JwtOptions>(configuration.GetSection("Jwt"));
 

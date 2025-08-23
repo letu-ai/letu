@@ -1,4 +1,4 @@
-﻿namespace Letu.Identity.Jwt
+﻿namespace Letu.Core.Identity.Jwt
 {
     /// <summary>
     /// 授权配置

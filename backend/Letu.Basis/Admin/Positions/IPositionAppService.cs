@@ -1,6 +1,5 @@
-using Letu.Applications;
 using Letu.Basis.Admin.Positions.Dtos;
-using Letu.Shared.Models;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -38,7 +37,7 @@ namespace Letu.Basis.Admin.Positions
         /// 职位分组+职位树
         /// </summary>
         /// <returns></returns>
-        Task<List<AppOptionTree>> GetPositionTreeOptionAsync();
+        Task<List<TreeSelectOption>> GetPositionTreeOptionAsync();
 
         /// <summary>
         /// 新增职位分组

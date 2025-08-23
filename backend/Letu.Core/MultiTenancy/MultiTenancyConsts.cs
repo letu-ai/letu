@@ -1,4 +1,4 @@
-namespace Letu.Core.Authorization;
+namespace Letu.Core.MultiTenancy;
 
 public static class MultiTenancyConsts
 {

@@ -1,5 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.IService.System.Dtos;
+﻿using Letu.Basis.IService.System.Dtos;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.IService.System
 {

@@ -1,9 +1,8 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.OnlineUsers;
+﻿using Letu.Basis.Admin.OnlineUsers;
 using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Basis.Identity;
 using Letu.Basis.Permissions;
-
+using Letu.Core.Applications;
 using Letu.Logging;
 
 using Microsoft.AspNetCore.Authorization;

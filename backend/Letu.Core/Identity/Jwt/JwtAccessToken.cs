@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Letu.Identity.Jwt;
+namespace Letu.Core.Identity.Jwt;
 public class JwtAccessToken
 {
 

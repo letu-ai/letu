@@ -7,17 +7,19 @@ import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type';
 import ProIcon from '@/components/ProIcon';
 import useApp from 'antd/es/app/useApp';
-import UserStore from '@/store/userStore.ts';
+import useAppConfigStore from '@/application/appConfigStore';
 
 const OnlineUserList: React.FC = () => {
   const tableRef = useRef<SmartTableRef>(null);
+  const currentUser = useAppConfigStore(state=>state.currentUser)
+  const sessionId = currentUser.sessionId;
   const { message } = useApp();
   const columns: SmartTableColumnType[] = [
     {
       title: '账号',
       dataIndex: 'userName',
       render: (userName: string, record: OnlineUserResultDto) => {
-        if (UserStore.token && UserStore.token.sessionId === record.sessionId) {
+        if (sessionId === record.sessionId) {
           return (
             <div>
               {userName}

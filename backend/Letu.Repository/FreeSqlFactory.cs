@@ -1,7 +1,7 @@
 ﻿using FreeSql;
 using FreeSql.Aop;
 using FreeSql.Internal;
-using Letu.Core.Authorization;
+using Letu.Core.MultiTenancy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

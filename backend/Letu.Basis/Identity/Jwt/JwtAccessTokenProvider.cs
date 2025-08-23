@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Letu.Identity.Jwt;
+using Letu.Core.Identity.Jwt;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;

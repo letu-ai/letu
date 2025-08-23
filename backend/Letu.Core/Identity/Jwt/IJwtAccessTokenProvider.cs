@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Letu.Identity.Jwt;
+namespace Letu.Core.Identity.Jwt;
 
 public interface IJwtAccessTokenProvider
 {

@@ -12,7 +12,7 @@ import {
 import './index.scss';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useThemeStore from '@/store/themeStore';
+import useThemeStore from '@/application/themeStore';
 
 const { Title, Text, Paragraph } = Typography;
 // 更新日志数据

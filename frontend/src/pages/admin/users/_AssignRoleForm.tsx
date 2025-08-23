@@ -2,7 +2,7 @@ import { Form, Input, Modal, Select } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { assignRole, type AssignRoleDto, getUserRoleIds, type UserListDto } from './service';
 import { getRoleOptions } from '../roles/service';
-import type { AppOption } from '@/types/api';
+import type { SelectOption } from '@/types/api';
 import useApp from 'antd/es/app/useApp';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -15,7 +15,7 @@ export interface AssignRoleFormRef {
 const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
-  const [roleOptions, setRoleOptions] = useState<AppOption[]>([]);
+  const [roleOptions, setRoleOptions] = useState<SelectOption[]>([]);
   const [currentRow, setCurrentRow] = useState<UserListDto>();
   const { message } = useApp();
 

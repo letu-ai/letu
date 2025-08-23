@@ -1,6 +1,5 @@
 ﻿using Letu.Basis.Admin.Tenants;
 using Letu.Basis.Admin.Tenants.Dtos;
-using Letu.Applications;
 
 using Letu.Logging;
 using Letu.Shared.Consts;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Letu.Basis.Permissions;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Controllers.Admin;
 

@@ -1,9 +1,8 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.DataDictionary.Dtos;
+﻿using Letu.Basis.Admin.DataDictionary.Dtos;
+using Letu.Core.Applications;
 using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
-using Letu.Shared.Models;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 
@@ -95,12 +94,16 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         await _dictTypeRepository.UpdateAsync(entity);
     }
 
-    public Task<List<AppOption>> GetDictDataOptionsAsync(string type)
+    public Task<List<SelectOption>> GetDictDataOptionsAsync(string type)
     {
         return _dictDataRepository
             .Where(x => x.DictType == type)
             .OrderBy(x => x.Sort)
-            .ToListAsync(x => new AppOption(x.Label, x.Value));
+            .ToListAsync(x => new SelectOption
+            {
+                Label = x.Label,
+                Value = x.Value
+            });
     }
 
     [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictBatchDeleteSubType, "{{ids}}", LogRecordConsts.SysDictBatchDeleteContent)]

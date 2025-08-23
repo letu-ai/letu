@@ -1,5 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.Personal.Notifications.Dtos;
+﻿using Letu.Basis.Personal.Notifications.Dtos;
+using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

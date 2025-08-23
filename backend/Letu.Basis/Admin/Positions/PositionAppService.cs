@@ -6,8 +6,7 @@ using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Positions.Dtos;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
-using Letu.Applications;
-using Letu.Shared.Models;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -177,23 +176,24 @@ namespace Letu.Basis.Admin.Positions
             return true;
         }
 
-        public async Task<List<AppOptionTree>> GetPositionTreeOptionAsync()
+        public async Task<List<TreeSelectOption>> GetPositionTreeOptionAsync()
         {
             var groups = await _positionGroupRepository.Select.ToListAsync();
             var positions = await _positionRepository.Select.ToListAsync();
             var topGroups = groups.Where(x => !x.ParentId.HasValue).ToList();
-            var list = new List<AppOptionTree>();
-            List<AppOptionTree> GetChildren(string id)
+            var list = new List<TreeSelectOption>();
+            List<TreeSelectOption> GetChildren(string id)
             {
                 var items = groups.Where(x => x.ParentId.ToString() == id);
-                var children = new List<AppOptionTree>();
+                var children = new List<TreeSelectOption>();
                 if (items.Any())
                 {
                     foreach (var item in items)
                     {
-                        var t = new AppOptionTree()
+                        var t = new TreeSelectOption()
                         {
-                            Label = item.GroupName,
+                            Key = item.Id.ToString(),
+                            Title = item.GroupName,
                             Value = item.Id.ToString()
                         };
                         t.Children = GetChildren(t.Value);
@@ -201,9 +201,10 @@ namespace Letu.Basis.Admin.Positions
                         //最底级查职位
                         if (t.Children.Count == 0)
                         {
-                            t.Children = positions.Where(x => x.GroupId.ToString() == t.Value).Select(x => new AppOptionTree
+                            t.Children = positions.Where(x => x.GroupId.ToString() == t.Value).Select(x => new TreeSelectOption
                             {
-                                Label = x.Name,
+                                Key = x.Id.ToString(),
+                                Title = x.Name,
                                 Value = x.Id.ToString()
                             }).ToList();
                         }
@@ -211,9 +212,10 @@ namespace Letu.Basis.Admin.Positions
                 }
                 else
                 {
-                    children = positions.Where(x => x.GroupId.ToString() == id).Select(x => new AppOptionTree
+                    children = positions.Where(x => x.GroupId.ToString() == id).Select(x => new TreeSelectOption
                     {
-                        Label = x.Name,
+                        Key = x.Id.ToString(),
+                        Title = x.Name,
                         Value = x.Id.ToString()
                     }).ToList();
                 }
@@ -222,9 +224,10 @@ namespace Letu.Basis.Admin.Positions
 
             foreach (var group in topGroups)
             {
-                var t = new AppOptionTree()
+                var t = new TreeSelectOption()
                 {
-                    Label = group.GroupName,
+                    Key = group.Id.ToString(),
+                    Title = group.GroupName,
                     Value = group.Id.ToString()
                 };
                 t.Children = GetChildren(t.Value);

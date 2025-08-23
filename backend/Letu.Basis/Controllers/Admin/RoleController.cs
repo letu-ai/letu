@@ -1,11 +1,9 @@
-using Letu.Applications;
 using Letu.Basis.Admin.Roles;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Permissions;
-
+using Letu.Core.Applications;
 using Letu.Logging;
 using Letu.Shared.Consts;
-using Letu.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -94,7 +92,7 @@ namespace Letu.Basis.Controllers.Admin
         /// </summary>
         /// <returns></returns>
         [HttpGet("options")]
-        public async Task<List<AppOption>> GetRoleOptionsAsync()
+        public async Task<List<SelectOption>> GetRoleOptionsAsync()
         {
             return await _roleService.GetRoleOptionsAsync();
         }

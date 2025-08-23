@@ -1,5 +1,4 @@
-﻿using Letu.Core.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 using System.Security.Claims;
 

@@ -1,7 +1,6 @@
 ﻿using FreeSql;
 using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Roles;
-using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Repository;
 using Letu.Shared.Consts;
@@ -68,7 +67,7 @@ namespace Letu.Basis.SharedService
             var roles = await _roleRepository.Where(x => roleIds.Contains(x.Id) && x.IsEnabled).ToListAsync();
             var isSuperAdmin = roles.Any(r => r.Name == AdminConsts.SuperAdminRole);
             var menuIds = await _roleMenuRepository.Where(x => roleIds.Contains(x.RoleId)).ToListAsync(x => x.MenuId);
-            var menus = await _menuRepository.Select.Where(x => menuIds.Contains(x.Id) || isSuperAdmin).ToListAsync(x => new { x.Permission, x.Id, x.MenuType });
+            var menus = await _menuRepository.Select.Where(x => menuIds.Contains(x.Id) || isSuperAdmin).ToListAsync(x => new {x.Id, x.MenuType });
             if (isSuperAdmin)
             {
                 menuIds = menus.Select(x => x.Id).ToList();
@@ -77,7 +76,7 @@ namespace Letu.Basis.SharedService
             {
                 UserId = userId,
                 Roles = roles.Select(c => c.Name).ToArray(),
-                Auths = menus.Where(c => !string.IsNullOrEmpty(c.Permission) && c.MenuType == MenuType.Button).Select(c => c.Permission!).Distinct().ToArray(),
+                //Auths = menus.Where(c => !string.IsNullOrEmpty(c.Permission) && c.MenuType == MenuType.Button).Select(c => c.Permission!).Distinct().ToArray(),
                 RoleIds = [.. roleIds],
                 MenuIds = [.. menuIds],
                 IsSuperAdmin = isSuperAdmin
@@ -110,19 +109,19 @@ namespace Letu.Basis.SharedService
             await permissionCache.RemoveAsync(SystemCacheKey.UserPermission(userId));
         }
 
-        /// <summary>
-        /// 检查用户是否有权限
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckPermissionAsync(string userId, string code)
-        {
-            var permission = await GetUserPermissionAsync(Guid.Parse(userId));
-            if (permission == null || permission.Auths == null) return false;
+        ///// <summary>
+        ///// 检查用户是否有权限
+        ///// </summary>
+        ///// <param name="userId"></param>
+        ///// <param name="code"></param>
+        ///// <returns></returns>
+        //public async Task<bool> CheckPermissionAsync(string userId, string code)
+        //{
+        //    var permission = await GetUserPermissionAsync(Guid.Parse(userId));
+        //    if (permission == null || permission.Auths == null) return false;
 
-            return permission.Auths.Contains(code) || permission.IsSuperAdmin;
-        }
+        //    return permission.Auths.Contains(code) || permission.IsSuperAdmin;
+        //}
 
         /// <summary>
         /// 生成Token

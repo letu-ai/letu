@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Localization;
 using Volo.Abp.MultiTenancy;
@@ -14,10 +13,10 @@ namespace Letu.Basis.Admin.PermissionManagement;
 [Authorize]
 public class PermissionAppService : BasisAppService, IPermissionAppService
 {
-    protected PermissionManagementOptions Options { get; }
-    protected IPermissionManager PermissionManager { get; }
-    protected IPermissionDefinitionManager PermissionDefinitionManager { get; }
-    protected ISimpleStateCheckerManager<PermissionDefinition> SimpleStateCheckerManager { get; }
+    private readonly PermissionManagementOptions options;
+    private readonly IPermissionManager permissionManager;
+    private readonly IPermissionDefinitionManager permissionDefinitionManager;
+    private readonly ISimpleStateCheckerManager<PermissionDefinition> simpleStateCheckerManager;
 
     public PermissionAppService(
         IPermissionManager permissionManager,
@@ -25,13 +24,27 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
         IOptions<PermissionManagementOptions> options,
         ISimpleStateCheckerManager<PermissionDefinition> simpleStateCheckerManager)
     {
-        Options = options.Value;
-        PermissionManager = permissionManager;
-        PermissionDefinitionManager = permissionDefinitionManager;
-        SimpleStateCheckerManager = simpleStateCheckerManager;
+        this.options = options.Value;
+        this.permissionManager = permissionManager;
+        this.permissionDefinitionManager = permissionDefinitionManager;
+        this.simpleStateCheckerManager = simpleStateCheckerManager;
     }
 
-    public virtual async Task<GetPermissionListResultDto> GetAsync(string providerName, string providerKey)
+    public async Task<List<PermissionDefinitionDto>> GetPermissionDefinitionsAsync()
+    {
+        var groups = await permissionDefinitionManager.GetGroupsAsync();
+        return groups.Select(x => new PermissionDefinitionDto(x.Name, x.DisplayName?.Localize(StringLocalizerFactory) ?? x.Name)
+        {
+            IsGroup = true,
+            Permissions = x.Permissions.Select(x => new PermissionDefinitionDto(x.Name, x.DisplayName?.Localize(StringLocalizerFactory) ?? x.Name)
+            {
+                Permissions = x.Children.Select(x => new PermissionDefinitionDto(x.Name, x.DisplayName?.Localize(StringLocalizerFactory) ?? x.Name)).ToList()
+            }).ToList()
+        })
+        .ToList();
+    }
+
+    public async Task<GetPermissionListResultDto> GetAsync(string providerName, string providerKey)
     {
         await CheckProviderPolicy(providerName);
 
@@ -44,7 +57,7 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
         var multiTenancySide = CurrentTenant.GetMultiTenancySide();
         var permissionGroups = new List<PermissionGroupDto>();
 
-        foreach (var group in await PermissionDefinitionManager.GetGroupsAsync())
+        foreach (var group in await permissionDefinitionManager.GetGroupsAsync())
         {
             var groupDto = CreatePermissionGroupDto(group);
             var permissions = group.GetPermissionsWithChildren()
@@ -60,7 +73,7 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
                     continue;
                 }
 
-                if (await SimpleStateCheckerManager.IsEnabledAsync(permission))
+                if (await simpleStateCheckerManager.IsEnabledAsync(permission))
                 {
                     neededCheckPermissions.Add(permission);
                 }
@@ -75,7 +88,7 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
             permissionGroups.Add(groupDto);
         }
 
-        var multipleGrantInfo = await PermissionManager.GetAsync(
+        var multipleGrantInfo = await permissionManager.GetAsync(
             permissionGroups.SelectMany(group => group.Permissions).Select(permission => permission.Name).ToArray(),
             providerName,
             providerKey);
@@ -107,47 +120,43 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
         return result;
     }
 
-    protected virtual PermissionGrantInfoDto CreatePermissionGrantInfoDto(PermissionDefinition permission)
+    private PermissionGrantInfoDto CreatePermissionGrantInfoDto(PermissionDefinition permission)
     {
         return new PermissionGrantInfoDto
         {
             Name = permission.Name,
-            DisplayName = permission.DisplayName?.Localize(StringLocalizerFactory),
+            DisplayName = permission.DisplayName?.Localize(StringLocalizerFactory) ?? permission.Name,
             ParentName = permission.Parent?.Name,
             AllowedProviders = permission.Providers,
             GrantedProviders = new List<ProviderInfoDto>()
         };
     }
 
-    protected virtual PermissionGroupDto CreatePermissionGroupDto(PermissionGroupDefinition group)
+    private PermissionGroupDto CreatePermissionGroupDto(PermissionGroupDefinition group)
     {
         var localizableDisplayName = group.DisplayName as LocalizableString;
 
         return new PermissionGroupDto
         {
             Name = group.Name,
-            DisplayName = group.DisplayName?.Localize(StringLocalizerFactory),
-            DisplayNameKey = localizableDisplayName?.Name,
-            DisplayNameResource = localizableDisplayName?.ResourceType != null
-                ? LocalizationResourceNameAttribute.GetName(localizableDisplayName.ResourceType)
-                : null,
+            DisplayName = group.DisplayName?.Localize(StringLocalizerFactory) ?? group.Name,
             Permissions = new List<PermissionGrantInfoDto>()
         };
     }
 
-    public virtual async Task UpdateAsync(string providerName, string providerKey, UpdatePermissionsDto input)
+    public async Task UpdateAsync(string providerName, string providerKey, UpdatePermissionsDto input)
     {
         await CheckProviderPolicy(providerName);
 
         foreach (var permissionDto in input.Permissions)
         {
-            await PermissionManager.SetAsync(permissionDto.Name, providerName, providerKey, permissionDto.IsGranted);
+            await permissionManager.SetAsync(permissionDto.Name, providerName, providerKey, permissionDto.IsGranted);
         }
     }
 
-    protected virtual async Task CheckProviderPolicy(string providerName)
+    private async Task CheckProviderPolicy(string providerName)
     {
-        var policyName = Options.ProviderPolicies.GetOrDefault(providerName);
+        var policyName = options.ProviderPolicies.GetOrDefault(providerName);
         if (policyName.IsNullOrEmpty())
         {
             throw new AbpException($"No policy defined to get/set permissions for the provider '{providerName}'. Use {nameof(PermissionManagementOptions)} to map the policy.");

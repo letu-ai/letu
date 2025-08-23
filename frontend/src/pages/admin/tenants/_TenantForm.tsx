@@ -5,7 +5,6 @@ import useApp from 'antd/es/app/useApp';
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadFile } from '@/api/oss';
 import dayjs from 'dayjs';
-import { useApplication } from '@/components/Application';
 
 interface ModalProps {
   refresh?: () => void;
@@ -22,7 +21,6 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const { message } = useApp();
   const [editionOptions, setEditionOptions] = useState<IEditionOption[]>([]);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const { ossDomain } = useApplication();
 
   useImperativeHandle(ref, () => ({
     openModal,
@@ -195,7 +193,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             {logoUrl && (
               <Avatar 
                 size={64} 
-                src={ossDomain + logoUrl} 
+                src={logoUrl} 
                 style={{ marginRight: 16 }}
               />
             )}

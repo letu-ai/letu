@@ -1,4 +1,4 @@
-namespace Letu.Applications
+namespace Letu.Core.Applications
 {
     public interface IPagination
     {

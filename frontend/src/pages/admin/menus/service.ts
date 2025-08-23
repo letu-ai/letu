@@ -4,24 +4,24 @@ import httpClient from '@/utils/httpClient';
  * 新增菜单
  * @param input
  */
-export function addMenu(input: MenuDto) {
-  return httpClient.post<MenuDto, void>('/api/admin/menus', input);
+export function addMenu(input: IMenuItemCreateOrOutput) {
+  return httpClient.post<IMenuItemCreateOrOutput, void>('/api/admin/menus', input);
 }
 
 /**
  * 菜单树形列表
  * @param input
  */
-export function getMenuList(input: MenuQueryDto) {
-  return httpClient.get<MenuQueryDto, MenuListDto[]>('/api/admin/menus', { params: input });
+export function getMenuList(input: IMenuItemListInput) {
+  return httpClient.get<IMenuItemListInput, IMenuItemListOutput[]>("/api/admin/menus/", { params: input });
 }
 
 /**
  * 修改菜单
  * @param input
  */
-export function updateMenu(id: string, input: MenuDto) {
-  return httpClient.put<MenuDto, void>(`/api/admin/menus/${id}`, input);
+export function updateMenu(id: string, input: IMenuItemCreateOrOutput) {
+  return httpClient.put<IMenuItemCreateOrOutput, void>(`/api/admin/menus/${id}`, input);
 }
 
 /**
@@ -36,61 +36,68 @@ export function deleteMenu(ids: string[]) {
 
 /**
  * 获取菜单组成的选项树
- * @param onlyMenu
+ * @param onlyFolder
  * @param keyword
  */
-export function getMenuOptions(onlyMenu: boolean, keyword?: string) {
-  return httpClient.get<number, MenuOptionResultDto>('/api/admin/menus/menu-options', {
+export function getMenuOptions(appName: string, onlyFolder: boolean = false) {
+  return httpClient.get<number, IMenuTreeSelectOption[]>(`/api/admin/menus/${appName}/tree-options`, {
     params: {
-      onlyMenu: onlyMenu,
-      keyword: keyword,
+      onlyFolder
     },
   });
 }
 
-export interface MenuDto {
-  id?: string | null;
+/**
+ * 菜单类型
+ */
+export const MenuType = {
+  Folder: 1,
+  Menu: 2,
+} as const;
+
+export type MenuType = typeof MenuType[keyof typeof MenuType];
+
+
+export interface IMenuItemCreateOrOutput {
   title: string;
-  name?: string;
   icon?: string | null;
   path: string | null;
-  menuType: number;
-  permission?: string;
+  applicationName: string;
+  menuType: MenuType;
   parentId?: string | null;
   sort: number;
   display: boolean;
-  component?: string;
   isExternal?: boolean;
+  permissions?: string[];
+  features?: string[];
 }
 
-export interface MenuQueryDto {
+export interface IMenuItemListInput {
+  applicationName: string;
   title?: string | null;
   path?: string | null;
 }
 
-export interface MenuOptionResultDto {
-  keys: string[];
-  tree: MenuOptionTreeDto[];
+export interface IMenuTreeSelectOption {
+  parent?: string;
+  value: string;
+  label: string;
+  children?: IMenuTreeSelectOption[];
 }
 
-export interface MenuOptionTreeDto {
-  key: string;
-  title?: string;
-  extra?: never;
-  children?: MenuOptionTreeDto[];
-}
-
-export interface MenuListDto {
+export interface IMenuItemListOutput {
   id: string;
   title: string;
   icon: string | null;
   path: string | null;
-  menuType: number;
-  permission: string;
+  menuType: MenuType;
   parentId: string;
   sort: number;
   display: boolean;
-  component: string;
-  children: MenuListDto[];
+  children: IMenuItemListOutput[];
   isExternal: boolean;
+  permissions?: string[];
+  permissionDisplayNames?: string[]; // 权限显示名称（权限组/权限名）
+  features?: string[];
+  featureDisplayNames?: string[]; // 功能显示名称（功能组/功能名）
 }

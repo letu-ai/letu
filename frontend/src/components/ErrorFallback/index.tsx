@@ -1,8 +1,7 @@
 import { Alert, Button } from 'antd';
-import React from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 
-const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
+const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   return (
     <div
       style={{

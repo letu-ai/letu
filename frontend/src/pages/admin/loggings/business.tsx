@@ -3,10 +3,10 @@ import { Form, Input, Select, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import type { SmartTableColumnType } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
-import type { AppOption } from '@/types/api';
+import type { SelectOption } from '@/types/api';
 
 const BusinessLogList: React.FC = () => {
-  const [typeOptions, setTypeOptions] = useState<AppOption[]>();
+  const [typeOptions, setTypeOptions] = useState<SelectOption[]>();
   const columns: SmartTableColumnType[] = [
     {
       title: '业务类型',

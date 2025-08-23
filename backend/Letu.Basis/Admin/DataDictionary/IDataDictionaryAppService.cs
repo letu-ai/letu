@@ -1,6 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.DataDictionary.Dtos;
-using Letu.Shared.Models;
+﻿using Letu.Basis.Admin.DataDictionary.Dtos;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.DataDictionary
 {
@@ -14,7 +13,7 @@ namespace Letu.Basis.Admin.DataDictionary
 
         Task DeleteDictTypeAsync(string dictType);
 
-        Task<List<AppOption>> GetDictDataOptionsAsync(string type);
+        Task<List<SelectOption>> GetDictDataOptionsAsync(string type);
 
         Task DeleteDictTypesAsync(Guid[] ids);
 

@@ -1,11 +1,9 @@
-using Letu.Applications;
 using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.Positions.Dtos;
 using Letu.Basis.Permissions;
-
+using Letu.Core.Applications;
 using Letu.Logging;
 using Letu.Shared.Consts;
-using Letu.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -81,7 +79,7 @@ namespace Letu.Basis.Controllers.Admin
         /// </summary>
         /// <returns></returns>
         [HttpGet("tree")]
-        public async Task<List<AppOptionTree>> GetPositionTreeAsync()
+        public async Task<List<TreeSelectOption>> GetPositionTreeAsync()
         {
             return await _positionService.GetPositionTreeOptionAsync();
         }

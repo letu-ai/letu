@@ -8,7 +8,7 @@ import {
   getEmployeeInfo,
   updateEmployee,
 } from '@/pages/admin/employees/service';
-import type { AppOptionTree } from '@/types/api';
+import type { TreeSelectOption } from '@/types/api';
 import { type DeptListDto, getDeptList } from '@/pages/admin/departments/service';
 import { getPositionOptions } from '../positions/service';
 import { Patterns } from '@/utils/globalValue';
@@ -29,7 +29,7 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
   const [row, setRow] = useState<EmployeeInfoDto | null>();
   const [employeeStatus, setEmployeeStatus] = useState<number>();
   const [deptData, setDeptData] = useState<DeptListDto[]>([]);
-  const [positionData, setPositionData] = useState<AppOptionTree[]>([]);
+  const [positionData, setPositionData] = useState<TreeSelectOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAddUser, setIsAddUser] = useState(false);
   const { message } = useApp();

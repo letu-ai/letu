@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Letu.Utils
+namespace Letu.Core.Utils
 {
     /// <summary>
     /// 加密

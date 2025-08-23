@@ -1,7 +1,7 @@
 import { Card, Divider, Form, Modal, Switch, Tag, Tree } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { assignMenu, type AssignMenuDto, getRoleMenuIds, type RoleListDto } from './service';
-import { getMenuOptions, type MenuOptionTreeDto } from '../menus/service';
+import { getMenuOptions, type IMenuTreeSelectOption } from '../menus/service';
 import useApp from 'antd/es/app/useApp';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -14,7 +14,7 @@ export interface AssignMenuModalRef {
 const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [form] = Form.useForm();
-  const [menuOptions, setMenuOptions] = useState<MenuOptionTreeDto[]>([]);
+  const [menuOptions, setMenuOptions] = useState<IMenuTreeSelectOption[]>([]);
   const [currentRow, setCurrentRow] = useState<RoleListDto>();
   const [roleMenuIds, setRoleMenuIds] = useState<string[] | null>();
   const [allKeys, setAllKeys] = useState<string[]>();
@@ -28,8 +28,7 @@ const AssignMenuForm = forwardRef<AssignMenuModalRef, ModalProps>((_, ref) => {
   const openModal = (row: RoleListDto) => {
     setCurrentRow(row);
     getMenuOptions(false).then(async (menuRes) => {
-      setMenuOptions(menuRes.tree);
-      setAllKeys(menuRes.keys);
+      setMenuOptions(menuRes);
       const data = await getRoleMenuIds(row!.id);
       setRoleMenuIds(data);
       setIsOpenModal(true);

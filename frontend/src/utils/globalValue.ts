@@ -5,14 +5,6 @@ export const ErrorCode = {
   Success: '0',
 };
 
-/**
- * 菜单类型
- */
-export const MenuType = {
-  Folder: 1,
-  Menu: 2,
-  Button: 3,
-};
 
 /**
  * 正则表达式
@@ -40,7 +32,8 @@ export const PermissionConstant = {
  * 静态路由
  */
 export const StaticRoutes = {
-  Login: '/auth/login',
+  login: '/account/login',
+  logout: "/account/logout"
 };
 
 /**

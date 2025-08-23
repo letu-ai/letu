@@ -1,10 +1,8 @@
-using Letu.Applications;
 using Letu.Basis.Admin.DataDictionary;
 using Letu.Basis.Admin.DataDictionary.Dtos;
 using Letu.Basis.Permissions;
-
+using Letu.Core.Applications;
 using Letu.Logging;
-using Letu.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -142,7 +140,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("types/type-options")]
-        public async Task<List<AppOption>> GetDictDataOptionsAsync(string type)
+        public async Task<List<SelectOption>> GetDictDataOptionsAsync(string type)
         {
             return await _dictTypeService.GetDictDataOptionsAsync(type);
         }

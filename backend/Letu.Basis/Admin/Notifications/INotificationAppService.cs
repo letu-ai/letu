@@ -1,5 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.Notifications.Dtos;
+﻿using Letu.Basis.Admin.Notifications.Dtos;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.Notifications
 {

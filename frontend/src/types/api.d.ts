@@ -8,15 +8,14 @@ export type PagedResultRequest = {
   current: number;
 }
 
-export type AppOption = {
+export type SelectOption = {
   label: string;
   value: string;
-  extra?: never;
 };
 
-export type AppOptionTree = {
-  label?: string;
-  value?: string;
-  extra?: never;
-  children?: AppOptionTree[];
+export type TreeSelectOption = {
+  key: string;
+  title: string;
+  value: string;
+  children?: TreeSelectOption[];
 };

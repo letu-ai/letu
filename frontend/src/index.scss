@@ -1,8 +1,3 @@
-// * {
-//   padding: 0;
-//   margin: 0;
-// }
-
 /** ================================ 覆盖antd pro样式开始 ================================ */
 .ant-pro-page-container-children-container-no-header {
   padding-block-start: 0 !important;
@@ -15,43 +10,6 @@
 
 /** ================================ 覆盖antdpro样式结束 ================================ */
 
-// .w-full {
-//   width: 100% !important;
-// }
-
-// .h-full {
-//   height: 100% !important;
-// }
-
-// .flex {
-//   display: flex;
-// }
-
-// .flex-column {
-//   display: flex;
-//   flex-direction: column;
-// }
-
-// .align-center {
-//   align-items: center;
-// }
-
-// .justify-center {
-//   justify-content: center;
-// }
-
-// .space-between {
-//   justify-content: space-between;
-// }
-
-// .grow {
-//   flex-grow: 1;
-// }
-
-// .flex-row-reverse {
-//   flex-direction: row-reverse;
-// }
-
 /** 行高样式10-100px */
 @for $i from 10 through 100 {
   .line-height-#{$i} {
@@ -59,33 +17,6 @@
   }
 }
 
-// /** 底部间距10-100px */
-// @for $i from 1 through 10 {
-//   .mb-#{$i} {
-//     margin-bottom: #{$i*10}px;
-//   }
-// }
-
-// /** 顶部间距10-100px */
-// @for $i from 1 through 10 {
-//   .mt-#{$i} {
-//     margin-top: #{$i*10}px;
-//   }
-// }
-
-// /** 左侧间距1-100px */
-// @for $i from 1 through 100 {
-//   .ml-#{$i} {
-//     margin-left: #{$i}px;
-//   }
-// }
-
-// /** 右侧间距1-100px */
-// @for $i from 1 through 100 {
-//   .mr-#{$i} {
-//     margin-right: #{$i}px;
-//   }
-// }
 
 .letu-table-wrapper {
   .ant-table-cell .ant-btn-link {

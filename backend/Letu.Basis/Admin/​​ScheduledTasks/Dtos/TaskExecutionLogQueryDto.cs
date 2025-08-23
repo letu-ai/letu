@@ -1,4 +1,4 @@
-﻿using Letu.Applications;
+﻿using Letu.Core.Applications;
 using System.ComponentModel.DataAnnotations;
 
 namespace Letu.Basis.IService.System.Dtos

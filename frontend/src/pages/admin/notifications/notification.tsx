@@ -5,13 +5,13 @@ import {
   getNotificationList,
   type NotificationDto,
   type NotificationListDto,
-} from './service.ts';
+} from './service';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Select, Space, Tag } from 'antd';
 import React, { useRef } from 'react';
-import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
+import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
-import NotificationForm, { type ModalRef } from './_NotificationForm.tsx';
+import NotificationForm, { type ModalRef } from './_NotificationForm';
 import useApp from 'antd/es/app/useApp';
 
 const NotificationList: React.FC = () => {

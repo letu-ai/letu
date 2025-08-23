@@ -1,6 +1,7 @@
 using Letu.Basis.Admin.FeatureManagement;
 using Letu.Basis.Admin.FeatureManagement.Dtos;
 using Letu.Basis.Permissions;
+using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,28 +12,40 @@ namespace Letu.Basis.Controllers.Admin;
 [Authorize(BasisPermissions.Feature.Default)]
 public class FeatureManagementController : ControllerBase
 {
-    protected IFeatureAppService FeatureAppService { get; }
+    private readonly IFeatureAppService featureAppService;
 
     public FeatureManagementController(IFeatureAppService featureAppService)
     {
-        FeatureAppService = featureAppService;
+        this.featureAppService = featureAppService;
     }
 
     [HttpGet]
     public virtual Task<GetFeatureListResultDto> GetAsync(string providerName, string? providerKey)
     {
-        return FeatureAppService.GetAsync(providerName, providerKey);
+        return featureAppService.GetAsync(providerName, providerKey);
     }
 
     [HttpPut]
     public virtual Task UpdateAsync(string providerName, string? providerKey, UpdateFeaturesDto input)
     {
-        return FeatureAppService.UpdateAsync(providerName, providerKey, input);
+        return featureAppService.UpdateAsync(providerName, providerKey, input);
     }
 
     [HttpDelete]
     public virtual Task DeleteAsync(string providerName, string? providerKey)
     {
-        return FeatureAppService.DeleteAsync(providerName, providerKey);
+        return featureAppService.DeleteAsync(providerName, providerKey);
     }
+
+
+    /// <summary>
+    /// 字典选项
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("select-options/{valueType?}")]
+    public async Task<List<SelectOption>> GetFeatureOptionsAsync(string? valueType = null)
+    {
+        return await featureAppService.GetSelectOptionsAsync(valueType);
+    }
+
 }

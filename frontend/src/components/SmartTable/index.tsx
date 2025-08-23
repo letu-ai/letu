@@ -4,15 +4,13 @@ import type { SmartTableProps, SmartTableRef } from './type';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
-import useThemeStore from '@/store/themeStore';
-import type { SizeType } from '@/store/layoutStore';
-import useLayoutStore, { isSizeType } from '@/store/layoutStore';
+import useLayoutStore, { isSizeType } from '@/application/layoutStore';
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
 const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
   <T extends object = any>(props: SmartTableProps<T>, ref: ForwardedRef<SmartTableRef>) => {
-    const { columns, selection = false, ...restProps } = props;
+    const { columns, selection = false, params, extraContent, ...restProps } = props;
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [queryParams, setQueryParams] = useState({
@@ -21,7 +19,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
     });
     const [total, setTotal] = useState<number>(0);
     const [dataSource, setDataSource] = useState<T[]>([]);
-    const size = useLayoutStore(state=>state.size);
+    const size = useLayoutStore(state => state.size);
     const [tableSize, setTableSize] = useState(props.size);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -40,7 +38,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
     const fetchData = async () => {
       if (props.request) {
         setLoading(true);
-        const result = await props.request(queryParams);
+        const result = await props.request({ ...queryParams, ...params });
         //判断当前页是否有数据，无数据设置第1页
         if (result.items === null || result.items.length === 0) {
           if (result.totalCount > 0) {
@@ -62,7 +60,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
 
     useDeepCompareEffect(() => {
       fetchData();
-    }, [queryParams]);
+    }, [queryParams, params]);
 
     const columnWidthItems: MenuProps['items'] = [
       {
@@ -79,7 +77,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
       },
     ];
     const columnWidthItemClick = ({ key }: { key: string }) => {
-      if(isSizeType(key))
+      if (isSizeType(key))
         setTableSize(key);
     };
 
@@ -113,13 +111,13 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
             <Form layout="inline" form={form} initialValues={{ layout: 'inline' }} style={{ maxWidth: 'none' }}>
               {Array.isArray(props.searchItems)
                 ? React.Children.map(props.searchItems, (child, index) => {
-                    if (React.isValidElement(child)) {
-                      return React.cloneElement(child, {
-                        key: child.key || `child-${index}`,
-                      });
-                    }
-                    return child;
-                  })
+                  if (React.isValidElement(child)) {
+                    return React.cloneElement(child, {
+                      key: child.key || `child-${index}`,
+                    });
+                  }
+                  return child;
+                })
                 : props.searchItems}
               <Form.Item>
                 <Space>
@@ -133,19 +131,24 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
           </Card>
         )}
 
+
+
         <Card>
+          {/* 额外内容区域 - 在搜索面板和表格之间 */}
+          {extraContent}
+
           {/* 新增/编辑等操作栏 */}
           <div className="flex justify-between">
             <div className="custom-toolbar mb-2">
               {Array.isArray(props.toolbar)
                 ? React.Children.map(props.toolbar, (child, index) => {
-                    if (React.isValidElement(child)) {
-                      return React.cloneElement(child, {
-                        key: child.key || `child-${index}`,
-                      });
-                    }
-                    return child;
-                  })
+                  if (React.isValidElement(child)) {
+                    return React.cloneElement(child, {
+                      key: child.key || `child-${index}`,
+                    });
+                  }
+                  return child;
+                })
                 : props.toolbar}
             </div>
             <div className={'right-operation-toolbar ' + (props.toolbar ? 'mt-1' : 'mb-1')}>

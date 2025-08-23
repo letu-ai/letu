@@ -1,5 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.OnlineUsers.Dtos;
+﻿using Letu.Basis.Admin.OnlineUsers.Dtos;
+using Letu.Core.Applications;
 using Letu.Logging.Entities;
 using Letu.Repository;
 using Volo.Abp.Application.Services;

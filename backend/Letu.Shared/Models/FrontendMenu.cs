@@ -28,11 +28,6 @@ namespace Letu.Shared.Models
         public string? Path { get; set; }
 
         /// <summary>
-        /// 组件地址
-        /// </summary>
-        public string? Component { get; set; }
-
-        /// <summary>
         /// 层级面包屑
         /// </summary>
         public string? LayerName { get; set; }

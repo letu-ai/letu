@@ -3,10 +3,9 @@ using Letu.Basis.Account.Dtos;
 using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.SharedService;
+using Letu.Core.Utils;
 using Letu.Repository;
-using Letu.Shared.Enums;
 using Letu.Shared.Models;
-using Letu.Utils;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.EventBus.Local;
@@ -35,7 +34,7 @@ namespace Letu.Basis.Account
         {
             var uid = CurrentUser.Id!.Value;
             var user = await userRepository.Where(x => x.Id == uid).FirstAsync() ?? throw new BusinessException(message: "用户不存在");
-            var permission = await identitySharedService.GetUserPermissionAsync(uid);
+            //var permission = await identitySharedService.GetUserPermissionAsync(uid);
             UserAuthInfoOutput result = new()
             {
                 User = new UserInfoOutput
@@ -48,7 +47,7 @@ namespace Letu.Basis.Account
                     Sex = (int)user.Sex,
                 },
                 Menus = await GetFrontMenus(),
-                Permissions = permission.Auths ?? []
+                Permissions =  []
             };
             return result;
         }
@@ -56,7 +55,7 @@ namespace Letu.Basis.Account
         public async Task<List<FrontendMenu>> GetFrontMenus()
         {
             var uid = CurrentUser.Id!.Value;
-            var permission = await identitySharedService.GetUserPermissionAsync(uid);
+            //var permission = await identitySharedService.GetUserPermissionAsync(uid);
             //if (permission.MenuIds == null || permission.MenuIds.Length <= 0) return [];
 
             var all = await menuRepository

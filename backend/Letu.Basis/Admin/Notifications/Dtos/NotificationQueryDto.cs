@@ -1,4 +1,4 @@
-﻿using Letu.Applications;
+﻿using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.Notifications.Dtos
 {

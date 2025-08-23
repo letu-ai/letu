@@ -1,9 +1,6 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import UserStore from '@/store/userStore';
-import { StaticRoutes } from '@/utils/globalValue.ts';
-import { message } from 'antd';
-import { refreshToken } from '@/pages/accounts/service';
-import ResponseErrorMessage from './ResponseErrorMessage';
+import { getToken, refreshToken as updateToken } from '@/application/authUtils';
+import { refreshToken } from '@/pages/account/service';
 
 interface IAbpFormatError {
     message: string;
@@ -131,6 +128,7 @@ class HttpClient {
     allowAnonymousApis: string[] = ['/api/account/login']; //允许匿名访问接口
     refreshTokenWhiteApis: string[] = ['/api/account/refresh-token', '/api/account/logout']; //不需要刷新token接口
     private refreshTokenPromise: Promise<any> | null = null; // 防止并发刷新token
+    private errorHandler: (error: IResponseError) => void = () => { };
 
     constructor(config?: AxiosRequestConfig) {
         this.instance = axios.create(config);
@@ -141,9 +139,10 @@ class HttpClient {
                 if (config.url && this.allowAnonymousApis.includes(config.url)) {
                     return config;
                 }
-                //添加token
-                const token = UserStore.token?.accessToken;
-                const expired = UserStore.token?.expiredTime;
+                //添加token - 从identityStore获取
+                const identityToken = getToken();
+                const token = identityToken?.accessToken;
+                const expired = identityToken?.expiredTime;
                 const now = new Date();
                 const expiredTime = expired ? new Date(expired) : null;
 
@@ -156,7 +155,7 @@ class HttpClient {
                         const leftSeconds = Math.floor((expiredTime.getTime() - now.getTime()) / 1000);
                         console.log(`token剩余过期时间：${leftSeconds}秒（统一时间戳比较）`);
                         //如果当前是刷新token接口就不调用，避免循环调用
-                        const refreshTokenValue = UserStore.token?.refreshToken;
+                        const refreshTokenValue = identityToken?.refreshToken;
                         const currentUrl = config.url?.toLowerCase() || '';
                         const isRefreshTokenApi = this.refreshTokenWhiteApis.some(
                             (x) => currentUrl.endsWith(x.toLowerCase())
@@ -169,7 +168,8 @@ class HttpClient {
                                     this.refreshTokenPromise = refreshToken(refreshTokenValue)
                                         .then((refreshTokenRes) => {
                                             if (refreshTokenRes) {
-                                                UserStore.refreshToken(
+                                                // 保存到identityStore
+                                                updateToken(
                                                     refreshTokenRes.accessToken,
                                                     refreshTokenRes.refreshToken,
                                                     refreshTokenRes.expiredTime,
@@ -185,10 +185,8 @@ class HttpClient {
                                 await this.refreshTokenPromise;
                             } catch (error) {
                                 if (axios.isAxiosError(error) && error.response?.status === 401) {
-                                    UserStore.logout();
-                                    message.error('登录已过期，请重新登录', 3, () => {
-                                        window.location.href = StaticRoutes.Login;
-                                    });
+                                    const errorInfo = await getErrorInfo(error);
+                                    this.errorHandler(errorInfo);
                                 }
                                 // 这里不再继续抛出错误，让请求继续进行
                                 // 当前请求会继续发送，但由于token已过期，会在响应拦截器中被捕获并处理
@@ -206,28 +204,18 @@ class HttpClient {
         // 响应拦截器
         this.instance.interceptors.response.use(
             (response) => {
-                // /** 统一返回结果响应码不等于成功，中断请求；这样做是确保.then()中是响应成功 */
-                // if (response.data.code && response.data.code !== ErrorCode.Success) {
-                //   const errMsg = response.data.message ?? '请求失败';
-                //   message.error(errMsg);
-                //   return Promise.reject(errMsg);
-                // }
                 return response.data;
             },
             async (error) => {
                 const errorInfo = await getErrorInfo(error);
-                if (errorInfo.jumpLogin) {
-                    UserStore.logout();
-                }
-
-                message.error(<ResponseErrorMessage error={errorInfo} />, 3, () => {
-                    if (errorInfo.jumpLogin) {
-                        window.location.href = StaticRoutes.Login;
-                    }
-                });
+                this.errorHandler(errorInfo);
                 return Promise.reject(error);
             },
         );
+    }
+
+    public setErrorHandler(handler: (error: IResponseError) => void) {
+        this.errorHandler = handler;
     }
 
     // GET请求
@@ -281,7 +269,7 @@ const defaultConfig: AxiosRequestConfig = {
     },
 };
 
-function getBaseUrl(){
+function getBaseUrl() {
     const urlTemplate = import.meta.env.VITE_API_BASE_URL;
     const port = import.meta.env.VITE_API_BASE_PORT;
     return urlTemplate.replace(/{{port}}/g, port);

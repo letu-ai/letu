@@ -1,5 +1,5 @@
 import httpClient from '@/utils/httpClient';
-import type { AppOptionTree, PagedResultRequest, PagedResult } from '@/types/api';
+import type { TreeSelectOption, PagedResultRequest, PagedResult } from '@/types/api';
 
 /**
  * 新增职位分组
@@ -94,7 +94,7 @@ export function deletePosition(id: string) {
  * 职位分组+职位树
  */
 export function getPositionOptions() {
-  return httpClient.get<unknown, AppOptionTree[]>('/api/admin/positions/tree');
+  return httpClient.get<unknown, TreeSelectOption[]>('/api/admin/positions/tree');
 }
 
 export interface PositionDto {

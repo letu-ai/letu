@@ -40,13 +40,13 @@ public class Program
     }
 
     /// <summary>
-    /// »ñÈ¡Ö÷½ø³ÌËùÔÚÄ¿Â¼¡£
+    /// è·å–ä¸»è¿›ç¨‹æ‰€åœ¨ç›®å½•ã€‚
     /// </summary>
     /// <returns></returns>
     public static string GetProgramDirectory()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return Path.GetDirectoryName(Environment.ProcessPath) ?? throw new InvalidOperationException("ÔÚWindows»·¾³ÖĞ»ñÈ¡µ±Ç°½ø³ÌÂ·¾¶Ê§°Ü¡£");
+            return Path.GetDirectoryName(Environment.ProcessPath) ?? throw new InvalidOperationException("åœ¨Windowsç¯å¢ƒä¸­è·å–å½“å‰è¿›ç¨‹è·¯å¾„å¤±è´¥ã€‚");
         else
             return AppDomain.CurrentDomain.BaseDirectory;
     }

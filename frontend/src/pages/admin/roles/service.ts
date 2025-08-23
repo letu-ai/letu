@@ -1,5 +1,5 @@
 import httpClient from '@/utils/httpClient';
-import type { PagedResult, PagedResultRequest, AppOption } from '@/types/api';
+import type { PagedResult, PagedResultRequest, SelectOption } from '@/types/api';
 
 /**
  * 新增角色
@@ -45,7 +45,7 @@ export function assignMenu(dto: AssignMenuDto) {
  * 获取角色
  */
 export function getRoleOptions() {
-  return httpClient.get<unknown, AppOption[]>('/api/admin/roles/options');
+  return httpClient.get<unknown, SelectOption[]>('/api/admin/roles/options');
 }
 
 /**

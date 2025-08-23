@@ -1,10 +1,10 @@
-using Letu.Applications;
+using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.SharedService;
+using Letu.Core.Applications;
 using Letu.Repository;
 using Letu.Shared.Consts;
-using Letu.Shared.Models;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
@@ -112,9 +112,9 @@ namespace Letu.Basis.Admin.Roles
             return new PagedResult<RoleListOutput>(total, rows);
         }
 
-        public async Task<List<AppOption>> GetRoleOptionsAsync()
+        public async Task<List<SelectOption>> GetRoleOptionsAsync()
         {
-            return await _roleRepository.Select.ToListAsync(x => new AppOption
+            return await _roleRepository.Select.ToListAsync(x => new SelectOption
             {
                 Label = x.Name,
                 Value = x.Id.ToString()

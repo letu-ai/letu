@@ -1,6 +1,5 @@
-using Letu.Applications;
 using Letu.Basis.Admin.Roles.Dtos;
-using Letu.Shared.Models;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.Roles
 {
@@ -23,6 +22,7 @@ namespace Letu.Basis.Admin.Roles
         /// <summary>
         /// 修改角色
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<bool> UpdateRoleAsync(Guid id, RoleCreateOrUpdateInput dto);
@@ -45,7 +45,7 @@ namespace Letu.Basis.Admin.Roles
         /// 获取角色
         /// </summary>
         /// <returns></returns>
-        Task<List<AppOption>> GetRoleOptionsAsync();
+        Task<List<SelectOption>> GetRoleOptionsAsync();
 
         /// <summary>
         /// 获取指定角色菜单

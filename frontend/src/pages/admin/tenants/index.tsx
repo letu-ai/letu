@@ -8,14 +8,12 @@ import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import useApp from 'antd/es/app/useApp';
 import Permission from '@/components/Permission';
-import { useApplication } from '@/components/Application';
 import { BasisPermissions } from '@/application/permissions';
 
 const Tenant = () => {
   const modalRef = useRef<ModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
   const { message, modal } = useApp();
-  const { ossDomain } = useApplication();
   const [featureEditorVisible, setFeatureEditorVisible] = useState(false);
   const [currentTenantId, setCurrentTenantId] = useState<string | null>(null);
   
@@ -28,7 +26,7 @@ const Tenant = () => {
         return (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {record.logo ? 
-              <Avatar src={ossDomain + record.logo} style={{ marginRight: 12 }} /> : 
+              <Avatar src={record.logo} style={{ marginRight: 12 }} /> : 
               <Avatar style={{ marginRight: 12 }}>T</Avatar>}
             <span>{name}</span>
           </div>

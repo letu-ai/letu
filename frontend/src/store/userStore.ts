@@ -1,4 +1,4 @@
-import type { IFrontendMenu } from '@/pages/accounts/service';
+import type { IFrontendMenu } from '@/pages/account/service';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 export type TokenInfo = {

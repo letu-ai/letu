@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Letu.Basis.Admin.FeatureManagement.Dtos;
 
 public class UpdateFeaturesDto
 {
-    public List<UpdateFeatureDto> Features { get; set; }
+    [Required]
+    public required List<UpdateFeatureDto> Features { get; set; }
 }

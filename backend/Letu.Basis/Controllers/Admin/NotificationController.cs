@@ -1,8 +1,7 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.Notifications;
+﻿using Letu.Basis.Admin.Notifications;
 using Letu.Basis.Admin.Notifications.Dtos;
 using Letu.Basis.Permissions;
-
+using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

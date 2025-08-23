@@ -1,6 +1,5 @@
-﻿using Letu.Applications;
-using Letu.Basis.Admin.Loggings.Dtos;
-using Letu.Shared.Models;
+﻿using Letu.Basis.Admin.Loggings.Dtos;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.Loggings
 {
@@ -18,6 +17,6 @@ namespace Letu.Basis.Admin.Loggings
         /// </summary>
         /// <param name="type">业务类型模糊匹配</param>
         /// <returns></returns>
-        Task<List<AppOption>> GetBusinessTypeOptionsAsync(string? type);
+        Task<List<SelectOption>> GetBusinessTypeOptionsAsync(string? type);
     }
 }

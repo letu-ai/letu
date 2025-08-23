@@ -81,7 +81,7 @@ export interface IAbpTimezone {
     };
 }
 
-export interface IAbpConfiguration {
+export interface ILetuApplicationConfiguration {
     /* LOCALIZATION ***********************************************/
     localization: {
         values: Record<string, Record<string, string>>;
@@ -142,14 +142,18 @@ export interface IAbpConfiguration {
 
     /* EXTRA PROPERTIES *************************************************/
     extraProperties: Record<string, any>;
+
+    menu: INavigationMenuDto[];
 }
 
-// ABP 状态管理
-export interface IAbpState {
-    config: IAbpConfiguration | null;
-    isLoading: boolean;
-    isReady: boolean;
-    error: Error | null;
+export interface INavigationMenuDto {
+  id: string;
+  parentId?: string;
+  title: string;
+  icon?: string | null;
+  path: string | null;
+  isExternal: boolean;
+  sort: number;
 }
 
 // 权限相关类型定义
