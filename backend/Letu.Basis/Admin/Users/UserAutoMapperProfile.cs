@@ -2,17 +2,21 @@
 using Letu.Basis.Admin.Users.Dtos;
 using Volo.Abp.AutoMapper;
 
-namespace Letu.Basis.Admin.Users
-{
-    public class UserAutoMapperProfile : Profile
-    {
-        public UserAutoMapperProfile()
-        {
-            CreateMap<UserCreateOrUpdateInput, User>(MemberList.Source)
-                .Ignore(dest=>dest.PasswordSalt)
-                .Ignore(dest=>dest.Id);
+namespace Letu.Basis.Admin.Users;
 
-            CreateMap<User, UserListOutput>();
-        }
+public class UserAutoMapperProfile : Profile
+{
+    public UserAutoMapperProfile()
+    {
+        CreateMap<UserCreateInput, User>(MemberList.Source)
+            .ForSourceMember(s => s.Password, opt => opt.DoNotValidate())
+            .ForSourceMember(s => s.UserName, opt => opt.DoNotValidate());
+
+        CreateMap<UserUpdateInput, User>(MemberList.Source);
+
+        CreateMap<User, UserListOutput>()
+            .Ignore(d => d.DepartmentName)
+            .Ignore(d => d.PositionName)
+            .Ignore(d => d.EmployeeName);
     }
 }

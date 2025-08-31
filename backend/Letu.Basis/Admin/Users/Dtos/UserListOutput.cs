@@ -23,11 +23,6 @@ namespace Letu.Basis.Admin.Users.Dtos
         public string? NickName { get; set; }
 
         /// <summary>
-        /// 性别
-        /// </summary>
-        public int Sex { get; set; }
-
-        /// <summary>
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
@@ -36,5 +31,40 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 手机号
         /// </summary>
         public string? Phone { get; set; }
+
+        /// <summary>
+        /// 邮箱
+        /// </summary>
+        public string? Email { get; set; }
+
+        /// <summary>
+        /// 部门ID
+        /// </summary>
+        public Guid? DepartmentId { get; set; }
+
+        /// <summary>
+        /// 部门名称
+        /// </summary>
+        public string? DepartmentName { get; set; }
+
+        /// <summary>
+        /// 职位ID
+        /// </summary>
+        public Guid? PositionId { get; set; }
+
+        /// <summary>
+        /// 职位名称
+        /// </summary>
+        public string? PositionName { get; set; }
+
+        /// <summary>
+        /// 关联员工ID
+        /// </summary>
+        public Guid? EmployeeId { get; set; }
+
+        /// <summary>
+        /// 员工姓名
+        /// </summary>
+        public string? EmployeeName { get; set; }
     }
 }

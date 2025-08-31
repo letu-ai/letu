@@ -1,168 +1,190 @@
 import { Button, Switch, Space, Form, Input, Avatar } from 'antd';
 import { useRef } from 'react';
-import { DeleteOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined } from '@ant-design/icons';
-import useApp from 'antd/es/app/useApp';
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined } from '@ant-design/icons';
+import { App } from 'antd';
 import {
-  deleteUser,
-  getUserList,
-  switchUserEnabledStatus,
-  type UserListDto,
-  type UserQueryDto,
-} from '@/pages/admin/users/service';
-import UserEditForm, { type ModalRef } from './_UserForm';
-import AssignRoleForm, { type AssignRoleFormRef } from "./_AssignRoleForm";
+    deleteUser,
+    getUserList,
+    switchUserEnabledStatus,
+    type UserListOutput,
+    type IUserListInput,
+} from '@/pages/admin/users/-service';
+import UserEditForm, { type ModalRef } from './-UserModal';
+import AssignRoleForm, { type AssignRoleFormRef } from "./-AssignRoleForm";
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
-import ResetUserPwdForm, { type ResetUserPwdFormRef } from './_ResetUserPwdForm';
+import ResetUserPwdForm, { type ResetUserPwdFormRef } from './-ResetUserPwdForm';
 import ProIcon from '@/components/ProIcon';
 import Permission from '@/components/Permission';
 import { BasisPermissions } from '@/application/permissions';
+import { createFileRoute } from '@tanstack/react-router';
 
-const UserTable = () => {
-  const tableRef = useRef<SmartTableRef>(null);
-  const { message, modal } = useApp();
-  const userEditModalRef = useRef<ModalRef>(null);
-  const assignRoleRef = useRef<AssignRoleFormRef>(null);
-  const resetUserPwdFormRef = useRef<ResetUserPwdFormRef>(null);
-  const columns: SmartTableColumnType[] = [
-    {
-      key: 'index',
-      render: (_: any, __: any, index: number) => index + 1,
-    },
-    {
-      title: '头像',
-      dataIndex: 'avatar',
-      render: (text: string) => {
-        return <Avatar size={50} src={text} />;
-      },
-    },
-    {
-      title: '账号',
-      dataIndex: 'userName',
-      key: 'userName',
-    },
-    {
-      title: '昵称',
-      dataIndex: 'nickName',
-    },
-    {
-      title: '性别',
-      dataIndex: 'sex',
-      key: 'sex',
-      render: (text: number) => (text === 1 ? '男' : '女'),
-    },
-    {
-      title: '状态',
-      dataIndex: 'isEnabled',
-      key: 'isEnabled',
-      render: (text: boolean, record: UserListDto) => (
-        <Switch
-          checked={text}
-          checkedChildren="启用"
-          unCheckedChildren="禁用"
-          onChange={() => onUserStatusChange(record)}
-        />
-      ),
-    },
-    {
-      title: '手机号',
-      dataIndex: 'phone',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 240,
-      fixed: 'right',
-      render: (_: any, record: UserListDto) => (
-        <Space>
-          <Permission permissions={BasisPermissions.User.ResetPassword}>
-            <Button
-              type="link"
-              icon={<KeyOutlined />}
-              onClick={() => {
-                resetUserPwdFormRef?.current?.openModal(record);
-              }}
-            >
-              重置密码
-            </Button>
-          </Permission>
-          <Permission permissions={BasisPermissions.Role.ManagePermission}>
-            <Button
-              type="link"
-              onClick={() => {
-                assignRoleRef?.current?.openModal(record);
-              }}
-            >
-              <ProIcon icon="iconify:simple-line-icons:check" />
-              分配角色
-            </Button>
-          </Permission>
-          <Permission permissions={BasisPermissions.User.Delete}>
-            <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
-              删除
-            </Button>
-          </Permission>
-        </Space>
-      ),
-    },
-  ];
+export const Route = createFileRoute('/admin/users/')({
+    component: UserTable
+});
 
-  const rowDelete = (id: string) => {
-    modal.confirm({
-      title: '确认删除？',
-      icon: <ExclamationCircleFilled />,
-      onOk() {
-        deleteUser(id).then(() => {
-          message.success('删除成功');
-          tableRef?.current?.reload();
+function UserTable() {
+    const tableRef = useRef<SmartTableRef>(null);
+    const { message, modal } = App.useApp();
+    const userEditModalRef = useRef<ModalRef>(null);
+    const assignRoleRef = useRef<AssignRoleFormRef>(null);
+    const resetUserPwdFormRef = useRef<ResetUserPwdFormRef>(null);
+    const columns: SmartTableColumnType<UserListOutput>[] = [
+        {
+            key: 'index',
+            render: (_, __, index: number) => index + 1,
+        },
+        {
+            title: '头像',
+            dataIndex: 'avatar',
+            render: (text: string) => {
+                return <Avatar size={50} src={text} />;
+            },
+        },
+        {
+            title: '账号',
+            dataIndex: 'userName',
+            key: 'userName',
+        },
+        {
+            title: '昵称',
+            dataIndex: 'nickName',
+        },
+        {
+            title: '手机号',
+            dataIndex: 'phone',
+        },
+        {
+            title: '邮箱',
+            dataIndex: 'email',
+        },
+        {
+            title: '部门',
+            dataIndex: 'departmentName',
+        },
+        {
+            title: '职位',
+            dataIndex: 'positionName',
+        },
+        {
+            title: '状态',
+            dataIndex: 'isEnabled',
+            key: 'isEnabled',
+            render: (text: boolean, record) => (
+                <Switch
+                    checked={text}
+                    checkedChildren="启用"
+                    unCheckedChildren="禁用"
+                    onChange={() => onUserStatusChange(record)}
+                />
+            ),
+        },
+        {
+            title: '操作',
+            key: 'action',
+            width: 240,
+            fixed: 'right',
+            render: (_, record) => (
+                <Space>
+                    <Permission permissions={BasisPermissions.User.Delete}>
+                        <Button
+                            type="link"
+                            icon={<EditOutlined />}
+                            onClick={() => rowEdit(record)}>
+                            编辑
+                        </Button>
+                    </Permission>
+
+                    <Permission permissions={BasisPermissions.User.ResetPassword}>
+                        <Button
+                            type="link"
+                            icon={<KeyOutlined />}
+                            onClick={() => {
+                                resetUserPwdFormRef?.current?.openModal(record);
+                            }}
+                        >
+                            重置密码
+                        </Button>
+                    </Permission>
+                    <Permission permissions={BasisPermissions.Role.ManagePermission}>
+                        <Button
+                            type="link"
+                            onClick={() => {
+                                assignRoleRef?.current?.openModal(record);
+                            }}
+                        >
+                            <ProIcon icon="iconify:simple-line-icons:check" />
+                            分配角色
+                        </Button>
+                    </Permission>
+                    <Permission permissions={BasisPermissions.User.Delete}>
+                        <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
+                            删除
+                        </Button>
+                    </Permission>
+                </Space>
+            ),
+        },
+    ];
+    const rowEdit = (record: UserListOutput) => {
+        userEditModalRef.current?.openModal(record);
+    };
+
+    const rowDelete = (id: string) => {
+        modal.confirm({
+            title: '确认删除？',
+            icon: <ExclamationCircleFilled />,
+            onOk() {
+                deleteUser(id).then(() => {
+                    message.success('删除成功');
+                    tableRef?.current?.reload();
+                });
+            },
         });
-      },
-    });
-  };
-  const onUserStatusChange = (record: UserListDto) => {
-    switchUserEnabledStatus(record.id).then(() => {
-      message.success('状态更改成功');
-      tableRef?.current?.reload();
-    });
-  };
+    };
+    const onUserStatusChange = (record: UserListOutput) => {
+        switchUserEnabledStatus(record.id).then(() => {
+            message.success('状态更改成功');
+            tableRef?.current?.reload();
+        });
+    };
 
-  return (
-    <>
-      <SmartTable
-        rowKey="id"
-        columns={columns}
-        ref={tableRef}
-        request={async (params) => {
-          const data = await getUserList(params);
-          return data;
-        }}
-        searchItems={
-          <Form.Item<UserQueryDto> label="账号" name="userName">
-            <Input placeholder="请输入账号" />
-          </Form.Item>
-        }
-        toolbar={
-          <Permission permissions={BasisPermissions.User.Create}>
-            <Button
-              color="primary"
-              variant="solid"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                userEditModalRef?.current?.openModal();
-              }}
-            >
-              新增
-            </Button>
-          </Permission>
-        }
-      />
-      {/* 新增/编辑弹窗 */}
-      <UserEditForm ref={userEditModalRef} refresh={() => tableRef?.current?.reload()} />
-      {/* 分配角色弹窗 */}
-      <AssignRoleForm ref={assignRoleRef} />
-      {/* 重置密码弹窗 */}
-      <ResetUserPwdForm ref={resetUserPwdFormRef} />
-    </>
-  );
-};
-export default UserTable;
+    return (
+        <>
+            <SmartTable
+                rowKey="id"
+                columns={columns}
+                ref={tableRef}
+                request={async (params) => {
+                    const data = await getUserList(params);
+                    return data;
+                }}
+                searchItems={
+                    <Form.Item<IUserListInput> label="账号" name="userName">
+                        <Input placeholder="请输入账号" />
+                    </Form.Item>
+                }
+                toolbar={
+                    <Permission permissions={BasisPermissions.User.Create}>
+                        <Button
+                            color="primary"
+                            variant="solid"
+                            icon={<PlusOutlined />}
+                            onClick={() => {
+                                userEditModalRef?.current?.openModal();
+                            }}
+                        >
+                            新增
+                        </Button>
+                    </Permission>
+                }
+            />
+            {/* 新增/编辑弹窗 */}
+            <UserEditForm ref={userEditModalRef} refresh={() => tableRef?.current?.reload()} />
+            {/* 分配角色弹窗 */}
+            <AssignRoleForm ref={assignRoleRef} />
+            {/* 重置密码弹窗 */}
+            <ResetUserPwdForm ref={resetUserPwdFormRef} />
+        </>
+    );
+}

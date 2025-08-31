@@ -90,7 +90,6 @@ namespace Letu.Basis
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add<HttpRequestValidationFilter>();
-                options.Filters.Add<AppGlobalExceptionFilter>(1);
             });
 
 

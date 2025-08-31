@@ -1,10 +1,15 @@
-import { type RequestLogDto, getRequestLogList } from '../service';
+import { createFileRoute } from '@tanstack/react-router'
+import { type RequestLogDto, getRequestLogList } from '../-service';
 import { Button, Form, Input, Tag } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
 import { FileTextOutlined } from '@ant-design/icons';
-import RequestDetails from './_RequestDetails';
+import RequestDetails from './-RequestDetails';
+
+export const Route = createFileRoute('/admin/loggings/auditLog/request/')({ 
+  component: RequestLogList
+});
 
 // HTTP方法标签
 const getHttpMethodTag = (method?: string) => {
@@ -38,7 +43,7 @@ const getHttpStatusCodeTag = (code: number) => {
     return <Tag>{code}</Tag>;
 };
 
-const RequestLogList: React.FC = () => {
+function RequestLogList() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedLogId, setSelectedLogId] = useState<string | undefined>(undefined);
   
@@ -48,7 +53,7 @@ const RequestLogList: React.FC = () => {
     setIsOpenModal(true);
   };
 
-  const columns: SmartTableColumnType[] = [
+  const columns: SmartTableColumnType<RequestLogDto>[] = [
     {
       title: '请求时间',
       dataIndex: 'executionTime',
@@ -57,7 +62,7 @@ const RequestLogList: React.FC = () => {
     {
       title: '请求地址',
       dataIndex: 'url',
-      render: (_: any, record: RequestLogDto) => (
+      render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {getHttpStatusCodeTag(record.httpStatusCode)}
           {getHttpMethodTag(record.httpMethod)}
@@ -150,6 +155,5 @@ const RequestLogList: React.FC = () => {
       />
     </>
   );
-};
-
-export default RequestLogList; 
+}
+;

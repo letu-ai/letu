@@ -89,7 +89,7 @@ namespace Letu.Basis.Admin.Departments
         /// <summary>
         /// 租户ID
         /// </summary>
-        [Column(IsNullable = true, StringLength = 18)]
+        [Column(IsNullable = true)]
         public Guid? TenantId { get; set; }
 
         [Navigate(nameof(ParentId))]

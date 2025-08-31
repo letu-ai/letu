@@ -1,8 +1,5 @@
-using FreeSql.DataAnnotations;
-using Letu.Shared.Enums;
-using System.ComponentModel;
+﻿using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
@@ -21,34 +18,32 @@ namespace Letu.Basis.Admin.Users
         protected User()
         {
         }
-        
-        public User(Guid id) : base(id)
+
+        public User(Guid id, string userName) : base(id)
         {
+            UserName = userName;
         }
 
         /// <summary>
         /// 用户名
         /// </summary>
-        [NotNull]
         [StringLength(32)]
         [Column(IsNullable = false, StringLength = 32)]
-        public string? UserName { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
-        /// 密码
+        /// 密码哈希
         /// </summary>
-        [NotNull]
         [StringLength(512)]
         [Column(IsNullable = false, StringLength = 512)]
-        public string? Password { get; set; }
+        public required string PasswordHash { get; set; }
 
         /// <summary>
         /// 密码盐
         /// </summary>
-        [NotNull]
         [StringLength(256)]
         [Column(IsNullable = false, StringLength = 256)]
-        public string? PasswordSalt { get; set; }
+        public required string PasswordSalt { get; set; }
 
         /// <summary>
         /// 头像
@@ -60,20 +55,11 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 昵称
         /// </summary>
-        [NotNull]
         [Required]
         [StringLength(64)]
         [Column(IsNullable = false, StringLength = 64)]
-        public string? NickName { get; set; }
+        public required string NickName { get; set; }
 
-        /// <summary>
-        /// 性别
-        /// </summary>
-        [NotNull]
-        [Required]
-        [Column(IsNullable = false)]
-        [DefaultValue(0)]
-        public SexType Sex { get; set; }
 
         /// <summary>
         /// 是否启用
@@ -96,7 +82,31 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 手机号码
         /// </summary>
-        [Column(StringLength = 11)]
+        [StringLength(16)]
+        [Column(StringLength = 16)]
         public string? Phone { get; set; }
+
+        /// <summary>
+        /// 邮箱
+        /// </summary>
+        [StringLength(64)]
+        [EmailAddress]
+        [Column(StringLength = 64)]
+        public string? Email { get; set; }
+
+        /// <summary>
+        /// 部门ID
+        /// </summary>
+        public Guid? DepartmentId { get; set; }
+
+        /// <summary>
+        /// 职位ID
+        /// </summary>
+        public Guid? PositionId { get; set; }
+
+        /// <summary>
+        /// 关联员工ID
+        /// </summary>
+        public Guid? EmployeeId { get; set; }
     }
 }

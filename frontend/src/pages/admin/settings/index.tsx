@@ -1,5 +1,5 @@
-import Feature from "./feature";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
-export default function SettingsIndex() {
-    return <Feature />;
-}
+export const Route = createFileRoute('/admin/settings/')({
+    component: () => <Navigate to="/admin/settings/account" replace />
+});

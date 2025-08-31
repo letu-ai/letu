@@ -117,12 +117,13 @@ export const useAppConfigStore = create<IConfigStore>((set, get) => {
             _lastAppName = appName; // 记录最后一次加载的应用名称
         }
         catch (error) {
+            console.error('[appConfigStore] 加载配置失败:', error);
+            
             set({
                 isLoading: false,
                 isReady: false,
                 error: error as Error
             });
-            console.error('加载ABP配置失败:', error);
         }
     }
 

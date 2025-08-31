@@ -1,6 +1,7 @@
 using Letu.Basis.Admin.Departments;
 using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Permissions;
+using Letu.Core.Applications;
 
 using Letu.Logging;
 using Letu.Shared.Consts;
@@ -72,6 +73,16 @@ namespace Letu.Basis.Controllers.Admin
         public async Task DeleteDeptAsync(Guid id)
         {
             await _deptService.DeleteDeptAsync(id);
+        }
+
+        /// <summary>
+        /// 获取部门树形选项列表（用于下拉选择器）
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("tree-options")]
+        public async Task<List<TreeSelectOption>> GetDeptTreeOptionsAsync()
+        {
+            return await _deptService.GetDeptTreeOptionsAsync();
         }
     }
 }

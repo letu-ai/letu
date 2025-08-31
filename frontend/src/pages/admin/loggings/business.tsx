@@ -1,13 +1,19 @@
-﻿import { getBusinessLogList, getBusinessTypeOptions } from './service';
+import { getBusinessLogList, getBusinessTypeOptions, type BusinessLogListDto } from './-service';
 import { Form, Input, Select, Tag, Tooltip } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { SmartTableColumnType } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
 import type { SelectOption } from '@/types/api';
+import { createFileRoute } from '@tanstack/react-router';
 
-const BusinessLogList: React.FC = () => {
+
+export const Route = createFileRoute('/admin/loggings/business')({
+  component: BusinessLogList,
+});
+
+function BusinessLogList() {
   const [typeOptions, setTypeOptions] = useState<SelectOption[]>();
-  const columns: SmartTableColumnType[] = [
+  const columns: SmartTableColumnType<BusinessLogListDto>[] = [
     {
       title: '业务类型',
       dataIndex: 'type',
@@ -113,4 +119,3 @@ const BusinessLogList: React.FC = () => {
   );
 };
 
-export default BusinessLogList;

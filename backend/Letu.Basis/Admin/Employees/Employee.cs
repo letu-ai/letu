@@ -1,5 +1,4 @@
-using FreeSql.DataAnnotations;
-using Letu.Shared.Enums;
+﻿using FreeSql.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -39,14 +38,6 @@ namespace Letu.Basis.Admin.Employees
         [Column(IsNullable = false)]
         public SexType Sex { get; set; }
 
-        /// <summary>
-        /// 手机号码
-        /// </summary>
-        [NotNull]
-        [Required]
-        [StringLength(16)]
-        [Column(IsNullable = false, StringLength = 16)]
-        public string? Phone { get; set; }
 
         /// <summary>
         /// 身份证
@@ -81,13 +72,6 @@ namespace Letu.Basis.Admin.Employees
         [Column(StringLength = 512)]
         public string? Address { get; set; }
 
-        /// <summary>
-        /// 邮箱
-        /// </summary>
-        [StringLength(64)]
-        [EmailAddress]
-        [Column(StringLength = 64)]
-        public string? Email { get; set; }
 
         /// <summary>
         /// 入职时间
@@ -104,20 +88,8 @@ namespace Letu.Basis.Admin.Employees
         /// </summary>
         public int Status { get; set; }
 
-        /// <summary>
-        /// 关联用户ID
-        /// </summary>
-        public Guid? UserId { get; set; }
 
-        /// <summary>
-        /// 部门ID
-        /// </summary>
-        public Guid? DeptId { get; set; }
 
-        /// <summary>
-        /// 职位ID
-        /// </summary>
-        public Guid? PositionId { get; set; }
 
         /// <summary>
         /// 租户ID

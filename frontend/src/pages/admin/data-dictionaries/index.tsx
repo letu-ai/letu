@@ -1,4 +1,5 @@
-﻿import Permission from '@/components/Permission';
+﻿import { createFileRoute } from '@tanstack/react-router';
+import Permission from '@/components/Permission';
 import { BasisPermissions } from '@/application/permissions';
 import {
   deleteDictType,
@@ -6,22 +7,26 @@ import {
   type DictTypeDto,
   type DictTypeResultDto,
   deleteDictTypes,
-} from './service';
+} from './-service';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Switch } from 'antd';
-import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useRef } from 'react';
+import { Link } from '@tanstack/react-router';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
-import DictTypeForm, { type ModalRef } from './_TypeForm';
+import DictTypeForm, { type ModalRef } from './-TypeForm';
 import ProIcon from '@/components/ProIcon';
 import useApp from 'antd/es/app/useApp';
 
-const DictList: React.FC = () => {
+export const Route = createFileRoute('/admin/data-dictionaries/')({ 
+  component: DictList
+});
+
+function DictList() {
   const tableRef = useRef<SmartTableRef>(null);
   const modalRef = useRef<ModalRef>(null);
   const { message, modal } = useApp();
-  const columns: SmartTableColumnType[] = [
+  const columns: SmartTableColumnType<DictTypeResultDto>[] = [
     {
       title: '字典名称',
       dataIndex: 'name',
@@ -65,7 +70,7 @@ const DictList: React.FC = () => {
             </Button>
           </Permission>
           <Permission permissions={BasisPermissions.DataDictionary.Default}>
-            <Link to={`/admin/data-dictionaries/${record.dictType}`}>
+            <Link to={`/admin/data-dictionaries/$type`} params={{ type: record.dictType }}>
             <Button
               type="link"
               icon={<ProIcon icon="iconify:mi:database" />}
@@ -160,5 +165,3 @@ const DictList: React.FC = () => {
     </>
   );
 };
-
-export default DictList;

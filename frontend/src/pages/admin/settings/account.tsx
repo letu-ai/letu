@@ -1,36 +1,41 @@
-import { Form, Checkbox, Button, Typography, message, Spin, InputNumber, Divider } from 'antd';
-import { fetchAccountSettings, type IAccountSettings, updateAccountSettings } from './service';
+import { createFileRoute } from '@tanstack/react-router';
+import { Form, Checkbox, Button, Typography, Spin, InputNumber, Divider, App } from 'antd';
+import { fetchAccountSettings, type IAccountSettings, updateAccountSettings } from './-service';
 import { useState, useEffect } from 'react';
 
 const { Title } = Typography;
+
+export const Route = createFileRoute('/admin/settings/account')({
+    component: AccountSettings
+});
 
 function AccountSettings() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(true);
     const [settings, setSettings] = useState<IAccountSettings | null>(null);
-
+    const { message } = App.useApp();
     useEffect(() => {
         const fetchSettings = async () => {
             try {
                 const data = await fetchAccountSettings();
                 setSettings(data);
                 form.setFieldsValue(data);
-            } catch (error) {
+            } catch {
                 message.error('获取账户设置失败');
             } finally {
                 setPageLoading(false);
             }
         };
         fetchSettings();
-    }, [form]);
+    }, [form, message]);
 
     const handleSubmit = async (values: IAccountSettings) => {
         setLoading(true);
         try {
             await updateAccountSettings(values);
             message.success('更新账户设置成功');
-        } catch (error) {
+        } catch  {
             message.error('更新账户设置失败');
         } finally {
             setLoading(false);
@@ -245,5 +250,3 @@ function AccountSettings() {
         </div>
     );
 }
-
-export default AccountSettings;

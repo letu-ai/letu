@@ -1,41 +1,44 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { Spin } from 'antd';
-import { clearToken } from '@/application/authUtils';
+import { clearToken } from '@/utils/authUtils';
 import useAppConfigStore from '@/application/appConfigStore';
-import { logout } from './service';
+import { logout } from './-service';
 import { StaticRoutes } from '@/utils/globalValue';
+import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
+import { useAsyncEffect } from 'ahooks';
 
-const LogoutPage = () => {
-  const navigate = useNavigate();
-  const clearConfiguration = useAppConfigStore(state => state.clearConfiguration);
+export const Route = createFileRoute('/account/logout')({
+    component: LogoutPage,
+    validateSearch: z.object({
+        returnUrl: z.string().optional(),
+    })
+});
 
-  useEffect(() => {
-    const handleLogout = async () => {
-      try {
-        // 调用后端注销接口
-        await logout();
-      } catch (error) {
-      } finally {
-        // 清除identityStore中的token
-        clearToken();
-        
-        // 清除configStore中的配置
-        clearConfiguration();
-        
-        // 跳转到首页
-        navigate(StaticRoutes.login, { replace: true });
-      }
-    };
+function LogoutPage() {
+    const navigate = useNavigate();
+    const clearConfiguration = useAppConfigStore(state => state.clearConfiguration);
+    const location = useLocation();
+    useAsyncEffect(async () => {
+        try {
+            // 调用后端注销接口
+            await logout();
+        }
+        finally {
+            // 清除identityStore中的token
+            clearToken();
 
-    handleLogout();
-  }, [navigate, clearConfiguration]);
+            // 清除configStore中的配置
+            clearConfiguration();
 
-  return (
-    <div className="flex justify-center items-center h-screen flex-col gap-4">
-      <Spin size="large" tip="正在注销..." />
-    </div>
-  );
-};
+            // 跳转到首页
+            await navigate({ to: StaticRoutes.login, search: { returnUrl: location.search.returnUrl }, replace: true });
+        }
+    }, []);
 
-export default LogoutPage;
+    return (
+        <div className="flex justify-center items-center h-screen flex-col gap-4">
+            <Spin size="large" />
+        </div>
+    );
+}

@@ -78,7 +78,7 @@ namespace Letu.Basis.Controllers.Admin
         /// 职位分组+职位树
         /// </summary>
         /// <returns></returns>
-        [HttpGet("tree")]
+        [HttpGet("tree-options")]
         public async Task<List<TreeSelectOption>> GetPositionTreeAsync()
         {
             return await _positionService.GetPositionTreeOptionAsync();

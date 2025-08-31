@@ -1,8 +1,12 @@
-import { type RequestLogDto, getRequestLogDetails } from '../service';
+import { type RequestLogDto, getRequestLogDetails } from '../-service';
 import { Button, Card, Descriptions, Divider, Space, Spin, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, createFileRoute } from '@tanstack/react-router';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+
+export const Route = createFileRoute('/admin/loggings/auditLog/request/$id')({
+  component: RequestLogDetails,
+});
 
 // 状态码标签
 const getHttpStatusCodeTag = (code: number) => {
@@ -36,23 +40,23 @@ const getHttpMethodTag = (method?: string) => {
   }
 };
 
-const RequestLogDetails: React.FC = () => {
-  const params = useParams<{ id: string }>();
+function RequestLogDetails() {
+  const { id } = Route.useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState<RequestLogDto | null>(null);
 
   // 返回列表
   const handleBack = () => {
-    navigate('/admin/loggings/auditlog/request');
+    navigate({ to: '/admin/loggings/auditLog/request' });
   };
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        if (params.id) {
+        if (id) {
           setLoading(true);
-          const data = await getRequestLogDetails(params.id);
+          const data = await getRequestLogDetails(id);
           setDetails(data);
         }
       } catch (error) {
@@ -63,7 +67,7 @@ const RequestLogDetails: React.FC = () => {
     };
     
     fetchDetails();
-  }, [params.id]);
+  }, [id]);
 
   return (
     <Spin spinning={loading}>
@@ -110,5 +114,3 @@ const RequestLogDetails: React.FC = () => {
     </Spin>
   );
 };
-
-export default RequestLogDetails; 

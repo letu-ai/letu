@@ -1,6 +1,7 @@
 ﻿using Letu.Basis.Admin.Editions;
 using Letu.Basis.Admin.Tenants.Dtos;
 using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Repository;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
@@ -24,7 +25,7 @@ namespace Letu.Basis.Admin.Tenants
         {
             if (await _tenantRepository.Select.AnyAsync(x => x.Name == dto.Name))
             {
-                throw new BusinessException(message: $"租户[{dto.Name}]已存在");
+                throw HttpFriendlyException.BadRequest($"租户[{dto.Name}]已存在");
             }
 
             var entity = new Tenant()
@@ -85,12 +86,12 @@ namespace Letu.Basis.Admin.Tenants
             var entity = await _tenantRepository.Where(x => x.Id == id).FirstAsync();
             if (entity == null)
             {
-                throw new BusinessException(message: $"租户不存在");
+                throw HttpFriendlyException.NotFound($"租户不存在");
             }
 
             if (await _tenantRepository.Select.AnyAsync(x => x.Id != id && x.Name == dto.Name))
             {
-                throw new BusinessException(message: $"租户名称[{dto.Name}]已存在");
+                throw HttpFriendlyException.BadRequest($"租户名称[{dto.Name}]已存在");
             }
 
             entity.Name = dto.Name;

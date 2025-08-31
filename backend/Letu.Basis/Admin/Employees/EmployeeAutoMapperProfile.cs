@@ -12,15 +12,11 @@ namespace Letu.Basis.Admin.Employees
             // 忽略源端属性通常用 .ForSourceMember(..., opt => opt.DoNotValidate()) 或 .ForSourceMember(..., opt => opt.Ignore())。
             // 这里的写法已经是标准做法。
             CreateMap<EmployeeCreateOrUpdateInput, Employee>(MemberList.Source)
-                .Ignore(dest => dest.Id)
-                .ForSourceMember(src => src.IsAddUser, opt => opt.DoNotValidate())
-                .ForSourceMember(src => src.UserPassword, opt => opt.DoNotValidate());
+                .Ignore(dest => dest.Id);
 
             CreateMap<Employee, EmployeeInfoDto>()
-                .Ignore(dest=>dest.UserName)
-                .Ignore(dest=>dest.NickName)
-                .Ignore(dest=>dest.DeptName)
-                .Ignore(dest=>dest.PositionName);
+                .Ignore(d=>d.UserName)
+                .Ignore(d=>d.NickName);
         }
     }
 }

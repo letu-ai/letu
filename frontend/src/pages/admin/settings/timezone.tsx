@@ -1,9 +1,14 @@
-import { Form, Select, Button, Typography, message, Spin } from 'antd';
+import { createFileRoute } from '@tanstack/react-router';
+import { Form, Select, Button, Typography, Spin, App } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
-import { fetchTimeZones, fetchTimeZoneSettings, type ITimeZone, updateTimeZoneSettings } from './service';
+import { fetchTimeZones, fetchTimeZoneSettings, type ITimeZone, updateTimeZoneSettings } from './-service';
 import { useState, useEffect } from 'react';
 
 const { Title } = Typography;
+
+export const Route = createFileRoute('/admin/settings/timezone')({
+    component: TimeZoneSettings
+});
 
 function TimeZoneSettings() {
     const [form] = Form.useForm();
@@ -11,7 +16,8 @@ function TimeZoneSettings() {
     const [pageLoading, setPageLoading] = useState(true);
     const [timeZoneOptions, setTimeZoneOptions] = useState<DefaultOptionType[]>([]);
     const [currentTimeZone, setCurrentTimeZone] = useState<string>('');
-
+    const { message } = App.useApp();
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -29,21 +35,21 @@ function TimeZoneSettings() {
                 setTimeZoneOptions(options);
                 setCurrentTimeZone(settingsData);
                 form.setFieldsValue({ timeZone: settingsData });
-            } catch (error) {
+            } catch  {
                 message.error('获取时区设置失败');
             } finally {
                 setPageLoading(false);
             }
         };
         fetchData();
-    }, [form]);
+    }, [form, message]);
 
     const handleSubmit = async (values: { timeZone: string }) => {
         setLoading(true);
         try {
             await updateTimeZoneSettings(values.timeZone);
             message.success('更新时区设置成功');
-        } catch (error) {
+        } catch  {
             message.error('更新时区设置失败');
         } finally {
             setLoading(false);
@@ -88,5 +94,3 @@ function TimeZoneSettings() {
         </div>
     );
 }
-
-export default TimeZoneSettings;

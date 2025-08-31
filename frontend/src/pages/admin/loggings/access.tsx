@@ -1,15 +1,21 @@
-﻿import { type ApiAccessLogListDto, getApiAccessLogList } from './service';
+import { type ApiAccessLogListDto, getApiAccessLogList } from './-service';
 import { Button, Descriptions, Form, Input, Modal, Tag, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 import type { SmartTableColumnType } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
 import { OperateType } from '@/utils/globalValue';
 import { FileTextOutlined } from '@ant-design/icons';
+import { createFileRoute } from '@tanstack/react-router';
 
-const BusinessLogList: React.FC = () => {
+
+export const Route = createFileRoute('/admin/loggings/access')({
+  component: BusinessLogList,
+});
+
+function BusinessLogList() {
   const [isOpenModal, setIsOpenModal] = React.useState(false);
   const [details, setDetails] = React.useState<ApiAccessLogListDto | null>();
-  const columns: SmartTableColumnType[] = [
+  const columns: SmartTableColumnType<ApiAccessLogListDto>[] = [
     {
       title: '请求时间',
       dataIndex: 'requestTime',
@@ -204,4 +210,3 @@ const BusinessLogList: React.FC = () => {
   );
 };
 
-export default BusinessLogList;

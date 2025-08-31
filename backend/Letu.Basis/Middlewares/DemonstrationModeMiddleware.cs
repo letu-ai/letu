@@ -1,4 +1,5 @@
-﻿using Volo.Abp;
+﻿using Letu.Core.AspNetCore.Mvc;
+using Volo.Abp;
 
 namespace Letu.Basis.Middlewares
 {
@@ -38,7 +39,7 @@ namespace Letu.Basis.Middlewares
 
             // TODO: 这里的逻辑需要验证
             if(isEnabled && !IsIgnoreHttpMethod(httpMethod) && !isWhite) 
-                throw new BusinessException(message:"演示模式（appsettings中配置\"DemonstrationMode\"可关闭此模式），不允许操作");
+                throw HttpFriendlyException.BadRequest("演示模式（appsettings中配置\"DemonstrationMode\"可关闭此模式），不允许操作");
 
             return true;
         }

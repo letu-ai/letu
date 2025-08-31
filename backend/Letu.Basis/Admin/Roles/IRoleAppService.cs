@@ -35,13 +35,6 @@ namespace Letu.Basis.Admin.Roles
         Task<bool> DeleteRoleAsync(Guid id);
 
         /// <summary>
-        /// 分配菜单
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<bool> AssignMenuAsync(AssignMenuDto dto);
-
-        /// <summary>
         /// 获取角色
         /// </summary>
         /// <returns></returns>

@@ -17,37 +17,45 @@ namespace Letu.Basis.Controllers.Admin
     [Route("api/admin/users")]
     public class UserController : ControllerBase
     {
-        private readonly IUserAppService _userService;
+        private readonly IUserAppService userService;
 
         public UserController(IUserAppService userService)
         {
-            _userService = userService;
+            this.userService = userService;
         }
 
         /// <summary>
         /// 新增用户
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize(BasisPermissions.User.Create)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
         [ApiAccessLog(operateName: "新增用户", operateType: [OperateType.Create], reponseEnable: true)]
-        public async Task AddUserAsync([FromBody] UserCreateOrUpdateInput dto)
+        public async Task AddUserAsync([FromBody] UserCreateInput input)
         {
-            await _userService.AddUserAsync(dto);
+            await userService.AddUserAsync(input);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(BasisPermissions.User.Update)]
+        [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
+        public async Task UpdateUserAsync(Guid id, [FromBody] UserUpdateInput input)
+        {
+            await userService.UpdateUserAsync(id, input);
         }
 
         /// <summary>
         /// 用户分页列表
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpGet]
         [ApiAccessLog(operateName: "用户分页列表")]
-        public async Task<PagedResult<UserListOutput>> GetUserListAsync([FromQuery] UserListInput dto)
+        public async Task<PagedResult<UserListOutput>> GetUserListAsync([FromQuery] UserListInput input)
         {
-            return await _userService.GetUserListAsync(dto);
+            return await userService.GetUserListAsync(input);
         }
 
         /// <summary>
@@ -59,7 +67,7 @@ namespace Letu.Basis.Controllers.Admin
         [Authorize(BasisPermissions.User.Delete)]
         public async Task DeleteUserAsync(Guid id)
         {
-            await _userService.DeleteUserAsync(id);
+            await userService.DeleteUserAsync(id);
         }
 
         /// <summary>
@@ -73,7 +81,7 @@ namespace Letu.Basis.Controllers.Admin
         [ApiAccessLog(operateName: "分配角色", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task AssignRoleAsync(Guid id, [FromBody] AssignRoleDto input)
         {
-            await _userService.AssignRoleAsync(id, input);
+            await userService.AssignRoleAsync(id, input);
         }
 
         /// <summary>
@@ -86,7 +94,7 @@ namespace Letu.Basis.Controllers.Admin
         [ApiAccessLog(operateName: "切换用户启用状态", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task SwitchUserEnabledStatusAsync(Guid id)
         {
-            await _userService.SwitchUserEnabledStatusAsync(id);
+            await userService.SwitchUserEnabledStatusAsync(id);
         }
 
         /// <summary>
@@ -97,31 +105,43 @@ namespace Letu.Basis.Controllers.Admin
         [HttpGet("{uid:Guid}/roles")]
         public async Task<Guid[]> GetUserRoleIdsAsync(Guid uid)
         {
-            return await _userService.GetUserRoleIdsAsync(uid);
+            return await userService.GetUserRoleIdsAsync(uid);
         }
 
         /// <summary>
         /// 重置用户密码
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         [HttpPut("reset-password")]
         [Authorize(BasisPermissions.User.Update)]
         [ApiAccessLog(operateName: "重置用户密码", operateType: [OperateType.Update], reponseEnable: true)]
-        public async Task ResetUserPasswordAsync([FromBody] ResetUserPwdDto dto)
+        public async Task ResetUserPasswordAsync([FromBody] ResetUserPwdDto input)
         {
-            await _userService.ResetUserPasswordAsync(dto);
+            await userService.ResetUserPasswordAsync(input);
         }
+
+        /// <summary>
+        /// 根据用户ID批量获取用户信息（用于编辑时回显）
+        /// </summary>
+        /// <param name="userIds">用户ID列表</param>
+        /// <returns></returns>
+        [HttpPost("by-ids")]
+        public async Task<List<SelectOption>> GetEmployeesByUserIdsAsync([FromBody] List<Guid> userIds)
+        {
+            return await userService.GetUserSelectOptionsByIdsAsync(userIds);
+        }
+
 
         /// <summary>
         /// 用户简单信息查询
         /// </summary>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        [HttpGet("simple")]
-        public async Task<List<UserSimpleInfoDto>> GetUserSimpleInfosAsync(string? keyword)
+        [HttpGet("select-options")]
+        public async Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword)
         {
-            return await _userService.GetUserSimpleInfosAsync(keyword);
+            return await userService.GetUserSelectOptionsAsync(keyword);
         }
     }
 }

@@ -1,5 +1,8 @@
 using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.Users;
+using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Repository;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
@@ -10,18 +13,20 @@ namespace Letu.Basis.Admin.Departments
     {
         private readonly IFreeSqlRepository<Department> _deptRepository;
         private readonly IFreeSqlRepository<Employee> _employeeRepository;
+        private readonly IFreeSqlRepository<User> _userRepository;
 
-        public DepartmentAppService(IFreeSqlRepository<Department> deptRepository, IFreeSqlRepository<Employee> employeeRepository)
+        public DepartmentAppService(IFreeSqlRepository<Department> deptRepository, IFreeSqlRepository<Employee> employeeRepository, IFreeSqlRepository<User> userRepository)
         {
             _deptRepository = deptRepository;
             _employeeRepository = employeeRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<bool> AddDeptAsync(DepartmentCreateOrUpdateInput dto)
         {
             if (await _deptRepository.Where(x => x.Code.ToLower() == dto.Code!.ToLower()).AnyAsync())
             {
-                throw new BusinessException(message: "部门编号已存在");
+                throw HttpFriendlyException.BadRequest($"部门编号{dto.Code}已存在");
             }
 
             var entity = ObjectMapper.Map<DepartmentCreateOrUpdateInput, Department>(dto);
@@ -48,8 +53,9 @@ namespace Letu.Basis.Admin.Departments
 
         public async Task<bool> DeleteDeptAsync(Guid id)
         {
-            var hasEmployees = await _employeeRepository.Select.AnyAsync(x => x.DeptId == id);
-            if (hasEmployees) throw new BusinessException(message: "部门下存在员工，不能删除");
+            var hasUsers = await _userRepository.Select.AnyAsync(x => x.DepartmentId == id);
+            if (hasUsers)
+                throw HttpFriendlyException.BadRequest("部门内有用户，不能删除。");
             await _deptRepository.DeleteAsync(x => id == x.Id);
             return true;
         }
@@ -134,11 +140,11 @@ namespace Letu.Basis.Admin.Departments
 
             if (!entity.Code.Equals(input.Code, StringComparison.CurrentCultureIgnoreCase) && await _deptRepository.Select.AnyAsync(x => x.Code.ToLower() == input.Code!.ToLower()))
             {
-                throw new BusinessException(message: "部门编号已存在");
+                throw HttpFriendlyException.BadRequest($"部门编号{input.Code}已存在");
             }
             if (input.ParentId == entity.Id)
             {
-                throw new BusinessException(message: "不能选择自己为上级部门");
+                throw HttpFriendlyException.BadRequest("不能选择自己为上级部门");
             }
 
             ObjectMapper.Map(input, entity);
@@ -147,7 +153,7 @@ namespace Letu.Basis.Admin.Departments
                 var parentIsSub = await _deptRepository.Where(x => x.Id == entity.ParentId.Value && x.ParentId == entity.Id).AnyAsync();
                 if (parentIsSub)
                 {
-                    throw new BusinessException(message: "不能选择子部门作为上级部门");
+                    throw HttpFriendlyException.BadRequest("不能选择子部门作为上级部门");
                 }
 
                 var all = await _deptRepository.Select.ToListAsync();
@@ -157,6 +163,42 @@ namespace Letu.Basis.Admin.Departments
             }
             await _deptRepository.UpdateAsync(entity);
             return true;
+        }
+
+        public async Task<List<TreeSelectOption>> GetDeptTreeOptionsAsync()
+        {
+            var all = await _deptRepository.Select
+                .Where(x => x.Status == 1) // 只获取启用的部门
+                .OrderBy(x => x.ParentIds)
+                .ToListAsync();
+
+            var rootDepts = all.Where(x => x.ParentId == null).OrderBy(x => x.Sort).ToList();
+            var result = new List<TreeSelectOption>();
+
+            foreach (var dept in rootDepts)
+            {
+                result.Add(ConvertToTreeSelectOption(dept, all));
+            }
+
+            return result;
+        }
+
+        private TreeSelectOption ConvertToTreeSelectOption(Department dept, List<Department> allDepts)
+        {
+            var option = new TreeSelectOption
+            {
+                Key = dept.Id.ToString(),
+                Value = dept.Id.ToString(),
+                Title = dept.Name
+            };
+
+            var children = allDepts.Where(x => x.ParentId == dept.Id).OrderBy(x => x.Sort).ToList();
+            if (children.Any())
+            {
+                option.Children = children.Select(child => ConvertToTreeSelectOption(child, allDepts)).ToList();
+            }
+
+            return option;
         }
     }
 }

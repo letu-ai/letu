@@ -12,6 +12,6 @@ namespace Letu.Basis.Admin.Employees.Dtos
         /// <summary>
         /// 部门ID
         /// </summary>
-        public Guid? DeptId { get; set; }
+        public Guid? DepartmentId { get; set; }
     }
 }

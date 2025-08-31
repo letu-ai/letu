@@ -85,17 +85,6 @@ namespace Letu.Basis.Controllers.Admin
             await _employeeService.DeleteEmployeeAsync(id);
         }
 
-        /// <summary>
-        /// 绑定用户
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPost("bind-user")]
-        [Authorize(BasisPermissions.Employee.BindUser)]
-        public async Task EmployeeBindUserAsync([FromBody] EmployeeBindUserDto dto)
-        {
-            await _employeeService.EmployeeBindUserAsync(dto);
-        }
 
         /// <summary>
         /// 获取员工信息
@@ -117,6 +106,28 @@ namespace Letu.Basis.Controllers.Admin
         public async Task<List<DeptEmployeeTreeOutput>> GetDeptEmployeeTreeAsync([FromQuery] DeptEmployeeTreeInput dto)
         {
             return await _employeeService.GetDeptEmployeeTreeAsync(dto);
+        }
+
+        /// <summary>
+        /// 获取员工选项（用于下拉选择）
+        /// </summary>
+        /// <param name="keyword">搜索关键字</param>
+        /// <returns></returns>
+        [HttpGet("select-options")]
+        public async Task<List<EmployeeSelectOption>> GetEmployeeOptionsAsync([FromQuery] string? keyword)
+        {
+            return await _employeeService.GetEmployeeOptionsAsync(keyword);
+        }
+
+        /// <summary>
+        /// 根据用户ID批量获取员工信息（用于编辑时回显）
+        /// </summary>
+        /// <param name="userIds">用户ID列表</param>
+        /// <returns></returns>
+        [HttpPost("select-options/by-ids")]
+        public async Task<List<EmployeeSelectOption>> GetEmployeesByUserIdsAsync([FromBody] List<Guid> userIds)
+        {
+            return await _employeeService.GetEmployeesByUserIdsAsync(userIds);
         }
     }
 }

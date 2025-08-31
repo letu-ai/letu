@@ -1,0 +1,11 @@
+﻿using Letu.Core.Applications;
+
+namespace Letu.Basis.Notifications.Dtos
+{
+    public class UserNotificationQueryDto : PagedResultRequest
+    {
+        public string? Title { get; set; }
+
+        public bool? IsReaded { get; set; }
+    }
+}

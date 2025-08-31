@@ -12,4 +12,16 @@
   --color-error: #dc3545;
   --color-background: #FFFFFF;
   --color-text: #4A4A4A;
+  
+  /* Antd错误色相关变量 */
+  --color-antd-error: var(--color-error);
+  --color-antd-error-bg: var(--color-error-bg);
+  --color-antd-error-bg-hover: var(--color-error-bg-hover);
+  --color-antd-error-border: var(--color-error-border);
+  --color-antd-error-border-hover: var(--color-error-border-hover);
+  --color-antd-error-hover: var(--color-error-hover);
+  --color-antd-error-active: var(--color-error-active);
+  --color-antd-error-text-hover: var(--color-error-text-hover);
+  --color-antd-error-text: var(--color-error-text);
+  --color-antd-error-text-active: var(--color-error-text-active);
 }

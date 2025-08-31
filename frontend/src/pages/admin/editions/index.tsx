@@ -1,22 +1,28 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { Space, Form, Input, Button } from 'antd';
 import { useRef, useState } from 'react';
 import { PlusOutlined, ExclamationCircleFilled, EditOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { deleteEdition, getEditionList, type EditionListOutput } from './service';
-import EditionForm, { type ModalRef } from './_EditionForm';
-import FeatureEditor from '@/pages/admin/components/FeatureEditor';
+import { deleteEdition, getEditionList, type EditionListOutput } from './-service';
+import EditionForm, { type ModalRef } from './-EditionForm';
+import FeatureEditor from '@/pages/admin/-components/FeatureEditor';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type.ts';
 import useApp from 'antd/es/app/useApp';
 
-const Edition = () => {
+
+export const Route = createFileRoute('/admin/editions/')({
+    component: Edition
+});
+
+function Edition() {
     const modalRef = useRef<ModalRef>(null);
     const tableRef = useRef<SmartTableRef>(null);
     const { message, modal } = useApp();
     const [featureEditorVisible, setFeatureEditorVisible] = useState(false);
     const [currentEditionId, setCurrentEditionId] = useState<string | null>(null);
 
-    const columns: SmartTableColumnType[] = [
+    const columns: SmartTableColumnType<EditionListOutput>[] = [
         {
             title: '版本名称',
             dataIndex: 'name',
@@ -120,7 +126,7 @@ const Edition = () => {
             />
             {/* 版本新增/编辑弹窗 */}
             <EditionForm ref={modalRef} refresh={() => tableRef?.current?.reload()} />
-            
+
             {/* 功能编辑器 */}
             {featureEditorVisible && currentEditionId && (
                 <FeatureEditor
@@ -135,5 +141,3 @@ const Edition = () => {
         </>
     );
 };
-
-export default Edition; 

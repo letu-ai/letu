@@ -1,7 +1,12 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { Button } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
-import FeatureEditor from "@/pages/admin/components/FeatureEditor";
+import FeatureEditor from "@/pages/admin/-components/FeatureEditor";
 import { useState } from "react";
+
+export const Route = createFileRoute('/admin/settings/feature')({
+  component: Feature
+});
 
 function Feature() {
     const [open, setOpen] = useState(false);
@@ -32,5 +37,3 @@ return (
     </div>
 )
 }
-
-export default Feature;

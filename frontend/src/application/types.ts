@@ -15,6 +15,9 @@ export interface ICurrentUser {
     phoneNumberVerified: boolean;
     roles: string[];
     sessionId?: string | null;
+    avatar?: string | null;
+    department?: string | null;
+    organization?: string | null;
 }
 
 export interface ICurrentTenant {

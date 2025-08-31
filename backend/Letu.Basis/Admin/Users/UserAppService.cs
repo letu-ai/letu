@@ -1,15 +1,13 @@
+﻿using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users.Dtos;
-using Letu.Basis.SharedService;
 using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Utils;
 using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
-using Letu.Shared.Enums;
 using Letu.Shared.Generated;
-using Volo.Abp;
-using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.EventBus.Distributed;
 
@@ -17,52 +15,100 @@ namespace Letu.Basis.Admin.Users
 {
     public class UserAppService : BasisAppService, IUserAppService
     {
-        private readonly IFreeSqlRepository<User> _userRepository;
+        private readonly IFreeSqlRepository<User> userRepository;
         private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
-        private readonly IdentitySharedService _identityDomainService;
         private readonly IOperationLogManager operationLogManager;
         private readonly IDistributedEventBus eventBus;
         public UserAppService(IFreeSqlRepository<User> userRepository,
             IFreeSqlRepository<UserInRole> userRoleRepository,
-            IdentitySharedService identityDomainService,
             IOperationLogManager operationLogManager,
             IDistributedEventBus eventBus)
         {
-            _userRepository = userRepository;
+            this.userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
-            _identityDomainService = identityDomainService;
             this.operationLogManager = operationLogManager;
             this.eventBus = eventBus;
         }
 
-        public async Task<Guid> AddUserAsync(UserCreateOrUpdateInput dto)
+        public async Task<Guid> AddUserAsync(UserCreateInput input)
         {
-            var isExist = await _userRepository.Select.AnyAsync(x => x.UserName.ToLower() == dto.UserName.ToLower());
-            if (isExist)
+            await CheckUserExists(input.UserName, input.Phone, input.Email);
+
+            //TODO: 通过设置的密码强度策略来校验
+            if (!RegexCodeGen.Password().IsMatch(input.Password))
             {
-                throw new BusinessException(message: "账号已存在");
+                throw HttpFriendlyException.BadRequest("密码格式不正确");
             }
-            if (!RegexCodeGen.Password().IsMatch(dto.Password))
+
+            var salt = EncryptionUtils.GetPasswordSalt();
+            var user = new User(GuidGenerator.Create(), input.UserName)
             {
-                throw new BusinessException(message: "密码格式不正确");
-            }
-            var user = new User(GuidGenerator.Create())
-            {
-                UserName = dto.UserName,
-                PasswordSalt = EncryptionUtils.GetPasswordSalt(),
-                Avatar = dto.Avatar,
-                NickName = dto.NickName ?? dto.UserName,
-                Sex = dto.Sex,
-                Phone = dto.Phone,
+                PasswordSalt = salt,
+                PasswordHash = EncryptionUtils.CalcPasswordHash(input.Password, salt),
+                NickName = input.NickName,
                 IsEnabled = true
             };
-            if (string.IsNullOrWhiteSpace(dto.Avatar))
+
+            ObjectMapper.Map(input, user);
+
+            if (string.IsNullOrWhiteSpace(input.Avatar))
             {
-                user.Avatar = user.Sex == SexType.Male ? AdminConsts.AvatarMale : AdminConsts.AvatarFemale;
+                user.Avatar = AdminConsts.AvatarMale;
             }
-            user.Password = EncryptionUtils.CalcPasswordHash(dto.Password, user.PasswordSalt);
-            user = await _userRepository.InsertAsync(user);
+            user = await userRepository.InsertAsync(user);
             return user.Id;
+        }
+
+        public async Task<Guid> UpdateUserAsync(Guid id, UserUpdateInput input)
+        {
+            await CheckUserExists(null, input.Phone, input.Email, id);
+
+            var user = await userRepository.Where(x => x.Id == id).FirstAsync()
+                ?? throw HttpFriendlyException.NotFound($"用户ID:{id}不存在。");
+            ObjectMapper.Map(input, user);
+            await userRepository.UpdateAsync(user);
+
+            return user.Id;
+        }
+
+        private async Task CheckUserExists(string? userName, string? phone, string? email, Guid? excludeId = null)
+        {
+            System.Linq.Expressions.Expression<Func<User, bool>> condition = u => false; // 初始化为一个假条件
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                var lowerName = userName.ToLower(); // 预先转换为小写
+                condition = condition.Or(u => u.UserName.ToLower() == lowerName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(phone))
+            {
+                var lowerPhone = phone.ToLower();
+                condition = condition.Or(u => u.Phone.ToLower() == lowerPhone);
+            }
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                var lowerEmail = email.ToLower();
+                condition = condition.Or(u => u.Email.ToLower() == lowerEmail);
+            }
+
+            var existUser = await userRepository.Select
+                .Where(condition)
+                .WhereIf(excludeId.HasValue, u => u.Id != excludeId!.Value)
+                .FirstAsync();
+
+            if (existUser != null)
+            {
+                if (userName == existUser.UserName)
+                    throw HttpFriendlyException.BadRequest($"账号{userName}已存在");
+
+                if (!string.IsNullOrWhiteSpace(email) && email == existUser.Email)
+                    throw HttpFriendlyException.BadRequest($"邮箱{email}已存在");
+
+                if (!string.IsNullOrWhiteSpace(phone) && phone == existUser.Phone)
+                    throw HttpFriendlyException.BadRequest($"手机号{phone}已存在");
+            }
         }
 
         public async Task<bool> AssignRoleAsync(Guid userId, AssignRoleDto input)
@@ -91,11 +137,10 @@ namespace Letu.Basis.Admin.Users
         {
             if (CurrentUser.Id == id)
             {
-                throw new BusinessException(message: "不能删除自己");
+                throw HttpFriendlyException.BadRequest("不能删除自己");
             }
-            var user = await _userRepository.Where(x => x.Id == id).FirstAsync();
-            await _userRepository.DeleteAsync(x => x.Id == id);
-            await _identityDomainService.RemoveUserPermissionCacheByUserIdAsync(id);
+            var user = await userRepository.Where(x => x.Id == id).FirstAsync();
+            await userRepository.DeleteAsync(x => x.Id == id);
 
             var userDeleteEto = new EntityDeletedEto<UserEto>(new UserEto()
             {
@@ -113,12 +158,31 @@ namespace Letu.Basis.Admin.Users
 
         public async Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto)
         {
-            var rows = await _userRepository.Select
-                .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
-                .OrderByDescending(x => x.CreationTime)
+            var rows = await userRepository.Select
+                .From<Departments.Department, Positions.PositionGroup, Employee>((u, d, p, e) => u
+                    .LeftJoin(u1 => u1.DepartmentId == d.Id)
+                    .LeftJoin(u1 => u1.PositionId == p.Id)
+                    .LeftJoin(u1 => u1.EmployeeId == e.Id))
+                .WhereIf(!string.IsNullOrEmpty(dto.UserName), (u, d, p, e) => u.UserName.Contains(dto.UserName!))
+                .OrderByDescending((u, d, p, e) => u.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync<UserListOutput>();
+                .ToListAsync((u, d, p, e) => new UserListOutput
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Avatar = u.Avatar,
+                    NickName = u.NickName,
+                    IsEnabled = u.IsEnabled,
+                    Phone = u.Phone,
+                    Email = u.Email,
+                    DepartmentId = u.DepartmentId,
+                    DepartmentName = d.Name,
+                    PositionId = u.PositionId,
+                    PositionName = p.GroupName,
+                    EmployeeId = u.EmployeeId,
+                    EmployeeName = e.Name
+                });
 
             return new PagedResult<UserListOutput>(total, rows);
         }
@@ -130,41 +194,58 @@ namespace Letu.Basis.Admin.Users
 
         public async Task<bool> SwitchUserEnabledStatusAsync(Guid id)
         {
-            var entity = await _userRepository.Where(x => x.Id == id).FirstAsync()
-                ?? throw new BusinessException(message: "数据不存在");
+            var entity = await userRepository.Where(x => x.Id == id).FirstAsync()
+                ?? throw HttpFriendlyException.NotFound("数据不存在");
             entity.IsEnabled = !entity.IsEnabled;
-            await _userRepository.UpdateAsync(entity);
+            await userRepository.UpdateAsync(entity);
 
-            if (!entity.IsEnabled)
-            {
-                await _identityDomainService.RemoveUserPermissionCacheByUserIdAsync(id);
-            }
+            // TODO: 启用用户时发出Event通知？
+
             return true;
         }
 
         [OperationLog(LogRecordConsts.SysUser, LogRecordConsts.SysUserResetPwdSubType, "{{id}}", LogRecordConsts.SysUserResetPwdContent)]
         public async Task ResetUserPasswordAsync(ResetUserPwdDto dto)
         {
-            var user = await _userRepository.Where(x => x.Id == dto.UserId).FirstAsync();
+            var user = await userRepository.Where(x => x.Id == dto.UserId).FirstAsync();
             if (!RegexCodeGen.Password().IsMatch(dto.Password))
             {
-                throw new BusinessException(message: "密码格式不正确");
+                throw HttpFriendlyException.BadRequest("密码格式不正确");
             }
 
             user.PasswordSalt = EncryptionUtils.GetPasswordSalt();
-            user.Password = EncryptionUtils.CalcPasswordHash(dto.Password!, user.PasswordSalt);
-            await _userRepository.UpdateAsync(user);
+            user.PasswordHash = EncryptionUtils.CalcPasswordHash(dto.Password!, user.PasswordSalt);
+            await userRepository.UpdateAsync(user);
 
             operationLogManager.Current?.AddVariable("id", user.Id);
             operationLogManager.Current?.AddVariable("userName", user.UserName);
         }
 
-        public Task<List<UserSimpleInfoDto>> GetUserSimpleInfosAsync(string? keyword)
+        public async Task<List<SelectOption>> GetUserSelectOptionsByIdsAsync(List<Guid> userIds)
         {
-            return _userRepository.Where(x => x.IsEnabled)
+            if (userIds == null || userIds.Count == 0)
+            {
+                return [];
+            }
+
+            return await userRepository.Select
+                .Where(x => userIds.Contains(x.Id))
+                .OrderBy(x => x.UserName)
+                .ToListAsync(x => new SelectOption
+                {
+                    Label = $"{x.UserName} {x.NickName}",
+                    Value = x.Id.ToString()
+                });
+        }
+
+
+        public Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword)
+        {
+            return userRepository.Where(x => x.IsEnabled)
                 .WhereIf(!string.IsNullOrEmpty(keyword), x => x.UserName.Contains(keyword!) || x.NickName.Contains(keyword!))
-                .OrderBy(x => x.NickName)
-                .ToListAsync<UserSimpleInfoDto>();
+                .Limit(50)
+                .OrderBy(x => x.UserName)
+                .ToListAsync(x => new SelectOption { Value = x.Id.ToString(), Label = $"{x.UserName} {x.NickName}" });
         }
     }
 }

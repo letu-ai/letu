@@ -1,4 +1,5 @@
 using Letu.Basis.Admin.Departments.Dtos;
+using Letu.Core.Applications;
 
 
 namespace Letu.Basis.Admin.Departments
@@ -33,5 +34,11 @@ namespace Letu.Basis.Admin.Departments
         /// <param name="id"></param>
         /// <returns></returns>
         Task<bool> DeleteDeptAsync(Guid id);
+
+        /// <summary>
+        /// 获取部门树形选项列表（用于下拉选择器）
+        /// </summary>
+        /// <returns></returns>
+        Task<List<TreeSelectOption>> GetDeptTreeOptionsAsync();
     }
 }

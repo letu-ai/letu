@@ -1,11 +1,12 @@
-﻿import { deletePosition, getPositionList } from './service';
-import type { PositionListDto } from './service';
+﻿import { createFileRoute } from '@tanstack/react-router';
+import { deletePosition, getPositionList } from './-service';
+import type { PositionListDto } from './-service';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space } from 'antd';
 import React, { useRef } from 'react';
 import Permission from '@/components/Permission';
 import { BasisPermissions } from '@/application/permissions';
-import PositionForm, { type PositionModalRef } from './_PositionForm';
+import PositionForm, { type PositionModalRef } from './-PositionForm';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type';
 import DataDictionarySelect from '@/components/DataDictionarySelect';
@@ -16,7 +17,7 @@ const Position: React.FC = () => {
   const modalRef = useRef<PositionModalRef>(null);
   const tableRef = useRef<SmartTableRef>(null);
   const { message } = useApp();
-  const columns: SmartTableColumnType[] = [
+  const columns: SmartTableColumnType<PositionListDto>[] = [
     {
       title: '职位名称',
       dataIndex: 'name',
@@ -143,4 +144,6 @@ const Position: React.FC = () => {
   );
 };
 
-export default Position;
+export const Route = createFileRoute('/admin/positions/')({ 
+  component: Position
+});

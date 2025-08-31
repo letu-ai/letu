@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using Letu.Shared.Enums;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Letu.Basis.Admin.Employees.Dtos
 {
@@ -25,10 +24,6 @@ namespace Letu.Basis.Admin.Employees.Dtos
         /// </summary>
         public SexType Sex { get; set; }
 
-        /// <summary>
-        /// 手机号码
-        /// </summary>
-        public string? Phone { get; set; }
 
         /// <summary>
         /// 身份证
@@ -55,11 +50,6 @@ namespace Letu.Basis.Admin.Employees.Dtos
         /// </summary>
         public string? Address { get; set; }
 
-        /// <summary>
-        /// 邮箱
-        /// </summary>
-        [StringLength(64)]
-        public string? Email { get; set; }
 
         /// <summary>
         /// 入职时间
@@ -76,29 +66,5 @@ namespace Letu.Basis.Admin.Employees.Dtos
         /// </summary>
         public int Status { get; set; }
 
-        /// <summary>
-        /// 关联用户ID
-        /// </summary>
-        public Guid? UserId { get; set; }
-
-        /// <summary>
-        /// 部门ID
-        /// </summary>
-        public Guid? DeptId { get; set; }
-
-        /// <summary>
-        /// 职位ID
-        /// </summary>
-        public Guid? PositionId { get; set; }
-
-        /// <summary>
-        /// 部门名称
-        /// </summary>
-        public string? DeptName { get; set; }
-
-        /// <summary>
-        /// 职位名称
-        /// </summary>
-        public string? PositionName { get; set; }
     }
 }

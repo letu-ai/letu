@@ -2,6 +2,7 @@ using Letu.Basis.Account;
 using Letu.Basis.Account.Dtos;
 using Letu.Basis.Identity;
 using Letu.Basis.Identity.Dtos;
+using Letu.Core.Applications;
 using Letu.Shared.Consts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -79,17 +80,27 @@ public class AccountController : AbpControllerBase
     [HttpPut("updatePwd")]
     public async Task UpdateUserPwdAsync([FromBody] ChangePasswordInput dto)
     {
-        await accountService.UpdateUserPwdAsync(dto);
+        await accountService.ChangePasswordAsync(dto);
     }
 
     /// <summary>
-    /// 用户权限信息
+    /// 获取个人登录日志列表
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpGet("security-logs")]
+    public async Task<PagedResult<SecurityLogListDto>> GetSecurityLogsAsync([FromQuery] SecurityLogQueryInput input)
+    {
+        return await accountService.GetSecurityLogsAsync(input);
+    }
+
+    /// <summary>
+    /// 获取个人登录统计信息
     /// </summary>
     /// <returns></returns>
-    [HttpGet("userAuth")]
-    public async Task<UserAuthInfoOutput> GetUserAuthInfoAsync()
+    [HttpGet("security-logs/stats")]
+    public async Task<SecurityLogStatsDto> GetSecurityLogStatsAsync()
     {
-        var data = await accountService.GetUserAuthInfoAsync();
-        return data;
+        return await accountService.GetSecurityLogStatsAsync();
     }
 }

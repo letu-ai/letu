@@ -9,9 +9,11 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 新增用户
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        Task<Guid> AddUserAsync(UserCreateOrUpdateInput dto);
+        Task<Guid> AddUserAsync(UserCreateInput input);
+
+        Task<Guid> UpdateUserAsync(Guid id, UserUpdateInput input);
 
         /// <summary>
         /// 用户分页列表
@@ -61,6 +63,7 @@ namespace Letu.Basis.Admin.Users
         /// </summary>
         /// <param name="keyword">账号/昵称</param>
         /// <returns></returns>
-        Task<List<UserSimpleInfoDto>> GetUserSimpleInfosAsync(string? keyword);
+        Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword);
+        Task<List<SelectOption>> GetUserSelectOptionsByIdsAsync(List<Guid> userIds);
     }
 }

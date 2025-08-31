@@ -3,10 +3,12 @@ using Letu.Repository;
 using FreeSql;
 using System.Data;
 using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.Users;
 using Letu.Basis.Admin.Positions.Dtos;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -15,13 +17,15 @@ namespace Letu.Basis.Admin.Positions
         private readonly IFreeSqlRepository<Position> _positionRepository;
         private readonly IFreeSqlRepository<PositionGroup> _positionGroupRepository;
         private readonly IFreeSqlRepository<Employee> _employeeRepository;
+        private readonly IFreeSqlRepository<User> _userRepository;
 
         public PositionAppService(IFreeSqlRepository<Position> positionRepository, IFreeSqlRepository<PositionGroup> positionGroupRepository
-            , IFreeSqlRepository<Employee> employeeRepository)
+            , IFreeSqlRepository<Employee> employeeRepository, IFreeSqlRepository<User> userRepository)
         {
             _positionRepository = positionRepository;
             _positionGroupRepository = positionGroupRepository;
             _employeeRepository = employeeRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<bool> AddPositionGroupAsync(PositionGroupCreateOrUpdateInput dto)
@@ -49,7 +53,7 @@ namespace Letu.Basis.Admin.Positions
             var hasPositions = await _positionRepository.Select.AnyAsync(x => x.GroupId == id);
             if (hasPositions)
             {
-                throw new BusinessException(message: "分组下有职位，不能删除");
+                throw HttpFriendlyException.BadRequest("分组下有职位，不能删除");
             }
             await _positionGroupRepository.DeleteAsync(x => x.Id == id);
             return true;
@@ -70,7 +74,7 @@ namespace Letu.Basis.Admin.Positions
             var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
             if (dto.ParentId == entity.Id)
             {
-                throw new BusinessException(message: "不能选择自己为父级");
+                throw HttpFriendlyException.BadRequest("不能选择自己为父级");
             }
 
             entity.GroupName = dto.GroupName;
@@ -118,7 +122,7 @@ namespace Letu.Basis.Admin.Positions
         {
             if (_positionRepository.Select.Any(x => x.Code.ToLower() == dto.Code!.ToLower()))
             {
-                throw new BusinessException(message: "职位编号已存在");
+                throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
             }
             var entity = ObjectMapper.Map<PositionCreateOrUpdateInput, Position>(dto);
             await _positionRepository.InsertAsync(entity);
@@ -127,8 +131,8 @@ namespace Letu.Basis.Admin.Positions
 
         public async Task<bool> DeletePositionAsync(Guid id)
         {
-            var hasEmployees = await _employeeRepository.Select.AnyAsync(x => x.PositionId == id);
-            if (hasEmployees) throw new BusinessException(message: "职位正在使用，不能删除");
+            var hasUsers = await _userRepository.Select.AnyAsync(x => x.PositionId == id);
+            if (hasUsers) throw HttpFriendlyException.BadRequest("职位正在使用，不能删除");
             await _positionRepository.DeleteAsync(x => x.Id == id);
             return true;
         }
@@ -159,11 +163,11 @@ namespace Letu.Basis.Admin.Positions
         public async Task<bool> UpdatePositionAsync(Guid id, PositionCreateOrUpdateInput dto)
         {
             var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync()
-                ?? throw new BusinessException(message: "数据不存在");
+                ?? throw HttpFriendlyException.NotFound("数据不存在");
             string code = dto.Code!.ToLower();
             if (entity.Code.ToLower() != code && _positionRepository.Select.Any(x => x.Code.ToLower() == code))
             {
-                throw new BusinessException(message: "职位编号已存在");
+                throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
             }
 
             entity.Name = dto.Name;

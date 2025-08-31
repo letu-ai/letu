@@ -1,0 +1,92 @@
+import { Form, Input, Modal, Select } from 'antd';
+import { forwardRef, useImperativeHandle, useState } from 'react';
+import { assignRole, type AssignRoleDto, getUserRoleIds, type UserListOutput } from './-service';
+import { getRoleOptions } from '../roles/-service';
+import type { SelectOption } from '@/types/api';
+import useApp from 'antd/es/app/useApp';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface ModalProps {}
+
+export interface AssignRoleFormRef {
+  openModal: (row: UserListOutput) => void; // 定义 ref 的类型
+}
+
+const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [form] = Form.useForm();
+  const [roleOptions, setRoleOptions] = useState<SelectOption[]>([]);
+  const [currentRow, setCurrentRow] = useState<UserListOutput>();
+  const { message } = useApp();
+
+  useImperativeHandle(ref, () => ({
+    openModal,
+  }));
+
+  const openModal = (row: UserListOutput) => {
+    setCurrentRow(row);
+    form.setFieldValue('userName', row.userName);
+    form.setFieldValue('nickName', row.nickName);
+    getRoleOptions().then(async (roleRes) => {
+      setRoleOptions(roleRes);
+      const data = await getUserRoleIds(row.id);
+      form.setFieldsValue({
+        roleIds: data,
+      });
+    });
+
+    setIsOpenModal(true);
+  };
+
+  const onCancel = () => {
+    form.resetFields();
+    setIsOpenModal(false);
+  };
+
+  const onOk = () => {
+    form.submit();
+  };
+
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    setIsOpenModal(false);
+    form.resetFields();
+  };
+
+  const onFinish = async (values: AssignRoleDto) => {
+    await assignRole(currentRow!.id, values);
+    handleSuccess('分配成功');
+  };
+
+  return (
+    <Modal title="分配角色" open={isOpenModal} onCancel={onCancel} onOk={onOk} maskClosable={false} width="40%">
+      <Form<AssignRoleDto>
+        name="wrap"
+        labelCol={{ flex: '80px' }}
+        labelWrap
+        form={form}
+        wrapperCol={{ flex: 1 }}
+        colon={false}
+        onFinish={onFinish}
+        style={{ minHeight: '180px' }}
+      >
+        <Form.Item label="账号" name="userName">
+          <Input disabled />
+        </Form.Item>
+        <Form.Item label="昵称" name="nickName">
+          <Input disabled />
+        </Form.Item>
+        <Form.Item label="角色" name="roleIds">
+          <Select
+            mode="multiple"
+            style={{ width: '100%' }}
+            options={roleOptions}
+            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+          />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+});
+
+export default AssignRoleForm;

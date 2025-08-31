@@ -1,6 +1,4 @@
-using Letu.Shared.Enums;
-
-namespace Letu.Basis.Account.Dtos
+﻿namespace Letu.Basis.Account.Dtos
 {
     public class UserInfoUpdateInput
     {
@@ -13,10 +11,5 @@ namespace Letu.Basis.Account.Dtos
         /// 昵称
         /// </summary>
         public string? NickName { get; set; }
-
-        /// <summary>
-        /// 性别
-        /// </summary>
-        public SexType Sex { get; set; }
     }
 }

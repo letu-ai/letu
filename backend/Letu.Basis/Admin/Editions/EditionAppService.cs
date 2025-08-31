@@ -1,6 +1,7 @@
 using Letu.Basis.Admin.Editions.Dtos;
 using Letu.Basis.Admin.Tenants;
 using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Repository;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
@@ -31,7 +32,7 @@ namespace Letu.Basis.Admin.Editions
         {
             var exist = await _editionRepository.Select.Where(x => x.Name == dto.Name).AnyAsync();
             if (exist)
-                throw new BusinessException(message: "版本名称已存在");
+                throw HttpFriendlyException.BadRequest($"版本名称{dto.Name}已存在");
 
             var edition = ObjectMapper.Map<EditionCreateOrUpdateInput, Edition>(dto);
             var result = await _editionRepository.InsertAsync(edition);
@@ -92,13 +93,13 @@ namespace Letu.Basis.Admin.Editions
                 .FirstAsync();
 
             if (edition == null)
-                throw new BusinessException("版本不存在");
+                throw HttpFriendlyException.NotFound("版本不存在");
 
             var exist = await _editionRepository.Select
                 .Where(x => x.Name == input.Name && x.Id != id)
                 .AnyAsync();
             if (exist)
-                throw new BusinessException("版本名称已存在");
+                throw HttpFriendlyException.BadRequest($"版本名称{input.Name}已存在");
 
             ObjectMapper.Map(input, edition);
 
@@ -119,14 +120,14 @@ namespace Letu.Basis.Admin.Editions
                 .FirstAsync();
 
             if (edition == null)
-                throw new BusinessException("版本不存在");
+                throw HttpFriendlyException.NotFound("版本不存在");
 
             // 检查是否有租户使用此版本
             var hasTenants = await _tenantRepository.Select
                 .Where(t => t.EditionId == id)
                 .AnyAsync();
             if (hasTenants)
-                throw new BusinessException("此版本下有租户，无法删除");
+                throw HttpFriendlyException.BadRequest("此版本下有租户，无法删除");
 
             var result = await _editionRepository.DeleteAsync(x => x.Id == id);
 

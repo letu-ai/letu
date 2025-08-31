@@ -26,5 +26,33 @@ public class AccountSettingDefinitionProvider : SettingDefinitionProvider
                 "false",
                 isVisibleToClients: true)
         );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableMobileVerificationCodeLogin,
+                "false",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableEmailVerificationCodeLogin,
+                "false",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableMobileVerificationCodeRegistration,
+                "false",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableEmailVerificationCodeRegistration,
+                "false",
+                isVisibleToClients: true)
+        );
     }
 }

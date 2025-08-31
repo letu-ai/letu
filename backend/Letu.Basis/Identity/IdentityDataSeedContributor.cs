@@ -1,10 +1,10 @@
 ﻿using JetBrains.Annotations;
+using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Roles;
 using Letu.Basis.Admin.Users;
 using Letu.Core.Utils;
 using Letu.Repository;
 using Letu.Shared.Consts;
-using Letu.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
@@ -104,14 +104,12 @@ public class IdentityDataSeedContributor : IDataSeedContributor, ITransientDepen
             var hashedPassword = EncryptionUtils.CalcPasswordHash(adminPassword, passwordSalt);
 
             // 创建管理员用户
-            adminUser = new User(guidGenerator.Create())
+            adminUser = new User(guidGenerator.Create(), adminUserName)
             {
-                UserName = adminUserName,
-                Password = hashedPassword,
+                PasswordHash = hashedPassword,
                 PasswordSalt = passwordSalt,
                 NickName = adminUserName,
-                Avatar = AdminConsts.AvatarMale, // 默认使用男性头像
-                Sex = SexType.Male, // 默认性别
+                Avatar = AdminConsts.AvatarMale,
                 IsEnabled = true,
                 TenantId = tenantId,
             };

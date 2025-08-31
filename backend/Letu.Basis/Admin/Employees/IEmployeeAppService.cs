@@ -23,6 +23,7 @@ namespace Letu.Basis.Admin.Employees
         /// <summary>
         /// 修改员工
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<bool> UpdateEmployeeAsync(Guid id, EmployeeCreateOrUpdateInput dto);
@@ -34,12 +35,6 @@ namespace Letu.Basis.Admin.Employees
         /// <returns></returns>
         Task<bool> DeleteEmployeeAsync(Guid id);
 
-        /// <summary>
-        /// 绑定用户
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task EmployeeBindUserAsync(EmployeeBindUserDto dto);
 
         /// <summary>
         /// 获取员工信息
@@ -61,5 +56,19 @@ namespace Letu.Basis.Admin.Employees
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<List<DeptEmployeeTreeOutput>> GetDeptEmployeeTreeAsync(DeptEmployeeTreeInput dto);
+
+        /// <summary>
+        /// 获取员工选项（用于下拉选择）
+        /// </summary>
+        /// <param name="keyword">搜索关键字</param>
+        /// <returns></returns>
+        Task<List<EmployeeSelectOption>> GetEmployeeOptionsAsync(string? keyword);
+
+        /// <summary>
+        /// 根据用户ID批量获取员工信息（用于编辑时回显）
+        /// </summary>
+        /// <param name="userIds">用户ID列表</param>
+        /// <returns></returns>
+        Task<List<EmployeeSelectOption>> GetEmployeesByUserIdsAsync(List<Guid> userIds);
     }
 }

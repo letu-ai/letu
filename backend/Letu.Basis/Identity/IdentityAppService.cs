@@ -3,6 +3,7 @@ using Letu.Basis.Admin.Users;
 using Letu.Basis.Identity.Dtos;
 using Letu.Basis.Settings;
 using Letu.Basis.SharedService;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Identity.Jwt;
 using Letu.Core.Utils;
 using Letu.Repository;
@@ -18,6 +19,7 @@ using Volo.Abp.Guids;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Settings;
 using Volo.Abp.Users;
+using Volo.Abp.Validation;
 
 namespace Letu.Basis.Identity
 {
@@ -26,10 +28,9 @@ namespace Letu.Basis.Identity
         private readonly IGuidGenerator guidGenerator;
         private readonly JwtOptions jwtOptions;
         private readonly IFreeSqlRepository<User> _userRepository;
-        private readonly ILocalEventBus _localEventBus;
+        private readonly ILocalEventBus localEventBus;
         private readonly HttpContext _httpContext;
         private readonly IJwtAccessTokenProvider jwtAccessTokenProvider;
-        private readonly IdentitySharedService identitySharedService;
         private readonly IDistributedCache<string> accessTokenCache;
         private readonly IDistributedCache<string> refreshTokenCache;
         private readonly IDistributedCache<HashSet<string>> _userSessionIdsCache;
@@ -43,7 +44,6 @@ namespace Letu.Basis.Identity
             IHttpContextAccessor httpContextAccessor,
             IOptions<JwtOptions> jwtOptions,
             IJwtAccessTokenProvider jwtAccessTokenProvider,
-            IdentitySharedService identitySharedService,
             IDistributedCache<string> accessTokenCache,
             IDistributedCache<string> refreshTokenCache,
             IDistributedCache<HashSet<string>> userSessionIdsCache,
@@ -53,9 +53,8 @@ namespace Letu.Basis.Identity
             this.guidGenerator = guidGenerator;
             this.jwtOptions = jwtOptions.Value;
             this.jwtAccessTokenProvider = jwtAccessTokenProvider;
-            this.identitySharedService = identitySharedService;
             _userRepository = userRepository;
-            _localEventBus = localEventBus;
+            this.localEventBus = localEventBus;
             _httpContext = httpContextAccessor.HttpContext!;
             this.accessTokenCache = accessTokenCache;
             this.refreshTokenCache = refreshTokenCache;
@@ -82,10 +81,12 @@ namespace Letu.Basis.Identity
                     .FirstAsync();
 
                 if (user == null)
-                    throw new BusinessException(message: "账号或密码不存在");
+                    throw HttpFriendlyException.BadRequest("账号或密码错误。")
+                        .WithData("UserName", input.UserName);
 
-                if (user.Password != EncryptionUtils.CalcPasswordHash(input.Password, user.PasswordSalt))
-                    throw new BusinessException(message: "密码错误");
+                if (user.PasswordHash != EncryptionUtils.CalcPasswordHash(input.Password, user.PasswordSalt))
+                    throw HttpFriendlyException.BadRequest("账号或密码错误。")
+                        .WithData("UserName", input.UserName);
 
                 var sessionId = guidGenerator.Create().ToString("N");
 
@@ -113,7 +114,7 @@ namespace Letu.Basis.Identity
             {
                 loginLog.Address = RequestUtils.ResolveAddress(loginLog.Ip);
                 loginLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
-                await _localEventBus.PublishAsync(loginLog);
+                await localEventBus.PublishAsync(loginLog);
             }
         }
 
@@ -126,6 +127,14 @@ namespace Letu.Basis.Identity
             var sessionId = CurrentUser.GetSessionId();
 
             await LogoutAsync(userId, sessionId);
+            await localEventBus.PublishAsync(new SecurityLog
+            {
+                IsSuccess = true,
+                Ip = RequestUtils.GetIp(_httpContext),
+                OperationMsg = "注销成功",
+                UserName = CurrentUser.UserName
+            });
+
         }
 
         /// <summary>
@@ -139,7 +148,6 @@ namespace Letu.Basis.Identity
         {
             await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId));
             await refreshTokenCache.RemoveAsync(IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId));
-            await identitySharedService.RemoveUserPermissionCacheByUserIdAsync(userId);
         }
 
 
@@ -170,7 +178,7 @@ namespace Letu.Basis.Identity
             await using var handle = await distributedLock.TryAcquireAsync(nameof(IdentityAppService), TimeSpan.FromSeconds(10));
             if (handle == null)
             {
-                throw new BusinessException(message: "token刷新请求过于频繁，请稍后重试");
+                throw HttpFriendlyException.BadRequest("token刷新请求过于频繁，请稍后重试");
             }
 
             // 创建安全日志记录
@@ -186,15 +194,15 @@ namespace Letu.Basis.Identity
             try
             {
                 var existRefreshToken = await refreshTokenCache.GetAsync(IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId))
-                    ?? throw new BusinessException(message: "刷新token已过期");
+                    ?? throw HttpFriendlyException.BadRequest("刷新token已过期");
 
                 if (!refreshToken.Equals(existRefreshToken))
-                    throw new BusinessException(message: "刷新token不正确");
+                    throw HttpFriendlyException.BadRequest("刷新token不正确");
 
                 // 获取用户信息
                 var user = await _userRepository.Where(x => x.Id == userId).FirstAsync();
                 if (user == null)
-                    throw new BusinessException(message: "用户不存在");
+                    throw HttpFriendlyException.NotFound("用户不存在");
 
                 // 创建用户声明和生成令牌
                 var claims = await CreateUserClaims(user, sessionId);
@@ -220,7 +228,7 @@ namespace Letu.Basis.Identity
             {
                 securityLog.Address = RequestUtils.ResolveAddress(securityLog.Ip);
                 securityLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
-                await _localEventBus.PublishAsync(securityLog);
+                await localEventBus.PublishAsync(securityLog);
             }
         }
 

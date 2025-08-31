@@ -17,7 +17,7 @@ namespace Letu.Basis.Admin.Roles
         /// 部门ID
         /// </summary>
         [Column(IsPrimary = true, IsNullable = false)]
-        public Guid DeptId { get; set; }
+        public Guid DepartmentId { get; set; }
 
         /// <summary>
         /// 租户ID

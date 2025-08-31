@@ -1,4 +1,5 @@
 using Letu.Basis.Account.Dtos;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Account
 {
@@ -17,12 +18,19 @@ namespace Letu.Basis.Account
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<bool> UpdateUserPwdAsync(ChangePasswordInput dto);
+        Task<bool> ChangePasswordAsync(ChangePasswordInput dto);
 
         /// <summary>
-        /// 获取用户权限信息
+        /// 获取个人登录日志列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task<PagedResult<SecurityLogListDto>> GetSecurityLogsAsync(SecurityLogQueryInput input);
+
+        /// <summary>
+        /// 获取个人登录统计信息
         /// </summary>
         /// <returns></returns>
-        Task<UserAuthInfoOutput> GetUserAuthInfoAsync();
+        Task<SecurityLogStatsDto> GetSecurityLogStatsAsync();
     }
 }

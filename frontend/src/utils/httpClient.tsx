@@ -1,6 +1,5 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { getToken, refreshToken as updateToken } from '@/application/authUtils';
-import { refreshToken } from '@/pages/account/service';
+import { getToken, ensureTokenValid } from '@/utils/authUtils';
 
 interface IAbpFormatError {
     message: string;
@@ -18,7 +17,7 @@ export interface IResponseError {
     data?: any;
 }
 
-let codeMessage: Record<number, string> = {
+const codeMessage: Record<number, string> = {
     200: "服务器成功返回请求的数据。",
     201: "新建或修改数据成功。",
     202: "一个请求已经进入后台排队（异步任务）。",
@@ -40,7 +39,7 @@ const getStatusMessage = (status?: number): string => {
     if (!status)
         return "未知错误";
 
-    if (codeMessage.hasOwnProperty(status))
+    if (Object.prototype.hasOwnProperty.call(codeMessage, status))
         return codeMessage[status];
     else
         return `未知错误:[${status}]`;
@@ -127,7 +126,6 @@ class HttpClient {
     private readonly instance: AxiosInstance;
     allowAnonymousApis: string[] = ['/api/account/login']; //允许匿名访问接口
     refreshTokenWhiteApis: string[] = ['/api/account/refresh-token', '/api/account/logout']; //不需要刷新token接口
-    private refreshTokenPromise: Promise<any> | null = null; // 防止并发刷新token
     private errorHandler: (error: IResponseError) => void = () => { };
 
     constructor(config?: AxiosRequestConfig) {
@@ -139,61 +137,33 @@ class HttpClient {
                 if (config.url && this.allowAnonymousApis.includes(config.url)) {
                     return config;
                 }
-                //添加token - 从identityStore获取
-                const identityToken = getToken();
-                const token = identityToken?.accessToken;
-                const expired = identityToken?.expiredTime;
-                const now = new Date();
-                const expiredTime = expired ? new Date(expired) : null;
 
-                if (token && expiredTime && expiredTime.getTime() > now.getTime()) {
-                    config.headers.Authorization = `Bearer ${token}`;
-                    //过期时间小于10分钟进行刷新token
-                    const tenMinutesFromNow = new Date(now.getTime() + 10 * 60 * 1000);
-                    if (expiredTime.getTime() < tenMinutesFromNow.getTime()) {
-                        // 打印token剩余过期时间
-                        const leftSeconds = Math.floor((expiredTime.getTime() - now.getTime()) / 1000);
-                        console.log(`token剩余过期时间：${leftSeconds}秒（统一时间戳比较）`);
-                        //如果当前是刷新token接口就不调用，避免循环调用
-                        const refreshTokenValue = identityToken?.refreshToken;
-                        const currentUrl = config.url?.toLowerCase() || '';
-                        const isRefreshTokenApi = this.refreshTokenWhiteApis.some(
-                            (x) => currentUrl.endsWith(x.toLowerCase())
-                        );
+                // 检查是否为刷新token接口，避免循环调用
+                const currentUrl = config.url?.toLowerCase() || '';
+                const isRefreshTokenApi = this.refreshTokenWhiteApis.some(
+                    (x) => currentUrl.endsWith(x.toLowerCase())
+                );
 
-                        if (!isRefreshTokenApi && refreshTokenValue) {
-                            try {
-                                // 防止并发刷新token
-                                if (!this.refreshTokenPromise) {
-                                    this.refreshTokenPromise = refreshToken(refreshTokenValue)
-                                        .then((refreshTokenRes) => {
-                                            if (refreshTokenRes) {
-                                                // 保存到identityStore
-                                                updateToken(
-                                                    refreshTokenRes.accessToken,
-                                                    refreshTokenRes.refreshToken,
-                                                    refreshTokenRes.expiredTime,
-                                                );
-                                            }
-                                            return refreshTokenRes;
-                                        })
-                                        .finally(() => {
-                                            // 刷新完成后清除Promise，允许下次刷新
-                                            this.refreshTokenPromise = null;
-                                        });
-                                }
-                                await this.refreshTokenPromise;
-                            } catch (error) {
-                                if (axios.isAxiosError(error) && error.response?.status === 401) {
-                                    const errorInfo = await getErrorInfo(error);
-                                    this.errorHandler(errorInfo);
-                                }
-                                // 这里不再继续抛出错误，让请求继续进行
-                                // 当前请求会继续发送，但由于token已过期，会在响应拦截器中被捕获并处理
-                            }
+                // 非刷新token接口，确保token有效
+                if (!isRefreshTokenApi) {
+                    try {
+                        const isValid = await ensureTokenValid();
+                        if (!isValid) {
+                            // token无效，让响应拦截器处理401错误
+                            console.warn('Token validation failed');
                         }
+                    } catch (error) {
+                        console.error('Token validation error:', error);
+                        // 继续发送请求，让响应拦截器处理错误
                     }
                 }
+
+                // 添加当前有效的token到请求头
+                const token = getToken();
+                if (token?.accessToken) {
+                    config.headers.Authorization = `Bearer ${token.accessToken}`;
+                }
+
                 return config;
             },
             (error) => {
@@ -269,7 +239,7 @@ const defaultConfig: AxiosRequestConfig = {
     },
 };
 
-function getBaseUrl() {
+export function getBaseUrl() {
     const urlTemplate = import.meta.env.VITE_API_BASE_URL;
     const port = import.meta.env.VITE_API_BASE_PORT;
     return urlTemplate.replace(/{{port}}/g, port);

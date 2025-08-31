@@ -1,17 +1,23 @@
-﻿import { type ExceptionLogListDto, getExceptionLogList, handleException } from './service';
+import { type ExceptionLogListDto, getExceptionLogList, handleException } from './-service';
 import { Button, Collapse, Descriptions, Form, Input, Modal, Select, Space, Tag } from 'antd';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
 import { CheckCircleOutlined, ExclamationCircleFilled, FileTextOutlined } from '@ant-design/icons';
-import useApp from 'antd/es/app/useApp';
+import { App } from 'antd';
+import { createFileRoute } from '@tanstack/react-router';
 
-const BusinessLogList: React.FC = () => {
+
+export const Route = createFileRoute('/admin/loggings/exception')({
+  component: ExceptionLogList,
+});
+
+function ExceptionLogList() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [details, setDetails] = useState<ExceptionLogListDto | null>();
-  const { message, modal } = useApp();
+  const { message, modal } = App.useApp();
   const tableRef = useRef<SmartTableRef>(null);
-  const columns: SmartTableColumnType[] = [
+  const columns: SmartTableColumnType<ExceptionLogListDto>[] = [
     {
       title: '异常发生时间',
       dataIndex: 'creationTime',
@@ -207,4 +213,3 @@ const BusinessLogList: React.FC = () => {
   );
 };
 
-export default BusinessLogList;

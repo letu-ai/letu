@@ -3,6 +3,7 @@ using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.SharedService;
 using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Volo.Abp;
@@ -18,21 +19,18 @@ namespace Letu.Basis.Admin.Roles
         private readonly IFreeSqlRepository<Role> _roleRepository;
         private readonly IFreeSqlRepository<MenuInRole> _roleMenuRepository;
         private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
-        private readonly IdentitySharedService _identitySharedService;
         private readonly IDistributedEventBus eventBus;
 
         public RoleAppService(
             IFreeSqlRepository<Role> roleRepository,
             IFreeSqlRepository<MenuInRole> roleMenuRepository,
             IFreeSqlRepository<UserInRole> userRoleRepository,
-            IdentitySharedService identitySharedService,
             IDistributedEventBus eventBus
             )
         {
             _roleRepository = roleRepository;
             _roleMenuRepository = roleMenuRepository;
             _userRoleRepository = userRoleRepository;
-            _identitySharedService = identitySharedService;
             this.eventBus = eventBus;
         }
 
@@ -41,7 +39,7 @@ namespace Letu.Basis.Admin.Roles
             var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == dto.Name.ToLower());
             if (isExist)
             {
-                throw new BusinessException(message: "角色名已存在");
+                throw HttpFriendlyException.BadRequest($"角色名{dto.Name}已存在");
             }
             var entity = new Role
             {
@@ -52,42 +50,17 @@ namespace Letu.Basis.Admin.Roles
             return true;
         }
 
-        public async Task<bool> AssignMenuAsync(AssignMenuDto dto)
-        {
-            await _roleMenuRepository.DeleteAsync(x => x.RoleId == dto.RoleId);
-            if (dto.MenuIds != null)
-            {
-                var items = new List<MenuInRole>();
-                foreach (var item in dto.MenuIds)
-                {
-                    items.Add(new MenuInRole
-                    {
-                        RoleId = dto.RoleId,
-                        MenuId = item
-                    });
-                }
-                if (items.Count > 0)
-                {
-                    await _roleMenuRepository.InsertAsync(items);
-                }
-            }
-
-            await _identitySharedService.RemoveUserPermissionCacheByRoleIdAsync(dto.RoleId);
-            return true;
-        }
-
         public async Task<bool> DeleteRoleAsync(Guid id)
         {
             var hasUsers = await _userRoleRepository.Select.AnyAsync(x => x.RoleId == id);
-            if (hasUsers) throw new BusinessException(message: "角色已分配给用户，不能删除");
+            if (hasUsers) throw HttpFriendlyException.BadRequest("角色已分配给用户，不能删除");
 
             var role = await _roleRepository.Where(x => x.Id == id).FirstAsync();
             if (role.Name == AdminConsts.SuperAdminRole)
             {
-                throw new BusinessException(message: $"{role.Name}不能删除");
+                throw HttpFriendlyException.BadRequest($"{role.Name}不能删除");
             }
             await _roleRepository.DeleteAsync(x => x.Id == id);
-            await _identitySharedService.RemoveUserPermissionCacheByRoleIdAsync(id);
 
             var roleDeleteEto = new EntityDeletedEto<RoleEto>(new RoleEto()
             {
@@ -129,11 +102,11 @@ namespace Letu.Basis.Admin.Roles
             var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == input.Name.ToLower());
             if (entity.Name.ToLower() != input.Name.ToLower() && isExist)
             {
-                throw new BusinessException(message: "角色名已存在");
+                throw HttpFriendlyException.BadRequest($"角色名{input.Name}已存在");
             }
             if (entity.Name == AdminConsts.SuperAdminRole)
             {
-                throw new BusinessException(message: $"{entity.Name}不允许编辑");
+                throw HttpFriendlyException.BadRequest($"{entity.Name}不允许编辑");
             }
 
             RoleNameChangedEto? roleNameChangedEto = null;
@@ -158,7 +131,7 @@ namespace Letu.Basis.Admin.Roles
 
             if (!entity.IsEnabled)
             {
-                await _identitySharedService.RemoveUserPermissionCacheByRoleIdAsync(entity.Id);
+                // TODO: 禁用角色时发出Event通知？
             }
             return true;
         }

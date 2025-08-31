@@ -1,5 +1,6 @@
 ﻿using Letu.Basis.Admin.DataDictionary.Dtos;
 using Letu.Core.Applications;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
@@ -29,7 +30,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
     {
         if (await _dictTypeRepository.Select.AnyAsync(x => x.DictType.ToLower() == dto.DictType.ToLower()))
         {
-            throw new BusinessException(message: "字典类型已存在");
+            throw HttpFriendlyException.BadRequest($"字典类型{dto.DictType}已存在");
         }
 
         var entity = new DictionaryType
@@ -86,7 +87,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
             
         if (!entity.DictType.Equals(input.DictType, StringComparison.CurrentCultureIgnoreCase) && await _dictTypeRepository.Select.AnyAsync(x => x.DictType.ToLower() == input.DictType.ToLower()))
         {
-            throw new BusinessException(message: "字典类型已存在");
+            throw HttpFriendlyException.BadRequest($"字典类型{input.DictType}已存在");
         }
 
         ObjectMapper.Map(input, entity);
@@ -122,7 +123,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == dto.Value.ToLower());
         if (isExist)
         {
-            throw new BusinessException(message: "字典值已存在");
+            throw HttpFriendlyException.BadRequest($"字典值{dto.Value}已存在");
         }
         var entity = ObjectMapper.Map<ItemCreateOrUpdateInput, DictionaryItem>(dto);
         await _dictDataRepository.InsertAsync(entity);
@@ -134,7 +135,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
     public async Task<bool> DeleteDictDataAsync(Guid[] ids)
     {
         var entity = await _dictDataRepository.Where(x => ids.Contains(x.Id)).FirstAsync()
-            ?? throw new BusinessException(message: "数据不存在");
+            ?? throw HttpFriendlyException.NotFound("数据不存在");
         await _dictDataRepository.DeleteAsync(entity);
 
         operationLogManager.Current?.AddVariable("ids", string.Join(',', ids));
@@ -162,7 +163,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         var isExist = await _dictDataRepository.Select.AnyAsync(x => x.Value.ToLower() == input.Value.ToLower());
         if (entity.Value.ToLower() != input.Value.ToLower() && isExist)
         {
-            throw new BusinessException(message: "字典值已存在");
+            throw HttpFriendlyException.BadRequest($"字典值{input.Value}已存在");
         }
         ObjectMapper.Map(input, entity);
         await _dictDataRepository.UpdateAsync(entity);

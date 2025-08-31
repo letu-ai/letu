@@ -10,14 +10,6 @@
 
 /** ================================ 覆盖antdpro样式结束 ================================ */
 
-/** 行高样式10-100px */
-@for $i from 10 through 100 {
-  .line-height-#{$i} {
-    line-height: #{$i}px;
-  }
-}
-
-
 .letu-table-wrapper {
   .ant-table-cell .ant-btn-link {
     padding-left: 0 !important;
@@ -29,95 +21,6 @@
     button {
       padding: 0 !important;
     }
-  }
-}
-
-.letu-layout {
-  .letu-sidebar {
-    min-height: 100vh;
-  }
-
-  //侧边栏标题
-  .sidebar-header {
-    height: 50px; // 严格限定高度
-    padding: 0 20px;
-    background: linear-gradient(135deg, #7E57C2 0%, #9575CD 100%);
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-    // 紫色波纹装饰
-    &::after {
-      content: '';
-      position: absolute;
-      right: -30px;
-      top: -30px;
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 50%;
-    }
-
-    h2 {
-      margin: 0;
-      color: white;
-      font-size: 18px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      width: 100%;
-      white-space: nowrap;
-
-      .header-icon {
-        font-size: 22px;
-        margin-right: 10px;
-        flex-shrink: 0;
-      }
-
-      .header-icon-center {
-        margin: 0 auto;
-      }
-    }
-
-    // 悬停动画
-    &:hover::after {
-      transform: scale(1.1);
-      transition: transform 0.3s ease;
-    }
-  }
-
-  .letu-navbar {
-    border-bottom: 1px solid #f0f0f0;
-    background-color: #ffffff;
-
-    button.ant-btn {
-      height: 50px !important;
-      border-radius: 0 !important;
-    }
-
-    .letu-navbar-breadcrumb-wrapper {
-      nav {
-        line-height: 50px !important;
-      }
-    }
-
-    .letu-navbar-right-wrapper {
-      button.ant-btn {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-      }
-    }
-  }
-
-  .letu-tabs {
-    background-color: #ffffff;
-  }
-
-  main {
-    padding: 15px;
-    background-color: #f5f5f5;
   }
 }
 
@@ -160,8 +63,4 @@
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(126, 87, 194, 0.3);
   }
-}
-
-.icon-info:hover {
-  color: #000000;
 }

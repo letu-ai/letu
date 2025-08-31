@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 import ExternalFrame from '@/components/ExternalFrame';
 
 const ExternalWrapper = () => {

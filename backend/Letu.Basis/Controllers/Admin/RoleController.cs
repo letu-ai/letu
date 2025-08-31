@@ -74,20 +74,6 @@ namespace Letu.Basis.Controllers.Admin
         }
 
         /// <summary>
-        /// 分配菜单
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("{id:Guid}/menus")]
-        [ApiAccessLog(operateName: "分配菜单权限", operateType: [OperateType.Update], reponseEnable: true)]
-        public async Task AssignMenuAsync(Guid id, [FromBody] AssignMenuDto dto)
-        {
-            dto.RoleId = id; // 确保角色ID一致
-            await _roleService.AssignMenuAsync(dto);
-        }
-
-        /// <summary>
         /// 获取角色选项
         /// </summary>
         /// <returns></returns>

@@ -1,5 +1,6 @@
 using FreeSql;
 using Letu.Basis.Admin.Menus.Dtos;
+using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Utils;
 using Letu.Repository;
 using Volo.Abp;
@@ -32,17 +33,17 @@ namespace Letu.Basis.Admin.Menus
         {
             if (dto.MenuType == MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
             {
-                throw new BusinessException(message: "菜单的路由不能为空");
+                throw HttpFriendlyException.BadRequest("菜单的路由不能为空");
             }
             if (dto.IsExternal && !StringUtils.IsValidUrlStrict(dto.Path))
             {
-                throw new BusinessException(message: "外链地址不合法");
+                throw HttpFriendlyException.BadRequest("外链地址不合法");
             }
 
             var isExist = await menuRepository.Select.AnyAsync(x => x.Path != null && dto.Path != null && x.Path.ToLower() == dto.Path.ToLower());
             if (isExist)
             {
-                throw new BusinessException(message: $"已存在【{dto.Path}】菜单路由");
+                throw HttpFriendlyException.BadRequest($"已存在【{dto.Path}】菜单路由");
             }
 
             var entity = ObjectMapper.Map<MenuItemCreateOrUpdateInput, MenuItem>(dto);
@@ -56,23 +57,23 @@ namespace Letu.Basis.Admin.Menus
         {
             if (input.MenuType == MenuType.Menu && string.IsNullOrWhiteSpace(input.Path))
             {
-                throw new BusinessException(message: "菜单的路由不能为空");
+                throw HttpFriendlyException.BadRequest("菜单的路由不能为空");
             }
             if (input.IsExternal && !StringUtils.IsValidUrlStrict(input.Path))
             {
-                throw new BusinessException(message: "外链地址不合法");
+                throw HttpFriendlyException.BadRequest("外链地址不合法");
             }
 
             var isExist = await menuRepository.Select.AnyAsync(x => x.Path != null && input.Path != null && x.Path.ToLower() == input.Path.ToLower());
-            var entity = await menuRepository.Where(x => x.Id == id).FirstAsync() ?? throw new BusinessException(message: "数据不存在");
+            var entity = await menuRepository.Where(x => x.Id == id).FirstAsync() ?? throw HttpFriendlyException.NotFound("数据不存在");
             if (isExist && entity.Path != null && input.Path!.ToLower() != entity.Path.ToLower())
             {
-                throw new BusinessException(message: $"已存在【{input.Path}】菜单路由");
+                throw HttpFriendlyException.BadRequest($"已存在【{input.Path}】菜单路由");
             }
             // TODO: 增加菜单层级检查
             if (input.ParentId == entity.Id)
             {
-                throw new BusinessException(message: "不能选择自己为父级");
+                throw HttpFriendlyException.BadRequest("不能选择自己为父级");
             }
 
             ObjectMapper.Map(input, entity);

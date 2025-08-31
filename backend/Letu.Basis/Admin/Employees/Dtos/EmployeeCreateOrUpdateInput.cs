@@ -1,5 +1,4 @@
-using Letu.Shared.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Letu.Basis.Admin.Employees.Dtos
@@ -29,13 +28,6 @@ namespace Letu.Basis.Admin.Employees.Dtos
         [Required]
         public SexType Sex { get; set; }
 
-        /// <summary>
-        /// 手机号码
-        /// </summary>
-        [NotNull]
-        [Required]
-        [MaxLength(16)]
-        public string? Phone { get; set; }
 
         /// <summary>
         /// 身份证
@@ -66,12 +58,6 @@ namespace Letu.Basis.Admin.Employees.Dtos
         [StringLength(512)]
         public string? Address { get; set; }
 
-        /// <summary>
-        /// 邮箱
-        /// </summary>
-        [StringLength(64)]
-        [EmailAddress]
-        public string? Email { get; set; }
 
         /// <summary>
         /// 入职时间
@@ -88,29 +74,8 @@ namespace Letu.Basis.Admin.Employees.Dtos
         /// </summary>
         public int Status { get; set; }
 
-        /// <summary>
-        /// 关联用户ID
-        /// </summary>
-        public Guid? UserId { get; set; }
 
-        /// <summary>
-        /// 部门ID
-        /// </summary>
-        public Guid? DeptId { get; set; }
 
-        /// <summary>
-        /// 职位ID
-        /// </summary>
-        public Guid? PositionId { get; set; }
 
-        /// <summary>
-        /// 是否同时添加用户
-        /// </summary>
-        public bool IsAddUser { get; set; }
-
-        /// <summary>
-        /// 用户密码
-        /// </summary>
-        public string? UserPassword { get; set; }
     }
 }
