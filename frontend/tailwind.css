@@ -1,27 +1,44 @@
-@layer reset, base, components, theme, utilities;
+@layer reset, theme, base, antd, components, utilities;
 
-@import "tailwindcss";
-
+@import "tailwindcss/theme.css" layer(theme);
+/* @import "tailwindcss/preflight.css" layer(base); */
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "antd/dist/reset.css" layer(antd);
 
 @theme {
  
-  --color-primary: #7E57C2;  /* 主色调 */
+  --color-primary: #7E57C2;  /* 品牌主色 colorPrimary */
+  --color-primary-bg: #F5F3FF;  /* 主色浅色背景色 colorPrimaryBg */
+  --color-primary-bg-hover: #EDE7F6;  /* 主色浅色背景悬浮态 colorPrimaryBgHover */
+  --color-primary-border: #D1C4E9;  /* 主色描边色 colorPrimaryBorder */
+  --color-primary-border-hover: #B39DDB;  /* 主色描边色悬浮态 colorPrimaryBorderHover */
+  --color-primary-hover: #9575CD;  /* 主色悬浮态 colorPrimaryHover */
+  --color-primary-active: #673AB7;  /* 主色激活态 colorPrimaryActive */
+  --color-primary-text: #7E57C2;  /* 主色文本 colorPrimaryText */
+  --color-primary-text-hover: #9575CD;  /* 主色文本悬浮态 colorPrimaryTextHover */
+  --color-primary-text-active: #673AB7;  /* 主色文本激活态 colorPrimaryTextActive */
+  
   --color-link: #7E57C2;
+  --color-link-hover: #d7cce6;
+  --color-link-active: #7156a6;
+  
   --color-success: #3CB371;
   --color-warning: #ffcd30;
   --color-error: #dc3545;
   --color-background: #FFFFFF;
-  --color-text: #4A4A4A;
+  --color-text: rgba(0,0,0,0.88);   /* 主文本色 */
+  --color-text-secondary: rgba(0,0,0,0.65); /* 次文本色 */
+  --color-text-muted: rgba(0,0,0,0.45); /* 弱文本色 */
+  --color-text-disabled: rgba(0,0,0,0.25); /* 禁用文本色 */
   
-  /* Antd错误色相关变量 */
-  --color-antd-error: var(--color-error);
-  --color-antd-error-bg: var(--color-error-bg);
-  --color-antd-error-bg-hover: var(--color-error-bg-hover);
-  --color-antd-error-border: var(--color-error-border);
-  --color-antd-error-border-hover: var(--color-error-border-hover);
-  --color-antd-error-hover: var(--color-error-hover);
-  --color-antd-error-active: var(--color-error-active);
-  --color-antd-error-text-hover: var(--color-error-text-hover);
-  --color-antd-error-text: var(--color-error-text);
-  --color-antd-error-text-active: var(--color-error-text-active);
+  /* Antd错误色相关变量 - 提供默认值，App.tsx会动态覆盖 */
+  --color-error-bg: #fff2f0;
+  --color-error-bg-hover: #fff1f0;
+  --color-error-border: #ffccc7;
+  --color-error-border-hover: #ffa39e;
+  --color-error-hover: #ff7875;
+  --color-error-active: #d9363e;
+  --color-error-text-hover: #ff7875;
+  --color-error-text: #ff4d4f;
+  --color-error-text-active: #d9363e;
 }

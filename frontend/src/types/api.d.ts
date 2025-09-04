@@ -11,6 +11,7 @@ export type PagedResultRequest = {
 export type SelectOption = {
   label: string;
   value: string;
+  disabled?: boolean;
 };
 
 export type TreeSelectOption = {
@@ -18,4 +19,5 @@ export type TreeSelectOption = {
   title: string;
   value: string;
   children?: TreeSelectOption[];
+  disabled?: boolean;
 };

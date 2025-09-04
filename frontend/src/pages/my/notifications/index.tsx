@@ -6,7 +6,7 @@ import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTabl
 import SmartTable from '@/components/SmartTable';
 import { App } from 'antd';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { clientConnection } from '@/utils/clientConnection';
+import { clientConnection } from '@/application/clientConnection';
 import { formatTimeFromNow } from "@/utils/timeUtils";
 
 export const Route = createFileRoute('/my/notifications/')({
@@ -90,11 +90,11 @@ function NotificationList() {
 
     useEffect(() => {
         // 监听新通知
-        clientConnection.registerMessageHandler('notification', handleNewNotification);
+        clientConnection.on('notification', handleNewNotification);
 
         // 组件卸载时清理监听器
         return () => {
-            clientConnection.unregisterMessageHandler('notification', handleNewNotification);
+            clientConnection.off('notification', handleNewNotification);
         };
     }, [handleNewNotification]);
 

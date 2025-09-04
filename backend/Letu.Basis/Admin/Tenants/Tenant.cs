@@ -1,6 +1,5 @@
 ﻿using FreeSql.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Letu.Basis.Admin.Tenants
@@ -11,11 +10,12 @@ namespace Letu.Basis.Admin.Tenants
         /// <summary>
         /// 租户名称
         /// </summary>
-        [NotNull]
-        [Required]
-        [StringLength(64)]
-        [Column(IsNullable = false)]
-        public string? Name { get; set; }
+        [Column(IsNullable = false, StringLength = 64)]
+        public required string Name { get; set; }
+
+
+        [Column(IsNullable = false, StringLength = 64)]
+        public required string NormalizedName { get; set; }
 
         /// <summary>
         /// 备注

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { requireAuth } from '@/utils/authUtils'
 
 import { Outlet } from '@tanstack/react-router';
@@ -9,7 +9,7 @@ import ErrorFallback from '@/components/ErrorFallback';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useEffect } from 'react';
 import useLayoutStore from '@/application/layoutStore';
-import Application from '@/components/Application';
+import { AppConfigProvider, loadConfiguration } from '@/components/AppConfigProvider';
 import Navbar from '@/components/layout/Navbar';
 
 export const Route = createFileRoute('/home')({
@@ -17,6 +17,26 @@ export const Route = createFileRoute('/home')({
     beforeLoad: async ({ location }) => {
         requireAuth(location);
     },
+    loader: async () => {
+        const config = await loadConfiguration("app")
+        return {
+            config
+        }
+    },
+    staleTime: 1000 * 60 * 30, // 30分钟过期
+    errorComponent: ({ error }) => {
+        const router = useRouter();
+        
+        const handleRetry = () => {
+            router.invalidate();
+        };
+
+        return (
+            <div className='h-screen'>
+                <ErrorFallback error={error} resetErrorBoundary={handleRetry} />
+            </div>
+        )
+    }
 })
 
 
@@ -24,6 +44,8 @@ const { Content, Sider } = Layout;
 
 
 function AppLayout() {
+    const { config } = Route.useLoaderData()
+
     const collapsed = useLayoutStore(state => state.collapsed);
     const toggleCollapsed = useLayoutStore(state => state.toggleCollapsed);
     const isMinScreen = useMediaQuery({ maxWidth: '768px' });
@@ -37,7 +59,7 @@ function AppLayout() {
 
 
     return (
-        <Application app="app">
+        <AppConfigProvider config={config}>
             <Layout hasSider>
                 <Sider trigger={null} collapsible collapsed={collapsed}>
                     <Sidebar />
@@ -52,6 +74,6 @@ function AppLayout() {
                     <FloatButton.BackTop />
                 </Layout>
             </Layout>
-        </Application>
+        </AppConfigProvider>
     );
 }

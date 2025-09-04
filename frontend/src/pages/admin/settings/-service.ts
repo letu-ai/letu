@@ -57,7 +57,12 @@ export function sendTestEmail(data: ISendTestEmailInput): Promise<void> {
 export interface IAccountSettings {
     // Account
     isSelfRegistrationEnabled?: boolean;
-    enableLocalLogin?: boolean;
+    enableUserNameRegistration?: boolean;
+    enableEmailRegistration?: boolean;
+    enablePhoneNumberRegistration?: boolean;
+    enableUserNameLogin?: boolean;
+    enableEmailLogin?: boolean;
+    enablePhoneNumberLogin?: boolean;
     allowPasswordRecovery?: boolean;
     
     // Password
@@ -95,3 +100,34 @@ export function updateAccountSettings(data: IAccountSettings): Promise<void> {
     return httpClient.post<IAccountSettings, void>("/api/admin/setting-management/account", data);
 }
 
+export interface ISiteSettings {
+    title: string;
+    favicon: string;
+    logo: string;
+    logoText: string;
+    copyright: string;
+    icp: string;
+    description: string;
+    keywords: string;
+    primaryColor: string;
+}
+
+export function fetchSiteSettings(): Promise<ISiteSettings> {
+    return httpClient.get<void, ISiteSettings>("/api/admin/setting-management/site");
+}
+
+export function updateSiteSettings(data: ISiteSettings): Promise<void> {
+    return httpClient.post<ISiteSettings, void>("/api/admin/setting-management/site", data);
+}
+
+export interface IAmapSettings {
+    apiKey: string | null;
+}
+
+export function fetchAmapSettings(): Promise<IAmapSettings> {
+    return httpClient.get<void, IAmapSettings>("/api/admin/setting-management/amap");
+}
+
+export function updateAmapSettings(data: IAmapSettings): Promise<void> {
+    return httpClient.post<IAmapSettings, void>("/api/admin/setting-management/amap", data);
+}

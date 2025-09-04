@@ -7,6 +7,7 @@ import useLayoutStore from '@/application/layoutStore';
 import UserInfo from './UserInfo';
 import SizeChanger from './SizeChanger';
 import NavBreadcrumb from './NavBreadcrumb';
+import ThemeChanger from './ThemeChanger';
 
 
 
@@ -37,7 +38,8 @@ const Navbar = () => {
                     <UserNotification />
                     {/** 尺寸 */}
                     <SizeChanger />
-                    
+                    {/** 主题 */}
+                    <ThemeChanger />
                     <Button type="text" className="" onClick={searchModalRef?.current?.openModal}>
                         <ProIcon icon="antd:SearchOutlined" />
                     </Button>

@@ -11,6 +11,8 @@ public class TreeSelectOption<T> where T : TreeSelectOption<T>
 
     public string? Parent;
 
+    public bool Disabled { get; set; }
+
     /// <summary>
     /// 子集
     /// </summary>

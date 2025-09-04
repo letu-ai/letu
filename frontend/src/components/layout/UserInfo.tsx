@@ -1,13 +1,13 @@
 import { Avatar, Button, Card, Dropdown, Typography, type MenuProps } from 'antd';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import useAppConfigStore from '@/application/appConfigStore';
+import { useAppConfig } from '@/components/AppConfigProvider';
 import { Link} from '@tanstack/react-router';
 
 
 const { Text } = Typography
 
 export function UserInfo() {
-    const user = useAppConfigStore(state => state.currentUser);
+    const { currentUser: user } = useAppConfig();
 
     const menuItems: MenuProps["items"] = [
         {

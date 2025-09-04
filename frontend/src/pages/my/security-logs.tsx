@@ -7,8 +7,8 @@ import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTabl
 import {
     getSecurityLogs,
     getSecurityLogStats,
-    type SecurityLogListDto,
-    type SecurityLogQueryDto,
+    type ISecurityLogListOutput,
+    type ISecurityLogListInput,
     type SecurityLogStatsDto
 } from './-service';
 import { formatTime } from '@/utils/timeUtils';
@@ -30,7 +30,7 @@ function SecurityLogsPage() {
     });
     const [loadingStats, setLoadingStats] = useState(true);
 
-    const columns: SmartTableColumnType<SecurityLogListDto>[] = [
+    const columns: SmartTableColumnType<ISecurityLogListOutput>[] = [
         {
             title: '登录时间',
             dataIndex: 'creationTime',
@@ -170,7 +170,7 @@ function SecurityLogsPage() {
                 columns={columns}
                 rowKey="id"
                 size="small"
-                request={async (params: SecurityLogQueryDto) => {
+                request={async (params: ISecurityLogListInput) => {
                     try {
                         const data = await getSecurityLogs(params);
                         return data;

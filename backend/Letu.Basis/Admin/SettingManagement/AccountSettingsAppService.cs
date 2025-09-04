@@ -25,7 +25,12 @@ public class AccountSettingsAppService : BasisAppService, IAccountSettingsAppSer
         {
             // Account
             IsSelfRegistrationEnabled = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.IsSelfRegistrationEnabled)),
-            EnableLocalLogin = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnableLocalLogin)),
+            EnableUserNameRegistration = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnableUserNameRegistration)),
+            EnableEmailRegistration = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnableEmailRegistration)),
+            EnablePhoneNumberRegistration = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnablePhoneNumberRegistration)),
+            EnableUserNameLogin = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnableUserNameLogin)),
+            EnableEmailLogin = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnableEmailLogin)),
+            EnablePhoneNumberLogin = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.EnablePhoneNumberLogin)),
             AllowPasswordRecovery = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(AccountSettingNames.AllowPasswordRecovery)),
 
             // Password
@@ -59,7 +64,22 @@ public class AccountSettingsAppService : BasisAppService, IAccountSettingsAppSer
         await CheckFeatureAsync();
 
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.IsSelfRegistrationEnabled, input.IsSelfRegistrationEnabled.ToString());
-        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableLocalLogin, input.EnableLocalLogin.ToString());
+        if (input.IsSelfRegistrationEnabled)
+        {
+            await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableUserNameRegistration, input.EnableUserNameRegistration.ToString());
+            await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableEmailRegistration, input.EnableEmailRegistration.ToString());
+            await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnablePhoneNumberRegistration, input.EnablePhoneNumberRegistration.ToString());
+        }
+        else
+        {
+            await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableUserNameRegistration, false.ToString());
+            await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableEmailRegistration, false.ToString());
+            await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnablePhoneNumberRegistration, false.ToString());
+        }
+
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableUserNameLogin, input.EnableUserNameLogin.ToString());
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnableEmailLogin, input.EnableEmailLogin.ToString());
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.EnablePhoneNumberLogin, input.EnablePhoneNumberLogin.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AccountSettingNames.AllowPasswordRecovery, input.AllowPasswordRecovery.ToString());
 
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.Password.RequiredLength, input.PasswordRequiredLength.ToString());
@@ -78,7 +98,7 @@ public class AccountSettingsAppService : BasisAppService, IAccountSettingsAppSer
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.RequireConfirmedEmail, input.SignInRequireConfirmedEmail.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.EnablePhoneNumberConfirmation, input.SignInEnablePhoneNumberConfirmation.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.RequireConfirmedPhoneNumber, input.SignInRequireConfirmedPhoneNumber.ToString());
-        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.AllowMultipleLogin, input.SignInAllowMultipleLogin.ToString()); 
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.AllowMultipleLogin, input.SignInAllowMultipleLogin.ToString());
 
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.User.IsUserNameUpdateEnabled, input.IsUserNameUpdateEnabled.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.User.IsEmailUpdateEnabled, input.IsEmailUpdateEnabled.ToString());

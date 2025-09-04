@@ -56,8 +56,8 @@ namespace Letu.Basis.Admin.Users
         /// 昵称
         /// </summary>
         [Required]
-        [StringLength(64)]
-        [Column(IsNullable = false, StringLength = 64)]
+        [StringLength(32)]
+        [Column(IsNullable = false, StringLength = 32)]
         public required string NickName { get; set; }
 
 

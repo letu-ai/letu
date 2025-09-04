@@ -1,7 +1,6 @@
 ﻿using Letu.Basis.Admin.PermissionManagement.Identity;
 using Letu.Basis.Filters;
 using Letu.Basis.Localization;
-using Letu.Basis.Middlewares;
 using Letu.Basis.Permissions;
 using Letu.Core.Helpers;
 using Letu.Core.MultiTenancy;
@@ -9,9 +8,7 @@ using Letu.Job;
 using Letu.Logging;
 using Letu.ObjectStorage;
 using Letu.Repository;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MQTTnet.AspNetCore;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -80,13 +77,6 @@ namespace Letu.Basis
                 mvcBuilder.AddApplicationPartIfNotExists(GetType().Assembly);
             });
 
-            services.AddHostedMqttServer(
-                optionsBuilder =>
-                {
-                    optionsBuilder.WithDefaultEndpoint();
-                });
-            services.AddMqttConnectionHandler();
-
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add<HttpRequestValidationFilter>();
@@ -96,6 +86,13 @@ namespace Letu.Basis
             // services.AddSingleton<IAuthorizationMiddlewareResultHandler, IdentityMiddlewareResultHandler>();
 
             services.AddHostedService<PreparationHostService>();
+
+            // 配置高德地图 HttpClient
+            services.AddHttpClient("amap", client =>
+            {
+                client.BaseAddress = new Uri("https://restapi.amap.com");
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
 
             SnowflakeHelper.Init(short.Parse(configuration["Snowflake:WorkerId"]!), short.Parse(configuration["Snowflake:DataCenterId"]!));
         }

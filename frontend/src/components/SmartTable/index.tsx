@@ -21,7 +21,15 @@ const defaultPagination: TablePaginationConfig =
 
 const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
     <T extends object = any>(props: SmartTableProps<T>, ref: ForwardedRef<SmartTableRef>) => {
-        const { columns, selection = false, params, extraContent, pagination: paginationProps, ...restProps } = props;
+        const {
+            columns,
+            selection = false,
+            params,
+            extraContent,
+            pagination: paginationProps,
+            dataSource: dataSourceProps,
+            ...restProps
+        } = props;
         const [form] = Form.useForm();
         const [loading, setLoading] = useState(false);
         const [queryParams, setQueryParams] = useState({
@@ -29,7 +37,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
             pageSize: 10,
         });
         const [total, setTotal] = useState<number>(0);
-        const [dataSource, setDataSource] = useState<T[]>([]);
+        const [dataSource, setDataSource] = useState<readonly T[]>(dataSourceProps ?? []);
         const size = useLayoutStore(state => state.size);
         const [tableSize, setTableSize] = useState(props.size);
         const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -41,6 +49,10 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                 form.setFieldValue(field, value);
             },
         }));
+
+        useEffect(() => {
+            setDataSource(dataSourceProps ?? []);
+        }, [dataSourceProps]);
 
         useEffect(() => {
             setTableSize(size);
@@ -74,10 +86,6 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                 setTotal(result.totalCount);
                 setDataSource(result.items);
                 setLoading(false);
-            } else {
-                if (Array.isArray(props.dataSource)) {
-                    setDataSource(props.dataSource);
-                }
             }
         };
 

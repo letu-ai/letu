@@ -124,7 +124,7 @@ public static class BasisPermissions
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
         public const string BindUser = Default + ".BindUser";
- 
+
     }
 
     public static class Position
@@ -137,6 +137,18 @@ public static class BasisPermissions
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
         public const string BindEmployee = Default + ".BindEmployee";
+    }
+
+    public static class Region
+    {
+        /// <summary>
+        /// 行政区域管理
+        /// </summary>
+        public const string Default = BaseDataGroupName + ".Region";
+        public const string Create = Default + ".Create";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+        public const string Import = Default + ".Import";
     }
 
     public static class Notification
@@ -175,6 +187,17 @@ public static class BasisPermissions
         /// 时区设置
         /// </summary>
         public const string TimeZone = Default + ".TimeZone";
+
+        /// <summary>
+        /// 网站设置
+        /// </summary>
+        public const string Site = Default + ".Site";
+
+        /// <summary>
+        /// 高德地图设置
+        /// </summary>
+        public const string Amap = Default + ".Amap";
+
     }
 
     public static class Feature

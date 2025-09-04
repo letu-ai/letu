@@ -6,7 +6,7 @@ import {
     readed,
     type UserNotificationNavbarItemDto,
 } from '@/pages/my/notifications/-service';
-import { clientConnection } from '@/utils/clientConnection';
+import { clientConnection } from '@/application/clientConnection';
 import useApp from 'antd/es/app/useApp';
 import { CheckOutlined, EyeOutlined } from '@ant-design/icons';
 import { formatTimeFromNow } from '@/utils/timeUtils';
@@ -24,6 +24,8 @@ const UserNotification = () => {
         getMyNotificationNavbarInfo().then((data) => {
             setNotifications(data.items ?? []);
             setUnreadCount(data.noReadedCount);
+        }).catch((error) => {
+            console.error('获取通知失败:', error);
         });
     };
 
@@ -43,11 +45,11 @@ const UserNotification = () => {
             });
         };
 
-        clientConnection.registerMessageHandler('notification', handleNewNotification);
+        clientConnection.on('notification', handleNewNotification);
 
         // 组件卸载时清理监听器
         return () => {
-            clientConnection.unregisterMessageHandler('notification', handleNewNotification);
+            clientConnection.off('notification', handleNewNotification);
         };
     }, [notification]);
 
@@ -164,7 +166,7 @@ const UserNotification = () => {
                     <ProIcon icon="antd:BellOutlined" />
                 </Button>
                 {unreadCount > 0 && (
-                    <div className="absolute top-1 -right-1 min-w-[16px] h-[16px] bg-antd-error text-white rounded-full flex items-center justify-center text-xs font-light">
+                    <div className="absolute top-1 -right-1 min-w-[16px] h-[16px] bg-error text-white rounded-full flex items-center justify-center text-xs">
                         {unreadCount > 99 ? '99+' : unreadCount}
                     </div>
                 )}

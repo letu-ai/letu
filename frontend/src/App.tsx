@@ -1,5 +1,5 @@
 import zhCN from 'antd/locale/zh_CN';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 import { useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import useThemeStore from '@/application/themeStore';
@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import httpClient from './utils/httpClient';
 import ResponseErrorMessage from './utils/ResponseErrorMessage';
 import { StaticRoutes } from './utils/globalValue';
+import { StyleProvider } from '@ant-design/cssinjs';
 
 interface IAppProps {
     children: React.ReactNode;
@@ -22,37 +23,57 @@ const App = ({ children }: IAppProps) => {
     const size = useLayoutStore(state => state.size);
 
     return (
-        <ConfigProvider locale={zhCN} componentSize={size} theme={themeConfig}>
-            <QueryClientProvider client={queryClient}>
-                <AntApp>
-                    <InnerApp>{children}</InnerApp>
-                </AntApp>
-            </QueryClientProvider>
-        </ConfigProvider >
+        <StyleProvider layer>
+            <ConfigProvider locale={zhCN} componentSize={size} theme={themeConfig}>
+                <QueryClientProvider client={queryClient}>
+                    <AntApp>
+                        <InnerApp>{children}</InnerApp>
+                    </AntApp>
+                </QueryClientProvider>
+            </ConfigProvider >
+        </StyleProvider>
     )
 }
 
+const { useToken } = theme;
 
 function InnerApp({ children }: IAppProps) {
-    const themeConfig = useThemeStore(state => state.theme);
+    const { token } = useToken();
     const appStyle = useMemo(() => ({
-        '--color-primary': themeConfig.token?.colorPrimary,
-        "--color-link": themeConfig.token?.colorLink,
-        "--color-success": themeConfig.token?.colorSuccess,
-        "--color-warning": themeConfig.token?.colorWarning,
-        "--color-error": themeConfig.token?.colorError,
-        "--color-background": themeConfig.token?.colorBgBase,
-        "--color-text": themeConfig.token?.colorText,
-        '--color-error-bg': themeConfig.token?.colorErrorBg,
-        '--color-error-bg-hover': themeConfig.token?.colorErrorBgHover,  
-        '--color-error-border': themeConfig.token?.colorErrorBorder,
-        '--color-error-border-hover': themeConfig.token?.colorErrorBorderHover,
-        '--color-error-hover': themeConfig.token?.colorErrorHover,
-        '--color-error-active': themeConfig.token?.colorErrorActive,
-        '--color-error-text-hover': themeConfig.token?.colorErrorTextHover,
-        '--color-error-text': themeConfig.token?.colorErrorText,
-        '--color-error-text-active': themeConfig.token?.colorErrorTextActive,
-    } as React.CSSProperties), [themeConfig]);
+        '--color-primary': token.colorPrimary,
+        "--color-primary-bg": token.colorPrimaryBg,
+        "--color-primary-bg-hover": token.colorPrimaryBgHover,
+        "--color-primary-border": token.colorPrimaryBorder,
+        "--color-primary-border-hover": token.colorPrimaryBorderHover,
+        "--color-primary-hover": token.colorPrimaryHover,
+        "--color-primary-active": token.colorPrimaryActive,
+        "--color-primary-text": token.colorPrimaryText,
+        "--color-primary-text-hover": token.colorPrimaryTextHover,
+        "--color-primary-text-active": token.colorPrimaryTextActive,
+
+        "--color-link": token.colorLink,
+        "--color-link-hover": token.colorLinkHover,
+        "--color-link-active": token.colorLinkActive,
+
+        "--color-success": token.colorSuccess,
+        "--color-warning": token.colorWarning,
+        "--color-error": token.colorError,
+        "--color-background": token.colorBgBase,
+        "--color-text": token.colorText,
+        "--color-text-secondary": token.colorTextSecondary,
+        "--color-text-muted": token.colorTextTertiary,
+        "--color-text-disabled": token.colorTextQuaternary,
+
+        '--color-error-bg': token.colorErrorBg,
+        '--color-error-bg-hover': token.colorErrorBgHover,
+        '--color-error-border': token.colorErrorBorder,
+        '--color-error-border-hover': token.colorErrorBorderHover,
+        '--color-error-hover': token.colorErrorHover,
+        '--color-error-active': token.colorErrorActive,
+        '--color-error-text-hover': token.colorErrorTextHover,
+        '--color-error-text': token.colorErrorText,
+        '--color-error-text-active': token.colorErrorTextActive,
+    } as React.CSSProperties), [token]);
     const { message } = AntApp.useApp();
     useEffect(() => {
         httpClient.setErrorHandler((errorInfo) => {

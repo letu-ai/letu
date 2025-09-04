@@ -105,7 +105,7 @@ src/
 - 常量文件使用 `-constants.ts` 后缀
 
 #### 状态管理架构
-- **全局应用状态**：使用Zustand (`appConfigStore`, `layoutStore`, `themeStore`)
+- **全局应用状态**：使用Zustand (`layoutStore`, `themeStore`)
 - **服务端状态**：使用TanStack Query管理API数据
 - **组件状态**：优先使用React useState
 - **表单状态**：使用Ant Design Form组件

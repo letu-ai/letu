@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import ProIcon from '@/components/ProIcon';
 import { HomeOutlined } from '@ant-design/icons';
 import useLayoutStore from '@/application/layoutStore';
-import useAppConfigStore from '@/application/appConfigStore';
+import { useAppConfig } from '@/components/AppConfigProvider';
 import type { INavigationMenuDto } from '@/application/types';
 import type { MenuItemType, SubMenuType } from 'antd/es/menu/interface';
 import { cn } from '@/utils/cssUtils';
@@ -80,12 +80,12 @@ function convertToAntdMenuItems(menus: INavigationMenuDto[]): MenuItem[] {
 function getSelectedKeyFromItems(pathname: string, items: MenuItem[]): string | null {
     for (const item of items) {
         const key = item.key as string;
-        
+
         // 精确匹配或路径包含匹配
         if (pathname === key || pathname.startsWith(key + '/')) {
             return key;
         }
-        
+
         // 递归检查子菜单
         if ('children' in item && item.children) {
             const found = getSelectedKeyFromItems(pathname, item.children as MenuItem[]);
@@ -97,17 +97,17 @@ function getSelectedKeyFromItems(pathname: string, items: MenuItem[]): string | 
 
 function getOpenKeysFromItems(selectedKey: string, items: MenuItem[]): string[] {
     const openKeys: string[] = [];
-    
+
     const findPath = (targetKey: string, menuItems: MenuItem[], currentPath: string[] = []): boolean => {
         for (const item of menuItems) {
             const key = item.key as string;
             const newPath = [...currentPath, key];
-            
+
             if (key === targetKey) {
                 openKeys.push(...currentPath);
                 return true;
             }
-            
+
             if ('children' in item && item.children) {
                 if (findPath(targetKey, item.children as MenuItem[], newPath)) {
                     return true;
@@ -116,7 +116,7 @@ function getOpenKeysFromItems(selectedKey: string, items: MenuItem[]): string[] 
         }
         return false;
     };
-    
+
     findPath(selectedKey, items);
     return openKeys;
 }
@@ -126,18 +126,35 @@ interface ISidebarProps {
     menu?: MenuItem[];
 }
 
+interface ILogoProps {
+    logo?: string;
+    collapsed: boolean;
+}
+
+function Logo({ logo, collapsed }: ILogoProps) {
+    if (logo && logo !== '') {
+        return <img src={logo} className={cn('text-2xl pr-1 ', collapsed ? 'mx-auto' : '')} />
+    } else {
+        return <HomeOutlined className={cn('text-2xl pr-1 ', collapsed ? 'mx-auto' : '')} />
+    }
+}
+
 const Sidebar = ({ className, menu: propMenu }: ISidebarProps) => {
     const collapsed = useLayoutStore(state => state.collapsed);
-    const storeMenu = useAppConfigStore(state => state.menu);
+    const { menu: storeMenu, getSetting } = useAppConfig();
     const location = useLocation();
-    
+    const logo = getSetting("Letu.Application.Site.Logo");
+    const logoText = getSetting("Letu.Application.Site.LogoText");
+
     // 用户手动操作的展开状态
     const [userOpenKeys, setUserOpenKeys] = useState<string[]>([]);
-    
+    // 记录用户手动关闭的菜单项
+    const [userClosedKeys, setUserClosedKeys] = useState<Set<string>>(new Set());
+
     const calcItems = useMemo(() => {
         return propMenu || convertToAntdMenuItems(storeMenu);
     }, [propMenu, storeMenu]);
-    
+
     // 根据当前路由计算选中的菜单项
     const selectedKeys = useMemo(() => {
         if (propMenu) {
@@ -150,12 +167,12 @@ const Sidebar = ({ className, menu: propMenu }: ISidebarProps) => {
             return selectedKey ? [selectedKey] : [];
         }
     }, [location.pathname, propMenu, storeMenu]);
-    
+
     // 根据选中菜单项计算需要展开的菜单
     const autoOpenKeys = useMemo(() => {
         const selectedKey = selectedKeys[0];
         if (!selectedKey) return [];
-        
+
         if (propMenu) {
             // 使用自定义菜单时，从菜单项中计算展开状态
             return getOpenKeysFromItems(selectedKey, propMenu);
@@ -164,16 +181,38 @@ const Sidebar = ({ className, menu: propMenu }: ISidebarProps) => {
             return getOpenMenuKeys(selectedKey, storeMenu);
         }
     }, [selectedKeys, propMenu, storeMenu]);
-    
-    // 合并自动展开和用户手动展开的菜单
+
+    // 合并自动展开和用户手动展开的菜单，同时排除用户手动关闭的菜单
     const openKeys = useMemo(() => {
-        const allOpenKeys = new Set([...autoOpenKeys, ...userOpenKeys]);
+        const allOpenKeys = new Set([
+            // 包含自动展开但用户未手动关闭的菜单
+            ...autoOpenKeys.filter(key => !userClosedKeys.has(key)),
+            // 包含用户手动展开的菜单
+            ...userOpenKeys,
+        ]);
         return Array.from(allOpenKeys);
-    }, [autoOpenKeys, userOpenKeys]);
-    
+    }, [autoOpenKeys, userOpenKeys, userClosedKeys]);
+
     // 处理菜单展开/收起
     const handleOpenChange: MenuProps['onOpenChange'] = (keys) => {
-        setUserOpenKeys(keys as string[]);
+        const newKeys = keys as string[];
+        setUserOpenKeys(newKeys);
+
+        // 计算用户手动关闭的菜单
+        const newUserClosedKeys = new Set(userClosedKeys);
+
+        // 检查哪些自动展开的菜单现在被关闭了
+        autoOpenKeys.forEach(key => {
+            if (!newKeys.includes(key)) {
+                // 如果自动展开的菜单在新的keys中不存在，说明用户手动关闭了它
+                newUserClosedKeys.add(key);
+            } else {
+                // 如果用户重新打开了之前关闭的菜单，从关闭集合中移除
+                newUserClosedKeys.delete(key);
+            }
+        });
+
+        setUserClosedKeys(newUserClosedKeys);
     };
 
     return (
@@ -181,16 +220,15 @@ const Sidebar = ({ className, menu: propMenu }: ISidebarProps) => {
             <div className="h-16 bg-primary">
                 <Link to="/">
                     <h2 className="flex items-center h-full px-4 text-white text-xl font-semibold">
-                        <HomeOutlined className={'text-2xl pr-1 header-icon' + (collapsed ? ' header-icon-center' : '')} />
-                        {!collapsed && <span>乐途管理系统</span>}
+                        <Logo logo={logo} collapsed={collapsed} />
+                        {!collapsed && <span className="whitespace-nowrap overflow-hidden">{logoText}</span>}
                     </h2>
                 </Link>
             </div>
 
-            <Menu 
-                className='bg-gray-200' 
-                mode="inline" 
-                items={calcItems} 
+            <Menu
+                mode="inline"
+                items={calcItems}
                 inlineCollapsed={collapsed}
                 selectedKeys={selectedKeys}
                 openKeys={openKeys}

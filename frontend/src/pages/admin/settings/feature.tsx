@@ -21,7 +21,7 @@ function Feature() {
 
 return (
     <div>
-        <p style={{ marginBottom: 16 }}>点击管理主站功能参数</p>
+        <p className="mb-4">点击管理主站功能参数</p>
         <Button 
             type="primary" 
             icon={<SettingOutlined />} 
@@ -30,7 +30,7 @@ return (
             设置主站功能
         </Button>
 
-        <p style={{ fontSize: 12, color: '#666', marginTop: 8 }}>要设置租户功能参数，请在租户列表中操作。</p>
+        <p className="text-sm text-gray-500 mt-2">要设置租户功能参数，请在租户列表中操作。</p>
 
         {open && <FeatureEditor providerName="T"  onClose={handleClose} />}
 

@@ -16,7 +16,7 @@ public class OnlineUserAppService : BasisAppService, IOnlineUserAppService
     private readonly IFreeSqlRepository<SecurityLog> _loginLogRepository;
     private readonly IFreeSqlRepository<User> _userRepository;
     private readonly IDistributedCache<string> _accessTokenCache;
-
+    
     public OnlineUserAppService(IFreeSqlRepository<SecurityLog> loginLogRepository, IFreeSqlRepository<User> userRepository, IDistributedCache<string> accessTokenCache)
     {
         _loginLogRepository = loginLogRepository;

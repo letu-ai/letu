@@ -15,7 +15,42 @@ public class AccountSettingDefinitionProvider : SettingDefinitionProvider
 
         context.Add(
             new SettingDefinition(
-                AccountSettingNames.EnableLocalLogin,
+                AccountSettingNames.EnableUserNameRegistration,
+                "true",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableEmailRegistration,
+                "true",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnablePhoneNumberRegistration,
+                "true",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableUserNameLogin,
+                "true",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnableEmailLogin,
+                "true",
+                isVisibleToClients: true)
+        );
+
+        context.Add(
+            new SettingDefinition(
+                AccountSettingNames.EnablePhoneNumberLogin,
                 "true",
                 isVisibleToClients: true)
         );
@@ -23,35 +58,7 @@ public class AccountSettingDefinitionProvider : SettingDefinitionProvider
         context.Add(
             new SettingDefinition(
                 AccountSettingNames.AllowPasswordRecovery,
-                "false",
-                isVisibleToClients: true)
-        );
-
-        context.Add(
-            new SettingDefinition(
-                AccountSettingNames.EnableMobileVerificationCodeLogin,
-                "false",
-                isVisibleToClients: true)
-        );
-
-        context.Add(
-            new SettingDefinition(
-                AccountSettingNames.EnableEmailVerificationCodeLogin,
-                "false",
-                isVisibleToClients: true)
-        );
-
-        context.Add(
-            new SettingDefinition(
-                AccountSettingNames.EnableMobileVerificationCodeRegistration,
-                "false",
-                isVisibleToClients: true)
-        );
-
-        context.Add(
-            new SettingDefinition(
-                AccountSettingNames.EnableEmailVerificationCodeRegistration,
-                "false",
+                "true",
                 isVisibleToClients: true)
         );
     }

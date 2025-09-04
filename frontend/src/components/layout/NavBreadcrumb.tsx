@@ -1,4 +1,4 @@
-import useAppConfigStore from '@/application/appConfigStore';
+import { useAppConfig } from '@/components/AppConfigProvider';
 import type { INavigationMenuDto } from '@/application/types';
 import { useLocation } from '@tanstack/react-router';
 import { Breadcrumb } from 'antd';
@@ -28,7 +28,7 @@ const findMenuById = (menus: INavigationMenuDto[], targetId: string): INavigatio
 };
 
 function NavBreadcrumb() {
-    const menu = useAppConfigStore(state => state.menu);
+    const { menu } = useAppConfig();
     const location = useLocation();
 
     const breadcrumbItems = useMemo((): { title: string }[] => {

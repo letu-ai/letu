@@ -1,22 +1,21 @@
 using Letu.Basis.Admin.Loggings.Dtos;
 using Letu.Core.Applications;
 using Letu.Repository;
-using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Loggings
 {
     public class SecurityLogAppService : BasisAppService, ISecurityLogAppService
     {
-        private readonly IFreeSqlRepository<SecurityLog> _loginLogRepository;
+        private readonly IFreeSqlRepository<SecurityLog> securityLogRepository;
 
-        public SecurityLogAppService(IFreeSqlRepository<SecurityLog> loginLogRepository)
+        public SecurityLogAppService(IFreeSqlRepository<SecurityLog> securityLogRepository)
         {
-            _loginLogRepository = loginLogRepository;
+            this.securityLogRepository = securityLogRepository;
         }
 
         public async Task<PagedResult<LoginLogListDto>> GetLoginLogListAsync(LoginLogQueryDto dto)
         {
-            var rows = await _loginLogRepository.Select
+            var rows = await securityLogRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
                 .WhereIf(dto.Status == 1, x => x.IsSuccess)
                 .WhereIf(dto.Status == 2, x => !x.IsSuccess)

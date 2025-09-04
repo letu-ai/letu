@@ -6,7 +6,17 @@ public class AccountSettingsDto
     // Account * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     public bool IsSelfRegistrationEnabled { get; set; }
 
-    public bool EnableLocalLogin { get; set; }
+    public bool EnableUserNameRegistration { get; set; }
+
+    public bool EnableEmailRegistration { get; set; }
+
+    public bool EnablePhoneNumberRegistration { get; set; }
+
+    public bool EnableUserNameLogin { get; set; }
+
+    public bool EnableEmailLogin { get; set; }
+
+    public bool EnablePhoneNumberLogin { get; set; }
 
     public bool AllowPasswordRecovery { get; set; }
 

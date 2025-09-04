@@ -1,5 +1,5 @@
 import { Modal, Menu, Input, Switch, Button, Select, message, Form, Spin } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { type IFeature, type IFeatureGroup, fetchFeatureGroups, updateFeature, deleteFeature } from "./service";
 import { StringValueTypes } from "@/application/string-values";
 
@@ -23,7 +23,7 @@ function FeatureEditor({ providerName, providerKey, onClose }: IFeatureEditorPro
     }
 
     // 获取feature groups数据
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const result = await fetchFeatureGroups(providerName, providerKey);
@@ -36,12 +36,12 @@ function FeatureEditor({ providerName, providerKey, onClose }: IFeatureEditorPro
         } finally {
             setLoading(false);
         }
-    }
+    }, [providerName, providerKey]);
 
     // 初始化数据
     useEffect(() => {
         fetchData();
-    }, [fetchData, providerName, providerKey]);
+    }, [fetchData]);
 
     const groupItems = useMemo(() => {
         if (groups === undefined) {

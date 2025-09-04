@@ -26,7 +26,7 @@ const Position: React.FC = () => {
       title: '职位职级',
       dataIndex: 'level',
       render: (text: number) => {
-        return <DataDictionarySelect dictType={DictType.PositionLevel} value={text.toString()} isPlainText />;
+        return <DataDictionarySelect dictName={DictType.PositionLevel} value={text.toString()} isPlainText />;
       },
     },
     {
@@ -117,7 +117,7 @@ const Position: React.FC = () => {
           </Form.Item>,
           <Form.Item label="职级" name="level">
             <DataDictionarySelect
-              dictType={DictType.PositionLevel}
+              dictName={DictType.PositionLevel}
               placeholder="请选择职位职级"
               style={{
                 width: '150px',

@@ -1,11 +1,13 @@
 import { Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { addUser, updateUser, type ICreateUserInput, type IUpdateUserInput, type UserListOutput } from './-service';
-import { Patterns } from '@/utils/globalValue';
 import useApp from 'antd/es/app/useApp';
 import DepartmentSelect from '@/components/DepartmentSelect';
 import PositionSelect from '@/components/PositionSelect';
 import EmployeeSelect from '@/components/EmployeeSelect';
+import { useAppConfig } from '@/components/AppConfigProvider';
+import { generatePasswordRules, type PasswordConfig } from '@/utils/passwordUtils';
+import { Patterns } from '@/utils/globalValue';
 
 interface ModalProps {
     refresh?: () => void; // 定义 props 的类型
@@ -20,6 +22,17 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [form] = Form.useForm();
     const { message } = useApp();
     const [row, setRow] = useState<UserListOutput | null>();
+    const { getSettingInt, getSettingBoolean } = useAppConfig();
+    
+    // 获取密码配置
+    const passwordConfig: PasswordConfig = {
+        requiredLength: getSettingInt('Letu.Identity.Password.RequiredLength') || 8,
+        requiredUniqueChars: getSettingInt('Letu.Identity.Password.RequiredUniqueChars') || 1,
+        requireNonAlphanumeric: getSettingBoolean('Letu.Identity.Password.RequireNonAlphanumeric') || false,
+        requireLowercase: getSettingBoolean('Letu.Identity.Password.RequireLowercase') || false,
+        requireUppercase: getSettingBoolean('Letu.Identity.Password.RequireUppercase') || false,
+        requireDigit: getSettingBoolean('Letu.Identity.Password.RequireDigit') || false,
+    };
 
     useImperativeHandle(ref, () => ({
         openModal,
@@ -99,11 +112,8 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         }
     };
 
-    const pwdPatternValidateItem = {
-        pattern: Patterns.LoginPassword,
-        message: '密码至少有一个字母和数字，长度6-16位，特殊字符 "~`!@#$%^&*()_-+={[}]|\\:;\\"\'<,>.?/',
-    };
-
+    // 生成密码验证规则
+    const passwordRules = generatePasswordRules(passwordConfig);
     const isEdit = !!row?.id;
 
     return (
@@ -129,7 +139,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     </Form.Item>
                 )}
                 {!isEdit && (
-                    <Form.Item label="密码" name="password" rules={[{ required: true }, pwdPatternValidateItem]}>
+                    <Form.Item label="密码" name="password" rules={passwordRules}>
                         <Input.Password placeholder="请输入密码" />
                     </Form.Item>
                 )}

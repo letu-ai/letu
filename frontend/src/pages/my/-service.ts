@@ -6,16 +6,16 @@ import type { PagedResult, PagedResultRequest } from '@/types/api';
 /**
  * 获取个人信息
  */
-export function getPersonalInfo() {
-  return httpClient.get<unknown, PersonalInfoDto>('/api/account/info');
+export function getProfile() {
+    return httpClient.get<void, IProfileOutput>('/api/my/profile');
 }
 
 /**
  * 修改个人基本信息
  * @param info
  */
-export function updatePersonalInfo(info: PersonalInfoUpdateDto) {
-  return httpClient.put<PersonalInfoUpdateDto, void>('/api/account/updateInfo', info);
+export function updateProfile(info: IProfileUpdateInput) {
+    return httpClient.put<IProfileUpdateInput, void>('/api/my/profile', info);
 }
 
 /**
@@ -23,91 +23,88 @@ export function updatePersonalInfo(info: PersonalInfoUpdateDto) {
  * @param file
  */
 export function uploadAvatar(file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-  return httpClient.post<FormData, { url: string }>('/api/oss/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return httpClient.post<FormData, string>('/api/my/profile/avatar', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 }
 
-export interface PersonalInfoDto {
-  avatar?: string;
-  nickName?: string;
-  sex?: number;
-  phone?: string;
-  email?: string;
-  userName?: string;
+export interface IProfileOutput {
+    nickName: string;
+    avatar?: string;
+    phone?: string;
+    email?: string;
 }
 
-export interface PersonalInfoUpdateDto {
-  avatar?: string;
-  nickName?: string;
-  sex?: number;
+export interface IProfileUpdateInput {
+    nickName: string;
+    avatar?: string;
 }
 
 // ========================= 密码相关 =========================
 
 /**
  * 修改个人密码
- * @param dto
+ * @param input
  */
-export function changePassword(dto: ChangePasswordDto) {
-  return httpClient.put<ChangePasswordDto, void>('/api/account/updatePwd', dto);
+export function changePassword(input: IChangePasswordInput) {
+    return httpClient.put<IChangePasswordInput, void>('/api/my/profile/change-password', input);
 }
 
-export interface ChangePasswordDto {
-  oldPassword: string;
-  newPassword: string;
+export interface IChangePasswordInput {
+    oldPassword: string;
+    newPassword: string;
 }
 
 // ========================= 登录日志相关 =========================
 
 /**
  * 获取个人登录日志列表
- * @param dto
+ * @param input
  */
-export function getSecurityLogs(dto: SecurityLogQueryDto) {
-  return httpClient.get<SecurityLogQueryDto, PagedResult<SecurityLogListDto>>(
-    '/api/account/security-logs',
-    {
-      params: dto,
-    }
-  );
+export function getSecurityLogs(input: ISecurityLogListInput) {
+    return httpClient.get<ISecurityLogListInput, PagedResult<ISecurityLogListOutput>>(
+        '/api/my/profile/security-logs',
+        {
+            params: input,
+        }
+    );
 }
 
 /**
  * 获取登录统计信息
  */
 export function getSecurityLogStats() {
-  return httpClient.get<unknown, SecurityLogStatsDto>('/api/account/security-logs/stats');
+    return httpClient.get<void, ISecurityLogStatsOutput>('/api/my/profile/security-logs/stats');
 }
 
-export interface SecurityLogQueryDto extends PagedResultRequest {
-  startDate?: string;
-  endDate?: string;
-  isSuccess?: boolean;
-  ip?: string;
+export interface ISecurityLogListInput extends PagedResultRequest {
+    startDate?: string;
+    endDate?: string;
+    isSuccess?: boolean;
+    ip?: string;
 }
 
-export interface SecurityLogListDto {
-  id: string;
-  ip: string;
-  location?: string;
-  browser?: string;
-  os?: string;
-  device?: string;
-  isSuccess: boolean;
-  operationMsg?: string;
-  creationTime: string;
+export interface ISecurityLogListOutput {
+    id: string;
+    ip: string;
+    location?: string;
+    browser?: string;
+    os?: string;
+    device?: string;
+    isSuccess: boolean;
+    operationMsg?: string;
+    creationTime: string;
 }
 
-export interface SecurityLogStatsDto {
-  todayLoginCount: number;
-  recentLoginIp?: string;
-  abnormalLoginCount: number;
-  totalLoginCount: number;
+export interface ISecurityLogStatsOutput {
+    todayLoginCount: number;
+    recentLoginIp?: string;
+    abnormalLoginCount: number;
+    totalLoginCount: number;
 }
 
 // ========================= 通知相关（从notifications/-service.ts迁移） =========================
@@ -117,29 +114,29 @@ export interface SecurityLogStatsDto {
  * @param ids 通知ID数组
  */
 export function markNotificationsRead(ids: string[]) {
-  return httpClient.put<string[], void>('/api/my/notification/mark-as-read', ids);
+    return httpClient.put<string[], void>('/api/my/notification/mark-as-read', ids);
 }
 
 /**
  * 我的通知分页列表
- * @param dto
+ * @param input
  */
-export function getMyNotificationList(dto: UserNotificationQueryDto) {
-  return httpClient.get<UserNotificationQueryDto, PagedResult<MyNotificationListDto>>(
-    '/api/my/notification',
-    {
-      params: dto,
-    }
-  );
+export function getMyNotificationList(input: IUserNotificationListInput) {
+    return httpClient.get<IUserNotificationListInput, PagedResult<IMyNotificationListOutput>>(
+        '/api/my/notification',
+        {
+            params: input,
+        }
+    );
 }
 
 /**
  * 我的通知顶部导航信息
  */
 export function getMyNotificationNavbarInfo() {
-  return httpClient.get<unknown, UserNotificationNavbarDto>(
-    '/api/my/notification/navbar-info'
-  );
+    return httpClient.get<void, IUserNotificationNavbarOutput>(
+        '/api/my/notification/navbar-info'
+    );
 }
 
 /**
@@ -147,38 +144,38 @@ export function getMyNotificationNavbarInfo() {
  * @param id 通知ID
  */
 export function getNotificationDetail(id: string) {
-  return httpClient.get<unknown, MyNotificationListDto>(
-    `/api/my/notification/${id}`
-  );
+    return httpClient.get<void, IMyNotificationListOutput>(
+        `/api/my/notification/${id}`
+    );
 }
 
-export interface MyNotificationListDto {
-  id: string;
-  title: string;
-  content: string | null;
-  isReaded: boolean;
-  creationTime: string;
-  readedTime: string;
+export interface IMyNotificationListOutput {
+    id: string;
+    title: string;
+    content: string | null;
+    isReaded: boolean;
+    creationTime: string;
+    readedTime: string;
 }
 
-export interface UserNotificationQueryDto extends PagedResultRequest {
-  title?: string;
-  isReaded?: boolean;
+export interface IUserNotificationListInput extends PagedResultRequest {
+    title?: string;
+    isReaded?: boolean;
 }
 
-export interface UserNotificationNavbarDto {
-  noReadedCount: number;
-  items: UserNotificationNavbarItemDto[];
+export interface IUserNotificationNavbarOutput {
+    noReadedCount: number;
+    items: IUserNotificationNavbarItemOutput[];
 }
 
-export interface UserNotificationNavbarItemDto {
-  id: string;
-  title: string;
-  content: string | null;
-  isReaded: boolean;
-  creationTime: string;
+export interface IUserNotificationNavbarItemOutput {
+    id: string;
+    title: string;
+    content: string | null;
+    isReaded: boolean;
+    creationTime: string;
 }
 
-export interface NotificationMessageData {
-  notificationId: string;
+export interface INotificationMessageData {
+    notificationId: string;
 }

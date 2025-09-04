@@ -18,10 +18,9 @@ import { Route as HomeIndexRouteImport } from './pages/home/index'
 import { Route as MySecurityLogsRouteImport } from './pages/my/security-logs'
 import { Route as MyProfileRouteImport } from './pages/my/profile'
 import { Route as MyPasswordRouteImport } from './pages/my/password'
-import { Route as AdminSettingsRouteImport } from './pages/admin/settings'
-import { Route as AccountProfileRouteImport } from './pages/account/profile'
 import { Route as AccountLogoutRouteImport } from './pages/account/logout'
 import { Route as AccountLoginRouteImport } from './pages/account/login'
+import { Route as AdminSettingsRouteRouteImport } from './pages/admin/settings/route'
 import { Route as MyNotificationsIndexRouteImport } from './pages/my/notifications/index'
 import { Route as HomeTestIndexRouteImport } from './pages/home/test/index'
 import { Route as AdminUsersIndexRouteImport } from './pages/admin/users/index'
@@ -29,6 +28,7 @@ import { Route as AdminTenantsIndexRouteImport } from './pages/admin/tenants/ind
 import { Route as AdminSettingsIndexRouteImport } from './pages/admin/settings/index'
 import { Route as AdminScheduledTasksIndexRouteImport } from './pages/admin/scheduled-tasks/index'
 import { Route as AdminRolesIndexRouteImport } from './pages/admin/roles/index'
+import { Route as AdminRegionsIndexRouteImport } from './pages/admin/regions/index'
 import { Route as AdminPositionsIndexRouteImport } from './pages/admin/positions/index'
 import { Route as AdminOrganizationUnitsIndexRouteImport } from './pages/admin/organization-units/index'
 import { Route as AdminOnlineUsersIndexRouteImport } from './pages/admin/online-users/index'
@@ -40,8 +40,10 @@ import { Route as AdminDepartmentsIndexRouteImport } from './pages/admin/departm
 import { Route as AdminDataDictionariesIndexRouteImport } from './pages/admin/data-dictionaries/index'
 import { Route as MyNotificationsIdRouteImport } from './pages/my/notifications/$id'
 import { Route as AdminSettingsTimezoneRouteImport } from './pages/admin/settings/timezone'
+import { Route as AdminSettingsSiteRouteImport } from './pages/admin/settings/site'
 import { Route as AdminSettingsFeatureRouteImport } from './pages/admin/settings/feature'
 import { Route as AdminSettingsEmailingRouteImport } from './pages/admin/settings/emailing'
+import { Route as AdminSettingsAmapRouteImport } from './pages/admin/settings/amap'
 import { Route as AdminSettingsAccountRouteImport } from './pages/admin/settings/account'
 import { Route as AdminPositionsGroupsRouteImport } from './pages/admin/positions/groups'
 import { Route as AdminNotificationsNotificationRouteImport } from './pages/admin/notifications/notification'
@@ -53,7 +55,7 @@ import { Route as AdminLoggingsBusinessRouteImport } from './pages/admin/logging
 import { Route as AdminLoggingsAuditlogRouteImport } from './pages/admin/loggings/auditlog'
 import { Route as AdminLoggingsAccessRouteImport } from './pages/admin/loggings/access'
 import { Route as AdminEmployeesEmployeeRouteImport } from './pages/admin/employees/employee'
-import { Route as AdminDataDictionariesTypeRouteImport } from './pages/admin/data-dictionaries/$type'
+import { Route as AdminDataDictionariesNameRouteImport } from './pages/admin/data-dictionaries/$name'
 import { Route as AdminLoggingsAuditLogRequestIndexRouteImport } from './pages/admin/loggings/auditLog/request/index'
 import { Route as AdminLoggingsAuditLogEntityIndexRouteImport } from './pages/admin/loggings/auditLog/entity/index'
 import { Route as AdminLoggingsAuditLogRequestIdRouteImport } from './pages/admin/loggings/auditLog/request/$id'
@@ -104,16 +106,6 @@ const MyPasswordRoute = MyPasswordRouteImport.update({
   path: '/password',
   getParentRoute: () => MyRouteRoute,
 } as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AccountProfileRoute = AccountProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AccountRouteRoute,
-} as any)
 const AccountLogoutRoute = AccountLogoutRouteImport.update({
   id: '/logout',
   path: '/logout',
@@ -123,6 +115,11 @@ const AccountLoginRoute = AccountLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AccountRouteRoute,
+} as any)
+const AdminSettingsRouteRoute = AdminSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const MyNotificationsIndexRoute = MyNotificationsIndexRouteImport.update({
   id: '/notifications/',
@@ -147,7 +144,7 @@ const AdminTenantsIndexRoute = AdminTenantsIndexRouteImport.update({
 const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminSettingsRoute,
+  getParentRoute: () => AdminSettingsRouteRoute,
 } as any)
 const AdminScheduledTasksIndexRoute =
   AdminScheduledTasksIndexRouteImport.update({
@@ -158,6 +155,11 @@ const AdminScheduledTasksIndexRoute =
 const AdminRolesIndexRoute = AdminRolesIndexRouteImport.update({
   id: '/roles/',
   path: '/roles/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminRegionsIndexRoute = AdminRegionsIndexRouteImport.update({
+  id: '/regions/',
+  path: '/regions/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminPositionsIndexRoute = AdminPositionsIndexRouteImport.update({
@@ -215,22 +217,32 @@ const MyNotificationsIdRoute = MyNotificationsIdRouteImport.update({
 const AdminSettingsTimezoneRoute = AdminSettingsTimezoneRouteImport.update({
   id: '/timezone',
   path: '/timezone',
-  getParentRoute: () => AdminSettingsRoute,
+  getParentRoute: () => AdminSettingsRouteRoute,
+} as any)
+const AdminSettingsSiteRoute = AdminSettingsSiteRouteImport.update({
+  id: '/site',
+  path: '/site',
+  getParentRoute: () => AdminSettingsRouteRoute,
 } as any)
 const AdminSettingsFeatureRoute = AdminSettingsFeatureRouteImport.update({
   id: '/feature',
   path: '/feature',
-  getParentRoute: () => AdminSettingsRoute,
+  getParentRoute: () => AdminSettingsRouteRoute,
 } as any)
 const AdminSettingsEmailingRoute = AdminSettingsEmailingRouteImport.update({
   id: '/emailing',
   path: '/emailing',
-  getParentRoute: () => AdminSettingsRoute,
+  getParentRoute: () => AdminSettingsRouteRoute,
+} as any)
+const AdminSettingsAmapRoute = AdminSettingsAmapRouteImport.update({
+  id: '/amap',
+  path: '/amap',
+  getParentRoute: () => AdminSettingsRouteRoute,
 } as any)
 const AdminSettingsAccountRoute = AdminSettingsAccountRouteImport.update({
   id: '/account',
   path: '/account',
-  getParentRoute: () => AdminSettingsRoute,
+  getParentRoute: () => AdminSettingsRouteRoute,
 } as any)
 const AdminPositionsGroupsRoute = AdminPositionsGroupsRouteImport.update({
   id: '/positions/groups',
@@ -283,10 +295,10 @@ const AdminEmployeesEmployeeRoute = AdminEmployeesEmployeeRouteImport.update({
   path: '/employees/employee',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminDataDictionariesTypeRoute =
-  AdminDataDictionariesTypeRouteImport.update({
-    id: '/data-dictionaries/$type',
-    path: '/data-dictionaries/$type',
+const AdminDataDictionariesNameRoute =
+  AdminDataDictionariesNameRouteImport.update({
+    id: '/data-dictionaries/$name',
+    path: '/data-dictionaries/$name',
     getParentRoute: () => AdminRouteRoute,
   } as any)
 const AdminLoggingsAuditLogRequestIndexRoute =
@@ -320,15 +332,14 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/home': typeof HomeRouteRouteWithChildren
   '/my': typeof MyRouteRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
-  '/account/profile': typeof AccountProfileRoute
-  '/admin/settings': typeof AdminSettingsRouteWithChildren
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
   '/home/': typeof HomeIndexRoute
-  '/admin/data-dictionaries/$type': typeof AdminDataDictionariesTypeRoute
+  '/admin/data-dictionaries/$name': typeof AdminDataDictionariesNameRoute
   '/admin/employees/employee': typeof AdminEmployeesEmployeeRoute
   '/admin/loggings/access': typeof AdminLoggingsAccessRoute
   '/admin/loggings/auditlog': typeof AdminLoggingsAuditlogRoute
@@ -340,8 +351,10 @@ export interface FileRoutesByFullPath {
   '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
+  '/admin/settings/amap': typeof AdminSettingsAmapRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
+  '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries': typeof AdminDataDictionariesIndexRoute
@@ -353,6 +366,7 @@ export interface FileRoutesByFullPath {
   '/admin/online-users': typeof AdminOnlineUsersIndexRoute
   '/admin/organization-units': typeof AdminOrganizationUnitsIndexRoute
   '/admin/positions': typeof AdminPositionsIndexRoute
+  '/admin/regions': typeof AdminRegionsIndexRoute
   '/admin/roles': typeof AdminRolesIndexRoute
   '/admin/scheduled-tasks': typeof AdminScheduledTasksIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
@@ -372,12 +386,11 @@ export interface FileRoutesByTo {
   '/my': typeof MyRouteRouteWithChildren
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
-  '/account/profile': typeof AccountProfileRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
   '/home': typeof HomeIndexRoute
-  '/admin/data-dictionaries/$type': typeof AdminDataDictionariesTypeRoute
+  '/admin/data-dictionaries/$name': typeof AdminDataDictionariesNameRoute
   '/admin/employees/employee': typeof AdminEmployeesEmployeeRoute
   '/admin/loggings/access': typeof AdminLoggingsAccessRoute
   '/admin/loggings/auditlog': typeof AdminLoggingsAuditlogRoute
@@ -389,8 +402,10 @@ export interface FileRoutesByTo {
   '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
+  '/admin/settings/amap': typeof AdminSettingsAmapRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
+  '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries': typeof AdminDataDictionariesIndexRoute
@@ -402,6 +417,7 @@ export interface FileRoutesByTo {
   '/admin/online-users': typeof AdminOnlineUsersIndexRoute
   '/admin/organization-units': typeof AdminOrganizationUnitsIndexRoute
   '/admin/positions': typeof AdminPositionsIndexRoute
+  '/admin/regions': typeof AdminRegionsIndexRoute
   '/admin/roles': typeof AdminRolesIndexRoute
   '/admin/scheduled-tasks': typeof AdminScheduledTasksIndexRoute
   '/admin/settings': typeof AdminSettingsIndexRoute
@@ -421,15 +437,14 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/home': typeof HomeRouteRouteWithChildren
   '/my': typeof MyRouteRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
-  '/account/profile': typeof AccountProfileRoute
-  '/admin/settings': typeof AdminSettingsRouteWithChildren
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
   '/home/': typeof HomeIndexRoute
-  '/admin/data-dictionaries/$type': typeof AdminDataDictionariesTypeRoute
+  '/admin/data-dictionaries/$name': typeof AdminDataDictionariesNameRoute
   '/admin/employees/employee': typeof AdminEmployeesEmployeeRoute
   '/admin/loggings/access': typeof AdminLoggingsAccessRoute
   '/admin/loggings/auditlog': typeof AdminLoggingsAuditlogRoute
@@ -441,8 +456,10 @@ export interface FileRoutesById {
   '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
+  '/admin/settings/amap': typeof AdminSettingsAmapRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
+  '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries/': typeof AdminDataDictionariesIndexRoute
@@ -454,6 +471,7 @@ export interface FileRoutesById {
   '/admin/online-users/': typeof AdminOnlineUsersIndexRoute
   '/admin/organization-units/': typeof AdminOrganizationUnitsIndexRoute
   '/admin/positions/': typeof AdminPositionsIndexRoute
+  '/admin/regions/': typeof AdminRegionsIndexRoute
   '/admin/roles/': typeof AdminRolesIndexRoute
   '/admin/scheduled-tasks/': typeof AdminScheduledTasksIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
@@ -474,15 +492,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/home'
     | '/my'
+    | '/admin/settings'
     | '/account/login'
     | '/account/logout'
-    | '/account/profile'
-    | '/admin/settings'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
     | '/home/'
-    | '/admin/data-dictionaries/$type'
+    | '/admin/data-dictionaries/$name'
     | '/admin/employees/employee'
     | '/admin/loggings/access'
     | '/admin/loggings/auditlog'
@@ -494,8 +511,10 @@ export interface FileRouteTypes {
     | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
+    | '/admin/settings/amap'
     | '/admin/settings/emailing'
     | '/admin/settings/feature'
+    | '/admin/settings/site'
     | '/admin/settings/timezone'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries'
@@ -507,6 +526,7 @@ export interface FileRouteTypes {
     | '/admin/online-users'
     | '/admin/organization-units'
     | '/admin/positions'
+    | '/admin/regions'
     | '/admin/roles'
     | '/admin/scheduled-tasks'
     | '/admin/settings/'
@@ -526,12 +546,11 @@ export interface FileRouteTypes {
     | '/my'
     | '/account/login'
     | '/account/logout'
-    | '/account/profile'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
     | '/home'
-    | '/admin/data-dictionaries/$type'
+    | '/admin/data-dictionaries/$name'
     | '/admin/employees/employee'
     | '/admin/loggings/access'
     | '/admin/loggings/auditlog'
@@ -543,8 +562,10 @@ export interface FileRouteTypes {
     | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
+    | '/admin/settings/amap'
     | '/admin/settings/emailing'
     | '/admin/settings/feature'
+    | '/admin/settings/site'
     | '/admin/settings/timezone'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries'
@@ -556,6 +577,7 @@ export interface FileRouteTypes {
     | '/admin/online-users'
     | '/admin/organization-units'
     | '/admin/positions'
+    | '/admin/regions'
     | '/admin/roles'
     | '/admin/scheduled-tasks'
     | '/admin/settings'
@@ -574,15 +596,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/home'
     | '/my'
+    | '/admin/settings'
     | '/account/login'
     | '/account/logout'
-    | '/account/profile'
-    | '/admin/settings'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
     | '/home/'
-    | '/admin/data-dictionaries/$type'
+    | '/admin/data-dictionaries/$name'
     | '/admin/employees/employee'
     | '/admin/loggings/access'
     | '/admin/loggings/auditlog'
@@ -594,8 +615,10 @@ export interface FileRouteTypes {
     | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
+    | '/admin/settings/amap'
     | '/admin/settings/emailing'
     | '/admin/settings/feature'
+    | '/admin/settings/site'
     | '/admin/settings/timezone'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries/'
@@ -607,6 +630,7 @@ export interface FileRouteTypes {
     | '/admin/online-users/'
     | '/admin/organization-units/'
     | '/admin/positions/'
+    | '/admin/regions/'
     | '/admin/roles/'
     | '/admin/scheduled-tasks/'
     | '/admin/settings/'
@@ -693,20 +717,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyPasswordRouteImport
       parentRoute: typeof MyRouteRoute
     }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/account/profile': {
-      id: '/account/profile'
-      path: '/profile'
-      fullPath: '/account/profile'
-      preLoaderRoute: typeof AccountProfileRouteImport
-      parentRoute: typeof AccountRouteRoute
-    }
     '/account/logout': {
       id: '/account/logout'
       path: '/logout'
@@ -720,6 +730,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/login'
       preLoaderRoute: typeof AccountLoginRouteImport
       parentRoute: typeof AccountRouteRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/my/notifications/': {
       id: '/my/notifications/'
@@ -754,7 +771,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/settings/'
       preLoaderRoute: typeof AdminSettingsIndexRouteImport
-      parentRoute: typeof AdminSettingsRoute
+      parentRoute: typeof AdminSettingsRouteRoute
     }
     '/admin/scheduled-tasks/': {
       id: '/admin/scheduled-tasks/'
@@ -768,6 +785,13 @@ declare module '@tanstack/react-router' {
       path: '/roles'
       fullPath: '/admin/roles'
       preLoaderRoute: typeof AdminRolesIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/regions/': {
+      id: '/admin/regions/'
+      path: '/regions'
+      fullPath: '/admin/regions'
+      preLoaderRoute: typeof AdminRegionsIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/positions/': {
@@ -845,28 +869,42 @@ declare module '@tanstack/react-router' {
       path: '/timezone'
       fullPath: '/admin/settings/timezone'
       preLoaderRoute: typeof AdminSettingsTimezoneRouteImport
-      parentRoute: typeof AdminSettingsRoute
+      parentRoute: typeof AdminSettingsRouteRoute
+    }
+    '/admin/settings/site': {
+      id: '/admin/settings/site'
+      path: '/site'
+      fullPath: '/admin/settings/site'
+      preLoaderRoute: typeof AdminSettingsSiteRouteImport
+      parentRoute: typeof AdminSettingsRouteRoute
     }
     '/admin/settings/feature': {
       id: '/admin/settings/feature'
       path: '/feature'
       fullPath: '/admin/settings/feature'
       preLoaderRoute: typeof AdminSettingsFeatureRouteImport
-      parentRoute: typeof AdminSettingsRoute
+      parentRoute: typeof AdminSettingsRouteRoute
     }
     '/admin/settings/emailing': {
       id: '/admin/settings/emailing'
       path: '/emailing'
       fullPath: '/admin/settings/emailing'
       preLoaderRoute: typeof AdminSettingsEmailingRouteImport
-      parentRoute: typeof AdminSettingsRoute
+      parentRoute: typeof AdminSettingsRouteRoute
+    }
+    '/admin/settings/amap': {
+      id: '/admin/settings/amap'
+      path: '/amap'
+      fullPath: '/admin/settings/amap'
+      preLoaderRoute: typeof AdminSettingsAmapRouteImport
+      parentRoute: typeof AdminSettingsRouteRoute
     }
     '/admin/settings/account': {
       id: '/admin/settings/account'
       path: '/account'
       fullPath: '/admin/settings/account'
       preLoaderRoute: typeof AdminSettingsAccountRouteImport
-      parentRoute: typeof AdminSettingsRoute
+      parentRoute: typeof AdminSettingsRouteRoute
     }
     '/admin/positions/groups': {
       id: '/admin/positions/groups'
@@ -938,11 +976,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmployeesEmployeeRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/data-dictionaries/$type': {
-      id: '/admin/data-dictionaries/$type'
-      path: '/data-dictionaries/$type'
-      fullPath: '/admin/data-dictionaries/$type'
-      preLoaderRoute: typeof AdminDataDictionariesTypeRouteImport
+    '/admin/data-dictionaries/$name': {
+      id: '/admin/data-dictionaries/$name'
+      path: '/data-dictionaries/$name'
+      fullPath: '/admin/data-dictionaries/$name'
+      preLoaderRoute: typeof AdminDataDictionariesNameRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/loggings/auditLog/request/': {
@@ -979,42 +1017,43 @@ declare module '@tanstack/react-router' {
 interface AccountRouteRouteChildren {
   AccountLoginRoute: typeof AccountLoginRoute
   AccountLogoutRoute: typeof AccountLogoutRoute
-  AccountProfileRoute: typeof AccountProfileRoute
 }
 
 const AccountRouteRouteChildren: AccountRouteRouteChildren = {
   AccountLoginRoute: AccountLoginRoute,
   AccountLogoutRoute: AccountLogoutRoute,
-  AccountProfileRoute: AccountProfileRoute,
 }
 
 const AccountRouteRouteWithChildren = AccountRouteRoute._addFileChildren(
   AccountRouteRouteChildren,
 )
 
-interface AdminSettingsRouteChildren {
+interface AdminSettingsRouteRouteChildren {
   AdminSettingsAccountRoute: typeof AdminSettingsAccountRoute
+  AdminSettingsAmapRoute: typeof AdminSettingsAmapRoute
   AdminSettingsEmailingRoute: typeof AdminSettingsEmailingRoute
   AdminSettingsFeatureRoute: typeof AdminSettingsFeatureRoute
+  AdminSettingsSiteRoute: typeof AdminSettingsSiteRoute
   AdminSettingsTimezoneRoute: typeof AdminSettingsTimezoneRoute
   AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
 }
 
-const AdminSettingsRouteChildren: AdminSettingsRouteChildren = {
+const AdminSettingsRouteRouteChildren: AdminSettingsRouteRouteChildren = {
   AdminSettingsAccountRoute: AdminSettingsAccountRoute,
+  AdminSettingsAmapRoute: AdminSettingsAmapRoute,
   AdminSettingsEmailingRoute: AdminSettingsEmailingRoute,
   AdminSettingsFeatureRoute: AdminSettingsFeatureRoute,
+  AdminSettingsSiteRoute: AdminSettingsSiteRoute,
   AdminSettingsTimezoneRoute: AdminSettingsTimezoneRoute,
   AdminSettingsIndexRoute: AdminSettingsIndexRoute,
 }
 
-const AdminSettingsRouteWithChildren = AdminSettingsRoute._addFileChildren(
-  AdminSettingsRouteChildren,
-)
+const AdminSettingsRouteRouteWithChildren =
+  AdminSettingsRouteRoute._addFileChildren(AdminSettingsRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
-  AdminSettingsRoute: typeof AdminSettingsRouteWithChildren
-  AdminDataDictionariesTypeRoute: typeof AdminDataDictionariesTypeRoute
+  AdminSettingsRouteRoute: typeof AdminSettingsRouteRouteWithChildren
+  AdminDataDictionariesNameRoute: typeof AdminDataDictionariesNameRoute
   AdminEmployeesEmployeeRoute: typeof AdminEmployeesEmployeeRoute
   AdminLoggingsAccessRoute: typeof AdminLoggingsAccessRoute
   AdminLoggingsAuditlogRoute: typeof AdminLoggingsAuditlogRoute
@@ -1034,6 +1073,7 @@ interface AdminRouteRouteChildren {
   AdminOnlineUsersIndexRoute: typeof AdminOnlineUsersIndexRoute
   AdminOrganizationUnitsIndexRoute: typeof AdminOrganizationUnitsIndexRoute
   AdminPositionsIndexRoute: typeof AdminPositionsIndexRoute
+  AdminRegionsIndexRoute: typeof AdminRegionsIndexRoute
   AdminRolesIndexRoute: typeof AdminRolesIndexRoute
   AdminScheduledTasksIndexRoute: typeof AdminScheduledTasksIndexRoute
   AdminTenantsIndexRoute: typeof AdminTenantsIndexRoute
@@ -1045,8 +1085,8 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminSettingsRoute: AdminSettingsRouteWithChildren,
-  AdminDataDictionariesTypeRoute: AdminDataDictionariesTypeRoute,
+  AdminSettingsRouteRoute: AdminSettingsRouteRouteWithChildren,
+  AdminDataDictionariesNameRoute: AdminDataDictionariesNameRoute,
   AdminEmployeesEmployeeRoute: AdminEmployeesEmployeeRoute,
   AdminLoggingsAccessRoute: AdminLoggingsAccessRoute,
   AdminLoggingsAuditlogRoute: AdminLoggingsAuditlogRoute,
@@ -1066,6 +1106,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminOnlineUsersIndexRoute: AdminOnlineUsersIndexRoute,
   AdminOrganizationUnitsIndexRoute: AdminOrganizationUnitsIndexRoute,
   AdminPositionsIndexRoute: AdminPositionsIndexRoute,
+  AdminRegionsIndexRoute: AdminRegionsIndexRoute,
   AdminRolesIndexRoute: AdminRolesIndexRoute,
   AdminScheduledTasksIndexRoute: AdminScheduledTasksIndexRoute,
   AdminTenantsIndexRoute: AdminTenantsIndexRoute,

@@ -1,131 +1,79 @@
 ﻿using Letu.Basis.Account.Dtos;
-using Letu.Basis.Admin.Loggings;
-using Letu.Basis.Admin.Users;
-using Letu.Core.Applications;
-using Letu.Core.AspNetCore.Mvc;
-using Letu.Core.Utils;
-using Letu.Repository;
-using Volo.Abp.EventBus.Local;
+using Letu.Basis.Settings;
+using Microsoft.Extensions.Options;
+using Volo.Abp.AspNetCore.MultiTenancy;
+using Volo.Abp.MultiTenancy;
+using Volo.Abp.Settings;
 
 namespace Letu.Basis.Account;
 
 public class AccountAppService : BasisAppService, IAccountAppService
 {
-    private readonly IFreeSqlRepository<User> userRepository;
-    private readonly IFreeSqlRepository<SecurityLog> securityLogRepository;
+    private readonly ITenantStore tenantStore;
+    private readonly AbpMultiTenancyOptions abpTenantOptions;
+    private readonly AbpAspNetCoreMultiTenancyOptions aspnetCoreTenantOptions;
 
     public AccountAppService(
-        IFreeSqlRepository<User> userRepository,
-        IFreeSqlRepository<SecurityLog> securityLogRepository,
-        ILocalEventBus localEventBus)
+        ITenantStore tenantStore,
+        IOptions<AbpMultiTenancyOptions> abpTenantOptions,
+        IOptions<AbpAspNetCoreMultiTenancyOptions> aspnetCoreTenantOptions
+    )
     {
-        this.userRepository = userRepository;
-        this.securityLogRepository = securityLogRepository;
+        this.tenantStore = tenantStore;
+        this.abpTenantOptions = abpTenantOptions.Value;
+        this.aspnetCoreTenantOptions = aspnetCoreTenantOptions.Value;
     }
 
-    public async Task<bool> UpdateUserInfoAsync(UserInfoUpdateInput input)
+    public async Task<LoginSettingsOutput> GetLoginSettingsAsync()
     {
-        var user = await userRepository.Where(x => x.Id == CurrentUser.Id).FirstAsync();
-        if (!string.IsNullOrEmpty(input.NickName))
+        var signInSettings = new LoginSettingsOutput();
+        if (CurrentTenant.IsAvailable)
         {
-            if (user.NickName.ToLower() != input.NickName!.ToLower())
+            var tenant = await tenantStore.FindAsync(CurrentTenant.GetId());
+            signInSettings.TenantName = tenant?.Name;
+        }
+        signInSettings.MultiTenancyEnabled = abpTenantOptions.IsEnabled;
+        signInSettings.ExternalProviders = await GetExternalProviders();
+        signInSettings.EnableUserNameLogin = await SettingProvider.IsTrueAsync(AccountSettingNames.EnableUserNameLogin);
+        signInSettings.EnableEmailLogin = await SettingProvider.IsTrueAsync(AccountSettingNames.EnableEmailLogin);
+        signInSettings.EnablePhoneNumberLogin = await SettingProvider.IsTrueAsync(AccountSettingNames.EnablePhoneNumberLogin);
+        signInSettings.AllowPasswordRecovery = await SettingProvider.IsTrueAsync(AccountSettingNames.AllowPasswordRecovery);
+        signInSettings.IsSelfRegistrationEnabled = await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled);
+        signInSettings.EnableUserNameRegistration = await SettingProvider.IsTrueAsync(AccountSettingNames.EnableUserNameRegistration);
+        signInSettings.EnableEmailRegistration = await SettingProvider.IsTrueAsync(AccountSettingNames.EnableEmailRegistration);
+        signInSettings.EnablePhoneNumberRegistration = await SettingProvider.IsTrueAsync(AccountSettingNames.EnablePhoneNumberRegistration);
+
+        return signInSettings;
+    }
+
+    public async Task<SwitchTenantOutput> SwitchTenantAsync(string? tenantName)
+    {
+        SwitchTenantOutput output = new()
+        {
+            CookieKey = aspnetCoreTenantOptions.TenantKey
+        };
+
+        if (!tenantName.IsNullOrEmpty())
+        {
+            var tenant = await tenantStore.FindAsync(tenantName!);
+            if (tenant != null && tenant.IsActive)
             {
-                var exist = await userRepository.Where(x => x.NickName.ToLower() == input.NickName.ToLower()).AnyAsync();
-                if (exist)
-                    throw HttpFriendlyException.BadRequest($"昵称{input.NickName}已使用。");
+                output.TenantId = tenant.Id;
+                output.Success = true;
             }
-            user.NickName = input.NickName;
+        }
+        else
+        {
+            output.Success = true;
+            output.TenantId = null;
         }
 
-        if (!string.IsNullOrEmpty(input.Avatar))
-        {
-            user.Avatar = input.Avatar;
-        }
-
-        await userRepository.UpdateAsync(user);
-        return true;
+        return output;
     }
 
-    public async Task<bool> ChangePasswordAsync(ChangePasswordInput input)
+
+    private Task<List<ExternalProviderOutput>> GetExternalProviders()
     {
-        var user = await userRepository.Where(x => x.Id == CurrentUser.Id).FirstAsync()
-            ?? throw HttpFriendlyException.NotFound("用户不存在");
-
-        if (user.PasswordHash != null)
-        {
-            if (string.IsNullOrEmpty(input.OldPassword))
-                throw HttpFriendlyException.BadRequest("请输入旧密码");
-
-            var isRight = user.PasswordHash == EncryptionUtils.CalcPasswordHash(input.OldPassword, user.PasswordSalt);
-            if (!isRight)
-                throw HttpFriendlyException.BadRequest("旧密码错误");
-        }
-
-        user.PasswordSalt = EncryptionUtils.GetPasswordSalt();
-        user.PasswordHash = EncryptionUtils.CalcPasswordHash(input.NewPassword, user.PasswordSalt);
-        await userRepository.UpdateAsync(user);
-        return true;
-    }
-
-    public async Task<PagedResult<SecurityLogListDto>> GetSecurityLogsAsync(SecurityLogQueryInput input)
-    {
-        var query = securityLogRepository.Select
-            .Where(x => x.UserName == CurrentUser.UserName)
-            .WhereIf(input.StartDate.HasValue, x => x.CreationTime >= input.StartDate!.Value)
-            .WhereIf(input.EndDate.HasValue, x => x.CreationTime <= input.EndDate!.Value.AddDays(1))
-            .WhereIf(input.IsSuccess.HasValue, x => x.IsSuccess == input.IsSuccess!.Value)
-            .WhereIf(!string.IsNullOrEmpty(input.Ip), x => x.Ip!.Contains(input.Ip!))
-            .OrderByDescending(x => x.CreationTime);
-
-        var totalCount = await query.CountAsync();
-        var items = await query
-            .Page(input.Current, input.PageSize)
-            .ToListAsync();
-
-        var dtos = ObjectMapper.Map<List<SecurityLog>, List<SecurityLogListDto>>(items);
-
-        return new PagedResult<SecurityLogListDto>
-        {
-            Items = dtos,
-            TotalCount = totalCount
-        };
-    }
-
-    public async Task<SecurityLogStatsDto> GetSecurityLogStatsAsync()
-    {
-        var today = DateTime.Today;
-
-        // 今日登录次数
-        var todayLoginCount = await securityLogRepository.Select
-            .Where(x => x.UserName == CurrentUser.UserName)
-            .Where(x => x.CreationTime >= today && x.CreationTime < today.AddDays(1))
-            .Where(x => x.IsSuccess)
-            .CountAsync();
-
-        // 最近登录记录
-        var recentLogin = await securityLogRepository.Select
-            .Where(x => x.UserName == CurrentUser.UserName && x.IsSuccess)
-            .OrderByDescending(x => x.CreationTime)
-            .FirstAsync();
-
-        // 异常登录次数（今天失败的登录）
-        var abnormalLoginCount = await securityLogRepository.Select
-            .Where(x => x.UserName == CurrentUser.UserName)
-            .Where(x => x.CreationTime >= today && x.CreationTime < today.AddDays(1))
-            .Where(x => !x.IsSuccess)
-            .CountAsync();
-
-        // 总登录次数
-        var totalLoginCount = await securityLogRepository.Select
-            .Where(x => x.UserName == CurrentUser.UserName && x.IsSuccess)
-            .CountAsync();
-
-        return new SecurityLogStatsDto
-        {
-            TodayLoginCount = (int)todayLoginCount,
-            RecentLoginIp = recentLogin?.Ip,
-            AbnormalLoginCount = (int)abnormalLoginCount,
-            TotalLoginCount = (int)totalLoginCount
-        };
+        return Task.FromResult(new List<ExternalProviderOutput>());
     }
 }

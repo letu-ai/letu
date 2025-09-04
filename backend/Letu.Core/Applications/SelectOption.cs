@@ -12,4 +12,9 @@ public class SelectOption
     /// 实际值
     /// </summary>
     public required string Value { get; set; }
+
+    /// <summary>
+    /// true表示被禁用的项
+    /// </summary>
+    public bool Disabled { get; set; }
 }

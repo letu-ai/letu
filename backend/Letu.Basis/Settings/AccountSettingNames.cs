@@ -3,34 +3,40 @@
 public class AccountSettingNames
 {
     /// <summary>
-    /// 启用自助注册 - 是否允许用户自助注册账户
+    /// 允许自助注册
     /// </summary>
     public const string IsSelfRegistrationEnabled = "Letu.Account.IsSelfRegistrationEnabled";
 
     /// <summary>
-    /// 启用本地登录 - 是否允许使用本地账户登录
+    /// 允许用户名注册
     /// </summary>
-    public const string EnableLocalLogin = "Letu.Account.EnableLocalLogin";
+    public const string EnableUserNameRegistration = "Letu.Account.EnableUserNameRegistration";
+    
+    /// <summary>
+    /// 允许邮箱注册
+    /// </summary>
+    public const string EnableEmailRegistration = "Letu.Account.EnableEmailRegistration";
 
     /// <summary>
-    /// 启用手机验证码登录 - 是否允许使用手机验证码登录
+    /// 允许手机号码注册
     /// </summary>
-    public const string EnableMobileVerificationCodeLogin = "Letu.Account.EnableMobileVerificationCodeLogin";
+    public const string EnablePhoneNumberRegistration = "Letu.Account.EnablePhoneNumberRegistration";
+
 
     /// <summary>
-    /// 启用邮箱验证码登录 - 是否允许使用邮箱验证码登录
+    /// 允许用户名登录
     /// </summary>
-    public const string EnableEmailVerificationCodeLogin = "Letu.Account.EnableEmailVerificationCodeLogin";
+    public const string EnableUserNameLogin = "Letu.Account.EnableUserNameLogin";
 
     /// <summary>
-    /// 启用手机验证码注册 - 是否允许使用手机验证码注册
+    /// 允许邮箱登录
     /// </summary>
-    public const string EnableMobileVerificationCodeRegistration = "Letu.Account.EnableMobileVerificationCodeRegistration";
+    public const string EnableEmailLogin = "Letu.Account.EnableEmailLogin";
 
     /// <summary>
-    /// 启用邮箱验证码注册 - 是否允许使用邮箱验证码注册
+    /// 允许手机号码登录
     /// </summary>
-    public const string EnableEmailVerificationCodeRegistration = "Letu.Account.EnableEmailVerificationCodeRegistration";
+    public const string EnablePhoneNumberLogin = "Letu.Account.EnablePhoneNumberLogin";
 
     /// <summary>
     /// 允许自助找回密码

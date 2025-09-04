@@ -104,6 +104,16 @@ export class BasisPermissions {
         Delete: `${BasisPermissions.BaseDataGroupName}.DataDictionary.Delete`,
     } as const;
 
+    // 行政区域管理权限
+    public static readonly Region = {
+        /** 行政区域管理 */
+        Default: `${BasisPermissions.BaseDataGroupName}.Region`,
+        Create: `${BasisPermissions.BaseDataGroupName}.Region.Create`,
+        Update: `${BasisPermissions.BaseDataGroupName}.Region.Update`,
+        Delete: `${BasisPermissions.BaseDataGroupName}.Region.Delete`,
+        Import: `${BasisPermissions.BaseDataGroupName}.Region.Import`,
+    } as const;
+
     // 通知管理权限
     public static readonly Notification = {
         /** 通知管理 */
@@ -201,6 +211,7 @@ export class BasisPermissions {
             MenuItem: this.MenuItem,
             OrganizationUnit: this.OrganizationUnit,
             DataDictionary: this.DataDictionary,
+            Region: this.Region,
             Setting: this.Setting,
             Feature: this.Feature,
             Tenant: this.Tenant,
@@ -220,6 +231,7 @@ export type DepartmentPermissions = typeof BasisPermissions.Department;
 export type MenuItemPermissions = typeof BasisPermissions.MenuItem;
 export type OrganizationUnitPermissions = typeof BasisPermissions.OrganizationUnit;
 export type DataDictionaryPermissions = typeof BasisPermissions.DataDictionary;
+export type RegionPermissions = typeof BasisPermissions.Region;
 export type SettingPermissions = typeof BasisPermissions.Setting;
 export type FeaturePermissions = typeof BasisPermissions.Feature;
 export type TenantPermissions = typeof BasisPermissions.Tenant;
@@ -235,6 +247,7 @@ export type AllPermissionKeys =
     | keyof MenuItemPermissions
     | keyof OrganizationUnitPermissions
     | keyof DataDictionaryPermissions
+    | keyof RegionPermissions
     | keyof SettingPermissions
     | keyof FeaturePermissions
     | keyof TenantPermissions

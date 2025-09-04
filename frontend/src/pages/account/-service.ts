@@ -2,25 +2,25 @@ import httpClient from '@/utils/httpClient';
 
 /**
  * 登录
- * @param dto
+ * @param input
  */
-export function loginByPassword(dto: IPasswordLoginInput) {
-    return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/account/login', dto);
+export function loginByPassword(input: IPasswordLoginInput) {
+    return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/identity/login', input);
 }
 
 /**
  * 短信登录
- * @param dto
+ * @param input
  */
-export function loginBySms(dto: ISmsLoginInput) {
-    return httpClient.post<ISmsLoginInput, IUserTokenOutput>('/api/account/SmsLogin', dto);
+export function loginBySms(input: ISmsLoginInput) {
+    return httpClient.post<ISmsLoginInput, IUserTokenOutput>('/api/identity/SmsLogin', input);
 }
 
 /**
  * 注销
  */
 export function logout() {
-    return httpClient.post<void>('/api/account/logout');
+    return httpClient.post<void>('/api/identity/logout');
 }
 
 /**
@@ -28,7 +28,7 @@ export function logout() {
  * @param phone
  */
 export function sendLoginSmsCode(phone: string) {
-    return httpClient.post<string, string>('/api/account/SendLoginSmsCode?phone=' + phone);
+    return httpClient.post<string, string>('/api/identity/SendLoginSmsCode?phone=' + phone);
 }
 
 /**
@@ -37,23 +37,53 @@ export function sendLoginSmsCode(phone: string) {
  * @returns
  */
 export function refreshToken(refreshToken: string) {
-    return httpClient.post<string, IUserTokenOutput>('/api/account/refresh-token', { refreshToken });
+    return httpClient.post<string, IUserTokenOutput>('/api/identity/refresh-token', { refreshToken });
 }
 
-/**
- * 修改个人基本信息
- * @param info
- */
-export function updateInfo(info: PersonalInfoDto) {
-    return httpClient.put<PersonalInfoDto, void>('/api/account/updateInfo', info);
+export function getLoginSettings() {
+    return httpClient.get<ILoginSettingsOutput>('/api/account/login-settings');
 }
 
-/**
- * 修改个人密码
- * @param dto
- */
-export function updatePwd(dto: UserPwdDto) {
-    return httpClient.put<UserPwdDto, void>('/api/account/updatePwd', dto);
+export function switchTenant(tenantName?: string) {
+    return httpClient.post<void, ISwitchTenantOutput>('/api/account/switch-tenant', null, { params: { tenantName } });
+}
+
+
+export interface ILoginSettingsOutput {
+    tenantName?: string;
+
+    multiTenancyEnabled: boolean;
+
+    enableUserNameLogin: boolean;
+
+    enableEmailLogin: boolean;
+
+    enablePhoneNumberLogin: boolean;
+
+    enableUserNameRegistration: boolean;
+
+    enableEmailRegistration: boolean;
+
+    enablePhoneNumberRegistration: boolean;
+
+    isSelfRegistrationEnabled: boolean;
+
+    allowPasswordRecovery: boolean;
+
+    externalProviders?: IExternalProviderOutput[];
+}
+
+export interface IExternalProviderOutput {
+    displayName: string;
+    name: string;
+}
+
+export interface ISwitchTenantOutput {
+    success: boolean;
+
+    cookieKey: string;
+
+    tenantId?: string;
 }
 
 export interface IPasswordLoginInput {
@@ -67,7 +97,6 @@ export interface ISmsLoginInput {
     code: string;
 }
 
-
 export interface IRefreshTokenInput {
     refreshToken: string;
 }
@@ -77,29 +106,4 @@ export interface IUserTokenOutput {
     accessToken: string;
     refreshToken?: string;
     expiredTime: Date;
-}
-
-export interface PersonalInfoDto {
-    avatar?: string;
-    nickName?: string;
-    sex?: number;
-    phone?: string;
-}
-
-export interface UserPwdDto {
-    newPassword: string;
-    oldPassword: string;
-}
-
-export interface IFrontendMenu {
-    id: string;
-    title: string;
-    icon: string | null;
-    display: boolean;
-    path: string;
-    component: string | null;
-    children: IFrontendMenu[] | null;
-    layerName: string;
-    menuType: number;
-    isExternal: boolean;
 }

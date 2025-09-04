@@ -1,5 +1,5 @@
 ﻿import React, { useMemo } from 'react';
-import useAppConfigStore from '@/application/appConfigStore';
+import { useAppConfig } from '@/components/AppConfigProvider';
 
 // 权限检查条件接口
 interface IPermissionCondition {
@@ -32,7 +32,6 @@ type NoPermissionStrategy =
 interface PermissionProps extends IPermissionCondition {
   children: React.ReactNode;
   fallback?: React.ReactNode; // 无权限时的替代内容
-  loading?: React.ReactNode; // 配置加载中的替代内容
   requireAll?: boolean; // 是否需要满足所有条件（权限、功能、设置）
   noPermissionStrategy?: NoPermissionStrategy; // 无权限时的渲染策略
   disabledProps?: Record<string, any>; // 当使用render策略时，传递给子组件的禁用属性
@@ -40,9 +39,7 @@ interface PermissionProps extends IPermissionCondition {
 
 interface IContext {
     // 状态属性
-    isLoading: boolean;
     isReady: boolean;
-    error: Error | null;
 
     // 权限
     isAnyGranted: (...args: string[]) => boolean;
@@ -83,7 +80,7 @@ function checkPermissions(
   } = conditions;
 
   // 如果 ABP 配置加载失败或未准备好，出于安全考虑返回 false
-  if (context.error || !context.isReady) {
+  if (!context.isReady) {
     return false;
   }
 
@@ -222,24 +219,23 @@ function checkPermissions(
  * ```
  */
 export function usePermission(conditions: IPermissionCondition & { requireAll?: boolean } = {}) {
-  // 获取状态和方法
-  const error = useAppConfigStore(state => state.error);
-  const isReady = useAppConfigStore(state => state.isReady);
-  const isLoading = useAppConfigStore(state => state.isLoading);
-  const isAnyGranted = useAppConfigStore(state => state.isAnyGranted);
-  const areAllGranted = useAppConfigStore(state => state.areAllGranted);
-  const getSetting = useAppConfigStore(state => state.getSetting);
-  const getSettingBoolean = useAppConfigStore(state => state.getSettingBoolean);
-  const getSettingInt = useAppConfigStore(state => state.getSettingInt);
-  const isFeatureEnabled = useAppConfigStore(state => state.isFeatureEnabled);
-  const isGlobalFeatureEnabled = useAppConfigStore(state => state.isGlobalFeatureEnabled);
+  // 获取配置上下文
+  const appConfig = useAppConfig();
+  const {
+    isReady,
+    isAnyGranted,
+    areAllGranted,
+    getSetting,
+    getSettingBoolean,
+    getSettingInt,
+    isFeatureEnabled,
+    isGlobalFeatureEnabled
+  } = appConfig;
 
   return useMemo(() => {
     // 创建 context 对象
     const context: IContext = {
-      isLoading,
-      isReady,
-      error,
+      isReady: isReady,
       isAnyGranted,
       areAllGranted,
       getSetting,
@@ -251,7 +247,7 @@ export function usePermission(conditions: IPermissionCondition & { requireAll?: 
 
     // 使用统一的权限检查函数
     return checkPermissions(context, conditions);
-  }, [error, isReady, isLoading, isAnyGranted, areAllGranted, getSetting, getSettingBoolean, getSettingInt, isFeatureEnabled, isGlobalFeatureEnabled, conditions]);
+  }, [isReady, isAnyGranted, areAllGranted, getSetting, getSettingBoolean, getSettingInt, isFeatureEnabled, isGlobalFeatureEnabled, conditions]);
 }
 
 /**
@@ -274,7 +270,6 @@ const Permission: React.FC<PermissionProps> = ({
   // 其他属性
   children,
   fallback = null,
-  loading = null,
   requireAll = true,
   noPermissionStrategy = 'fallback',
   disabledProps = {}
@@ -292,21 +287,9 @@ const Permission: React.FC<PermissionProps> = ({
     requireAll
   });
 
-  // 分别获取状态
-  const isLoading = useAppConfigStore(state => state.isLoading);
-  const error = useAppConfigStore(state => state.error);
-  const isReady = useAppConfigStore(state => state.isReady);
-
-  // 如果 ABP 配置还在加载中，显示加载状态
-  if (isLoading) {
-    return <>{loading}</>;
-  }
-
-  // 如果 ABP 配置加载失败，出于安全考虑不显示内容
-  if (error) {
-    console.warn('ABP配置加载失败，权限检查无法进行:', error);
-    return <>{fallback}</>;
-  }
+  // 获取配置上下文
+  const appConfig = useAppConfig();
+  const { isReady } = appConfig;
 
   // 如果 ABP 配置未准备好，出于安全考虑不显示内容
   if (!isReady) {

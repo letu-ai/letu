@@ -1,5 +1,6 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { getToken, ensureTokenValid } from '@/utils/authUtils';
+import { getToken, shouldRefreshToken, refreshToken as updateToken } from '@/utils/authUtils';
+import { getApiBaseUrl } from './urlUtils';
 
 interface IAbpFormatError {
     message: string;
@@ -124,9 +125,136 @@ const getErrorInfo = async (error: AxiosError): Promise<IResponseError> => {
 
 class HttpClient {
     private readonly instance: AxiosInstance;
-    allowAnonymousApis: string[] = ['/api/account/login']; //允许匿名访问接口
-    refreshTokenWhiteApis: string[] = ['/api/account/refresh-token', '/api/account/logout']; //不需要刷新token接口
+    refreshTokenWhiteApis: string[] = [ //不需要刷新token接口
+        '/api/identity/login',
+        '/api/identity/refresh-token',
+        '/api/identity/logout',
+        "/api/application/configuration"
+    ]; 
     private errorHandler: (error: IResponseError) => void = () => { };
+    private refreshTokenPromise: Promise<boolean> | null = null;
+
+    // 工具函数：统一URL小写；是否“跳过刷新token”的接口（匿名 或 刷新/注销）
+    private toUrl(url?: string): string { return (url || '').toLowerCase(); }
+    private isSkipRefreshApi(url?: string): boolean {
+        const u = this.toUrl(url);
+        return this.refreshTokenWhiteApis.some(x => u.endsWith(x.toLowerCase()));
+    }
+
+    // 工具函数：给请求附带当前本地token（即使已过期也附带）
+    private attachTokenHeader(config: AxiosRequestConfig) {
+        const token = getToken();
+        if (token?.accessToken) {
+            config.headers = config.headers || {};
+            (config.headers as any).Authorization = `Bearer ${token.accessToken}`;
+        }
+    }
+
+    // 内部刷新token的方法
+    private async refreshTokenInternal(): Promise<boolean> {
+        if (this.refreshTokenPromise) {
+            return this.refreshTokenPromise;
+        }
+
+        const currentToken = getToken();
+        if (!currentToken?.refreshToken) {
+            return false;
+        }
+
+        this.refreshTokenPromise = this.performTokenRefresh(currentToken.refreshToken)
+            .finally(() => {
+                this.refreshTokenPromise = null;
+            });
+
+        return this.refreshTokenPromise;
+    }
+
+    // 执行token刷新的HTTP请求
+    private async performTokenRefresh(refreshTokenValue: string): Promise<boolean> {
+        try {
+            console.log('开始刷新token');
+            
+            // 使用原生axios避免递归调用
+            const response = await axios.post(
+                `${this.instance.defaults.baseURL}/api/identity/refresh-token`,
+                { refreshToken: refreshTokenValue },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    timeout: 30000
+                }
+            );
+
+            if (response.data && response.data.accessToken) {
+                console.log('token刷新成功');
+                updateToken(
+                    response.data.accessToken,
+                    response.data.refreshToken,
+                    response.data.expiredTime
+                );
+                return true;
+            } else {
+                console.warn('token刷新返回空结果');
+                return false;
+            }
+        } catch (error) {
+            console.error('token刷新失败:', error);
+            return false;
+        }
+    }
+
+    // 处理请求前：受保护接口需要确保token有效；匿名/刷新白名单跳过"刷新token"
+    private async prepareAuthForRequest(config: AxiosRequestConfig): Promise<void> {
+        const skipRefresh = this.isSkipRefreshApi(config.url);
+        
+        // 如果不是白名单接口，检查是否需要刷新token
+        if (!skipRefresh && shouldRefreshToken()) {
+            const refreshed = await this.refreshTokenInternal();
+            if (!refreshed) {
+                const token = getToken();
+                // 如果刷新失败且token已过期，抛出错误
+                if (!token || !token.accessToken) {
+                    const err = new Error('Token is invalid or expired');
+                    err.name = 'TokenInvalidError';
+                    throw err;
+                }
+            }
+        }
+
+        // 无论是否匿名/刷新白名单，都附带当前本地token（如果有的话）
+        this.attachTokenHeader(config);
+    }
+
+    // 响应401时尝试刷新并重试一次（排除“跳过刷新token”的接口）
+    private async tryRefreshAndRetry(error: any): Promise<any> {
+        const originalConfig = error?.config as (AxiosRequestConfig & { __isRetry?: boolean }) | undefined;
+        const status = error?.response?.status as number | undefined;
+        if (!originalConfig || status !== 401) return Promise.reject(error);
+
+        const skipRefresh = this.isSkipRefreshApi(originalConfig.url);
+        if (skipRefresh || originalConfig.__isRetry) {
+            return Promise.reject(error);
+        }
+
+        try {
+            const refreshed = await this.refreshTokenInternal();
+            if (!refreshed) {
+                const tokenError: IResponseError = { message: '登录已过期，请重新登录', jumpLogin: true };
+                this.errorHandler(tokenError);
+                return Promise.reject(error);
+            }
+
+            // 使用最新token重试一次
+            this.attachTokenHeader(originalConfig);
+            originalConfig.__isRetry = true;
+            return this.instance.request(originalConfig);
+        } catch {
+            const tokenError: IResponseError = { message: '登录已过期，请重新登录', jumpLogin: true };
+            this.errorHandler(tokenError);
+            return Promise.reject(error);
+        }
+    }
 
     constructor(config?: AxiosRequestConfig) {
         this.instance = axios.create(config);
@@ -134,41 +262,10 @@ class HttpClient {
         // 请求拦截器
         this.instance.interceptors.request.use(
             async (config) => {
-                if (config.url && this.allowAnonymousApis.includes(config.url)) {
-                    return config;
-                }
-
-                // 检查是否为刷新token接口，避免循环调用
-                const currentUrl = config.url?.toLowerCase() || '';
-                const isRefreshTokenApi = this.refreshTokenWhiteApis.some(
-                    (x) => currentUrl.endsWith(x.toLowerCase())
-                );
-
-                // 非刷新token接口，确保token有效
-                if (!isRefreshTokenApi) {
-                    try {
-                        const isValid = await ensureTokenValid();
-                        if (!isValid) {
-                            // token无效，让响应拦截器处理401错误
-                            console.warn('Token validation failed');
-                        }
-                    } catch (error) {
-                        console.error('Token validation error:', error);
-                        // 继续发送请求，让响应拦截器处理错误
-                    }
-                }
-
-                // 添加当前有效的token到请求头
-                const token = getToken();
-                if (token?.accessToken) {
-                    config.headers.Authorization = `Bearer ${token.accessToken}`;
-                }
-
+                await this.prepareAuthForRequest(config);
                 return config;
             },
-            (error) => {
-                return Promise.reject(error);
-            },
+            (error) => Promise.reject(error),
         );
 
         // 响应拦截器
@@ -177,6 +274,11 @@ class HttpClient {
                 return response.data;
             },
             async (error) => {
+                // 401兜底重试
+                const maybeRetried = await this.tryRefreshAndRetry(error).catch(() => undefined);
+                if (maybeRetried !== undefined) 
+                    return maybeRetried;
+
                 const errorInfo = await getErrorInfo(error);
                 this.errorHandler(errorInfo);
                 return Promise.reject(error);
@@ -233,17 +335,11 @@ class HttpClient {
 
 // 默认配置
 const defaultConfig: AxiosRequestConfig = {
-    baseURL: getBaseUrl(),
+    baseURL: getApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
     },
 };
-
-export function getBaseUrl() {
-    const urlTemplate = import.meta.env.VITE_API_BASE_URL;
-    const port = import.meta.env.VITE_API_BASE_PORT;
-    return urlTemplate.replace(/{{port}}/g, port);
-}
 
 // 创建默认实例
 const httpClient = new HttpClient(defaultConfig);

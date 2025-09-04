@@ -74,24 +74,6 @@ const repoLinks = [
     { name: '文档', icon: <BookOutlined />, url: 'https://docs.letu.run' },
 ];
 
-
-const ThemeTest = () => {
-    const setTheme = useThemeStore(state => state.setTheme);
-
-    const changePrimaryColor = (color: string) => {
-        setTheme({ token: { colorPrimary: color } });
-    };
-
-    return (
-        <div className="flex gap-2 ">
-            <Button type="primary">ANTD</Button>
-            <button className="px-2 py-1 bg-primary rounded-corner text-text">Tailwind CSS</button>
-            <ColorPicker defaultValue="#463a8f" onChange={(value) => changePrimaryColor(value.toHexString())} />
-        </div>
-    )
-
-}
-
 function HomePage() {
     const [githubRepoInfo, setGithubRepoInfo] = useState<any>({
         starCount: 26,
@@ -131,9 +113,9 @@ function HomePage() {
                                         </Title>
                                     </Space>
                                 }
-                                className="dashboard-card"
+                                className="dashboard-card hover:shadow-lg transition-all duration-300"
                             >
-                                <ThemeTest />
+                                
                             </Card>
                         </Col>
 
@@ -147,7 +129,7 @@ function HomePage() {
                                         </Title>
                                     </Space>
                                 }
-                                className="dashboard-card"
+                                className="dashboard-card hover:shadow-lg transition-all duration-300"
                             >
                                 <Paragraph>
                                     乐途管理系统，使用.NET9+React18构建的RBAC通用权限管理系统（支持按钮级别权限），支持多租户功能，简单易上手，不使用任何三方Admin框架，完全作者独立开发；旨在为个人、企业提供高效、美观的后台管理解决方案，为.NET+React后台方案添砖加瓦，
@@ -175,7 +157,7 @@ function HomePage() {
                                                 icon={link.icon}
                                                 size="middle"
                                                 onClick={() => window.open(link.url, '_blank')}
-                                                className="repo-button"
+                                                className="repo-button bg-primary-bg text-primary-text hover:bg-primary hover:text-white transition-all duration-300"
                                             >
                                                 {link.name}
                                             </Button>
@@ -216,11 +198,11 @@ function HomePage() {
                                         </Title>
                                     </Space>
                                 }
-                                className="dashboard-card"
+                                className="dashboard-card hover:shadow-lg transition-all duration-300"
                             >
                                 <div className="tech-stack">
                                     {techStack.map((tech, index) => (
-                                        <Tag key={index} className="tech-tag">
+                                        <Tag key={index} className="tech-tag bg-primary-bg text-primary-text hover:bg-primary hover:text-white transition-all duration-300">
                                             {tech.name}
                                         </Tag>
                                     ))}
@@ -249,7 +231,7 @@ function HomePage() {
                                         </Title>
                                     </Space>
                                 }
-                                className="dashboard-card"
+                                className="dashboard-card hover:shadow-lg transition-all duration-300"
                             >
                                 <Link to="/admin/users">系统设置</Link>
                             </Card>
@@ -266,7 +248,7 @@ function HomePage() {
                                         </Title>
                                     </Space>
                                 }
-                                className="dashboard-card"
+                                className="dashboard-card hover:shadow-lg transition-all duration-300"
                             >
                                 <Timeline
                                     mode="left"

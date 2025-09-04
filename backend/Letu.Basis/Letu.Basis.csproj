@@ -31,9 +31,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Swashbuckle.AspNetCore" />
-		<PackageReference Include="MQTTnet" />
-		<PackageReference Include="MQTTnet.Server" />
-		<PackageReference Include="MQTTnet.AspNetCore" />
+		<PackageReference Include="Microsoft.Extensions.Http.Polly" />
 		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" />
 		<PackageReference Include="Volo.Abp.AutoMapper" />
 		<PackageReference Include="Volo.Abp.Autofac" />
@@ -46,7 +44,13 @@
 		<PackageReference Include="Volo.Abp.MultiTenancy" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.Domain" />
 		<PackageReference Include="Volo.Abp.SettingManagement.Domain" />
+		<PackageReference Include="Volo.Abp.BlobStoring" />
+
 		<PackageReference Include="DistributedLock.Redis" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Account\Dtos\" />
 	</ItemGroup>
 
 </Project>

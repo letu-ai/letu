@@ -1,12 +1,12 @@
-import { createFileRoute, Outlet, Link } from '@tanstack/react-router'
+import { createFileRoute, Outlet, Link, useRouter } from '@tanstack/react-router'
 import { FloatButton, Layout } from 'antd'
 import { UserOutlined, LockOutlined, HistoryOutlined, BellOutlined } from '@ant-design/icons'
 import { requireAuth } from '@/utils/authUtils'
 import Navbar from '@/components/layout/Navbar'
-import Application from '@/components/Application'
 import Sidebar from '@/components/layout/Sidebar'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorFallback from '@/components/ErrorFallback'
+import { AppConfigProvider, loadConfiguration } from '@/components/AppConfigProvider'
 
 const { Sider, Content } = Layout
 
@@ -15,7 +15,28 @@ export const Route = createFileRoute('/my')({
     beforeLoad: async ({ location }) => {
         requireAuth(location)
     },
+    loader: async () => {
+        const config = await loadConfiguration()
+        return {
+            config
+        }
+    },
+    staleTime: 1000 * 60 * 30, // 30分钟过期
+    errorComponent: ({ error }) => {
+        const router = useRouter();
+        
+        const handleRetry = () => {
+            router.invalidate();
+        };
+
+        return (
+            <div className='h-screen'>
+                <ErrorFallback error={error} resetErrorBoundary={handleRetry} />
+            </div>
+        )
+    }
 })
+
 const menuItems = [
     {
         key: '/my/profile',
@@ -40,8 +61,10 @@ const menuItems = [
 ]
 
 function MyLayout() {
+    const { config } = Route.useLoaderData()
+
     return (
-        <Application>
+        <AppConfigProvider config={config}>
             <Layout hasSider>
                 <Sider>
                     <Sidebar menu={menuItems} />
@@ -56,6 +79,6 @@ function MyLayout() {
                     <FloatButton.BackTop />
                 </Layout>
             </Layout>
-        </Application>
+        </AppConfigProvider>
     );
 }

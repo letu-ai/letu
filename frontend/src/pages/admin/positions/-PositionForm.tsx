@@ -135,7 +135,7 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
                 <Form.Item label="职位职级" name="level" rules={[{ required: true, message: '请选择职位职级' }]}>
                     <DataDictionarySelect
-                        dictType={DictType.PositionLevel}
+                        dictName={DictType.PositionLevel}
                         value={positionLevel.toString()}
                         onChange={positionLevelChange}
                         placeholder="请选择职位职级"

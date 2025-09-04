@@ -31,7 +31,6 @@ function OrganizationUnitList() {
     },
     {
       title: '操作',
-      dataIndex: 'option',
       width: 140,
       fixed: 'right',
       render: (_: any, record: OrganizationUnitListOutput) => (

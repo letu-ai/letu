@@ -21,6 +21,7 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         DefineEmployees(baisiGroup);
         DefinePositions(baisiGroup);
         DefineNotifications(baisiGroup);
+        DefineRegions(baisiGroup);
 
         // 系统设置
         var settingGroup = context.AddGroup(BasisPermissions.SettingGroupName, L("Permission:Admin.Setting"));
@@ -128,6 +129,16 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         permission.AddChild(BasisPermissions.DataDictionary.Delete, L("Permission:Delete"));
     }
 
+    // 行政区域
+    public void DefineRegions(PermissionGroupDefinition group)
+    {
+        var permission = group.AddPermission(BasisPermissions.Region.Default, L("Permission:RegionManagement"));
+        permission.AddChild(BasisPermissions.Region.Create, L("Permission:Create"));
+        permission.AddChild(BasisPermissions.Region.Update, L("Permission:Edit"));
+        permission.AddChild(BasisPermissions.Region.Delete, L("Permission:Delete"));
+        permission.AddChild(BasisPermissions.Region.Import, L("Permission:Import"));
+    }
+
     // 通知
     public void DefineNotifications(PermissionGroupDefinition group)
     {
@@ -154,6 +165,8 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         permission.AddChild(BasisPermissions.Setting.Emailing, L("Permission:Emailling"));
         permission.AddChild(BasisPermissions.Setting.EmailingTest, L("Permission:EmailingTest"));
         permission.AddChild(BasisPermissions.Setting.TimeZone, L("Permission:TimeZone"));
+        permission.AddChild(BasisPermissions.Setting.Site, L("Permission:Site"));
+        permission.AddChild(BasisPermissions.Setting.Amap, L("Permission:Amap"));
     }
 
     // 功能管理

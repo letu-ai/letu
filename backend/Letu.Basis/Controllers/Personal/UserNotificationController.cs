@@ -1,6 +1,6 @@
 ﻿using Letu.Basis.ClientConnection;
-using Letu.Basis.Notifications;
-using Letu.Basis.Notifications.Dtos;
+using Letu.Basis.Personal.Notifications;
+using Letu.Basis.Personal.Notifications.Dtos;
 using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

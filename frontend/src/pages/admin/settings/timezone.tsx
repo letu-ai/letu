@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Form, Select, Button, Typography, Spin, App } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
 import { fetchTimeZones, fetchTimeZoneSettings, type ITimeZone, updateTimeZoneSettings } from './-service';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useAsyncEffect } from 'ahooks';
 
 const { Title } = Typography;
 
@@ -17,31 +18,28 @@ function TimeZoneSettings() {
     const [timeZoneOptions, setTimeZoneOptions] = useState<DefaultOptionType[]>([]);
     const [currentTimeZone, setCurrentTimeZone] = useState<string>('');
     const { message } = App.useApp();
-    
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [timeZonesData, settingsData] = await Promise.all([
-                    fetchTimeZones(),
-                    fetchTimeZoneSettings()
-                ]);
 
-                // 将服务端数据转换为Select组件所需的格式
-                const options: DefaultOptionType[] = timeZonesData.map((tz: ITimeZone) => ({
-                    label: tz.name,
-                    value: tz.value
-                }));
+    useAsyncEffect(async () => {
+        try {
+            const [timeZonesData, settingsData] = await Promise.all([
+                fetchTimeZones(),
+                fetchTimeZoneSettings()
+            ]);
 
-                setTimeZoneOptions(options);
-                setCurrentTimeZone(settingsData);
-                form.setFieldsValue({ timeZone: settingsData });
-            } catch  {
-                message.error('获取时区设置失败');
-            } finally {
-                setPageLoading(false);
-            }
-        };
-        fetchData();
+            // 将服务端数据转换为Select组件所需的格式
+            const options: DefaultOptionType[] = timeZonesData.map((tz: ITimeZone) => ({
+                label: tz.name,
+                value: tz.value
+            }));
+
+            setTimeZoneOptions(options);
+            setCurrentTimeZone(settingsData);
+            form.setFieldsValue({ timeZone: settingsData });
+        } catch {
+            message.error('获取时区设置失败');
+        } finally {
+            setPageLoading(false);
+        }
     }, [form, message]);
 
     const handleSubmit = async (values: { timeZone: string }) => {
@@ -49,7 +47,7 @@ function TimeZoneSettings() {
         try {
             await updateTimeZoneSettings(values.timeZone);
             message.success('更新时区设置成功');
-        } catch  {
+        } catch {
             message.error('更新时区设置失败');
         } finally {
             setLoading(false);
@@ -57,40 +55,38 @@ function TimeZoneSettings() {
     };
 
     return (
-        <div style={{ maxWidth: 800 }}>
-            <Spin spinning={pageLoading} tip="加载中...">
-                <Title level={3} style={{ textAlign: 'center', marginBottom: 32 }}>
-                    时区设置
-                </Title>
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleSubmit}
-                    initialValues={{ timeZone: currentTimeZone }}
+        <Spin spinning={pageLoading} tip="加载中...">
+            <Title level={3} className="text-center mb-8">
+                时区设置
+            </Title>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                initialValues={{ timeZone: currentTimeZone }}
+            >
+                <Form.Item
+                    name="timeZone"
+                    label="时区"
+                    help="此设置用于应用程序范围或基于租户。"
+                    rules={[{ required: true, message: '请选择时区' }]}
                 >
-                    <Form.Item
-                        name="timeZone"
-                        label="时区"
-                        help="此设置用于应用程序范围或基于租户。"
-                        rules={[{ required: true, message: '请选择时区' }]}
-                    >
-                        <Select
-                            placeholder="请选择时区"
-                            showSearch
-                            filterOption={(input, option) =>
-                                String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                            }
-                            options={timeZoneOptions}
-                        />
-                    </Form.Item>
+                    <Select
+                        placeholder="请选择时区"
+                        showSearch
+                        filterOption={(input, option) =>
+                            String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        options={timeZoneOptions}
+                    />
+                </Form.Item>
 
-                    <div style={{ textAlign: 'center', marginTop: 24 }}>
-                        <Button type="primary" htmlType="submit" loading={loading}>
-                            保存
-                        </Button>
-                    </div>
-                </Form>
-            </Spin>
-        </div>
+                <div className="text-center mt-16">
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        保存
+                    </Button>
+                </div>
+            </Form>
+        </Spin>
     );
 }

@@ -4,6 +4,7 @@ using Letu.Basis.Middlewares;
 using Letu.Core.JsonConverters;
 using Letu.Core.Middlewares;
 using Letu.Logging.Options;
+using Letu.Server;
 using Letu.Shared.Consts;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
@@ -25,6 +26,8 @@ using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Authorization;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.BlobStoring;
+using Volo.Abp.BlobStoring.FileSystem;
 using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.DistributedLocking;
@@ -46,6 +49,7 @@ namespace Letu;
     typeof(AbpEventBusModule),
     typeof(AbpDistributedLockingModule),
     typeof(AbpCachingStackExchangeRedisModule),
+    typeof(AbpBlobStoringFileSystemModule),
     typeof(LetuAbpFreeSqlModule),
     typeof(LetuBasisModule)
 )]
@@ -64,14 +68,21 @@ public class LetuServerModule : AbpModule
         ConfigureSwagger(services, configuration);
         ConfigureJsonOptions(services, configuration);
         ConfigureLogging(services, configuration);
+        ConfigureBlobStoring();
     }
 
     private void ConfigureDistributedLock(IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IDistributedLockProvider>(sp =>
         {
+            var redisConfiguration = configuration["Redis:Configuration"];
+            if (string.IsNullOrWhiteSpace(redisConfiguration))
+            {
+                throw new Exception("Redis 配置不能为空，请检查配置文件。");
+            }
+
             var connection = ConnectionMultiplexer
-                .Connect(configuration["Redis:Configuration"]);
+                .Connect(redisConfiguration);
             return new
                 RedisDistributedSynchronizationProvider(connection.GetDatabase());
         });
@@ -225,6 +236,20 @@ public class LetuServerModule : AbpModule
         services.Configure<LetuLoggingOption>(options =>
         {
             options.IgnoreExceptionTypes = [typeof(BusinessException), typeof(EntityNotFoundException)];
+        });
+    }
+
+    private void ConfigureBlobStoring()
+    {
+        Configure<AbpBlobStoringOptions>(options =>
+        {
+            options.Containers.ConfigureDefault(container =>
+            {
+                container.UseFileSystem(fileSystem =>
+                {
+                    fileSystem.BasePath = Path.Join(Program.GetProgramDirectory(), "blobs");
+                });
+            });
         });
     }
 

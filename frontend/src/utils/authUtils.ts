@@ -1,5 +1,4 @@
 import type { IUserTokenOutput } from '@/pages/account/-service';
-import { refreshToken as refreshTokenAPI } from '@/pages/account/-service';
 import { redirect } from '@tanstack/react-router';
 
 // 存储键名
@@ -7,8 +6,6 @@ const TOKEN_KEY = 'auth-token';
 const REMEMBER_ME_KEY = 'auth-remember-me';
 const SAVED_USERNAME_KEY = 'auth-saved-username';
 
-// 全局token刷新Promise，防止并发刷新
-let refreshTokenPromise: Promise<void> | null = null;
 
 /**
  * 获取存储对象（根据记住我状态）
@@ -98,7 +95,7 @@ export function getSavedUserName(): string {
 }
 
 /**
- * 判断 Token 是否有效
+ * 判断 Token 是否有效（精确判断，不含缓冲时间）
  */
 export function isTokenValid(): boolean {
     const token = getToken();
@@ -109,13 +106,9 @@ export function isTokenValid(): boolean {
 
     // 如果有过期时间，检查是否过期
     if (token.expiredTime) {
-        // 统一转换为 UTC 时间戳进行比较，避免时区问题
         const expiredTime = new Date(token.expiredTime).getTime();
-        const now = Date.now(); // 当前 UTC 时间戳
-
-        // 提前5分钟判断为过期，避免边界情况
-        const bufferTime = 5 * 60 * 1000; // 5分钟
-        return now < (expiredTime - bufferTime);
+        const now = Date.now();
+        return now < expiredTime;
     }
 
     // 如果没有过期时间，只要有 accessToken 就认为有效
@@ -140,60 +133,24 @@ export function requireAuth({ href}: { href: string }): void {
 }
 
 /**
- * 确保token有效，必要时自动刷新
- * @returns Promise<boolean> 返回token是否有效
+ * 检查token是否需要刷新
+ * @returns {boolean} 是否需要刷新token
  */
-export async function ensureTokenValid(): Promise<boolean> {
+export function shouldRefreshToken(): boolean {
     const token = getToken();
-    
-    if (!token || !token.accessToken) {
+
+    if (!token || !token.accessToken || !token.refreshToken) {
         return false;
     }
-    
+
     const now = Date.now();
     const expiredTime = token.expiredTime ? new Date(token.expiredTime).getTime() : 0;
-    
-    // token已过期
-    if (expiredTime && now >= expiredTime) {
+
+    if (!expiredTime) {
         return false;
     }
-    
-    // token在10分钟内过期，需要刷新
+
+    // 判断是否需要刷新：已过期或10分钟内即将过期
     const tenMinutesFromNow = now + 10 * 60 * 1000;
-    if (expiredTime && expiredTime < tenMinutesFromNow && token.refreshToken) {
-        // 防止并发刷新
-        if (!refreshTokenPromise) {
-            console.log(`token即将过期，开始刷新。剩余时间：${Math.floor((expiredTime - now) / 1000)}秒`);
-            
-            refreshTokenPromise = refreshTokenAPI(token.refreshToken)
-                .then((res) => {
-                    if (res) {
-                        console.log('token刷新成功');
-                        refreshToken(res.accessToken, res.refreshToken, res.expiredTime);
-                    } else {
-                        console.warn('token刷新返回空结果');
-                        throw new Error('Token refresh returned null');
-                    }
-                })
-                .catch((error) => {
-                    console.error('token刷新失败:', error);
-                    // 刷新失败，清除token
-                    clearToken();
-                    throw error;
-                })
-                .finally(() => {
-                    refreshTokenPromise = null;
-                });
-        }
-        
-        try {
-            await refreshTokenPromise;
-            return isTokenValid();
-        } catch {
-            // 刷新失败
-            return false;
-        }
-    }
-    
-    return true;
+    return now >= expiredTime || expiredTime < tenMinutesFromNow;
 }

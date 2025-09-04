@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Empty, Input, Menu, Modal } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { Link } from '@tanstack/react-router';
-import useAppConfigStore from '@/application/appConfigStore';
+import { useAppConfig } from '@/components/AppConfigProvider';
 
 export interface SearchModalRef {
   openModal: () => void;
@@ -12,8 +12,8 @@ const SearchModal = forwardRef<SearchModalRef, any>((_, ref) => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>();
   const [filteredData, setFilteredData] = useState<any[]>([]);
-  const menu = useAppConfigStore(state => state.menu);
-
+  const appConfig = useAppConfig();
+  const { menu } = appConfig;
   useImperativeHandle(ref, () => ({
     openModal,
   }));

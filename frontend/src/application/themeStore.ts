@@ -1,5 +1,7 @@
 import { theme, type ThemeConfig } from 'antd';
 import { create } from 'zustand';
+import tinycolor from "tinycolor2";
+import { fixedLightColor } from '@/utils/colorUtils';
 
 // 清爽紫色主题配置
 const defaultTheme: ThemeConfig = {
@@ -29,7 +31,7 @@ const defaultTheme: ThemeConfig = {
             itemBorderRadius: 8,
         },
         Button: {
-            // colorPrimary: '#7E57C2',
+            colorPrimary: '#7E57C2',
             colorPrimaryHover: '#9575CD',
             colorPrimaryActive: '#673AB7',
         },
@@ -44,15 +46,43 @@ const defaultTheme: ThemeConfig = {
 interface IThemeStore {
     theme: ThemeConfig
 
-    setTheme: (theme: ThemeConfig) => void
+    setThemeColor: (primaryColor: string, linkColor?: string) => void
 }
 
 const useThemeStore = create<IThemeStore>(set => ({
     // 默认主题
     theme: defaultTheme,
 
-    // 设置特定主题
-    setTheme: theme => set({ theme }),
+    setThemeColor: (primaryColor: string, linkColor?: string) => set(state => ({
+        theme: {
+            ...state.theme,
+            token: {
+                colorPrimary: primaryColor,
+                colorLink: linkColor ?? primaryColor
+            },
+            components: {
+                ...state.theme.components,
+                ...{
+                    Button: {
+                        colorPrimary: primaryColor,
+                        colorPrimaryHover: tinycolor(primaryColor).brighten(10).toHexString(),
+                        colorPrimaryActive: tinycolor(primaryColor).darken(10).toHexString(),
+                    },
+                    Menu: {
+                        itemSelectedBg: fixedLightColor(primaryColor, 0.9),
+                        itemSelectedColor: primaryColor,
+                        itemHoverBg: fixedLightColor(primaryColor, 0.95),
+                        itemBorderRadius: 8,
+                    },
+                    Table: {
+                        headerBg: fixedLightColor(primaryColor, 0.95),
+                        headerColor: fixedLightColor(primaryColor, 0.1),
+                        borderColor: fixedLightColor(primaryColor, 0.9),
+                    },
+                },
+            }
+        }
+    })),
 }));
 
 export default useThemeStore;

@@ -1,8 +1,9 @@
 import { Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { resetPassword, type ResetPasswordInput, type UserListOutput } from './-service';
-import { Patterns } from '@/utils/globalValue';
 import useApp from 'antd/es/app/useApp';
+import { useAppConfig } from '@/components/AppConfigProvider';
+import { generatePasswordRules, type PasswordConfig } from '@/utils/passwordUtils';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ModalProps {}
@@ -16,6 +17,17 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
   const [form] = Form.useForm();
   const [currentRow, setCurrentRow] = useState<UserListOutput>();
   const { message } = useApp();
+  const { getSettingInt, getSettingBoolean } = useAppConfig();
+  
+  // 获取密码配置
+  const passwordConfig: PasswordConfig = {
+    requiredLength: getSettingInt('Letu.Identity.Password.RequiredLength') || 8,
+    requiredUniqueChars: getSettingInt('Letu.Identity.Password.RequiredUniqueChars') || 1,
+    requireNonAlphanumeric: getSettingBoolean('Letu.Identity.Password.RequireNonAlphanumeric') || false,
+    requireLowercase: getSettingBoolean('Letu.Identity.Password.RequireLowercase') || false,
+    requireUppercase: getSettingBoolean('Letu.Identity.Password.RequireUppercase') || false,
+    requireDigit: getSettingBoolean('Letu.Identity.Password.RequireDigit') || false,
+  };
 
   useImperativeHandle(ref, () => ({
     openModal,
@@ -45,10 +57,9 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
     await resetPassword({ ...values, userId: currentRow!.id });
     handleSuccess('重置成功');
   };
-  const pwdPatternValidateItem = {
-    pattern: Patterns.LoginPassword,
-    message: '密码至少有一个字母和数字，长度6-16位，特殊字符 "~`!@#$%^&*()_-+={[}]|\\:;\\"\'<,>.?/',
-  };
+  
+  // 生成密码验证规则
+  const passwordRules = generatePasswordRules(passwordConfig);
 
   return (
     <Modal title="重置密码" open={isOpenModal} onCancel={onCancel} onOk={onOk} maskClosable={false} width="40%">
@@ -62,7 +73,7 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
         onFinish={onFinish}
       >
         <p className="mb-1">正在重置用户"{currentRow?.userName}"的密码：</p>
-        <Form.Item name="password" rules={[{ required: true, message: '用户密码不能为空' }, pwdPatternValidateItem]}>
+        <Form.Item name="password" rules={passwordRules}>
           <Input.Password placeholder="请输入用户密码" allowClear />
         </Form.Item>
       </Form>

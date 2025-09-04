@@ -1,11 +1,14 @@
-import { Card, Form, Input, Button, Checkbox, Tabs, message } from 'antd';
+import { Card, Form, Input, Button, Checkbox, Tabs, message, Divider } from 'antd';
 import { UserOutlined, LockOutlined, MobileOutlined, MailOutlined } from '@ant-design/icons';
 import './style/login.scss';
 import { sendLoginSmsCode, loginByPassword, loginBySms, type IPasswordLoginInput, type ISmsLoginInput } from './-service';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import LoginBg from '@/assets/login-bg.png';
 import { setToken, setRememberMe, getRememberMe, getSavedUserName } from '@/utils/authUtils';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useAppConfig } from '@/components/AppConfigProvider';
+import { getLoginSettings } from './-service';
+import SwitchTenantModel from './-SwitchTenantModel';
 
 export const Route = createFileRoute('/account/login')({
     component: LoginPage,
@@ -13,7 +16,12 @@ export const Route = createFileRoute('/account/login')({
         return {
             returnUrl: search.returnUrl as string || '/',
         };
+    },
+    loader: async () => {
+        const loginSettings = await getLoginSettings();
+        return loginSettings;
     }
+
 });
 
 function LoginPage() {
@@ -22,6 +30,12 @@ function LoginPage() {
     const [countdown, setCountdown] = useState(0);
     const { returnUrl } = Route.useSearch();
     const [form] = Form.useForm();
+    const { getSettingBoolean, getSetting } = useAppConfig();
+    const navigate = useNavigate();
+    const copyright = getSetting("Letu.Application.Site.Copyright");
+    const icp = getSetting("Letu.Application.Site.Icp");
+    const loginSettings = Route.useLoaderData();
+    const [switchTenantModelVisible, setSwitchTenantModelVisible] = useState(false);
 
     // 初始化表单值
     useEffect(() => {
@@ -34,6 +48,14 @@ function LoginPage() {
             });
         }
     }, [form]);
+
+    const handleSwitchTenant = () => {
+        setSwitchTenantModelVisible(true);
+    }
+
+    const handleSwitchTenantClose = () => {
+        setSwitchTenantModelVisible(false);
+    }
 
     const onFinish = async (values: any) => {
         setLoading(true);
@@ -60,8 +82,8 @@ function LoginPage() {
             }
 
             // 登录成功后跳转到返回URL或首页
-            window.location.href = returnUrl; //使用重新加载页面，确保正确获取配置
-        } catch  {
+            navigate({ to: returnUrl }); //使用重新加载页面，确保正确获取配置
+        } catch {
             // 登录失败处理已在service中处理
         } finally {
             setLoading(false);
@@ -88,6 +110,14 @@ function LoginPage() {
         });
     };
 
+    const loginMethods = useMemo(() => {
+        const methods = [{ key: 'password', label: '账号密码登录' }];
+        if (getSettingBoolean('Letu.Account.EnablePhoneNumberLogin')) {
+            methods.push({ key: 'sms', label: '短信验证码登录' });
+        }
+        return methods;
+    }, [getSettingBoolean]);
+
     return (
         <div className="login-container">
             <div className="login-container-main">
@@ -95,7 +125,7 @@ function LoginPage() {
                     <div className="login-layout">
                         {/* 左侧背景图 */}
                         <div className="login-bg-side" style={{ backgroundImage: `url(${LoginBg})` }}>
-                            <div className="bg-overlay">
+                            <div className="bg-overlay bg-primary/70">
                                 <h2>欢迎使用乐途管理系统</h2>
                                 <p>基于.NET9+React18打造的通用权限管理平台</p>
                             </div>
@@ -104,22 +134,26 @@ function LoginPage() {
                         {/* 右侧登录表单 */}
                         <div className="login-form-side">
                             <div className="form-container">
-                                <h3 className="form-title">用户登录</h3>
+                                <h3 className="form-title text-primary">用户登录</h3>
+                                {loginSettings.multiTenancyEnabled && (
+                                    <>
+                                        <div className="flex flex-col">
+                                            <h3 className="text-sm font-normal text-text-muted">租户</h3>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-base font-medium">{loginSettings.tenantName ?? '主站'}</span>
+                                                <Button type="link" onClick={handleSwitchTenant}>切换</Button>
+                                            </div>
+                                        </div>
+                                        <Divider />
+                                        <SwitchTenantModel visible={switchTenantModelVisible} onClose={handleSwitchTenantClose} />
+                                    </>
+                                )}
 
                                 <Tabs
                                     activeKey={activeTab}
                                     onChange={setActiveTab}
                                     centered
-                                    items={[
-                                        {
-                                            key: 'password',
-                                            label: '账号密码登录',
-                                        },
-                                        {
-                                            key: 'sms',
-                                            label: '短信验证码登录',
-                                        },
-                                    ]}
+                                    items={loginMethods}
                                 />
 
                                 <Form<IPasswordLoginInput | ISmsLoginInput>
@@ -192,13 +226,9 @@ function LoginPage() {
                 </Card>
 
                 <div className="login-footer">
-                    Copyright © {new Date().getFullYear()} 在线文档：
-                    <a href="https://doc.crackerwork.cn" target="_blank">
-                        doc.crackerwork.cn
-                    </a>{' '}
-                    |
+                    {copyright?.replace("%YEAR%", new Date().getFullYear().toString())} |
                     <a href="http://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px' }}>
-                        湘ICP备2024047029号-1
+                        {icp}
                     </a>
                 </div>
             </div>

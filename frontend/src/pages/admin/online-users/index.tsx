@@ -8,7 +8,7 @@ import SmartTable from '@/components/SmartTable';
 import type { SmartTableColumnType, SmartTableRef } from '@/components/SmartTable/type';
 import ProIcon from '@/components/ProIcon';
 import { App } from 'antd';
-import useAppConfigStore from '@/application/appConfigStore';
+import { useAppConfig } from '@/components/AppConfigProvider';
 
 export const Route = createFileRoute('/admin/online-users/')({
     component: OnlineUserList
@@ -17,7 +17,8 @@ export const Route = createFileRoute('/admin/online-users/')({
 
 function OnlineUserList() {
     const tableRef = useRef<SmartTableRef>(null);
-    const currentUser = useAppConfigStore(state => state.currentUser)
+    const appConfig = useAppConfig();
+    const { currentUser } = appConfig;
     const sessionId = currentUser.sessionId;
     const { message } = App.useApp();
     const columns: SmartTableColumnType<OnlineUserResultDto>[] = [
