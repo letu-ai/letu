@@ -51,6 +51,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <summary>
         /// 修改菜单
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
         [HttpPut("{id}")]

@@ -4,7 +4,7 @@ using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 
-namespace Letu.Basis.Admin.PermissionManagement;
+namespace Letu.Basis.DataSeed;
 
 public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransientDependency
 {
@@ -25,7 +25,10 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
     public virtual async Task SeedAsync(DataSeedContext context)
     {
         using (currentTenant.Change(context?.TenantId))
-        await SeedPositionLevelAsync();
+        {
+            await SeedPositionLevelAsync();
+            await SeedUserSexAsync();
+        }
     }
 
     private async Task SeedPositionLevelAsync()
@@ -35,8 +38,8 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         {
             return;
         }
-        
-       var dictionary = await dictionaryRepository.InsertAsync(new DataDictionary
+
+        var dictionary = await dictionaryRepository.InsertAsync(new DataDictionary
         {
             Name = "position-level",
             DisplayName = "职位职级",
@@ -52,8 +55,48 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
                 Value = i.ToString("D2"),
                 Label = $"L{i:D2}",
                 IsEnabled = true
+                
             });
         }
         await itemRepository.InsertAsync(items);
     }
+
+    private async Task SeedUserSexAsync()
+    {
+        var exists = await dictionaryRepository.Select.Where(x => x.Name == "user-sex").AnyAsync();
+        if (exists)
+        {
+            return;
+        }
+
+        var dictionary = await dictionaryRepository.InsertAsync(new DataDictionary
+        {
+            Name = "user-sex",
+            DisplayName = "用户性别",
+            IsEnabled = true
+        });
+
+        var items = new List<DataDictionaryItem>([
+            new (){
+                DictionaryName = dictionary.Name,
+                Value = "0",
+                Label = "未知",
+                IsEnabled = true
+            },
+            new() {
+                DictionaryName = dictionary.Name,
+                Value = "1",
+                Label = "男",
+                IsEnabled = true
+            },
+            new (){
+                DictionaryName = dictionary.Name,
+                Value = "2",
+                Label = "女",
+                IsEnabled = true
+            }
+        ]);
+        await itemRepository.InsertAsync(items);
+    }
+
 }

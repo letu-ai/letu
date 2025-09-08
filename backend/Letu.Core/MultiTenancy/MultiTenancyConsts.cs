@@ -3,7 +3,7 @@ namespace Letu.Core.MultiTenancy;
 public static class MultiTenancyConsts
 {
     /// <summary>
-    /// �Ƿ����ö��⻧�����������ã�����Ӳ������ã�
+    /// true表示启用多租户
     /// </summary>
     public const bool IsEnabled = true;
 }

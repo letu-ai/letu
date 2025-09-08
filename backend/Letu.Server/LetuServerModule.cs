@@ -2,7 +2,7 @@
 using Letu.Basis;
 using Letu.Basis.Middlewares;
 using Letu.Core.JsonConverters;
-using Letu.Core.Middlewares;
+using Letu.Core.MultiTenancy;
 using Letu.Logging.Options;
 using Letu.Server;
 using Letu.Shared.Consts;
@@ -281,9 +281,11 @@ public class LetuServerModule : AbpModule
         //允许跨域
         app.UseCors();
         app.UseAuthentication();
+        if (MultiTenancyConsts.IsEnabled)
+        {
+            app.UseMultiTenancy();
+        }
         app.UseAuthorization();
-
-        app.UseMiddleware<CurrentUserMiddleware>();
 
         app.UseConfiguredEndpoints(endpoints =>
         {

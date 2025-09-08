@@ -2,6 +2,7 @@
 using Letu.Repository;
 using Volo.Abp.Timing;
 using Volo.Abp.BackgroundJobs;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Abp.BackgroundJobs;
 
@@ -11,8 +12,9 @@ public class FreeSqlBackgroundJobRepository : FreeSqlRepository<BackgroundJobRec
 
     public FreeSqlBackgroundJobRepository(
         UnitOfWorkManager uowManger,
+        ICurrentTenant currentTenant,
         IClock clock)
-        : base(uowManger)
+        : base(uowManger, currentTenant)
     {
         this.clock = clock;
     }

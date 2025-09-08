@@ -5,6 +5,8 @@ import { redirect } from '@tanstack/react-router';
 const TOKEN_KEY = 'auth-token';
 const REMEMBER_ME_KEY = 'auth-remember-me';
 const SAVED_USERNAME_KEY = 'auth-saved-username';
+const TENANT_ID_KEY = 'auth-tenant-id';
+const TENANT_KEY_KEY = 'auth-tenant-key';
 
 
 /**
@@ -87,6 +89,32 @@ export function getRememberMe(): boolean {
     return localStorage.getItem(REMEMBER_ME_KEY) === 'true';
 }
 
+export interface ITenantInfo {
+    tenantKey: string;
+    tenantId: string | null;
+}
+
+/**
+ * 获取租户ID
+ */
+export function getTenantInfo(): ITenantInfo | null {
+    return {
+        tenantKey: localStorage.getItem(TENANT_KEY_KEY) || '',
+        tenantId: localStorage.getItem(TENANT_ID_KEY) || null,
+    }
+}
+
+export function setTenantId(tenantId: string | null, tenantKey: string ): void {
+    if (tenantId) {
+        localStorage.setItem(TENANT_ID_KEY, tenantId);
+        localStorage.setItem(TENANT_KEY_KEY, tenantKey);
+    }
+    else {
+        localStorage.removeItem(TENANT_ID_KEY);
+        localStorage.removeItem(TENANT_KEY_KEY);
+    }
+}
+
 /**
  * 获取保存的用户名
  */
@@ -121,7 +149,7 @@ export function isTokenValid(): boolean {
  * @param location - 当前位置对象，包含 pathname 和 searchStr
  * @throws {redirect} 如果用户未认证，抛出重定向对象
  */
-export function requireAuth({ href}: { href: string }): void {
+export function requireAuth({ href }: { href: string }): void {
     if (!isTokenValid()) {
         throw redirect({
             to: '/account/login',

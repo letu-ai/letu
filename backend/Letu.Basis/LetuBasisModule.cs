@@ -154,6 +154,11 @@ namespace Letu.Basis
                     .Add<BasisResource>("zh-Hans")
                     .AddVirtualJson("/Letu/Basis/Localization/Resources");
             });
+
+            Configure<AbpExceptionLocalizationOptions>(options =>
+            {
+                options.MapCodeNamespace("Volo.AbpIo.MultiTenancy", typeof(BasisResource));
+            });
         }
 
         //private void ConfigureDataSeed(IServiceCollection services)

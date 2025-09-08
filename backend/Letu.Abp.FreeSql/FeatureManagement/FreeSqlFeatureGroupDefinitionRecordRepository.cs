@@ -1,6 +1,7 @@
 using FreeSql;
 using Letu.Repository;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Abp.FeatureManagement;
 
@@ -9,8 +10,8 @@ public class FreeSqlFeatureGroupDefinitionRecordRepository :
    IFeatureGroupDefinitionRecordRepository
 {
     public FreeSqlFeatureGroupDefinitionRecordRepository(
-        UnitOfWorkManager uowManger)
-        : base(uowManger)
+        UnitOfWorkManager uowManger, ICurrentTenant currentTenant)
+        : base(uowManger, currentTenant)
     {
     }
 }

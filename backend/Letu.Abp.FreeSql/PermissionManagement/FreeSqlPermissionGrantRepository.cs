@@ -1,5 +1,6 @@
 ﻿using FreeSql;
 using Letu.Repository;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement;
 
 namespace Letu.Abp.PermissionManagement;
@@ -8,8 +9,8 @@ public class FreeSqlPermissionGrantRepository :
    FreeSqlRepository<PermissionGrant, Guid>,
    IPermissionGrantRepository
 {
-    public FreeSqlPermissionGrantRepository(UnitOfWorkManager uowManger)
-        : base(uowManger)
+    public FreeSqlPermissionGrantRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant)
+        : base(uowManger, currentTenant)
     {
 
     }

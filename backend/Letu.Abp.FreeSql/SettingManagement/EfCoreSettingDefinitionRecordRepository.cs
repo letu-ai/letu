@@ -1,13 +1,14 @@
 using FreeSql;
 using Letu.Repository;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.SettingManagement;
 
 namespace Letu.Abp.SettingManagement;
 
 public class FreeSqlSettingDefinitionRecordRepository : FreeSqlRepository<SettingDefinitionRecord, Guid>, ISettingDefinitionRecordRepository
 {
-    public FreeSqlSettingDefinitionRecordRepository(UnitOfWorkManager uowManger)
-        : base(uowManger)
+    public FreeSqlSettingDefinitionRecordRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant)
+        : base(uowManger, currentTenant)
     {
     }
 

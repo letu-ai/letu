@@ -18,6 +18,12 @@ namespace Letu.Basis.Admin.Menus
             StateCheckers = new();
         }
 
+        public MenuItem(Guid id)
+            : base(id)
+        {
+            StateCheckers = new();
+        }
+
         /// <summary>
         /// 显示标题/名称
         /// </summary>

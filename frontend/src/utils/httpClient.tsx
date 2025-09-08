@@ -13,6 +13,7 @@ interface IAbpFormatError {
 export interface IResponseError {
     message: string;
     jumpLogin?: boolean;
+    jumpTenantError?: boolean;
     code?: string;
     details?: string | string[];
     data?: any;
@@ -74,6 +75,22 @@ const getValidateError = (response: AxiosResponse): IResponseError | undefined =
     return undefined;
 }
 
+// 获取租户解析错误
+const getTenantResolveError = (response: AxiosResponse): IResponseError | undefined => {
+    // 检查是否存在租户解析错误头
+    const tenantResolveError = response.headers["abp-tenant-resolve-error"];
+    if (tenantResolveError) {
+        return {
+            message: `租户解析错误：${decodeURIComponent(tenantResolveError)}`,
+            jumpTenantError: true,
+            code: response.status.toString(),
+            jumpLogin: false
+        };
+    }
+
+    return undefined;
+}
+
 const getAbpError = async (response: AxiosResponse): Promise<IResponseError | undefined> => {
     if (response.headers["_abperrorformat"] === "true") {
         // 处理ABP框架已经格式化好的错误。
@@ -109,8 +126,9 @@ const getErrorInfo = async (error: AxiosError): Promise<IResponseError> => {
         case 'ERR_BAD_REQUEST':
         case 'ERR_BAD_RESPONSE':
             if (error.response) {
-                // 尝试按顺序处理不同类型的错误
-                errorInfo = (await getAbpError(error.response)) ||
+                // 尝试按顺序处理不同类型的错误，租户解析错误优先级最高
+                errorInfo = getTenantResolveError(error.response) ||
+                    (await getAbpError(error.response)) ||
                     getValidateError(error.response) ||
                     getHttpStatusError(error.response.status);
             }

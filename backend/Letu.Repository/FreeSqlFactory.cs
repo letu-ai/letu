@@ -77,7 +77,7 @@ namespace Letu.Repository
             fsql.GlobalFilter.Apply<ISoftDelete>("DeletedFilter", x => !x.IsDeleted, before: true);
             fsql.GlobalFilter.ApplyIf<IMultiTenant>(
                 "TenantFilter",
-                () => MultiTenancyConsts.IsEnabled && TenantManager.Current.HasValue,
+                () => MultiTenancyConsts.IsEnabled,
                 a => a.TenantId == TenantManager.Current,
                 before: true);
 

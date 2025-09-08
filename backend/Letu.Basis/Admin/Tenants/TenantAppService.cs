@@ -5,21 +5,29 @@ using Letu.Core.AspNetCore.Mvc;
 using Letu.Repository;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Data;
+using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
 
 namespace Letu.Basis.Admin.Tenants;
 
 public class TenantAppService : ApplicationService, ITenantAppService
 {
+    private readonly IDistributedEventBus distributedEventBus;
+    private readonly IDataSeeder dataSeeder;
     private readonly ITenantNormalizer tenantNormalizer;
     private readonly IFreeSqlRepository<Tenant> tenantRepository;
     private readonly IFreeSqlRepository<Edition> _editionRepository;
 
     public TenantAppService(
+        IDistributedEventBus distributedEventBus,
+        IDataSeeder dataSeeder,
         ITenantNormalizer tenantNormalizer,
         IFreeSqlRepository<Tenant> tenantRepository,
         IFreeSqlRepository<Edition> editionRepository)
     {
+        this.distributedEventBus = distributedEventBus;
+        this.dataSeeder = dataSeeder;
         this.tenantNormalizer = tenantNormalizer;
         this.tenantRepository = tenantRepository;
         _editionRepository = editionRepository;
@@ -49,6 +57,30 @@ public class TenantAppService : ApplicationService, ITenantAppService
             IsActive = dto.IsActive
         };
         await tenantRepository.InsertAsync(entity);
+
+        
+        await distributedEventBus.PublishAsync(
+            new TenantCreatedEto
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Properties =
+                {
+                        { "AdminEmail", dto.AdminEmail },
+                        { "AdminPassword", dto.AdminPassword }
+                }
+            });
+
+        using (CurrentTenant.Change(entity.Id, entity.Name))
+        {
+            //TODO: Handle database creation?
+            // TODO: Seeder might be triggered via event handler.
+            await dataSeeder.SeedAsync(
+                            new DataSeedContext(entity.Id)
+                                .WithProperty("AdminEmail", dto.AdminEmail)
+                                .WithProperty("AdminPassword", dto.AdminPassword)
+                            );
+        }
     }
 
     public async Task DeleteTenantAsync(Guid tenantId)

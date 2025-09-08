@@ -1,19 +1,36 @@
 import httpClient from '@/utils/httpClient';
+import { getTenantInfo } from '@/utils/authUtils';
+import type { AxiosRequestConfig } from 'axios';
+
+
+function buildTenantHeaders(): AxiosRequestConfig {
+    const tenantInfo = getTenantInfo();
+    let config = {} as AxiosRequestConfig;
+    if (tenantInfo?.tenantId) {
+        config.headers = {
+            [tenantInfo.tenantKey]: tenantInfo.tenantId
+        }
+    }
+
+    return config;
+}
 
 /**
  * 登录
  * @param input
  */
 export function loginByPassword(input: IPasswordLoginInput) {
-    return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/identity/login', input);
-}
+    const config = buildTenantHeaders();
 
+    return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/identity/login', input, config);
+}
 /**
  * 短信登录
  * @param input
  */
 export function loginBySms(input: ISmsLoginInput) {
-    return httpClient.post<ISmsLoginInput, IUserTokenOutput>('/api/identity/SmsLogin', input);
+    const config = buildTenantHeaders();
+    return httpClient.post<ISmsLoginInput, IUserTokenOutput>('/api/identity/SmsLogin', input, config);
 }
 
 /**
@@ -41,7 +58,8 @@ export function refreshToken(refreshToken: string) {
 }
 
 export function getLoginSettings() {
-    return httpClient.get<ILoginSettingsOutput>('/api/account/login-settings');
+    const config = buildTenantHeaders();
+    return httpClient.get<ILoginSettingsOutput>('/api/account/login-settings', config);
 }
 
 export function switchTenant(tenantName?: string) {

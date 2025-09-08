@@ -21,7 +21,6 @@ export const Route = createFileRoute('/account/login')({
         const loginSettings = await getLoginSettings();
         return loginSettings;
     }
-
 });
 
 function LoginPage() {
@@ -36,6 +35,7 @@ function LoginPage() {
     const icp = getSetting("Letu.Application.Site.Icp");
     const loginSettings = Route.useLoaderData();
     const [switchTenantModelVisible, setSwitchTenantModelVisible] = useState(false);
+    const [tenantName, setTenantName] = useState(loginSettings.tenantName);
 
     // 初始化表单值
     useEffect(() => {
@@ -55,6 +55,10 @@ function LoginPage() {
 
     const handleSwitchTenantClose = () => {
         setSwitchTenantModelVisible(false);
+    }
+
+    const handleSwitchTenantOk = (tenantName: string) => {
+        setTenantName(tenantName);
     }
 
     const onFinish = async (values: any) => {
@@ -140,12 +144,16 @@ function LoginPage() {
                                         <div className="flex flex-col">
                                             <h3 className="text-sm font-normal text-text-muted">租户</h3>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-base font-medium">{loginSettings.tenantName ?? '主站'}</span>
+                                                <span className="text-base font-medium">{tenantName ?? '主站'}</span>
                                                 <Button type="link" onClick={handleSwitchTenant}>切换</Button>
                                             </div>
                                         </div>
                                         <Divider />
-                                        <SwitchTenantModel visible={switchTenantModelVisible} onClose={handleSwitchTenantClose} />
+                                        <SwitchTenantModel
+                                            visible={switchTenantModelVisible}
+                                            onOk={handleSwitchTenantOk}
+                                            onClose={handleSwitchTenantClose}
+                                        />
                                     </>
                                 )}
 

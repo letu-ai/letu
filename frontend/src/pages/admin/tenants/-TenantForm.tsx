@@ -1,7 +1,6 @@
-import { Form, Input, Modal, Switch, DatePicker, Select, Upload, Avatar } from 'antd';
+import { Form, Input, Modal, Switch, DatePicker, Select, Upload, Avatar, App } from 'antd';
 import { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 import { addTenant, type TenantCreateOrUpdateInput, updateTenant, getEditionOptions, type IEditionOption, type TenantListOutput } from './-service';
-import useApp from 'antd/es/app/useApp';
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadFile } from '@/api/oss';
 import dayjs from 'dayjs';
@@ -18,7 +17,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     const [form] = Form.useForm();
     const [row, setRow] = useState<TenantListOutput | null>();
-    const { message } = useApp();
+    const { message } = App.useApp();
     const [editionOptions, setEditionOptions] = useState<IEditionOption[]>([]);
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
@@ -150,7 +149,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 onFinish={onFinish}
             >
                 <Form.Item label="租户名称" name="name" rules={[{ required: true, message: '请输入租户名称' }, { max: 64, message: '租户名称不能超过64个字符' }]}>
-                    <Input placeholder="请输入租户名称" />
+                    <Input />
                 </Form.Item>
 
                 <Form.Item label="版本" name="editionId">
@@ -162,30 +161,38 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
 
                 <Form.Item label="绑定域名" name="bindDomain" rules={[{ max: 128, message: '域名不能超过128个字符' }]}>
-                    <Input placeholder="请输入绑定域名" allowClear />
+                    <Input allowClear />
                 </Form.Item>
 
                 <Form.Item label="失效日期" name="expireDate">
-                    <DatePicker showTime placeholder="请选择失效日期" style={{ width: '100%' }} />
+                    <DatePicker showTime style={{ width: '100%' }} />
                 </Form.Item>
 
                 <Form.Item label="联系人姓名" name="contactName" rules={[{ max: 64, message: '联系人姓名不能超过64个字符' }]}>
-                    <Input placeholder="请输入联系人姓名" allowClear />
+                    <Input allowClear />
                 </Form.Item>
 
                 <Form.Item label="联系电话" name="contactPhone" rules={[{ max: 32, message: '联系电话不能超过32个字符' }]}>
-                    <Input placeholder="请输入联系电话" allowClear />
+                    <Input allowClear />
                 </Form.Item>
 
                 <Form.Item label="管理员邮箱" name="adminEmail" rules={[
                     { max: 128, message: '管理员邮箱不能超过128个字符' },
-                    { type: 'email', message: '请输入有效的邮箱地址' }
+                    { type: 'email', message: '请输入有效的邮箱地址' },
+                    { required: true, message: '请输入管理员邮箱' }
                 ]}>
-                    <Input placeholder="请输入管理员邮箱" allowClear />
+                    <Input allowClear />
+                </Form.Item>
+                <Form.Item label="管理员密码" name="adminPassword"
+                    rules={[
+                        { max: 32, message: '管理员密码不能超过32个字符' },
+                        { required: true, message: '请输入管理员密码' }
+                    ]}>
+                    <Input allowClear />
                 </Form.Item>
 
                 <Form.Item label="网站名称" name="websiteName" rules={[{ max: 128, message: '网站名称不能超过128个字符' }]}>
-                    <Input placeholder="请输入网站名称" allowClear />
+                    <Input allowClear />
                 </Form.Item>
 
                 <Form.Item label="Logo" name="logo">
@@ -209,11 +216,11 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
 
                 <Form.Item label="ICP备案号" name="icpNumber" rules={[{ max: 64, message: 'ICP备案号不能超过64个字符' }]}>
-                    <Input placeholder="请输入ICP备案号" allowClear />
+                    <Input allowClear />
                 </Form.Item>
 
                 <Form.Item label="备注" name="remark" rules={[{ max: 512, message: '备注不能超过512个字符' }]}>
-                    <Input.TextArea placeholder="请输入备注" allowClear rows={3} />
+                    <Input.TextArea allowClear rows={3} />
                 </Form.Item>
 
                 <Form.Item label="状态" name="isActive" valuePropName="checked" rules={[{ required: true, message: '请选择状态' }]}>

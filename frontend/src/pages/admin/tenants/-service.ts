@@ -51,7 +51,8 @@ export interface TenantCreateOrUpdateInput {
   expireDate?: string | null;
   contactName?: string | null;
   contactPhone?: string | null;
-  adminEmail?: string | null;
+  adminEmail: string;
+  adminPassword: string;
   websiteName?: string | null;
   logo?: string | null;
   icpNumber?: string | null;

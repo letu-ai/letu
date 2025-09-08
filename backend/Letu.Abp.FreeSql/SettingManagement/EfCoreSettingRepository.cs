@@ -1,5 +1,6 @@
 ﻿using FreeSql;
 using Letu.Repository;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.SettingManagement;
 
 namespace Letu.Abp.SettingManagement;
@@ -7,8 +8,8 @@ namespace Letu.Abp.SettingManagement;
 public class FreeSqlSettingRepository : FreeSqlRepository<Setting, Guid>,
    ISettingRepository
 {
-    public FreeSqlSettingRepository(UnitOfWorkManager uowManger)
-        : base(uowManger)
+    public FreeSqlSettingRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant)
+        : base(uowManger,currentTenant)
     {
     }
 

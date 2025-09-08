@@ -2,6 +2,7 @@
 using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Roles;
 using Letu.Basis.Admin.Users;
+using Letu.Basis.Identity;
 using Letu.Core.Utils;
 using Letu.Repository;
 using Letu.Shared.Consts;
@@ -14,12 +15,15 @@ using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Uow;
 
-namespace Letu.Basis.Identity;
+namespace Letu.Basis.DataSeed;
 
 public class IdentityDataSeedContributor : IDataSeedContributor, ITransientDependency
 {
+    public const string AdminEmailPropertyName = "AdminEmail";
     public const string AdminEmailDefaultValue = "admin@abp.io";
+    public const string AdminUserNamePropertyName = "AdminUserName";
     public const string AdminUserNameDefaultValue = "admin";
+    public const string AdminPasswordPropertyName = "AdminPassword";
     public const string AdminPasswordDefaultValue = "1q2w3E*";
 
     private readonly IGuidGenerator guidGenerator;
@@ -49,10 +53,10 @@ public class IdentityDataSeedContributor : IDataSeedContributor, ITransientDepen
     public virtual async Task SeedAsync(DataSeedContext context)
     {
         await SeedAdminUserAsync(
-            AdminEmailDefaultValue,
-            AdminPasswordDefaultValue,
+            context?[AdminEmailPropertyName] as string ?? AdminEmailDefaultValue,
+            context?[AdminPasswordPropertyName] as string ?? AdminPasswordDefaultValue,
             context?.TenantId,
-            AdminUserNameDefaultValue
+            context?[AdminUserNamePropertyName] as string ?? AdminUserNameDefaultValue
         );
     }
 

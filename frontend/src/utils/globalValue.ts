@@ -33,7 +33,8 @@ export const PermissionConstant = {
  */
 export const StaticRoutes = {
   login: '/account/login',
-  logout: "/account/logout"
+  logout: "/account/logout",
+  tenantError: "/account/tenant-error"
 };
 
 /**

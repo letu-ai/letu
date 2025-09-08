@@ -6,7 +6,7 @@ using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement;
 
-namespace Letu.Basis.Admin.PermissionManagement;
+namespace Letu.Basis.DataSeed;
 
 public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDependency
 {

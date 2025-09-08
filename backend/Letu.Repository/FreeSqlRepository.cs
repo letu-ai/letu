@@ -1,76 +1,78 @@
 ﻿using FreeSql;
 using System.Linq.Expressions;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.MultiTenancy;
 
-namespace Letu.Repository
+namespace Letu.Repository;
+
+public class FreeSqlRepository<TEntity> : FreeSqlBasicRepositoryBase<TEntity>, IFreeSqlRepository<TEntity>
+    where TEntity : class, IEntity
 {
-    public class FreeSqlRepository<TEntity> : FreeSqlBasicRepositoryBase<TEntity>, IFreeSqlRepository<TEntity>
-        where TEntity : class, IEntity
+    public FreeSqlRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant) : base(uowManger.Orm)
     {
-        public FreeSqlRepository(UnitOfWorkManager uowManger) : base(uowManger.Orm)
-        {
-        }
-
-        public Task<TEntity> OneAsync(Expression<Func<TEntity, bool>> expression)
-        {
-            return base.Select.Where(expression).ToOneAsync();
-        }
-
-        public Task<int> SoftDeleteAsync(Expression<Func<TEntity, bool>> expression)
-        {
-            return base.UpdateDiy.Where(expression).SetDto(new { IsDeleted = true }).ExecuteAffrowsAsync();
-        }
+        TenantManager.Current = currentTenant.Id;
     }
 
-    public class FreeSqlRepository<TEntity, TKey> : FreeSqlBasicRepositoryBase<TEntity, TKey>, IFreeSqlRepository<TEntity, TKey>
-        where TEntity : class, IEntity<TKey>
+    public Task<TEntity> OneAsync(Expression<Func<TEntity, bool>> expression)
     {
-        public FreeSqlRepository(UnitOfWorkManager uowManger) : base(uowManger.Orm)
-        {
-        }
+        return base.Select.Where(expression).ToOneAsync();
+    }
 
-        public int Delete(TKey id)
-        {
-            return base.Delete(e => e.Id!.Equals(id));
-        }
+    public Task<int> SoftDeleteAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        return base.UpdateDiy.Where(expression).SetDto(new { IsDeleted = true }).ExecuteAffrowsAsync();
+    }
+}
 
-        public Task<int> DeleteAsync(TKey id, CancellationToken cancellationToken = default)
-        {
-            return base.DeleteAsync(e => e.Id!.Equals(id), cancellationToken);
-        }
+public class FreeSqlRepository<TEntity, TKey> : FreeSqlBasicRepositoryBase<TEntity, TKey>, IFreeSqlRepository<TEntity, TKey>
+    where TEntity : class, IEntity<TKey>
+{
+    public FreeSqlRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant) : base(uowManger.Orm)
+    {
+        TenantManager.Current = currentTenant.Id;
+    }
 
-        public TEntity Find(TKey id)
-        {
-            return base.Select.Where(e => e.Id!.Equals(id)).First();
-        }
+    public int Delete(TKey id)
+    {
+        return base.Delete(e => e.Id!.Equals(id));
+    }
 
-        public Task<TEntity> FindAsync(TKey id, CancellationToken cancellationToken = default)
-        {
-            return base.Select.Where(e => e.Id!.Equals(id)).FirstAsync(cancellationToken);
-        }
+    public Task<int> DeleteAsync(TKey id, CancellationToken cancellationToken = default)
+    {
+        return base.DeleteAsync(e => e.Id!.Equals(id), cancellationToken);
+    }
 
-        public TEntity Get(TKey id)
-        {
-            var entity = Find(id);
-            if (entity == null)
-            {
-                throw new EntityNotFoundException(typeof(TEntity), id);
-            }
-            return entity;
-        }
+    public TEntity Find(TKey id)
+    {
+        return base.Select.Where(e => e.Id!.Equals(id)).First();
+    }
 
-        public Task<TEntity> GetAsync(TKey id, CancellationToken cancellationToken = default)
-        {
-            return base.Select.Where(e => e.Id!.Equals(id)).ToOneAsync(cancellationToken);
-        }
+    public Task<TEntity> FindAsync(TKey id, CancellationToken cancellationToken = default)
+    {
+        return base.Select.Where(e => e.Id!.Equals(id)).FirstAsync(cancellationToken);
+    }
 
-        public Task<TEntity> OneAsync(Expression<Func<TEntity, bool>> expression)
+    public TEntity Get(TKey id)
+    {
+        var entity = Find(id);
+        if (entity == null)
         {
-            return base.Select.Where(expression).ToOneAsync();
+            throw new EntityNotFoundException(typeof(TEntity), id);
         }
-        public Task<int> SoftDeleteAsync(Expression<Func<TEntity, bool>> expression)
-        {
-            return base.UpdateDiy.Where(expression).SetDto(new { IsDeleted = true }).ExecuteAffrowsAsync();
-        }
+        return entity;
+    }
+
+    public Task<TEntity> GetAsync(TKey id, CancellationToken cancellationToken = default)
+    {
+        return base.Select.Where(e => e.Id!.Equals(id)).ToOneAsync(cancellationToken);
+    }
+
+    public Task<TEntity> OneAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        return base.Select.Where(expression).ToOneAsync();
+    }
+    public Task<int> SoftDeleteAsync(Expression<Func<TEntity, bool>> expression)
+    {
+        return base.UpdateDiy.Where(expression).SetDto(new { IsDeleted = true }).ExecuteAffrowsAsync();
     }
 }

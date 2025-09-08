@@ -22,6 +22,7 @@ namespace Letu.Basis.Admin.Positions
         /// <summary>
         /// 修改职位
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<bool> UpdatePositionAsync(Guid id, PositionCreateOrUpdateInput dto);

@@ -38,6 +38,7 @@ const App = ({ children }: IAppProps) => {
 const { useToken } = theme;
 
 function InnerApp({ children }: IAppProps) {
+
     const { token } = useToken();
     const appStyle = useMemo(() => ({
         '--color-primary': token.colorPrimary,
@@ -77,6 +78,11 @@ function InnerApp({ children }: IAppProps) {
     const { message } = AntApp.useApp();
     useEffect(() => {
         httpClient.setErrorHandler((errorInfo) => {
+            if (errorInfo.jumpTenantError && window.location.pathname !== StaticRoutes.tenantError) {
+                window.location.href = StaticRoutes.tenantError;
+                return
+            }
+            
             message.error(<ResponseErrorMessage error={errorInfo} />, 3, () => {
                 if (errorInfo.jumpLogin && window.location.pathname !== StaticRoutes.login) {
                     window.location.href = StaticRoutes.logout; //去注销登页面清除登录信息

@@ -18,6 +18,7 @@ import { Route as HomeIndexRouteImport } from './pages/home/index'
 import { Route as MySecurityLogsRouteImport } from './pages/my/security-logs'
 import { Route as MyProfileRouteImport } from './pages/my/profile'
 import { Route as MyPasswordRouteImport } from './pages/my/password'
+import { Route as AccountTenantErrorRouteImport } from './pages/account/tenant-error'
 import { Route as AccountLogoutRouteImport } from './pages/account/logout'
 import { Route as AccountLoginRouteImport } from './pages/account/login'
 import { Route as AdminSettingsRouteRouteImport } from './pages/admin/settings/route'
@@ -105,6 +106,11 @@ const MyPasswordRoute = MyPasswordRouteImport.update({
   id: '/password',
   path: '/password',
   getParentRoute: () => MyRouteRoute,
+} as any)
+const AccountTenantErrorRoute = AccountTenantErrorRouteImport.update({
+  id: '/tenant-error',
+  path: '/tenant-error',
+  getParentRoute: () => AccountRouteRoute,
 } as any)
 const AccountLogoutRoute = AccountLogoutRouteImport.update({
   id: '/logout',
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
+  '/account/tenant-error': typeof AccountTenantErrorRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
@@ -386,6 +393,7 @@ export interface FileRoutesByTo {
   '/my': typeof MyRouteRouteWithChildren
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
+  '/account/tenant-error': typeof AccountTenantErrorRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
@@ -440,6 +448,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
+  '/account/tenant-error': typeof AccountTenantErrorRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
@@ -495,6 +504,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/account/login'
     | '/account/logout'
+    | '/account/tenant-error'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
@@ -546,6 +556,7 @@ export interface FileRouteTypes {
     | '/my'
     | '/account/login'
     | '/account/logout'
+    | '/account/tenant-error'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
@@ -599,6 +610,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/account/login'
     | '/account/logout'
+    | '/account/tenant-error'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
@@ -716,6 +728,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/my/password'
       preLoaderRoute: typeof MyPasswordRouteImport
       parentRoute: typeof MyRouteRoute
+    }
+    '/account/tenant-error': {
+      id: '/account/tenant-error'
+      path: '/tenant-error'
+      fullPath: '/account/tenant-error'
+      preLoaderRoute: typeof AccountTenantErrorRouteImport
+      parentRoute: typeof AccountRouteRoute
     }
     '/account/logout': {
       id: '/account/logout'
@@ -1017,11 +1036,13 @@ declare module '@tanstack/react-router' {
 interface AccountRouteRouteChildren {
   AccountLoginRoute: typeof AccountLoginRoute
   AccountLogoutRoute: typeof AccountLogoutRoute
+  AccountTenantErrorRoute: typeof AccountTenantErrorRoute
 }
 
 const AccountRouteRouteChildren: AccountRouteRouteChildren = {
   AccountLoginRoute: AccountLoginRoute,
   AccountLogoutRoute: AccountLogoutRoute,
+  AccountTenantErrorRoute: AccountTenantErrorRoute,
 }
 
 const AccountRouteRouteWithChildren = AccountRouteRoute._addFileChildren(

@@ -1,13 +1,14 @@
 ﻿using FreeSql;
 using Letu.Repository;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.MultiTenancy;
 
 namespace Letu.Abp.FeatureManagement;
 
 public class FreeSqlFeatureValueRepository : FreeSqlRepository<FeatureValue, Guid>, IFeatureValueRepository
 {
-    public FreeSqlFeatureValueRepository(UnitOfWorkManager uowManger)
-        : base(uowManger)
+    public FreeSqlFeatureValueRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant)
+        : base(uowManger, currentTenant)
     {
     }
 
