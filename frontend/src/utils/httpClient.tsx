@@ -356,7 +356,7 @@ const defaultConfig: AxiosRequestConfig = {
     baseURL: getApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
-    },
+    }
 };
 
 // 创建默认实例

@@ -26,6 +26,11 @@ namespace Letu.Basis.Admin.Regions.Dtos
         public int DistrictsCount { get; set; }
 
         /// <summary>
+        /// 导入的街道数量
+        /// </summary>
+        public int StreetsCount { get; set; }
+
+        /// <summary>
         /// 是否成功
         /// </summary>
         public bool Success { get; set; }

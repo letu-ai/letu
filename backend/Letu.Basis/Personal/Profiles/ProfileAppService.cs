@@ -86,17 +86,25 @@ public class ProfileAppService : BasisAppService, IProfileAppService
         return true;
     }
 
-    public async Task<(Stream?, string)> GetAvatarAsync()
+    public async Task<(Stream?, string)> GetAvatarAsync(CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.Where(x => x.Id == CurrentUser.Id).FirstAsync()
+        var user = await userRepository.Where(x => x.Id == CurrentUser.Id).FirstAsync(cancellationToken)
             ?? throw HttpFriendlyException.NotFound("用户不存在");
 
         if (string.IsNullOrEmpty(user.Avatar))
         {
             return (null, "");
         }
-        var stream = await avatarBlobContainer.GetAsync(user.Avatar);
-        return (stream, MimeMapper.GetContentType(user.Avatar));
+
+        if (await avatarBlobContainer.ExistsAsync(user.Avatar))
+        {
+            var stream = await avatarBlobContainer.GetAsync(user.Avatar, cancellationToken);
+            return (stream, MimeMapper.GetContentType(user.Avatar));
+        }
+        else
+        {
+            return (null, "");
+        }
     }
 
     public async Task<string> UploadAvatarAsync(AvatarUploadInput input)
@@ -104,6 +112,9 @@ public class ProfileAppService : BasisAppService, IProfileAppService
         var fileName = $"{CurrentUser.Id}/{Path.GetFileName(input.Avatar.FileName)}";
         using var avatarStream = input.Avatar.OpenReadStream();
         await avatarBlobContainer.SaveAsync(fileName, avatarStream, overrideExisting: true);
+        var user = await userRepository.Where(x => x.Id == CurrentUser.Id).FirstAsync();
+        user.Avatar = fileName;
+        await userRepository.UpdateAsync(user);
 
         return fileName;
     }

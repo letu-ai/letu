@@ -4,24 +4,16 @@ import httpClient from "@/utils/httpClient";
 export interface IRegionListOutput {
     id: string;
     code: string;
+    parentCOde?: string;
     name: string;
     level: number;
-    parentId?: string;
     sort: number;
-    isEnabled: boolean;
     creationTime: string;
     children?: IRegionListOutput[];
     hasChildren?: boolean;
+    nextLevel?: number;
 }
 
-// 行政区域新增/编辑输入接口
-export interface IRegionCreateOrUpdateInput {
-    code: string;
-    name: string;
-    parentId?: string;
-    sort: number;
-    isEnabled: boolean;
-}
 
 // 行政区域导入进度接口
 export interface IRegionImportProgress {
@@ -43,11 +35,10 @@ export interface IRegionImportResult {
 }
 
 /**
- * 获取子级区域
+ * 获取子级区域（统一使用基于Code的接口）
  */
-export const getRegionChildren = async (parentId?: string): Promise<IRegionListOutput[]> => {
-    const path = parentId ? `/api/admin/regions/children/${parentId}` : "/api/admin/regions/children";
-    return await httpClient.get<void, IRegionListOutput[]>(path);
+export const getRegionChildren = async (parentCode?: string): Promise<IRegionListOutput[]> => {
+    return await getRegionChildrenByCode(parentCode);
 };
 
 /**
@@ -57,32 +48,14 @@ export const getRegionByCode = async (code: string): Promise<IRegionListOutput |
     return await httpClient.get<void, IRegionListOutput>(`/api/admin/regions/by-code/${code}`);
 };
 
-/**
- * 新增行政区域
- */
-export const createRegion = async (data: IRegionCreateOrUpdateInput): Promise<IRegionListOutput> => {
-    return await httpClient.post<IRegionCreateOrUpdateInput, IRegionListOutput>("/api/admin/regions", data);
-};
-
-/**
- * 更新行政区域
- */
-export const updateRegion = async (id: string, data: IRegionCreateOrUpdateInput): Promise<IRegionListOutput> => {
-    return await httpClient.put<IRegionCreateOrUpdateInput, IRegionListOutput>(`/api/admin/regions/${id}`, data);
-};
-
-/**
- * 删除行政区域
- */
-export const deleteRegion = async (id: string): Promise<void> => {
-    await httpClient.delete<void, void>(`/api/admin/regions/${id}`);
-};
 
 /**
  * 从高德地图导入行政区域
+ * @param includeStreets 是否导入街道数据
  */
-export const importFromAmap = async (): Promise<IRegionImportResult> => {
-    return await httpClient.post<void, IRegionImportResult>("/api/admin/regions/import-from-amap");
+export const importFromAmap = async (includeStreets: boolean = false): Promise<IRegionImportResult> => {
+    return await httpClient.post<void, IRegionImportResult>(`/api/admin/regions/import-from-amap`,
+         { includeStreets });
 };
 
 /**
@@ -110,8 +83,8 @@ export const buildTreeData = (list: IRegionListOutput[]): IRegionListOutput[] =>
 
     // 构建树形结构
     list.forEach(item => {
-        if (item.parentId && map[item.parentId]) {
-            map[item.parentId].children!.push(map[item.id]);
+        if (item.parentCOde && map[item.parentCOde]) {
+            map[item.parentCOde].children!.push(map[item.id]);
         } else {
             roots.push(map[item.id]);
         }
@@ -151,41 +124,16 @@ export const getLevelName = (level: number): string => {
 };
 
 /**
- * 在树中查找指定节点
+ * 根据父级code获取子级区域列表
  */
-export const findNodeInTree = (nodes: IRegionListOutput[], nodeId: string): IRegionListOutput | null => {
-    for (const node of nodes) {
-        if (node.id === nodeId) return node;
-        if (node.children) {
-            const found = findNodeInTree(node.children, nodeId);
-            if (found) return found;
-        }
-    }
-    return null;
+export const getRegionChildrenByCode = async (parentCode?: string): Promise<IRegionListOutput[]> => {
+    const path = parentCode ? `/api/admin/regions/children-by-code/${parentCode}` : "/api/admin/regions/children-by-code";
+    return await httpClient.get<void, IRegionListOutput[]>(path);
 };
 
 /**
- * 更新树中的指定节点
+ * 根据code获取区域完整路径
  */
-export const updateNodeInTree = (nodes: IRegionListOutput[], nodeId: string, updatedData: Partial<IRegionListOutput>): IRegionListOutput[] => {
-    return nodes.map(node => {
-        if (node.id === nodeId) {
-            return { ...node, ...updatedData };
-        }
-        if (node.children) {
-            return { ...node, children: updateNodeInTree(node.children, nodeId, updatedData) };
-        }
-        return node;
-    });
-};
-
-/**
- * 从树中删除指定节点
- */
-export const removeNodeFromTree = (nodes: IRegionListOutput[], nodeId: string): IRegionListOutput[] => {
-    return nodes.filter(node => node.id !== nodeId)
-        .map(node => ({
-            ...node,
-            children: node.children ? removeNodeFromTree(node.children, nodeId) : undefined
-        }));
+export const getRegionPathByCodes = async (code: string): Promise<IRegionListOutput[]> => {
+    return await httpClient.get<void, IRegionListOutput[]>(`/api/admin/regions/path-by-code/${code}`);
 };

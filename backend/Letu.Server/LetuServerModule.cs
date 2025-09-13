@@ -1,6 +1,7 @@
 ﻿using Letu.Abp;
 using Letu.Basis;
 using Letu.Basis.Middlewares;
+using Letu.Core.Identity.Jwt;
 using Letu.Core.JsonConverters;
 using Letu.Core.MultiTenancy;
 using Letu.Logging.Options;
@@ -10,6 +11,7 @@ using Medallion.Threading;
 using Medallion.Threading.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -22,6 +24,7 @@ using System.Threading.RateLimiting;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Authorization;
 using Volo.Abp.Autofac;
@@ -64,6 +67,7 @@ public class LetuServerModule : AbpModule
         ConfigureDistributedLock(services, configuration);
         ConfigureAuthentication(services, configuration);
         ConfigureCorsOrigins(services, configuration);
+        ConfigureAntiForgery();
         ConfigureRateLimiter(services, configuration);
         ConfigureSwagger(services, configuration);
         ConfigureJsonOptions(services, configuration);
@@ -108,9 +112,9 @@ public class LetuServerModule : AbpModule
 
         Configure<JwtOptions>(configuration.GetSection("Jwt"));
 
-        // 注册认证服务（使用验证参数）
+        // 注册认证服务，支持从 Header 和 Cookie 中读取 JWT Token
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            .AddScheme<JwtBearerOptions, JwtCookieAuthenticationHandler>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.RequireHttpsMetadata = jwtOptions.Validation.RequireHttps;
                 options.Authority = jwtOptions.Issuance.Issuer;
@@ -129,7 +133,6 @@ public class LetuServerModule : AbpModule
             });
     }
 
-
     private void ConfigureCorsOrigins(IServiceCollection services, IConfiguration configuration)
     {
         //配置跨域 
@@ -138,21 +141,31 @@ public class LetuServerModule : AbpModule
             options.AddDefaultPolicy(builder =>
             {
                 // 允许跨域访问的主机地址。
-                string[] corsOrigins = configuration.GetSection("CorsOrigins").Get<string[]>() ?? Array.Empty<string>();
-                corsOrigins = corsOrigins.Select(o => o.RemovePostFix("/"))
-                    .ToArray();
+                string[] allowedOrigins = (configuration.GetSection("CorsOrigins").Get<string[]>() ?? Array.Empty<string>())
+                                            .Select(o => o.RemovePostFix("/"))
+                                            .ToArray();
 
                 builder.WithAbpExposedHeaders()
-                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .WithOrigins(allowedOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
 
-                builder.SetIsOriginAllowed(origin =>
-                {
-                    return corsOrigins.Contains("*") || corsOrigins.Contains(origin);
-                });
+                // CNB 云原生开发环境，允许任意来源跨域访问。
+                if (configuration["CNB_VSCODE_PROXY_URI"] != null)
+                    builder.SetIsOriginAllowed(_ => true);
             });
+        });
+    }
+
+    private void ConfigureAntiForgery()
+    {
+        Configure<AbpAntiForgeryOptions>(options =>
+        {
+            // 默认是全局自动Antiforgery验证，如果临时想全局验证，可以设置为false。
+            // 如果某个API要设置Cookie，可以在Action或Controller上加[AutoValidateAntiforgeryToken]特性
+            // 参见 Letu.Basis.Controllers.Accont.IdentityController.Login
+            // options.AutoValidate = true;
         });
     }
 
@@ -253,10 +266,11 @@ public class LetuServerModule : AbpModule
         });
     }
 
-    public override void OnApplicationInitialization(ApplicationInitializationContext context)
+    public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
+        var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
 
         if (env.IsDevelopment())
         {
@@ -278,7 +292,11 @@ public class LetuServerModule : AbpModule
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
         });
-        //允许跨域
+
+        // 在CNB云原生开发环境中使用CNB的跨域策略。
+        if (env.IsDevelopment() && configuration["CNB_VSCODE_PROXY_URI"] != null)
+            app.UseSetOriginFromReferer();
+
         app.UseCors();
         app.UseAuthentication();
         if (MultiTenancyConsts.IsEnabled)
@@ -299,6 +317,6 @@ public class LetuServerModule : AbpModule
         //    sch.Schedule<NotificationJob>().EveryMinute().RunOnceAtStart();
         //});
 
-        base.OnApplicationInitialization(context);
+        return base.OnApplicationInitializationAsync(context);
     }
 }

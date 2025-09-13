@@ -1,4 +1,4 @@
-using Letu.Basis.Personal.Profiles;
+﻿using Letu.Basis.Personal.Profiles;
 using Letu.Basis.Personal.Profiles.Dtos;
 using Letu.Core.Applications;
 using Microsoft.AspNetCore.Authorization;
@@ -12,10 +12,12 @@ namespace Letu.Basis.Controllers.Personal;
 public class ProfileController : ControllerBase
 {
     private readonly IProfileAppService profileAppService;
+    private readonly ILogger<ProfileController> logger;
 
-    public ProfileController(IProfileAppService profileAppService)
+    public ProfileController(IProfileAppService profileAppService, ILogger<ProfileController> logger)
     {
         this.profileAppService = profileAppService;
+        this.logger = logger;
     }
 
     [HttpGet]
@@ -44,16 +46,27 @@ public class ProfileController : ControllerBase
     }
 
     [HttpGet("avatar")]
-    [AllowAnonymous]
-    public async Task<ActionResult<Stream>> GetAvatarAsync()
+    public async Task<IActionResult> GetAvatarAsync(CancellationToken cancellationToken)
     {
-        var (stream, contentType) = await profileAppService.GetAvatarAsync();
-        if (stream == null)
+        try
         {
-            return NotFound();
-        }
+            var (stream, contentType) = await profileAppService.GetAvatarAsync(cancellationToken);
+            if (stream == null)
+            {
+                return NotFound();
+            }
 
-        return File(stream, contentType);
+            return File(stream, contentType, enableRangeProcessing: true);
+        }
+        catch (OperationCanceledException)
+        {
+            // 客户端取消请求，返回204 No Content
+            return NoContent();
+        }
+        catch
+        {
+            throw;
+        }
     }
 
 

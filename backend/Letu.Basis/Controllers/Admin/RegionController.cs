@@ -20,37 +20,36 @@ public class RegionController : ControllerBase
     }
 
     /// <summary>
-    /// 新增行政区域
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [Authorize(BasisPermissions.Region.Create)]
-    public async Task<RegionListOutput> AddRegionAsync([FromBody] RegionCreateOrUpdateInput input)
-    {
-        return await regionAppService.AddRegionAsync(input);
-    }
-
-    /// <summary>
-    /// 根据父级代码获取子区域
-    /// </summary>
-    /// <param name="parentId">父级区域ID</param>
-    /// <returns></returns>
-    [HttpGet("children/{parentId?}")]
-    public async Task<List<RegionListOutput>> GetChildrenAsync(int? parentId)
-    {
-        return await regionAppService.GetChildrenAsync(parentId);
-    }
-
-    /// <summary>
     /// 根据代码获取行政区域
     /// </summary>
     /// <param name="code"></param>
     /// <returns></returns>
     [HttpGet("by-code/{code}")]
-    public async Task<RegionListOutput?> GetRegionByCodeAsync(string code)
+    public async Task<RegionListOutput> GetRegionByCodeAsync(string code)
     {
         return await regionAppService.GetRegionByCodeAsync(code);
+    }
+
+    /// <summary>
+    /// 根据父级代码获取子级区域
+    /// </summary>
+    /// <param name="parentCode">父级区域代码，空值表示获取顶级</param>
+    /// <returns></returns>
+    [HttpGet("children-by-code/{parentCode?}")]
+    public async Task<List<RegionListOutput>> GetChildrenByCodeAsync(string? parentCode = null)
+    {
+        return await regionAppService.GetChildrenByCodeAsync(parentCode);
+    }
+
+    /// <summary>
+    /// 根据代码获取区域的完整路径
+    /// </summary>
+    /// <param name="code">区域代码</param>
+    /// <returns>从顶级到当前区域的完整路径</returns>
+    [HttpGet("path-by-code/{code}")]
+    public async Task<List<RegionListOutput>> GetPathByCodeAsync(string code)
+    {
+        return await regionAppService.GetPathByCodeAsync(code);
     }
 
     /// <summary>
@@ -59,9 +58,9 @@ public class RegionController : ControllerBase
     /// <returns></returns>
     [HttpPost("import-from-amap")]
     [Authorize(BasisPermissions.Region.Import)]
-    public async Task<RegionImportResultDto> ImportFromAmapAsync()
+    public async Task<RegionImportResultDto> ImportFromAmapAsync(bool includeStreets)
     {
-        return await regionAppService.ImportFromAmapAsync();
+        return await regionAppService.ImportFromAmapAsync(includeStreets);
     }
 
     /// <summary>
@@ -74,29 +73,4 @@ public class RegionController : ControllerBase
         return await regionAppService.GetImportProgressAsync();
     }
 
-    /// <summary>
-    /// 修改行政区域
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    [HttpPut("{id}")]
-    [Authorize(BasisPermissions.Region.Update)]
-    public async Task<RegionListOutput> UpdateRegionAsync(int id, [FromBody] RegionCreateOrUpdateInput input)
-    {
-        return await regionAppService.UpdateRegionAsync(id, input);
-    }
-
-    /// <summary>
-    /// 删除行政区域
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpDelete("{id:int}")]
-    [Authorize(BasisPermissions.Region.Delete)]
-    [ApiAccessLog(operateName: "删除行政区域", operateType: [OperateType.Delete], reponseEnable: true)]
-    public async Task DeleteRegionAsync(int id)
-    {
-        await regionAppService.DeleteRegionAsync(id);
-    }
 }

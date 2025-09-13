@@ -21,7 +21,7 @@ public class Program
         var app = builder.Build();
 
         AddListenUrls(app.Urls);
-        app.InitializeApplication();
+        await app.InitializeApplicationAsync();
 
         await app.RunAsync();
     }

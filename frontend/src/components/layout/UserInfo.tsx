@@ -1,7 +1,8 @@
 import { Avatar, Button, Card, Dropdown, Typography, type MenuProps } from 'antd';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useAppConfig } from '@/components/AppConfigProvider';
-import { Link} from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
+import { getApiBaseUrl } from '@/utils/urlUtils';
 
 
 const { Text } = Typography
@@ -52,8 +53,7 @@ export function UserInfo() {
                 <div>
                     <Card className="w-80 shadow-lg border border-gray-200" styles={{ body: { padding: "24px" } }}>
                         <div className="flex items-start gap-4 mb-4">
-                            <Avatar size={48} src={user.avatar || "/placeholder.svg"}>
-                            </Avatar>
+                            <Avatar size={48} src={`${getApiBaseUrl()}/api/my/profile/avatar`} icon={<img src="/images/avatar/male.png" />} />
 
                             <div className="flex-1 space-y-2">
                                 <div>
@@ -91,8 +91,7 @@ export function UserInfo() {
                 className="h-auto p-2 hover:bg-gray-50 transition-colors flex items-center gap-3"
                 aria-label="User menu"
             >
-                <Avatar size={40} src={user.avatar || "/placeholder.svg"}>
-                </Avatar>
+                <Avatar size={32} src={`${getApiBaseUrl()}/api/my/profile/avatar`} icon={<img src="/images/avatar/male.png" />} />
                 <div className="text-left hidden sm:block">
                     <Text strong className="text-sm leading-none block">
                         {user.name}

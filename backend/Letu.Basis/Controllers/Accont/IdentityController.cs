@@ -27,6 +27,7 @@ public class IdentityController : AbpControllerBase
     /// <param name="input"></param>
     /// <returns></returns>
     [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
     [HttpPost("login")]
     [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
     public async Task<UserTokenOutput> LoginAsync([FromBody] LoginInput input)
@@ -39,6 +40,7 @@ public class IdentityController : AbpControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost("logout")]
+    [IgnoreAntiforgeryToken]
     [AllowAnonymous]
     public async Task LogoutAsync()
     {
@@ -50,6 +52,7 @@ public class IdentityController : AbpControllerBase
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
+    [IgnoreAntiforgeryToken]
     [HttpPost("refresh-token")]
     public async Task<UserTokenOutput> RefreshTokenAsync(RefreshTokenInput input)
     {

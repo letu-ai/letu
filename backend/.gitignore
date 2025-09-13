@@ -1,0 +1,5 @@
+**/bin/**
+**/obj/**
+**/Letu.Basis/Logs/**
+**/.vs/**
+**/appsettings.Development.json

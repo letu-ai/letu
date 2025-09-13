@@ -118,7 +118,7 @@ function ProfilePage() {
                                             size={120}
                                             src={avatarSrc}
                                             icon={<UserOutlined />}
-                                            className="mb-2"
+                                            className=""
                                         />
                                         {uploading && (
                                             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full">

@@ -1,4 +1,4 @@
-import { Modal, Button, Space, Alert, Typography, Input, Progress } from "antd";
+import { Modal, Button, Space, Alert, Typography, Input, Progress, Switch, Divider } from "antd";
 import { ImportOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { importFromAmap, getImportProgress, type IRegionImportProgress } from "./-service";
@@ -25,6 +25,7 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
     const [currentProvince, setCurrentProvince] = useState("");
     const [current, setCurrent] = useState(0);
     const [total, setTotal] = useState(0);
+    const [includeStreets, setIncludeStreets] = useState(false);
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
@@ -44,6 +45,7 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
         setCurrent(0);
         setTotal(0);
         setLoading(false);
+        setIncludeStreets(false);
     };
 
     const handleImport = async () => {
@@ -72,7 +74,7 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
         }, 1000);
 
         try {
-            const result = await importFromAmap();
+            const result = await importFromAmap(includeStreets);
             if (result.success) {
                 message.success(`导入成功！共导入 ${result.totalCount} 条行政区域数据`);
                 message.info(`省份: ${result.provincesCount} 个, 城市: ${result.citiesCount} 个, 区县: ${result.districtsCount} 个`);
@@ -139,6 +141,40 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
                     icon={<ExclamationCircleOutlined />}
                     showIcon
                 />
+
+                {/* 导入选项区域 */}
+                {!loading && (
+                    <div>
+                        <div style={{ marginBottom: 16 }}>
+                            <Space direction="vertical" className="w-full">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <Text strong>导入街道数据</Text>
+                                        <div>
+                                            <Text type="secondary" className="text-sm">
+                                                包含街道/乡镇级别的详细数据，数据量非常大
+                                            </Text>
+                                        </div>
+                                    </div>
+                                    <Switch
+                                        checked={includeStreets}
+                                        onChange={setIncludeStreets}
+                                        disabled={loading}
+                                    />
+                                </div>
+
+                                {/* 街道数据警告 */}
+                                {includeStreets && (
+                                    <Alert
+                                        description="⏱️ 包含街道数据，预计需要数小时才能完成导入"
+                                        type="warning"
+                                        closable={false}
+                                    />
+                                )}
+                            </Space>
+                        </div>
+                    </div>
+                )}
 
                 {/* 确认输入区域 */}
                 {!loading && (

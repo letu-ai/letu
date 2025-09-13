@@ -95,6 +95,9 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             // 保存用户登录信息到缓存
             await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
 
+            // 设置 JWT Token 到 Cookie 中，用于图片等资源的认证
+            SetJwtCookie(token.Token, token.ExpiresAt);
+
             return new UserTokenOutput
             {
                 AccessToken = token.Token,
@@ -126,6 +129,10 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         var sessionId = CurrentUser.GetSessionId();
 
         await LogoutAsync(userId, sessionId);
+
+        // 清除 JWT Cookie
+        ClearJwtCookie();
+
         await localEventBus.PublishAsync(new SecurityLog
         {
             IsSuccess = true,
@@ -209,6 +216,9 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
 
             // 保存用户登录信息到缓存
             await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
+
+            // 更新 Cookie 中的 JWT Token
+            SetJwtCookie(token.Token, token.ExpiresAt);
 
             return new UserTokenOutput
             {
@@ -325,5 +335,38 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         var token = jwtAccessTokenProvider.CreateToken(claims, jwtOptions.Issuance.ExpirySeconds);
         token.RefreshToken = guidGenerator.Create().ToString("N").ToLower();
         return token;
+    }
+
+    /// <summary>
+    /// 设置 JWT Token 到 Cookie 中，用于图片等静态资源的认证
+    /// </summary>
+    /// <param name="token">JWT Token</param>
+    /// <param name="expiredTime">过期时间</param>
+    private void SetJwtCookie(string token, DateTimeOffset expiredTime)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,            // 防止 XSS 攻击，JavaScript 无法访问
+            Secure = _httpContext.Request.IsHttps,    // HTTPS 下设置 Secure
+            SameSite = SameSiteMode.Lax,              // 防止 CSRF 攻击
+            Path = "/",                 // Cookie 路径
+            Expires = expiredTime       // 与 JWT 相同的过期时间
+        };
+
+        _httpContext.Response.Cookies.Append("jwt-token", token, cookieOptions);
+    }
+
+    /// <summary>
+    /// 清除 JWT Cookie
+    /// </summary>
+    private void ClearJwtCookie()
+    {
+        _httpContext.Response.Cookies.Delete("jwt-token", new CookieOptions
+        {
+            Path = "/",
+            HttpOnly = true,
+            Secure = _httpContext.Request.IsHttps,
+            SameSite = SameSiteMode.Lax
+        });
     }
 }

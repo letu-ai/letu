@@ -20,7 +20,7 @@ namespace Letu.Basis.Personal.Profiles
 
         Task<string> UploadAvatarAsync(AvatarUploadInput input);
         
-        Task<(Stream?, string)> GetAvatarAsync();
+        Task<(Stream?, string)> GetAvatarAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 修改个人密码

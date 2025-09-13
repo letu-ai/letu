@@ -21,6 +21,7 @@ function buildTenantHeaders(): AxiosRequestConfig {
  */
 export function loginByPassword(input: IPasswordLoginInput) {
     const config = buildTenantHeaders();
+    config.withCredentials = true; //确保登录成功后设置的cookie能被浏览器正确接收
 
     return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/identity/login', input, config);
 }
@@ -30,6 +31,8 @@ export function loginByPassword(input: IPasswordLoginInput) {
  */
 export function loginBySms(input: ISmsLoginInput) {
     const config = buildTenantHeaders();
+    config.withCredentials = true; //确保登录成功后设置的cookie能被浏览器正确接收
+
     return httpClient.post<ISmsLoginInput, IUserTokenOutput>('/api/identity/SmsLogin', input, config);
 }
 
@@ -37,7 +40,10 @@ export function loginBySms(input: ISmsLoginInput) {
  * 注销
  */
 export function logout() {
-    return httpClient.post<void>('/api/identity/logout');
+    const config = buildTenantHeaders();
+    config.withCredentials = true; //确保注销成功后，cookie能被浏览器正确删除
+
+    return httpClient.post<void>('/api/identity/logout', null, config);
 }
 
 /**
@@ -54,7 +60,10 @@ export function sendLoginSmsCode(phone: string) {
  * @returns
  */
 export function refreshToken(refreshToken: string) {
-    return httpClient.post<string, IUserTokenOutput>('/api/identity/refresh-token', { refreshToken });
+    const config = {} as AxiosRequestConfig;
+    config.withCredentials = true; //确保刷新token成功后，cookie能被浏览器正确接收
+
+    return httpClient.post<string, IUserTokenOutput>('/api/identity/refresh-token', { refreshToken }, config);
 }
 
 export function getLoginSettings() {

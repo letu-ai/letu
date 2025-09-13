@@ -23,7 +23,7 @@ import { Route as AccountLogoutRouteImport } from './pages/account/logout'
 import { Route as AccountLoginRouteImport } from './pages/account/login'
 import { Route as AdminSettingsRouteRouteImport } from './pages/admin/settings/route'
 import { Route as MyNotificationsIndexRouteImport } from './pages/my/notifications/index'
-import { Route as HomeTestIndexRouteImport } from './pages/home/test/index'
+import { Route as HomeDemoIndexRouteImport } from './pages/home/demo/index'
 import { Route as AdminUsersIndexRouteImport } from './pages/admin/users/index'
 import { Route as AdminTenantsIndexRouteImport } from './pages/admin/tenants/index'
 import { Route as AdminSettingsIndexRouteImport } from './pages/admin/settings/index'
@@ -132,9 +132,9 @@ const MyNotificationsIndexRoute = MyNotificationsIndexRouteImport.update({
   path: '/notifications/',
   getParentRoute: () => MyRouteRoute,
 } as any)
-const HomeTestIndexRoute = HomeTestIndexRouteImport.update({
-  id: '/test/',
-  path: '/test/',
+const HomeDemoIndexRoute = HomeDemoIndexRouteImport.update({
+  id: '/demo/',
+  path: '/demo/',
   getParentRoute: () => HomeRouteRoute,
 } as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
@@ -379,7 +379,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
-  '/home/test': typeof HomeTestIndexRoute
+  '/home/demo': typeof HomeDemoIndexRoute
   '/my/notifications': typeof MyNotificationsIndexRoute
   '/admin/loggings/auditLog/entity/$id': typeof AdminLoggingsAuditLogEntityIdRoute
   '/admin/loggings/auditLog/request/$id': typeof AdminLoggingsAuditLogRequestIdRoute
@@ -431,7 +431,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
-  '/home/test': typeof HomeTestIndexRoute
+  '/home/demo': typeof HomeDemoIndexRoute
   '/my/notifications': typeof MyNotificationsIndexRoute
   '/admin/loggings/auditLog/entity/$id': typeof AdminLoggingsAuditLogEntityIdRoute
   '/admin/loggings/auditLog/request/$id': typeof AdminLoggingsAuditLogRequestIdRoute
@@ -486,7 +486,7 @@ export interface FileRoutesById {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tenants/': typeof AdminTenantsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
-  '/home/test/': typeof HomeTestIndexRoute
+  '/home/demo/': typeof HomeDemoIndexRoute
   '/my/notifications/': typeof MyNotificationsIndexRoute
   '/admin/loggings/auditLog/entity/$id': typeof AdminLoggingsAuditLogEntityIdRoute
   '/admin/loggings/auditLog/request/$id': typeof AdminLoggingsAuditLogRequestIdRoute
@@ -542,7 +542,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tenants'
     | '/admin/users'
-    | '/home/test'
+    | '/home/demo'
     | '/my/notifications'
     | '/admin/loggings/auditLog/entity/$id'
     | '/admin/loggings/auditLog/request/$id'
@@ -594,7 +594,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tenants'
     | '/admin/users'
-    | '/home/test'
+    | '/home/demo'
     | '/my/notifications'
     | '/admin/loggings/auditLog/entity/$id'
     | '/admin/loggings/auditLog/request/$id'
@@ -648,7 +648,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tenants/'
     | '/admin/users/'
-    | '/home/test/'
+    | '/home/demo/'
     | '/my/notifications/'
     | '/admin/loggings/auditLog/entity/$id'
     | '/admin/loggings/auditLog/request/$id'
@@ -764,11 +764,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyNotificationsIndexRouteImport
       parentRoute: typeof MyRouteRoute
     }
-    '/home/test/': {
-      id: '/home/test/'
-      path: '/test'
-      fullPath: '/home/test'
-      preLoaderRoute: typeof HomeTestIndexRouteImport
+    '/home/demo/': {
+      id: '/home/demo/'
+      path: '/demo'
+      fullPath: '/home/demo'
+      preLoaderRoute: typeof HomeDemoIndexRouteImport
       parentRoute: typeof HomeRouteRoute
     }
     '/admin/users/': {
@@ -1145,12 +1145,12 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 
 interface HomeRouteRouteChildren {
   HomeIndexRoute: typeof HomeIndexRoute
-  HomeTestIndexRoute: typeof HomeTestIndexRoute
+  HomeDemoIndexRoute: typeof HomeDemoIndexRoute
 }
 
 const HomeRouteRouteChildren: HomeRouteRouteChildren = {
   HomeIndexRoute: HomeIndexRoute,
-  HomeTestIndexRoute: HomeTestIndexRoute,
+  HomeDemoIndexRoute: HomeDemoIndexRoute,
 }
 
 const HomeRouteRouteWithChildren = HomeRouteRoute._addFileChildren(

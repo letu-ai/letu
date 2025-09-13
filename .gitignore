@@ -1,7 +1,2 @@
-**/bin/**
-**/obj/**
-**/Letu.Basis/Logs/**
-**/.vs/**
-/letu-server/TemplateEngineHost/vs
 .pnpm-store
-backend/**/appsettings.Development.json
+.claude/*.local.json
