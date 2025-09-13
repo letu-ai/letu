@@ -16,7 +16,7 @@ public class StreetAppService : BasisAppService, IStreetAppService
         this.logger = logger;
     }
 
-    public async Task<List<StreetListOutput>> GetByRegionIdAsync(string regionCode)
+    public async Task<List<StreetListOutput>> GetStreetsAsync(string regionCode)
     {
         return await streetRepository.Select
             .Where(x => x.RegionCode == regionCode)

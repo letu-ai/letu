@@ -137,3 +137,10 @@ export const getRegionChildrenByCode = async (parentCode?: string): Promise<IReg
 export const getRegionPathByCodes = async (code: string): Promise<IRegionListOutput[]> => {
     return await httpClient.get<void, IRegionListOutput[]>(`/api/admin/regions/path-by-code/${code}`);
 };
+
+/**
+ * 根据区域代码获取街道列表
+ */
+export const getStreets = async (regionCode: string): Promise<string[]> => {
+    return await httpClient.get<void, string[]>(`/api/admin/regions/streets/${regionCode}`);
+};

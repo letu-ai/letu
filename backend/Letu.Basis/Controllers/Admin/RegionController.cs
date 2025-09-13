@@ -13,10 +13,12 @@ namespace Letu.Basis.Controllers.Admin;
 public class RegionController : ControllerBase
 {
     private readonly IRegionAppService regionAppService;
+    private readonly IStreetAppService streetAppService;
 
-    public RegionController(IRegionAppService regionAppService)
+    public RegionController(IRegionAppService regionAppService, IStreetAppService streetAppService)
     {
         this.regionAppService = regionAppService;
+        this.streetAppService = streetAppService;
     }
 
     /// <summary>
@@ -73,4 +75,14 @@ public class RegionController : ControllerBase
         return await regionAppService.GetImportProgressAsync();
     }
 
+    /// <summary>
+    /// 根据区域代码获取街道名称列表
+    /// </summary>
+    /// <param name="regionCode">区域代码</param>
+    /// <returns>街道名称列表</returns>
+    [HttpGet("streets/{regionCode}")]
+    public async Task<List<string>> GetStreetsAsync(string regionCode)
+    {
+        return (await streetAppService.GetStreetsAsync(regionCode)).Select(x=>x.Name).ToList();
+    }
 }

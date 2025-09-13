@@ -10,7 +10,7 @@ public interface IStreetAppService : IApplicationService
     /// </summary>
     /// <param name="regionCode">区域ID</param>
     /// <returns>街道列表</returns>
-    Task<List<StreetListOutput>> GetByRegionIdAsync(string regionCode);
+    Task<List<StreetListOutput>> GetStreetsAsync(string regionCode);
 
     /// <summary>
     /// 根据区域ID删除街道

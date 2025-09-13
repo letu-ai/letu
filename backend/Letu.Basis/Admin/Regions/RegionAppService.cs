@@ -387,5 +387,4 @@ public class RegionAppService : BasisAppService, IRegionAppService
 
         memoryCache.Set(ImportProgressKey, progress, TimeSpan.FromMinutes(10));
     }
-
 }

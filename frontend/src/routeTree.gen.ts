@@ -23,7 +23,6 @@ import { Route as AccountLogoutRouteImport } from './pages/account/logout'
 import { Route as AccountLoginRouteImport } from './pages/account/login'
 import { Route as AdminSettingsRouteRouteImport } from './pages/admin/settings/route'
 import { Route as MyNotificationsIndexRouteImport } from './pages/my/notifications/index'
-import { Route as HomeDemoIndexRouteImport } from './pages/home/demo/index'
 import { Route as AdminUsersIndexRouteImport } from './pages/admin/users/index'
 import { Route as AdminTenantsIndexRouteImport } from './pages/admin/tenants/index'
 import { Route as AdminSettingsIndexRouteImport } from './pages/admin/settings/index'
@@ -40,6 +39,7 @@ import { Route as AdminEditionsIndexRouteImport } from './pages/admin/editions/i
 import { Route as AdminDepartmentsIndexRouteImport } from './pages/admin/departments/index'
 import { Route as AdminDataDictionariesIndexRouteImport } from './pages/admin/data-dictionaries/index'
 import { Route as MyNotificationsIdRouteImport } from './pages/my/notifications/$id'
+import { Route as HomeDemoRegionRouteImport } from './pages/home/demo/region'
 import { Route as AdminSettingsTimezoneRouteImport } from './pages/admin/settings/timezone'
 import { Route as AdminSettingsSiteRouteImport } from './pages/admin/settings/site'
 import { Route as AdminSettingsFeatureRouteImport } from './pages/admin/settings/feature'
@@ -132,11 +132,6 @@ const MyNotificationsIndexRoute = MyNotificationsIndexRouteImport.update({
   path: '/notifications/',
   getParentRoute: () => MyRouteRoute,
 } as any)
-const HomeDemoIndexRoute = HomeDemoIndexRouteImport.update({
-  id: '/demo/',
-  path: '/demo/',
-  getParentRoute: () => HomeRouteRoute,
-} as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -219,6 +214,11 @@ const MyNotificationsIdRoute = MyNotificationsIdRouteImport.update({
   id: '/notifications/$id',
   path: '/notifications/$id',
   getParentRoute: () => MyRouteRoute,
+} as any)
+const HomeDemoRegionRoute = HomeDemoRegionRouteImport.update({
+  id: '/demo/region',
+  path: '/demo/region',
+  getParentRoute: () => HomeRouteRoute,
 } as any)
 const AdminSettingsTimezoneRoute = AdminSettingsTimezoneRouteImport.update({
   id: '/timezone',
@@ -363,6 +363,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
+  '/home/demo/region': typeof HomeDemoRegionRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries': typeof AdminDataDictionariesIndexRoute
   '/admin/departments': typeof AdminDepartmentsIndexRoute
@@ -379,7 +380,6 @@ export interface FileRoutesByFullPath {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
-  '/home/demo': typeof HomeDemoIndexRoute
   '/my/notifications': typeof MyNotificationsIndexRoute
   '/admin/loggings/auditLog/entity/$id': typeof AdminLoggingsAuditLogEntityIdRoute
   '/admin/loggings/auditLog/request/$id': typeof AdminLoggingsAuditLogRequestIdRoute
@@ -415,6 +415,7 @@ export interface FileRoutesByTo {
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
+  '/home/demo/region': typeof HomeDemoRegionRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries': typeof AdminDataDictionariesIndexRoute
   '/admin/departments': typeof AdminDepartmentsIndexRoute
@@ -431,7 +432,6 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
-  '/home/demo': typeof HomeDemoIndexRoute
   '/my/notifications': typeof MyNotificationsIndexRoute
   '/admin/loggings/auditLog/entity/$id': typeof AdminLoggingsAuditLogEntityIdRoute
   '/admin/loggings/auditLog/request/$id': typeof AdminLoggingsAuditLogRequestIdRoute
@@ -470,6 +470,7 @@ export interface FileRoutesById {
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
+  '/home/demo/region': typeof HomeDemoRegionRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries/': typeof AdminDataDictionariesIndexRoute
   '/admin/departments/': typeof AdminDepartmentsIndexRoute
@@ -486,7 +487,6 @@ export interface FileRoutesById {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tenants/': typeof AdminTenantsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
-  '/home/demo/': typeof HomeDemoIndexRoute
   '/my/notifications/': typeof MyNotificationsIndexRoute
   '/admin/loggings/auditLog/entity/$id': typeof AdminLoggingsAuditLogEntityIdRoute
   '/admin/loggings/auditLog/request/$id': typeof AdminLoggingsAuditLogRequestIdRoute
@@ -526,6 +526,7 @@ export interface FileRouteTypes {
     | '/admin/settings/feature'
     | '/admin/settings/site'
     | '/admin/settings/timezone'
+    | '/home/demo/region'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries'
     | '/admin/departments'
@@ -542,7 +543,6 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tenants'
     | '/admin/users'
-    | '/home/demo'
     | '/my/notifications'
     | '/admin/loggings/auditLog/entity/$id'
     | '/admin/loggings/auditLog/request/$id'
@@ -578,6 +578,7 @@ export interface FileRouteTypes {
     | '/admin/settings/feature'
     | '/admin/settings/site'
     | '/admin/settings/timezone'
+    | '/home/demo/region'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries'
     | '/admin/departments'
@@ -594,7 +595,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tenants'
     | '/admin/users'
-    | '/home/demo'
     | '/my/notifications'
     | '/admin/loggings/auditLog/entity/$id'
     | '/admin/loggings/auditLog/request/$id'
@@ -632,6 +632,7 @@ export interface FileRouteTypes {
     | '/admin/settings/feature'
     | '/admin/settings/site'
     | '/admin/settings/timezone'
+    | '/home/demo/region'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries/'
     | '/admin/departments/'
@@ -648,7 +649,6 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tenants/'
     | '/admin/users/'
-    | '/home/demo/'
     | '/my/notifications/'
     | '/admin/loggings/auditLog/entity/$id'
     | '/admin/loggings/auditLog/request/$id'
@@ -764,13 +764,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyNotificationsIndexRouteImport
       parentRoute: typeof MyRouteRoute
     }
-    '/home/demo/': {
-      id: '/home/demo/'
-      path: '/demo'
-      fullPath: '/home/demo'
-      preLoaderRoute: typeof HomeDemoIndexRouteImport
-      parentRoute: typeof HomeRouteRoute
-    }
     '/admin/users/': {
       id: '/admin/users/'
       path: '/users'
@@ -882,6 +875,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/my/notifications/$id'
       preLoaderRoute: typeof MyNotificationsIdRouteImport
       parentRoute: typeof MyRouteRoute
+    }
+    '/home/demo/region': {
+      id: '/home/demo/region'
+      path: '/demo/region'
+      fullPath: '/home/demo/region'
+      preLoaderRoute: typeof HomeDemoRegionRouteImport
+      parentRoute: typeof HomeRouteRoute
     }
     '/admin/settings/timezone': {
       id: '/admin/settings/timezone'
@@ -1145,12 +1145,12 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 
 interface HomeRouteRouteChildren {
   HomeIndexRoute: typeof HomeIndexRoute
-  HomeDemoIndexRoute: typeof HomeDemoIndexRoute
+  HomeDemoRegionRoute: typeof HomeDemoRegionRoute
 }
 
 const HomeRouteRouteChildren: HomeRouteRouteChildren = {
   HomeIndexRoute: HomeIndexRoute,
-  HomeDemoIndexRoute: HomeDemoIndexRoute,
+  HomeDemoRegionRoute: HomeDemoRegionRoute,
 }
 
 const HomeRouteRouteWithChildren = HomeRouteRoute._addFileChildren(
