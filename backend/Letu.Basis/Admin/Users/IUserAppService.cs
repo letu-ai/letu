@@ -23,6 +23,14 @@ namespace Letu.Basis.Admin.Users
         Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto);
 
         /// <summary>
+        /// 获取用户头像
+        /// </summary>
+        /// <param name="avatar"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<(Stream?, string)> GetAvatarAsync(string? avatar, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// 删除用户
         /// </summary>
         /// <param name="id"></param>

@@ -28,40 +28,40 @@ public class AmapPoi
     /// <summary>
     /// POI 分类编码
     /// </summary>
-    public required string TypeCode { get; set; }
+    public string? TypeCode { get; set; }
 
     /// <summary>
     /// POI 所属省份
     /// </summary>
-    public required string ProvinceName { get; set; }
+    public string? ProvinceName { get; set; }
 
     /// <summary>
     /// POI 所属城市
     /// </summary>
-    public required string CityName { get; set; }
+    public string? CityName { get; set; }
 
     /// <summary>
     /// POI 所属区县
     /// </summary>
-    public required string DistrictName { get; set; }
+    public string? DistrictName { get; set; }
 
     /// <summary>
     /// POI 详细地址
     /// </summary>
-    public required string Address { get; set; }
+    public string? Address { get; set; }
 
     /// <summary>
     /// POI 所属省份编码
     /// </summary>
-    public required string ProvinceCode { get; set; }
+    public string? ProvinceCode { get; set; }
 
     /// <summary>
     /// POI 所属区域编码
     /// </summary>
-    public required string AdCode { get; set; }
+    public string? AdCode { get; set; }
 
     /// <summary>
     /// POI 所属城市编码
     /// </summary>
-    public required string CityCode { get; set; }
+    public string? CityCode { get; set; }
 }

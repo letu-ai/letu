@@ -15,10 +15,10 @@ export function updateUser(id: string, input: IUpdateUserInput) {
 
 /**
  * 用户分页列表
- * @param dto
+ * @param input
  */
-export function getUserList(dto: IUserListInput) {
-    return httpClient.get<IUserListInput, PagedResult<UserListOutput>>('/api/admin/users', { params: dto });
+export function getUserList(input: IUserListInput) {
+    return httpClient.get<IUserListInput, PagedResult<UserListOutput>>('/api/admin/users', { params: input });
 }
 
 /**
@@ -42,7 +42,7 @@ export function assignRole(userId: string, dto: AssignRoleDto) {
  * @param id
  */
 export function switchUserEnabledStatus(id: string) {
-    return httpClient.put<string, void>(`/api/admin/users/changeEnabled/${id}`);
+    return httpClient.put<string, void>(`/api/admin/users/${id}/enabled`);
 }
 
 /**
@@ -72,6 +72,7 @@ export interface ICreateUserInput {
     departmentId?: string | null;
     positionId?: string | null;
     employeeId?: string | null;
+    organizationUnitId?: string | null;
 }
 
 export interface IUpdateUserInput {
@@ -82,11 +83,13 @@ export interface IUpdateUserInput {
     departmentId?: string | null;
     positionId?: string | null;
     employeeId?: string | null;
+    organizationUnitId?: string | null;
 }
 
 
 export interface IUserListInput extends PagedResultRequest {
-    userName?: string | null;
+    keyword?: string;
+    organizationUnitId?: string;
 }
 
 export interface UserListOutput {
@@ -103,6 +106,8 @@ export interface UserListOutput {
     positionName?: string | null;
     employeeId?: string | null;
     employeeName?: string | null;
+    organizationUnitId?: string | null;
+    organizationUnitName?: string | null;
 }
 
 export interface AssignRoleDto {

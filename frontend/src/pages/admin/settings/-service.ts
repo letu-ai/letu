@@ -121,7 +121,8 @@ export function updateSiteSettings(data: ISiteSettings): Promise<void> {
 }
 
 export interface IAmapSettings {
-    apiKey: string | null;
+    apiKey: string;
+    securityJsCode: string;
 }
 
 export function fetchAmapSettings(): Promise<IAmapSettings> {

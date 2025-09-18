@@ -46,7 +46,7 @@ export function getToken(): IUserTokenOutput | null {
 }
 
 /**
- * 刷新 Token
+ * 写入新的 Token（用于刷新token）
  */
 export function refreshToken(accessToken: string, refreshToken?: string, expiredTime?: Date): void {
     const currentToken = getToken();

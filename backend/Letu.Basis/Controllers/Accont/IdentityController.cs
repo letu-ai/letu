@@ -52,6 +52,7 @@ public class IdentityController : AbpControllerBase
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
+    [AllowAnonymous]
     [IgnoreAntiforgeryToken]
     [HttpPost("refresh-token")]
     public async Task<UserTokenOutput> RefreshTokenAsync(RefreshTokenInput input)

@@ -1,6 +1,7 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { getToken, shouldRefreshToken, refreshToken as updateToken } from '@/utils/authUtils';
+import { getToken, shouldRefreshToken } from '@/utils/authUtils';
 import { getApiBaseUrl } from './urlUtils';
+import { tokenRefreshManager } from './tokenRefreshManager';
 
 interface IAbpFormatError {
     message: string;
@@ -150,7 +151,6 @@ class HttpClient {
         "/api/application/configuration"
     ]; 
     private errorHandler: (error: IResponseError) => void = () => { };
-    private refreshTokenPromise: Promise<boolean> | null = null;
 
     // 工具函数：统一URL小写；是否“跳过刷新token”的接口（匿名 或 刷新/注销）
     private toUrl(url?: string): string { return (url || '').toLowerCase(); }
@@ -168,58 +168,9 @@ class HttpClient {
         }
     }
 
-    // 内部刷新token的方法
+    // 使用共享的token刷新管理器
     private async refreshTokenInternal(): Promise<boolean> {
-        if (this.refreshTokenPromise) {
-            return this.refreshTokenPromise;
-        }
-
-        const currentToken = getToken();
-        if (!currentToken?.refreshToken) {
-            return false;
-        }
-
-        this.refreshTokenPromise = this.performTokenRefresh(currentToken.refreshToken)
-            .finally(() => {
-                this.refreshTokenPromise = null;
-            });
-
-        return this.refreshTokenPromise;
-    }
-
-    // 执行token刷新的HTTP请求
-    private async performTokenRefresh(refreshTokenValue: string): Promise<boolean> {
-        try {
-            console.log('开始刷新token');
-            
-            // 使用原生axios避免递归调用
-            const response = await axios.post(
-                `${this.instance.defaults.baseURL}/api/identity/refresh-token`,
-                { refreshToken: refreshTokenValue },
-                {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    timeout: 30000
-                }
-            );
-
-            if (response.data && response.data.accessToken) {
-                console.log('token刷新成功');
-                updateToken(
-                    response.data.accessToken,
-                    response.data.refreshToken,
-                    response.data.expiredTime
-                );
-                return true;
-            } else {
-                console.warn('token刷新返回空结果');
-                return false;
-            }
-        } catch (error) {
-            console.error('token刷新失败:', error);
-            return false;
-        }
+        return tokenRefreshManager.refreshToken();
     }
 
     // 处理请求前：受保护接口需要确保token有效；匿名/刷新白名单跳过"刷新token"

@@ -5,7 +5,7 @@ import type { AxiosRequestConfig } from 'axios';
 
 function buildTenantHeaders(): AxiosRequestConfig {
     const tenantInfo = getTenantInfo();
-    let config = {} as AxiosRequestConfig;
+    const config = {} as AxiosRequestConfig;
     if (tenantInfo?.tenantId) {
         config.headers = {
             [tenantInfo.tenantKey]: tenantInfo.tenantId

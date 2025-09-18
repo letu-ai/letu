@@ -2,6 +2,7 @@ using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Admin.Users.Dtos;
 using Letu.Basis.Permissions;
+using Letu.Basis.Personal.Profiles;
 using Letu.Core.Applications;
 using Letu.Logging;
 using Letu.Shared.Consts;
@@ -56,6 +57,36 @@ namespace Letu.Basis.Controllers.Admin
         public async Task<PagedResult<UserListOutput>> GetUserListAsync([FromQuery] UserListInput input)
         {
             return await userService.GetUserListAsync(input);
+        }
+
+        /// <summary>
+        /// 获取用户头像
+        /// </summary>
+        /// <param name="avatar"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("avatars/{*avatar}")]
+        public async Task<IActionResult> GetAvatarAsync(string avatar, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var (stream, contentType) = await userService.GetAvatarAsync(avatar, cancellationToken);
+                if (stream == null)
+                {
+                    return NotFound();
+                }
+
+                return File(stream, contentType, enableRangeProcessing: true);
+            }
+            catch (OperationCanceledException)
+            {
+                // 客户端取消请求，返回204 No Content
+                return NoContent();
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         /// <summary>

@@ -442,7 +442,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         // 创建 app 应用的父级菜单（文件夹）
         var testFolder = new MenuItem(guidGenerator.Create())
         {
-            Title = "test",
+            Title = "Demo",
             ApplicationName = "app",
             MenuType = MenuType.Folder,
             Sort = 1,
@@ -452,18 +452,18 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         };
 
         await menuRepository.InsertAsync(testFolder);
-        parentMenus["test"] = testFolder.Id;
+        parentMenus["Demo"] = testFolder.Id;
 
         // 创建 test 文件夹下的子菜单
         var childMenus = new List<MenuItem>
         {
             new MenuItem(guidGenerator.Create())
             {
-                Title = "ttt1",
-                Path = "/test1",
+                Title = "行政区域",
+                Path = "/home/demo/region",
                 ApplicationName = "app",
                 MenuType = MenuType.Menu,
-                ParentId = parentMenus["test"],
+                ParentId = parentMenus["Demo"],
                 Sort = 0,
                 Display = true,
                 IsExternal = false,

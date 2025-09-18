@@ -61,7 +61,6 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         this.distributedLock = distributedLock;
     }
 
-    [DisableAuditing]
     public async Task<UserTokenOutput> LoginAsync(LoginInput input)
     {
         // TODO：应记录登录成功，失败和方式
@@ -89,7 +88,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             var sessionId = guidGenerator.Create().ToString("N");
 
             var claims = await CreateUserClaims(user, sessionId);
-            var token = CreateToken(claims);
+            var token = CreateToken(claims, user.Id, sessionId);
             loginLog.SessionId = sessionId;
 
             // 保存用户登录信息到缓存
@@ -152,8 +151,20 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
     // TODO：添加权限验证，确保只有管理员可以调用此方法
     public async Task LogoutAsync(Guid userId, string sessionId)
     {
+        // 获取该会话的 RefreshToken
+        var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
+        var refreshToken = await refreshTokenCache.GetAsync(sessionKey);
+        
+        // 删除所有相关缓存
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
+            // 删除 RefreshToken 本身的缓存记录
+            await refreshTokenCache.RemoveAsync(refreshToken);
+        }
+        
+        // 删除会话映射和 AccessToken
+        await refreshTokenCache.RemoveAsync(sessionKey);
         await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId));
-        await refreshTokenCache.RemoveAsync(IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId));
     }
 
 
@@ -164,7 +175,6 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
     /// <param name="sessionId"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    [DisableAuditing]
     public async Task<bool> ValidateTokenAsync(string userId, string sessionId, string token)
     {
         string key = IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId);
@@ -173,15 +183,31 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
     }
 
 
-    [DisableAuditing]
     public async Task<UserTokenOutput> RefreshTokenAsync(string refreshToken)
     {
-        var sessionId = CurrentUser.GetSessionId();
-        var userId = CurrentUser.GetId();
+        // 1. 解析 RefreshToken 获取 userId 和 sessionId
+        var parts = refreshToken.Split('.');
+        if (parts.Length != 3)
+        {
+            throw HttpFriendlyException.BadRequest("刷新token格式错误");
+        }
+
+        var randomPart = parts[0];
+        Guid userId;
+        string sessionId;
+        
+        try
+        {
+            userId = Guid.Parse(parts[1]);
+            sessionId = parts[2];
+        }
+        catch
+        {
+            throw HttpFriendlyException.BadRequest("刷新token格式错误");
+        }
 
         // 使用分布式锁防止并发刷新token
-
-        await using var handle = await distributedLock.TryAcquireAsync(nameof(IdentityAppService), TimeSpan.FromSeconds(10));
+        await using var handle = await distributedLock.TryAcquireAsync($"refresh_token:{userId}:{sessionId}", TimeSpan.FromSeconds(10));
         if (handle == null)
         {
             throw HttpFriendlyException.BadRequest("token刷新请求过于频繁，请稍后重试");
@@ -193,31 +219,42 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             IsSuccess = true,
             Ip = RequestUtils.GetIp(_httpContext),
             OperationMsg = "刷新令牌成功",
-            UserName = CurrentUser.UserName!,
-            SessionId = CurrentUser.GetSessionId()
+            UserName = "", // 稍后填充
+            SessionId = sessionId
         };
 
         try
         {
-            var existRefreshToken = await refreshTokenCache.GetAsync(IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId))
-                ?? throw HttpFriendlyException.BadRequest("刷新token已过期");
+            // 2. 直接用 RefreshToken 作为键验证缓存
+            var tokenValue = await refreshTokenCache.GetAsync(refreshToken);
+            if (tokenValue == null)
+            {
+                throw HttpFriendlyException.BadRequest("刷新token已过期或无效");
+            }
 
-            if (!refreshToken.Equals(existRefreshToken))
-                throw HttpFriendlyException.BadRequest("刷新token不正确");
+            // 3. 验证会话是否还有效（可能被管理员强制下线）
+            var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
+            var sessionToken = await refreshTokenCache.GetAsync(sessionKey);
+            if (sessionToken != refreshToken)
+            {
+                throw HttpFriendlyException.BadRequest("会话已被终止");
+            }
 
-            // 获取用户信息
+            // 4. 获取用户信息
             var user = await _userRepository.Where(x => x.Id == userId).FirstAsync();
             if (user == null)
                 throw HttpFriendlyException.NotFound("用户不存在");
 
-            // 创建用户声明和生成令牌
-            var claims = await CreateUserClaims(user, sessionId);
-            var token = CreateToken(claims);
+            securityLog.UserName = user.UserName;
 
-            // 保存用户登录信息到缓存
+            // 5. 创建用户声明和生成令牌
+            var claims = await CreateUserClaims(user, sessionId);
+            var token = CreateToken(claims, userId, sessionId);
+
+            // 6. 保存用户登录信息到缓存
             await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
 
-            // 更新 Cookie 中的 JWT Token
+            // 7. 更新 Cookie 中的 JWT Token
             SetJwtCookie(token.Token, token.ExpiresAt);
 
             return new UserTokenOutput
@@ -259,6 +296,14 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             {
                 foreach (var sid in existsSessionIds)
                 {
+                    // 获取旧的 RefreshToken
+                    var oldRefreshToken = await refreshTokenCache.GetAsync(IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sid));
+                    if (!string.IsNullOrEmpty(oldRefreshToken))
+                    {
+                        // 删除 RefreshToken 本身的缓存记录
+                        await refreshTokenCache.RemoveAsync(oldRefreshToken);
+                    }
+                    
                     await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(user.Id, sid));
                     await refreshTokenCache.RemoveAsync(IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sid));
                 }
@@ -291,6 +336,18 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
 
         if (token.RefreshToken != null)
         {
+            // 双向映射：
+            // 1. RefreshToken 本身作为键，值为 "valid"（用于验证 token 有效性）
+            await refreshTokenCache.SetAsync(
+                token.RefreshToken,
+                "valid",
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = refreshTokenExpired
+                }
+            );
+            
+            // 2. userId:sessionId 作为键，值为 RefreshToken（用于会话管理）
             await refreshTokenCache.SetAsync(
                 IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sessionId),
                 token.RefreshToken,
@@ -330,10 +387,12 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         return claims;
     }
 
-    private JwtAccessToken CreateToken(List<Claim> claims)
+    private JwtAccessToken CreateToken(List<Claim> claims, Guid userId, string sessionId)
     {
         var token = jwtAccessTokenProvider.CreateToken(claims, jwtOptions.Issuance.ExpirySeconds);
-        token.RefreshToken = guidGenerator.Create().ToString("N").ToLower();
+        // 生成格式化的 RefreshToken: <random>.<userId>.<sessionId>
+        var randomToken = guidGenerator.Create().ToString("N").ToLower();
+        token.RefreshToken = $"{randomToken}.{userId}.{sessionId}";
         return token;
     }
 

@@ -124,7 +124,7 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
                 </Space>
             }
             maskClosable={false}
-            destroyOnClose
+            destroyOnHidden
         >
             <Space direction="vertical" style={{ width: "100%" }} size="large">
                 {/* 警告信息 */}

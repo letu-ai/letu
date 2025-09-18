@@ -39,5 +39,26 @@ namespace Letu.Basis.Admin.Regions
         /// <param name="code">区域代码</param>
         /// <returns>从顶级到当前区域的完整路径</returns>
         Task<List<RegionListOutput>> GetPathByCodeAsync(string code);
+
+        /// <summary>
+        /// 获取区域的省市区信息
+        /// </summary>
+        /// <param name="regionCode">区域代码</param>
+        /// <returns>省市区信息</returns>
+        Task<RegionInfo> GetRegionInfoAsync(string regionCode);
+
+        /// <summary>
+        /// 批量获取区域的省市区信息
+        /// </summary>
+        /// <param name="regionCodes">区域代码列表</param>
+        /// <returns>区域代码与省市区信息的字典</returns>
+        Task<Dictionary<string, RegionInfo>> GetRegionInfoBatchAsync(List<string> regionCodes);
+
+        /// <summary>
+        /// 根据行政区域代码判断其级别
+        /// </summary>
+        /// <param name="code">行政区域代码</param>
+        /// <returns>区域级别</returns>
+        RegionLevel GetCodeLevel(string? code);
     }
 }

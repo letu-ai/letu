@@ -12,6 +12,9 @@ export interface IRegionListOutput {
     children?: IRegionListOutput[];
     hasChildren?: boolean;
     nextLevel?: number;
+    center?: string;  // 中心点坐标
+    cityName?: string;  // 城市名称
+    provinceName?: string;  // 省份名称
 }
 
 
@@ -55,7 +58,7 @@ export const getRegionByCode = async (code: string): Promise<IRegionListOutput |
  */
 export const importFromAmap = async (includeStreets: boolean = false): Promise<IRegionImportResult> => {
     return await httpClient.post<void, IRegionImportResult>(`/api/admin/regions/import-from-amap`,
-         { includeStreets });
+        null, { params: { includeStreets } });
 };
 
 /**
@@ -105,22 +108,33 @@ const getHasChildrenByLevel = (level: number): boolean => {
     return level < 4;
 };
 
+
+const levelNameMap: Record<number, string> = {
+    1: "省/直辖市",
+    2: "市/州",
+    3: "县/区",
+    4: "街道/乡镇",
+};
+
+const colorMap: Record<number, string> = {
+    1: "geekblue",
+    2: "blue",
+    3: "cyan",
+    4: "green",
+};
+
 /**
  * 获取层级名称
  */
 export const getLevelName = (level: number): string => {
-    switch (level) {
-        case 1:
-            return "省/直辖市";
-        case 2:
-            return "市/州";
-        case 3:
-            return "县/区";
-        case 4:
-            return "街道/乡镇";
-        default:
-            return "未知层级";
-    }
+    return levelNameMap[level] ?? "未知层级";
+};
+
+/**
+ * 获取层级颜色
+ */
+export const getLevelColor = (level: number): string | undefined => {
+    return colorMap[level] ?? undefined;
 };
 
 /**

@@ -39,7 +39,10 @@ import { Route as AdminEditionsIndexRouteImport } from './pages/admin/editions/i
 import { Route as AdminDepartmentsIndexRouteImport } from './pages/admin/departments/index'
 import { Route as AdminDataDictionariesIndexRouteImport } from './pages/admin/data-dictionaries/index'
 import { Route as MyNotificationsIdRouteImport } from './pages/my/notifications/$id'
-import { Route as HomeDemoRegionRouteImport } from './pages/home/demo/region'
+import { Route as HomeDemoRegionSelectRouteImport } from './pages/home/demo/region-select'
+import { Route as HomeDemoMapViewRouteImport } from './pages/home/demo/map-view'
+import { Route as HomeDemoMapAddressInputRouteImport } from './pages/home/demo/map-address-input'
+import { Route as HomeDemoAddressPickerRouteImport } from './pages/home/demo/address-picker'
 import { Route as AdminSettingsTimezoneRouteImport } from './pages/admin/settings/timezone'
 import { Route as AdminSettingsSiteRouteImport } from './pages/admin/settings/site'
 import { Route as AdminSettingsFeatureRouteImport } from './pages/admin/settings/feature'
@@ -215,9 +218,24 @@ const MyNotificationsIdRoute = MyNotificationsIdRouteImport.update({
   path: '/notifications/$id',
   getParentRoute: () => MyRouteRoute,
 } as any)
-const HomeDemoRegionRoute = HomeDemoRegionRouteImport.update({
-  id: '/demo/region',
-  path: '/demo/region',
+const HomeDemoRegionSelectRoute = HomeDemoRegionSelectRouteImport.update({
+  id: '/demo/region-select',
+  path: '/demo/region-select',
+  getParentRoute: () => HomeRouteRoute,
+} as any)
+const HomeDemoMapViewRoute = HomeDemoMapViewRouteImport.update({
+  id: '/demo/map-view',
+  path: '/demo/map-view',
+  getParentRoute: () => HomeRouteRoute,
+} as any)
+const HomeDemoMapAddressInputRoute = HomeDemoMapAddressInputRouteImport.update({
+  id: '/demo/map-address-input',
+  path: '/demo/map-address-input',
+  getParentRoute: () => HomeRouteRoute,
+} as any)
+const HomeDemoAddressPickerRoute = HomeDemoAddressPickerRouteImport.update({
+  id: '/demo/address-picker',
+  path: '/demo/address-picker',
   getParentRoute: () => HomeRouteRoute,
 } as any)
 const AdminSettingsTimezoneRoute = AdminSettingsTimezoneRouteImport.update({
@@ -363,7 +381,10 @@ export interface FileRoutesByFullPath {
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
-  '/home/demo/region': typeof HomeDemoRegionRoute
+  '/home/demo/address-picker': typeof HomeDemoAddressPickerRoute
+  '/home/demo/map-address-input': typeof HomeDemoMapAddressInputRoute
+  '/home/demo/map-view': typeof HomeDemoMapViewRoute
+  '/home/demo/region-select': typeof HomeDemoRegionSelectRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries': typeof AdminDataDictionariesIndexRoute
   '/admin/departments': typeof AdminDepartmentsIndexRoute
@@ -415,7 +436,10 @@ export interface FileRoutesByTo {
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
-  '/home/demo/region': typeof HomeDemoRegionRoute
+  '/home/demo/address-picker': typeof HomeDemoAddressPickerRoute
+  '/home/demo/map-address-input': typeof HomeDemoMapAddressInputRoute
+  '/home/demo/map-view': typeof HomeDemoMapViewRoute
+  '/home/demo/region-select': typeof HomeDemoRegionSelectRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries': typeof AdminDataDictionariesIndexRoute
   '/admin/departments': typeof AdminDepartmentsIndexRoute
@@ -470,7 +494,10 @@ export interface FileRoutesById {
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
-  '/home/demo/region': typeof HomeDemoRegionRoute
+  '/home/demo/address-picker': typeof HomeDemoAddressPickerRoute
+  '/home/demo/map-address-input': typeof HomeDemoMapAddressInputRoute
+  '/home/demo/map-view': typeof HomeDemoMapViewRoute
+  '/home/demo/region-select': typeof HomeDemoRegionSelectRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
   '/admin/data-dictionaries/': typeof AdminDataDictionariesIndexRoute
   '/admin/departments/': typeof AdminDepartmentsIndexRoute
@@ -526,7 +553,10 @@ export interface FileRouteTypes {
     | '/admin/settings/feature'
     | '/admin/settings/site'
     | '/admin/settings/timezone'
-    | '/home/demo/region'
+    | '/home/demo/address-picker'
+    | '/home/demo/map-address-input'
+    | '/home/demo/map-view'
+    | '/home/demo/region-select'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries'
     | '/admin/departments'
@@ -578,7 +608,10 @@ export interface FileRouteTypes {
     | '/admin/settings/feature'
     | '/admin/settings/site'
     | '/admin/settings/timezone'
-    | '/home/demo/region'
+    | '/home/demo/address-picker'
+    | '/home/demo/map-address-input'
+    | '/home/demo/map-view'
+    | '/home/demo/region-select'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries'
     | '/admin/departments'
@@ -632,7 +665,10 @@ export interface FileRouteTypes {
     | '/admin/settings/feature'
     | '/admin/settings/site'
     | '/admin/settings/timezone'
-    | '/home/demo/region'
+    | '/home/demo/address-picker'
+    | '/home/demo/map-address-input'
+    | '/home/demo/map-view'
+    | '/home/demo/region-select'
     | '/my/notifications/$id'
     | '/admin/data-dictionaries/'
     | '/admin/departments/'
@@ -876,11 +912,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyNotificationsIdRouteImport
       parentRoute: typeof MyRouteRoute
     }
-    '/home/demo/region': {
-      id: '/home/demo/region'
-      path: '/demo/region'
-      fullPath: '/home/demo/region'
-      preLoaderRoute: typeof HomeDemoRegionRouteImport
+    '/home/demo/region-select': {
+      id: '/home/demo/region-select'
+      path: '/demo/region-select'
+      fullPath: '/home/demo/region-select'
+      preLoaderRoute: typeof HomeDemoRegionSelectRouteImport
+      parentRoute: typeof HomeRouteRoute
+    }
+    '/home/demo/map-view': {
+      id: '/home/demo/map-view'
+      path: '/demo/map-view'
+      fullPath: '/home/demo/map-view'
+      preLoaderRoute: typeof HomeDemoMapViewRouteImport
+      parentRoute: typeof HomeRouteRoute
+    }
+    '/home/demo/map-address-input': {
+      id: '/home/demo/map-address-input'
+      path: '/demo/map-address-input'
+      fullPath: '/home/demo/map-address-input'
+      preLoaderRoute: typeof HomeDemoMapAddressInputRouteImport
+      parentRoute: typeof HomeRouteRoute
+    }
+    '/home/demo/address-picker': {
+      id: '/home/demo/address-picker'
+      path: '/demo/address-picker'
+      fullPath: '/home/demo/address-picker'
+      preLoaderRoute: typeof HomeDemoAddressPickerRouteImport
       parentRoute: typeof HomeRouteRoute
     }
     '/admin/settings/timezone': {
@@ -1145,12 +1202,18 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 
 interface HomeRouteRouteChildren {
   HomeIndexRoute: typeof HomeIndexRoute
-  HomeDemoRegionRoute: typeof HomeDemoRegionRoute
+  HomeDemoAddressPickerRoute: typeof HomeDemoAddressPickerRoute
+  HomeDemoMapAddressInputRoute: typeof HomeDemoMapAddressInputRoute
+  HomeDemoMapViewRoute: typeof HomeDemoMapViewRoute
+  HomeDemoRegionSelectRoute: typeof HomeDemoRegionSelectRoute
 }
 
 const HomeRouteRouteChildren: HomeRouteRouteChildren = {
   HomeIndexRoute: HomeIndexRoute,
-  HomeDemoRegionRoute: HomeDemoRegionRoute,
+  HomeDemoAddressPickerRoute: HomeDemoAddressPickerRoute,
+  HomeDemoMapAddressInputRoute: HomeDemoMapAddressInputRoute,
+  HomeDemoMapViewRoute: HomeDemoMapViewRoute,
+  HomeDemoRegionSelectRoute: HomeDemoRegionSelectRoute,
 }
 
 const HomeRouteRouteWithChildren = HomeRouteRoute._addFileChildren(

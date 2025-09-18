@@ -42,6 +42,7 @@ export interface FetchEventSourceInit extends RequestInit {
      * which the request will automatically retry (with the last-event-id).
      * If this callback is not specified, or it returns undefined, fetchEventSource
      * will treat every error as retriable and will try again after 1 second.
+     * Return null or -1 to stop internal reconnection and let external code handle it.
      */
     onerror?: (err: any) => number | null | undefined | void,
 
@@ -147,7 +148,16 @@ export async function fetchEventSource(input: RequestInfo, {
                     // if we haven't aborted the request ourselves:
                     try {
                         // check if we need to retry:
-                        const interval: any = onerror?.(err) ?? retryInterval;
+                        const interval: number | null | undefined | void = onerror?.(err) ?? retryInterval;
+                        
+                        // 如果onerror返回null或-1，表示外部要停止重连
+                        if (interval === null || interval === -1) {
+                            console.log('SSE: External handler requested to stop reconnection');
+                            dispose();
+                            reject(err);
+                            return;
+                        }
+                        
                         clearTimeout(retryTimer);
                         retryTimer = setTimeout(create, interval);
                     } catch (innerErr) {
@@ -164,6 +174,14 @@ export async function fetchEventSource(input: RequestInfo, {
 }
 
 async function defaultOnOpen(response: Response) {
+    // 检测401未授权响应，立即抛出特定错误，不让库内部重试
+    if (response.status === 401) {
+        const error = new Error('Token expired - Unauthorized');
+        (error as any).statusCode = 401;
+        (error as any).isAuthError = true;
+        throw error;
+    }
+    
     const contentType = response.headers.get('content-type');
     if (!contentType?.startsWith(EventStreamContentType)) {
         throw new Error(`Expected content-type to be ${EventStreamContentType}, Actual: ${contentType}`);

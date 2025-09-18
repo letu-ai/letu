@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Volo.Abp.Auditing;
 
 namespace Letu.Basis.Identity.Dtos
 {
@@ -13,6 +14,7 @@ namespace Letu.Basis.Identity.Dtos
         /// <summary>
         /// 密码
         /// </summary>
+        [DisableAuditing]
         [Required]
         public required string Password { get; set; }
     }

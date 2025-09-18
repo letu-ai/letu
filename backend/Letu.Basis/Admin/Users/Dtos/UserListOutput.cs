@@ -66,5 +66,15 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 员工姓名
         /// </summary>
         public string? EmployeeName { get; set; }
+
+        /// <summary>
+        /// 组织单元ID
+        /// </summary>
+        public Guid? OrganizationUnitId { get; set; }
+
+        /// <summary>
+        /// 组织单元名称
+        /// </summary>
+        public string? OrganizationUnitName { get; set; }
     }
 }

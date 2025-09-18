@@ -61,7 +61,7 @@ const AssignRoleForm = forwardRef<AssignRoleFormRef, ModalProps>((_, ref) => {
   return (
     <Modal title="分配角色" open={isOpenModal} onCancel={onCancel} onOk={onOk} maskClosable={false} width="40%">
       <Form<AssignRoleDto>
-        name="wrap"
+        name="assignRoleForm"
         labelCol={{ flex: '80px' }}
         labelWrap
         form={form}

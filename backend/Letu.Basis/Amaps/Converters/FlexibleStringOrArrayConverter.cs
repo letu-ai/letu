@@ -52,7 +52,7 @@ public class FlexibleStringOrArrayConverter : JsonConverter<string?>
                 return null;
             
             default:
-                throw new JsonException($"Unexpected token type when parsing citycode: {reader.TokenType}");
+                throw new JsonException($"Unexpected token type when parsing : {reader.TokenType}");
         }
     }
 

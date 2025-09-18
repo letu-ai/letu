@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Select, Space } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { getRegionChildrenByCode, getRegionPathByCodes, getStreets } from "@/pages/admin/regions/-service";
+import { cn } from "@/utils/cssUtils";
 
 interface IRegionSelectValue {
     code?: string;
@@ -11,6 +12,11 @@ interface IRegionSelectValue {
 interface IRegionSelectProps {
     value?: IRegionSelectValue;
     onChange?: (value: IRegionSelectValue | undefined) => void;
+    onStepChange?: (step: {
+        level: 'province' | 'city' | 'district' | 'street';
+        code?: string;
+        name?: string;
+    }) => void;
     placeholder?: string;
     disabled?: boolean;
     allowClear?: boolean;
@@ -23,6 +29,7 @@ export type { IRegionSelectValue };
 const RegionSelect: React.FC<IRegionSelectProps> = ({
     value,
     onChange,
+    onStepChange,
     disabled = false,
     allowClear = true,
     className,
@@ -130,19 +137,24 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
         if (code) {
             const selectedProvince = provinces?.find(p => p.code === code);
             if (selectedProvince) {
+                // 触发步骤变化回调
+                onStepChange?.({
+                    level: 'province',
+                    code: selectedProvince.code,
+                    name: selectedProvince.name
+                });
+
                 // 只有明确没有下级时才隐藏
                 setShowCity(selectedProvince.nextLevel !== 0);
                 // 省份选择后，重置区县和街道的显示状态为默认显示
                 setShowDistrict(true);
                 setShowStreetInternal(true);
 
-                // 如果省份是叶节点，直接返回
+                // 只有当省份是叶节点时才调用 onChange
                 if (selectedProvince.nextLevel === 0) {
                     onChange?.({ code });
-                } else {
-                    // 不是叶节点，清空表单值
-                    onChange?.(undefined);
                 }
+                // 不是叶节点，不调用 onChange，等待用户选择下级
             }
         } else {
             // 清空选择时，恢复默认显示所有级别
@@ -150,6 +162,7 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
             setShowDistrict(true);
             setShowStreetInternal(true);
             onChange?.(undefined);
+            onStepChange?.({ level: 'province' });
         }
     };
 
@@ -162,29 +175,33 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
         if (code) {
             const selectedCity = cities?.find(c => c.code === code);
             if (selectedCity) {
+                // 触发步骤变化回调
+                onStepChange?.({
+                    level: 'city',
+                    code: selectedCity.code,
+                    name: selectedCity.name
+                });
+
                 // NextLevel: 0=无下级，3=下级是区县，4=下级是街道（直辖市）
                 // 只有当明确是直辖市（NextLevel=4）时才隐藏区县
                 setShowDistrict(selectedCity.nextLevel !== 0 && selectedCity.nextLevel !== 4);
                 // 默认显示街道，除非没有下级
                 setShowStreetInternal(selectedCity.nextLevel !== 0);
 
-                // 如果市是叶节点，直接返回市code
-                // 叶节点条件：nextLevel === 0 或者 nextLevel === 4 且不显示街道
+                // 只有在以下情况才调用 onChange：
+                // 1. 市是叶节点（nextLevel === 0）
+                // 2. 直辖市且不显示街道（nextLevel === 4 && !showStreet）
                 if (selectedCity.nextLevel === 0 || (selectedCity.nextLevel === 4 && !showStreet)) {
                     onChange?.({ code, street: showStreet ? "" : undefined });
-                } else if (selectedCity.nextLevel === 4 && showStreet && !showStreetInternal) {
-                    // 直辖市有街道权限但当前区域无街道级别
-                    onChange?.({ code, street: "" });
-                } else {
-                    // 不是叶节点，清空表单值
-                    onChange?.(undefined);
                 }
+                // 其他情况（需要选择区县或街道）不调用 onChange
             }
         } else {
             // 清空选择时，恢复默认显示区县和街道
             setShowDistrict(true);
             setShowStreetInternal(true);
             onChange?.(undefined);
+            onStepChange?.({ level: 'city' });
         }
     };
 
@@ -196,25 +213,33 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
         if (code) {
             const selectedDistrict = districts?.find(d => d.code === code);
             if (selectedDistrict) {
+                // 触发步骤变化回调
+                onStepChange?.({
+                    level: 'district',
+                    code: selectedDistrict.code,
+                    name: selectedDistrict.name
+                });
+
                 // 只有明确没有下级时才隐藏街道
                 setShowStreetInternal(selectedDistrict.nextLevel !== 0);
 
-                // 如果区县是叶节点，直接返回
-                // 叶节点条件：nextLevel === 0 或者有街道但不显示街道选择器
-                if (selectedDistrict.nextLevel === 0 || (selectedDistrict.nextLevel !== 0 && !showStreet)) {
+                // 只有在以下情况才调用 onChange：
+                // 1. 区县是叶节点（nextLevel === 0）
+                // 2. 不显示街道选择器（!showStreet）
+                // 3. 有街道权限但当前区域无街道级别（showStreet && !showStreetInternal）
+                if (selectedDistrict.nextLevel === 0 || !showStreet) {
                     onChange?.({ code, street: showStreet ? "" : undefined });
-                } else if (selectedDistrict.nextLevel !== 0 && showStreet && !showStreetInternal) {
+                } else if (showStreet && !showStreetInternal) {
                     // 有街道权限但当前区域无街道级别
                     onChange?.({ code, street: "" });
-                } else {
-                    // 不是叶节点且需要选择街道，清空表单值
-                    onChange?.(undefined);
                 }
+                // 需要选择街道的情况不调用 onChange，等待用户选择街道
             }
         } else {
             // 清空选择时，恢复默认显示街道
             setShowStreetInternal(true);
             onChange?.(undefined);
+            onStepChange?.({ level: 'district' });
         }
     };
 
@@ -222,15 +247,26 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
     const handleStreetChange = (street: string | undefined) => {
         setStreetName(street);
         const currentCode = districtCode || cityCode;
-        if (street && currentCode) {
-            onChange?.({ code: currentCode, street });
+
+        if (street) {
+            // 触发步骤变化回调
+            onStepChange?.({
+                level: 'street',
+                code: currentCode,
+                name: street
+            });
+
+            if (currentCode) {
+                onChange?.({ code: currentCode, street });
+            }
         } else {
             onChange?.(undefined);
+            onStepChange?.({ level: 'street' });
         }
     };
 
     return (
-        <Space.Compact className={className}>
+        <Space.Compact className={cn( "w-full", className)}>
             {/* 省份选择器 - 始终显示 */}
             <Select
                 value={provinceCode || undefined}
@@ -239,7 +275,6 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
                 loading={provincesLoading}
                 disabled={disabled}
                 allowClear={allowClear}
-                className="w-40"
                 options={provinces?.map(p => ({
                     label: p.name,
                     value: p.code
@@ -255,7 +290,6 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
                     loading={citiesLoading}
                     disabled={disabled || !provinceCode}
                     allowClear={allowClear}
-                    className="w-40"
                     options={cities?.map(c => ({
                         label: c.name,
                         value: c.code
@@ -272,7 +306,6 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
                     loading={districtsLoading}
                     disabled={disabled || !cityCode}
                     allowClear={allowClear}
-                    className="w-40"
                     options={districts?.map(d => ({
                         label: d.name,
                         value: d.code
@@ -289,7 +322,6 @@ const RegionSelect: React.FC<IRegionSelectProps> = ({
                     loading={streetsLoading}
                     disabled={disabled || (!showDistrict ? !cityCode : !districtCode)}
                     allowClear={allowClear}
-                    className="w-40"
                     options={streets}
                 />
             )}

@@ -5,6 +5,7 @@ import useApp from 'antd/es/app/useApp';
 import DepartmentSelect from '@/components/DepartmentSelect';
 import PositionSelect from '@/components/PositionSelect';
 import EmployeeSelect from '@/components/EmployeeSelect';
+import OrganizationUnitSelect from '@/components/OrganizationUnitSelect';
 import { useAppConfig } from '@/components/AppConfigProvider';
 import { generatePasswordRules, type PasswordConfig } from '@/utils/passwordUtils';
 import { Patterns } from '@/utils/globalValue';
@@ -71,6 +72,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         departmentId?: string | null;
         positionId?: string | null;
         employeeId?: string | null;
+        organizationUnitId?: string | null;
     }
 
     const onFinish = async (values: FormFields) => {
@@ -87,6 +89,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     departmentId: values.departmentId,
                     positionId: values.positionId,
                     employeeId: values.employeeId,
+                    organizationUnitId: values.organizationUnitId,
                 };
                 await updateUser(row.id, updateData);
                 message.success('编辑成功');
@@ -125,7 +128,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
             maskClosable={false}
         >
             <Form<ICreateUserInput>
-                name="wrap"
+                name="userModal"
                 labelCol={{ flex: '80px' }}
                 labelWrap
                 form={form}
@@ -150,6 +153,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     label="手机号"
                     name="phone"
                     rules={[
+                        { required: true, message: '请输入手机号' },
                         {
                             pattern: Patterns.Phone,
                             message: '请输入正确的手机号格式',
@@ -162,6 +166,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     label="邮箱"
                     name="email"
                     rules={[
+                        { required: true, message: '请输入邮箱' },
                         {
                             type: 'email',
                             message: '请输入正确的邮箱格式',
@@ -178,6 +183,9 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
                 <Form.Item label="关联员工" name="employeeId">
                     <EmployeeSelect placeholder="请选择关联员工（可选）" />
+                </Form.Item>
+                <Form.Item label="所属机构" name="organizationUnitId">
+                    <OrganizationUnitSelect />
                 </Form.Item>
             </Form>
         </Modal>

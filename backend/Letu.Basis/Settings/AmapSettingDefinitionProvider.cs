@@ -12,5 +12,12 @@ public class AmapSettingDefinitionProvider : SettingDefinitionProvider
                 isVisibleToClients: false,
                 isEncrypted: true)
         );
+
+        context.Add(
+            new SettingDefinition(
+                AmapSettingNames.SecurityJsCode,
+                isVisibleToClients: false,
+                isEncrypted: true)
+        );
     }
 }

@@ -29,4 +29,17 @@ public interface IAmapAppService
     /// <param name="offset">每页记录数</param>
     /// <returns>POI搜索结果</returns>
     Task<AmapPoi[]> SearchPOIAsync(string keywords, string types, string region, int page , int offset );
+
+    /// <summary>
+    /// 高德地图API - 逆地理编码（坐标转地址）
+    /// </summary>
+    /// <param name="location">经纬度坐标，格式：longitude,latitude</param>
+    /// <returns>逆地理编码结果</returns>
+    Task<AmapReGeoCode> GetReGeoCodeAsync(string location);
+
+    /// <summary>
+    /// 获取高德地图Web端配置
+    /// </summary>
+    /// <returns>Web端配置信息</returns>
+    Task<AmapWebConfig> GetWebConfigAsync();
 }

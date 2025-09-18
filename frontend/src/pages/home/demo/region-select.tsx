@@ -4,7 +4,7 @@ import RegionSelect, { type IRegionSelectValue } from "@/components/RegionSelect
 import RegionSelectFormItem from "@/components/RegionSelectFormItem";
 import { useState } from "react";
 
-export const Route = createFileRoute("/home/demo/region")({
+export const Route = createFileRoute("/home/demo/region-select")({
     component: TestPage
 });
 
@@ -132,13 +132,13 @@ function DataBackfillDemo() {
 
     const handleSimulateEdit = () => {
         const loufanData: IRegionSelectValue = {
-            code: "140123",
-            street: "娄烦镇"
+            code: "152526",
+            street: "巴拉嘎尔高勒镇"
         };
         form.setFieldsValue({
             editRegion: loufanData
         });
-        message.info("已加载山西省娄烦县娄烦镇的数据");
+        message.info("已加载内蒙古自治区锡林郭勒盟镶黄旗巴拉嘎尔高勒镇的数据");
     };
 
     const handleFormSubmit = (values: any) => {
@@ -153,7 +153,7 @@ function DataBackfillDemo() {
                 <Space direction="vertical" className="w-full">
                     <div>
                         <Button onClick={handleSimulateEdit} className="mb-3">
-                            加载山西省娄烦县数据
+                            加载内蒙古自治区锡林郭勒盟镶黄旗数据
                         </Button>
                         <Form form={form} onFinish={handleFormSubmit}>
                             <RegionSelectFormItem

@@ -72,4 +72,25 @@ public class AmapController : ControllerBase
     {
         return await amapAppService.SearchPOIAsync(keywords, types, city, page, offset);
     }
+
+    /// <summary>
+    /// 高德地图API - 逆地理编码（坐标转地址）
+    /// </summary>
+    /// <param name="location">经纬度坐标，格式：longitude,latitude</param>
+    /// <returns>逆地理编码结果</returns>
+    [HttpGet("regeocode")]
+    public async Task<AmapReGeoCode> GetReGeoCodeAsync(string location)
+    {
+        return await amapAppService.GetReGeoCodeAsync(location);
+    }
+
+    /// <summary>
+    /// 获取高德地图Web端配置
+    /// </summary>
+    /// <returns>Web端配置信息</returns>
+    [HttpGet("web-config")]
+    public async Task<AmapWebConfig> GetWebConfigAsync()
+    {
+        return await amapAppService.GetWebConfigAsync();
+    }
 }

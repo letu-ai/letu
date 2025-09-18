@@ -24,6 +24,7 @@ public class AmapSettingsAppService : BasisAppService, IAmapSettingsAppService
         return new AmapSettingsDto
         {
             ApiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey),
+            SecurityJsCode = await SettingProvider.GetOrNullAsync(AmapSettingNames.SecurityJsCode),
         };
     }
 
@@ -32,6 +33,7 @@ public class AmapSettingsAppService : BasisAppService, IAmapSettingsAppService
         await CheckFeatureAsync();
 
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AmapSettingNames.ApiKey, input.ApiKey);
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, AmapSettingNames.SecurityJsCode, input.SecurityJsCode);
     }
 
     protected virtual async Task CheckFeatureAsync()

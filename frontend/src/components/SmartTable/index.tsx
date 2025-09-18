@@ -1,8 +1,8 @@
-import { Button, Card, Dropdown, Form, type MenuProps, Space, Table, type TablePaginationConfig, Tooltip } from 'antd';
+import { Button, Card, Checkbox, Dropdown, Form, type MenuProps, Space, Table, type TablePaginationConfig, Tooltip } from 'antd';
 import React, { type ForwardedRef, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import type { SmartTableProps, SmartTableRef } from './type';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ColumnHeightOutlined, ReloadOutlined, SettingOutlined, TableOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import useLayoutStore, { isSizeType } from '@/application/layoutStore';
 
@@ -18,6 +18,20 @@ const defaultPagination: TablePaginationConfig =
     showTotal: (total: number) => `共 ${total} 条`,
 }
 
+const columnWidthItems: MenuProps['items'] = [
+    {
+        key: 'large',
+        label: '宽松',
+    },
+    {
+        key: 'middle',
+        label: '中等',
+    },
+    {
+        key: 'small',
+        label: '紧凑',
+    },
+];
 
 const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
     <T extends object = any>(props: SmartTableProps<T>, ref: ForwardedRef<SmartTableRef>) => {
@@ -41,6 +55,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
         const size = useLayoutStore(state => state.size);
         const [tableSize, setTableSize] = useState(props.size);
         const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+        const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
 
         useImperativeHandle(ref, () => ({
             reload: async () => await fetchData(),
@@ -58,6 +73,19 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
             setTableSize(size);
         }, [size]);
 
+        // 初始化列显示状态
+        useEffect(() => {
+            const visibility: Record<string, boolean> = {};
+            columns.forEach(col => {
+                const key = (col.key || col.dataIndex) as string;
+                if (key) {
+                    // 如果列有defaultHidden属性，则默认隐藏，否则默认显示
+                    visibility[key] = !col.defaultHidden;
+                }
+            });
+            setColumnVisibility(visibility);
+        }, [columns]);
+
         const pagination = useMemo(() => {
             if (paginationProps === false)
                 return false;
@@ -69,6 +97,17 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                 pageSize: queryParams.pageSize,
             };
         }, [paginationProps]);
+
+        // 处理columns，根据columnVisibility设置hidden属性
+        const processedColumns = useMemo(() => {
+            return columns.map(col => {
+                const key = (col.key || col.dataIndex) as string;
+                return {
+                    ...col,
+                    hidden: key ? columnVisibility[key] === false : false
+                };
+            });
+        }, [columns, columnVisibility]);
 
         const fetchData = async () => {
             if (props.request) {
@@ -93,20 +132,6 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
             fetchData();
         }, [queryParams, params]);
 
-        const columnWidthItems: MenuProps['items'] = [
-            {
-                key: 'large',
-                label: '宽松',
-            },
-            {
-                key: 'middle',
-                label: '中等',
-            },
-            {
-                key: 'small',
-                label: '紧凑',
-            },
-        ];
         const columnWidthItemClick = ({ key }: { key: string }) => {
             if (isSizeType(key))
                 setTableSize(key);
@@ -198,12 +223,51 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                                     <Button color="default" variant="link" icon={<ColumnHeightOutlined />}></Button>
                                 </Dropdown>
                             </Tooltip>
+                            <Tooltip title="列设置">
+                                <Dropdown
+                                    trigger={['click']}
+                                    popupRender={() => (
+                                        <div
+                                         className="rounded-md border-primary-border p-2 max-h-400 min-w-40 overflow-y-auto bg-white shadow-md"
+                                         >
+                                            {columns
+                                                .filter(col => col.hideable !== false)
+                                                .map((col, index) => {
+                                                    const key = (col.key || col.dataIndex) as string;
+                                                    if (!key) return null;
+
+                                                    const title = typeof col.title === 'string'
+                                                        ? col.title
+                                                        : `列 ${index + 1}`;
+
+                                                    return (
+                                                        <div key={key} style={{ padding: '4px 12px' }}>
+                                                            <Checkbox
+                                                                checked={columnVisibility[key] !== false}
+                                                                onChange={(e) => {
+                                                                    setColumnVisibility(prev => ({
+                                                                        ...prev,
+                                                                        [key]: e.target.checked
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                {title}
+                                                            </Checkbox>
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
+                                    )}
+                                >
+                                    <Button color="default" variant="link" icon={<TableOutlined />}></Button>
+                                </Dropdown>
+                            </Tooltip>
                         </div>
                     </div>
                     <Table
                         {...restProps}
                         dataSource={dataSource}
-                        columns={columns}
+                        columns={processedColumns}
                         rowKey={props.rowKey ?? 'id'}
                         size={tableSize}
                         pagination={pagination}

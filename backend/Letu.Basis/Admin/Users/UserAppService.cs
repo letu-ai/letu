@@ -1,6 +1,8 @@
 ﻿using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.OrganizationUnits;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users.Dtos;
+using Letu.Basis.Oss;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Utils;
@@ -8,6 +10,7 @@ using Letu.Logging;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Letu.Shared.Generated;
+using Volo.Abp.BlobStoring;
 using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.EventBus.Distributed;
 
@@ -17,17 +20,23 @@ namespace Letu.Basis.Admin.Users
     {
         private readonly IFreeSqlRepository<User> userRepository;
         private readonly IFreeSqlRepository<UserInRole> _userRoleRepository;
+        private readonly IFreeSqlRepository<OrganizationUnit> orgRepostory;
         private readonly IOperationLogManager operationLogManager;
         private readonly IDistributedEventBus eventBus;
+        private readonly IBlobContainer<AvatarBlobContainer> avatarBlobContainer;
         public UserAppService(IFreeSqlRepository<User> userRepository,
             IFreeSqlRepository<UserInRole> userRoleRepository,
+            IFreeSqlRepository<OrganizationUnit> orgRepostory,
             IOperationLogManager operationLogManager,
-            IDistributedEventBus eventBus)
+            IDistributedEventBus eventBus,
+            IBlobContainer<AvatarBlobContainer> avatarBlobContainer)
         {
             this.userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
+            this.orgRepostory = orgRepostory;
             this.operationLogManager = operationLogManager;
             this.eventBus = eventBus;
+            this.avatarBlobContainer = avatarBlobContainer;
         }
 
         public async Task<Guid> AddUserAsync(UserCreateInput input)
@@ -156,18 +165,27 @@ namespace Letu.Basis.Admin.Users
             return true;
         }
 
-        public async Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto)
+        public async Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput input)
         {
+            // 如果指定了组织机构ID，获取该机构及其所有子孙机构的ID列表
+            List<Guid>? organizationUnitIds = null;
+            if (input.OrganizationUnitId.HasValue)
+            {
+                organizationUnitIds = await GetOrganizationUnitIdsWithChildren(input.OrganizationUnitId.Value);
+            }
+
             var rows = await userRepository.Select
-                .From<Departments.Department, Positions.PositionGroup, Employee>((u, d, p, e) => u
+                .From<Departments.Department, Positions.PositionGroup, Employee, OrganizationUnits.OrganizationUnit>((u, d, p, e, o) => u
                     .LeftJoin(u1 => u1.DepartmentId == d.Id)
                     .LeftJoin(u1 => u1.PositionId == p.Id)
-                    .LeftJoin(u1 => u1.EmployeeId == e.Id))
-                .WhereIf(!string.IsNullOrEmpty(dto.UserName), (u, d, p, e) => u.UserName.Contains(dto.UserName!))
-                .OrderByDescending((u, d, p, e) => u.CreationTime)
+                    .LeftJoin(u1 => u1.EmployeeId == e.Id)
+                    .LeftJoin(u1 => u1.OrganizationUnitId == o.Id))
+                .WhereIf(!string.IsNullOrEmpty(input.Keyword), (u, d, p, e, o) => u.UserName.Contains(input.Keyword!) || u.NickName.Contains(input.Keyword!) || u.Phone.Contains(input.Keyword!) || u.Email.Contains(input.Keyword!))
+                .WhereIf(organizationUnitIds != null && organizationUnitIds.Count > 0, (u, d, p, e, o) => organizationUnitIds!.Contains(u.OrganizationUnitId!.Value))
+                .OrderByDescending((u, d, p, e, o) => u.CreationTime)
                 .Count(out var total)
-                .Page(dto.Current, dto.PageSize)
-                .ToListAsync((u, d, p, e) => new UserListOutput
+                .Page(input.Current, input.PageSize)
+                .ToListAsync((u, d, p, e, o) => new UserListOutput
                 {
                     Id = u.Id,
                     UserName = u.UserName,
@@ -181,10 +199,54 @@ namespace Letu.Basis.Admin.Users
                     PositionId = u.PositionId,
                     PositionName = p.GroupName,
                     EmployeeId = u.EmployeeId,
-                    EmployeeName = e.Name
+                    EmployeeName = e.Name,
+                    OrganizationUnitId = u.OrganizationUnitId,
+                    OrganizationUnitName = o.Name
                 });
 
             return new PagedResult<UserListOutput>(total, rows);
+        }
+
+        /// <summary>
+        /// 获取指定组织机构及其所有子孙机构的ID列表
+        /// </summary>
+        private async Task<List<Guid>> GetOrganizationUnitIdsWithChildren(Guid parentId)
+        {
+            // 获取父级组织的Code
+            var parentCode = await orgRepostory.Select
+                .Where(x => x.Id == parentId)
+                .FirstAsync(x => x.Code);
+
+            if (string.IsNullOrEmpty(parentCode))
+            {
+                // 如果找不到父级组织，返回空列表
+                return new List<Guid>();
+            }
+
+            // 通过Code的前缀匹配，一次查询获取所有子孙节点（包括自己）
+            var allIds = await orgRepostory.Select
+                .Where(x => x.Code.StartsWith(parentCode))
+                .ToListAsync(x => x.Id);
+
+            return allIds;
+        }
+
+        public async Task<(Stream?, string)> GetAvatarAsync(string? avatar, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(avatar))
+            {
+                return (null, "");
+            }
+
+            if (await avatarBlobContainer.ExistsAsync(avatar))
+            {
+                var stream = await avatarBlobContainer.GetAsync(avatar, cancellationToken);
+                return (stream, MimeMapper.GetContentType(avatar));
+            }
+            else
+            {
+                return (null, "");
+            }
         }
 
         public async Task<Guid[]> GetUserRoleIdsAsync(Guid uid)
@@ -237,7 +299,6 @@ namespace Letu.Basis.Admin.Users
                     Value = x.Id.ToString()
                 });
         }
-
 
         public Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword)
         {

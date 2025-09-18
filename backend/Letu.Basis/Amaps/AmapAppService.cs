@@ -265,4 +265,58 @@ public class AmapAppService : BasisAppService, IAmapAppService
 
         return response.Pois;
     }
+
+    public async Task<AmapReGeoCode> GetReGeoCodeAsync(string location)
+    {
+        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey)
+            ?? throw new UserFriendlyException("高德地图API密钥未配置");
+
+        var client = httpClientFactory.CreateClient("amap");
+        var url = $"/v3/geocode/regeo?key={apiKey}&location={HttpUtility.UrlEncode(location)}&extensions=all&radius=1000&roadlevel=0";
+
+        string? responseString = null;
+        try
+        {
+            responseString = await client.GetStringAsync(url);
+
+            var response = JsonSerializer.Deserialize<AmapReGeoCodeResponse>(responseString, JsonOptions);
+
+            if (response == null)
+            {
+                logger.LogError("反序列化逆地理编码响应失败，响应内容: {response}", responseString);
+                throw new UserFriendlyException("解析逆地理编码数据失败");
+            }
+
+            if (response.Status != "1" || response.InfoCode != "10000")
+            {
+                logger.LogError("逆地理编码API返回错误，Status: {status}, Info: {info}, InfoCode: {infoCode}",
+                    response.Status, response.Info, response.InfoCode);
+                throw new UserFriendlyException($"逆地理编码失败: {response.Info}");
+            }
+
+            return response.ReGeocode;
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new UserFriendlyException("调用高德地图服务失败，请检查网络连接");
+        }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "解析高德API响应JSON失败");
+            logger.LogDebug(responseString);
+            throw new UserFriendlyException("解析高德地图数据格式错误");
+        }
+    }
+
+    public async Task<AmapWebConfig> GetWebConfigAsync()
+    {
+        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey);
+        var securityJsCode = await SettingProvider.GetOrNullAsync(AmapSettingNames.SecurityJsCode);
+
+        return new AmapWebConfig
+        {
+            ApiKey = apiKey,
+            SecurityJsCode = securityJsCode
+        };
+    }
 }

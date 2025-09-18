@@ -64,7 +64,7 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
   return (
     <Modal title="重置密码" open={isOpenModal} onCancel={onCancel} onOk={onOk} maskClosable={false} width="40%">
       <Form<ResetPasswordInput>
-        name="wrap"
+        name="resetUserPwdForm"
         labelCol={{ flex: '80px' }}
         labelWrap
         form={form}

@@ -45,5 +45,10 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 关联员工ID
         /// </summary>
         public Guid? EmployeeId { get; set; }
+
+        /// <summary>
+        /// 组织单元ID
+        /// </summary>
+        public Guid? OrganizationUnitId { get; set; }
     }
 }

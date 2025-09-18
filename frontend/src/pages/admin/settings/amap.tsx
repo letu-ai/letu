@@ -3,6 +3,7 @@ import { Form, Button, Typography, Spin, App, Input } from 'antd';
 import { fetchAmapSettings, updateAmapSettings, type IAmapSettings } from './-service';
 import { useState } from 'react';
 import { useAsyncEffect } from 'ahooks';
+import { ExportOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
@@ -22,7 +23,7 @@ function AmapSettings() {
             const settingsData = await fetchAmapSettings();
             setSettings(settingsData);
 
-            form.setFieldsValue({ apiKey: settingsData.apiKey });
+            form.setFieldsValue(settingsData);
         } catch {
             message.error('获取高德地图设置失败');
         } finally {
@@ -51,12 +52,25 @@ function AmapSettings() {
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                initialValues={{ apiKey: settings?.apiKey }}
+                initialValues={{
+                    apiKey: settings?.apiKey,
+                    securityJsCode: settings?.securityJsCode
+                }}
+
             >
                 <Form.Item
                     name="apiKey"
-                    label="高德地图API密钥"
+                    label="API Key"
                     rules={[{ required: true, message: '请输入高德地图API密钥' }]}
+                    help={<a href="https://lbs.amap.com/api/javascript-api/guide/abc/prepare" target="_blank">高德地图API密钥申请 <ExportOutlined /> </a>}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    name="securityJsCode"
+                    label="安全密钥"
+                    rules={[{ required: true, message: '请输入高德地图安全密钥' }]}
                 >
                     <Input />
                 </Form.Item>

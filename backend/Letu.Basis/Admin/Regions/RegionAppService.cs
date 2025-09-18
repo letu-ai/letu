@@ -43,6 +43,21 @@ public class RegionAppService : BasisAppService, IRegionAppService
 
     public async Task<List<RegionListOutput>> GetChildrenByCodeAsync(string? parentCode)
     {
+        if(GetCodeLevel(parentCode) == RegionLevel.County)
+        {
+            return await streetRepository.Select
+                .Where(x => x.RegionCode == parentCode)
+                .OrderBy(x => new { x.Sort })
+                .ToListAsync(x=>new RegionListOutput{
+                    Id = x.Id,
+                    Code = x.RegionCode,
+                    Name = x.Name,
+                    Level = RegionLevel.Street,
+                    NextLevel = RegionLevel.None,
+                    Sort = x.Sort
+                });
+        }
+
         // 获取顶级区域（省份）
         return await regionRepository.Select
             .Where(x => x.ParentCode == parentCode)
@@ -386,5 +401,190 @@ public class RegionAppService : BasisAppService, IRegionAppService
         };
 
         memoryCache.Set(ImportProgressKey, progress, TimeSpan.FromMinutes(10));
+    }
+
+    public async Task<RegionInfo> GetRegionInfoAsync(string regionCode)
+    {
+        // 使用缓存
+        var cacheKey = $"region_info_{regionCode}";
+        if (memoryCache.TryGetValue<RegionInfo>(cacheKey, out var cachedInfo))
+        {
+            return cachedInfo!;
+        }
+
+        var regionInfo = new RegionInfo();
+
+        // 获取完整路径
+        var path = await GetPathByCodeAsync(regionCode);
+
+        // 根据路径中的级别提取省市区信息
+        foreach (var region in path)
+        {
+            switch (region.Level)
+            {
+                case RegionLevel.Province:
+                    regionInfo.Province = region.Name;
+                    break;
+                case RegionLevel.City:
+                    regionInfo.City = region.Name;
+                    break;
+                case RegionLevel.County:
+                    regionInfo.District = region.Name;
+                    break;
+            }
+        }
+
+        // 缓存结果
+        memoryCache.Set(cacheKey, regionInfo, TimeSpan.FromHours(1));
+
+        return regionInfo;
+    }
+
+    public async Task<Dictionary<string, RegionInfo>> GetRegionInfoBatchAsync(List<string> regionCodes)
+    {
+        if (regionCodes == null || regionCodes.Count == 0)
+        {
+            return new Dictionary<string, RegionInfo>();
+        }
+
+        var result = new Dictionary<string, RegionInfo>();
+        var uncachedCodes = new List<string>();
+
+        // 先从缓存获取
+        foreach (var code in regionCodes.Distinct())
+        {
+            var cacheKey = $"region_info_{code}";
+            if (memoryCache.TryGetValue<RegionInfo>(cacheKey, out var cachedInfo))
+            {
+                result[code] = cachedInfo!;
+            }
+            else
+            {
+                uncachedCodes.Add(code);
+            }
+        }
+
+        // 批量查询未缓存的区域
+        if (uncachedCodes.Count > 0)
+        {
+            // 获取所有相关的区域记录
+            var allRegions = await regionRepository.Select
+                .Where(x => uncachedCodes.Contains(x.Code))
+                .ToListAsync();
+
+            // 获取所有父级代码
+            var parentCodes = allRegions
+                .Where(x => !string.IsNullOrEmpty(x.ParentCode))
+                .Select(x => x.ParentCode!)
+                .Distinct()
+                .ToList();
+
+            // 递归获取所有父级
+            var allParentCodes = new HashSet<string>(parentCodes);
+            while (parentCodes.Count > 0)
+            {
+                var parents = await regionRepository.Select
+                    .Where(x => parentCodes.Contains(x.Code))
+                    .ToListAsync();
+
+                allRegions.AddRange(parents);
+
+                parentCodes = parents
+                    .Where(x => !string.IsNullOrEmpty(x.ParentCode) && !allParentCodes.Contains(x.ParentCode!))
+                    .Select(x => x.ParentCode!)
+                    .Distinct()
+                    .ToList();
+
+                foreach (var code in parentCodes)
+                {
+                    allParentCodes.Add(code);
+                }
+            }
+
+            // 构建代码到区域的映射
+            var regionMap = allRegions.ToDictionary(x => x.Code, x => x);
+
+            // 为每个未缓存的代码构建区域信息
+            foreach (var code in uncachedCodes)
+            {
+                var regionInfo = new RegionInfo();
+
+                if (regionMap.TryGetValue(code, out var currentRegion))
+                {
+                    // 构建完整路径
+                    var current = currentRegion;
+                    var pathRegions = new List<Region> { current };
+
+                    while (!string.IsNullOrEmpty(current.ParentCode) && regionMap.TryGetValue(current.ParentCode, out var parent))
+                    {
+                        pathRegions.Insert(0, parent);
+                        current = parent;
+                    }
+
+                    // 根据路径中的级别提取省市区信息
+                    foreach (var region in pathRegions)
+                    {
+                        switch (region.Level)
+                        {
+                            case RegionLevel.Province:
+                                regionInfo.Province = region.Name;
+                                break;
+                            case RegionLevel.City:
+                                regionInfo.City = region.Name;
+                                break;
+                            case RegionLevel.County:
+                                regionInfo.District = region.Name;
+                                break;
+                        }
+                    }
+                }
+
+                // 缓存结果
+                var cacheKey = $"region_info_{code}";
+                memoryCache.Set(cacheKey, regionInfo, TimeSpan.FromHours(1));
+
+                result[code] = regionInfo;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 根据行政区域代码判断其级别
+    /// </summary>
+    /// <param name="code">行政区域代码</param>
+    /// <returns>区域级别</returns>
+    public RegionLevel GetCodeLevel(string? code)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            return RegionLevel.None;
+        }
+
+        // 中国行政区域代码规则：
+        // 6位数字：前2位表示省级，中间2位表示地级，后2位表示县级
+        // 省级：后4位为0000（如110000北京市）
+        // 地级：后2位为00（如110100北京市市辖区）
+        // 县级：后2位不为00（如110101东城区）
+        
+        if (code.Length == 6 && code.All(char.IsDigit))
+        {
+            if (code.EndsWith("0000"))
+            {
+                return RegionLevel.Province; // 省级
+            }
+            else if (code.EndsWith("00"))
+            {
+                return RegionLevel.City; // 地级市
+            }
+            else
+            {
+                return RegionLevel.County; // 县级
+            }
+        }
+
+        // 如果不是标准的6位数字代码，返回无效级别
+        return RegionLevel.None;
     }
 }

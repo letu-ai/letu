@@ -15,6 +15,7 @@ public class UserAutoMapperProfile : Profile
         CreateMap<UserUpdateInput, User>(MemberList.Source);
 
         CreateMap<User, UserListOutput>()
+            .Ignore(d=>d.OrganizationUnitName)
             .Ignore(d => d.DepartmentName)
             .Ignore(d => d.PositionName)
             .Ignore(d => d.EmployeeName);

@@ -25,5 +25,5 @@ public class AmapPoiResponse
     /// <summary>
     /// POI 列表
     /// </summary>
-    public required AmapPoi[] Pois { get; set; }
+    public AmapPoi[]? Pois { get; set; }
 }

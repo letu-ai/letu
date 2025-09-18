@@ -32,6 +32,7 @@ const Position: React.FC = () => {
     {
       title: '职位编码',
       dataIndex: 'code',
+      defaultHidden: true, // 测试默认隐藏
     },
     {
       title: '职位状态',
@@ -47,12 +48,14 @@ const Position: React.FC = () => {
     {
       title: '备注',
       dataIndex: 'description',
+      defaultHidden: true, // 测试默认隐藏
     },
     {
       title: '操作',
       dataIndex: 'option',
       width: 140,
       fixed: 'right',
+      hideable: false, // 操作列不能被隐藏
       render: (_: any, record: PositionListDto) => (
         <Space>
           <Permission permissions={BasisPermissions.Position.Update}>
