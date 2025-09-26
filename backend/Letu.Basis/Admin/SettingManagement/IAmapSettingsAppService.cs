@@ -1,11 +1,11 @@
-﻿using Letu.Basis.Admin.SettingManagement.Dtos;
+﻿using Letu.Basis.Amaps;
 using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.SettingManagement;
 
 public interface IAmapSettingsAppService : IApplicationService
 {
-    Task<AmapSettingsDto> GetAsync();
+    Task<AmapSettings> GetAsync();
 
-    Task UpdateAsync(AmapSettingsDto input);
+    Task UpdateAsync(AmapSettings input);
 }

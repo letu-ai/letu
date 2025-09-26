@@ -26,7 +26,9 @@
     "Permission:EmailingTest": "发送邮件测试",
     "Permission:TimeZone": "时区设置",
     "Permission:Site": "网站设置",
-    "Permission:Amap": "高德地图设置",
+    "Permission:Amap": "高德地图",
+    "Permission:Payment": "支付网关",
+    "Permission:Sms": "短信网关",
     "Permission:BindUser": "绑定用户",
     "Permission:BindEmployee": "绑定员工",
     "Permission:Log": "日志",
@@ -49,6 +51,7 @@
     "Permission:PositionManagement": "职位管理",
     "Permission:NotificationManagement": "通知管理",
     "Permission:ScheduledTaskManagement": "定时任务管理",
+    "Permission:IntegrationManagement": "系统集成管理",
 
     "Volo.AbpIo.MultiTenancy:010001": "未找到租户1。",
     "Volo.AbpIo.MultiTenancy:010002": "租户未启用1",

@@ -3,7 +3,8 @@ import type {
     ILetuApplicationConfiguration,
     ICurrentUser,
     ICurrentTenant,
-    INavigationMenuDto
+    INavigationMenuDto,
+    IUserExtraInfo
 } from '@/application/types'
 import httpClient from '@/utils/httpClient';
 import useThemeStore from '@/application/themeStore';
@@ -47,6 +48,7 @@ interface IAppConfigContext {
     // 状态
     isReady: boolean;
     currentUser: ICurrentUser;
+    userExtraInfo: IUserExtraInfo;
     currentTenant: ICurrentTenant;
     menu: INavigationMenuDto[];
 
@@ -105,6 +107,7 @@ export const AppConfigProvider = ({ config, children }: IAppConfigProviderProps)
             // 状态
             isReady,
             currentUser: configuration?.currentUser || DEFAULT_VALUES.currentUser,
+            userExtraInfo: configuration?.userExtraInfo || {},
             currentTenant: configuration?.currentTenant || DEFAULT_VALUES.currentTenant,
             menu: configuration?.menu || DEFAULT_VALUES.menu,
 

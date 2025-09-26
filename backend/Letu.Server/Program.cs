@@ -26,7 +26,6 @@ public class Program
         await app.RunAsync();
     }
 
-
     public static void AddListenUrls(ICollection<string> urls)
     {
         var eps = appSettings.GetValue<string>("Server:WebEndPoints");

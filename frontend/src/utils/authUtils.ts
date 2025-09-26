@@ -177,8 +177,11 @@ export function shouldRefreshToken(): boolean {
     if (!expiredTime) {
         return false;
     }
-
-    // 判断是否需要刷新：已过期或10分钟内即将过期
-    const tenMinutesFromNow = now + 10 * 60 * 1000;
+    // 判断是否需要刷新：已过期或1分钟内即将过期
+    const tenMinutesFromNow = now + 1 * 60 * 1000;
     return now >= expiredTime || expiredTime < tenMinutesFromNow;
+
+    // // 判断是否需要刷新：已过期或10分钟内即将过期
+    // const tenMinutesFromNow = now + 10 * 60 * 1000;
+    // return now >= expiredTime || expiredTime < tenMinutesFromNow;
 }

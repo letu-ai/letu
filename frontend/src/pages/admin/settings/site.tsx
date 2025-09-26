@@ -88,6 +88,18 @@ function SiteSettings() {
                 onValuesChange={handleFormValuesChange}
             >
                 <Form.Item
+                    name="siteUrl"
+                    label="网站URL"
+                    rules={[
+                        { type: 'url', message: '请输入正确的URL' },
+                        { required: true, message: '请输入站点URL' }
+                    ]}
+                    extra="用于生成对外分享链接时使用，例如：https://www.example.com"
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
                     name="title"
                     label="网站标题"
                     rules={[{ required: true, message: '请输入站点标题' }]}
@@ -98,7 +110,7 @@ function SiteSettings() {
                 <Form.Item
                     name="favicon"
                     label="网站图标"
-                    help="在浏览器标签页显示的图标"
+                    extra="在浏览器标签页显示的图标"
                 >
                     <Input />
                 </Form.Item>
@@ -106,7 +118,7 @@ function SiteSettings() {
                 <Form.Item
                     name="logo"
                     label="网站Logo"
-                    help="在网页中显示的Logo"
+                    extra="在网页中显示的Logo"
                 >
                     <Input />
                 </Form.Item>
@@ -114,7 +126,7 @@ function SiteSettings() {
                 <Form.Item
                     name="logoText"
                     label="网站Logo文本"
-                    help="网页中显示Logo右边的标题"
+                    extra="网页中显示Logo右边的标题"
                 >
                     <Input />
                 </Form.Item>
@@ -123,7 +135,7 @@ function SiteSettings() {
                     name="copyright"
                     label="网站版权"
                     rules={[{ required: true, message: '请输入网站版权' }]}
-                    help="支持%YEAR%占位符，表示当前年份"
+                    extra="支持%YEAR%占位符，表示当前年份"
                 >
                     <Input />
                 </Form.Item>

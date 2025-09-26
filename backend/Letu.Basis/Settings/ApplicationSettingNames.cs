@@ -7,6 +7,7 @@ public static class ApplicationSettingNames
     public static class Site
     {
         private const string SitePrefix = Prefix + ".Site";
+        public const string SiteUrl = SitePrefix + ".SiteUrl";
         public const string Title = SitePrefix + ".Title";
         public const string Favicon = SitePrefix + ".Favicon";
         public const string Logo = SitePrefix + ".Logo";

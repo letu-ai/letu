@@ -1,9 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { Card, Button, Input, Slider, Typography, message } from 'antd';
+import { Card, Button, Input, Slider, Typography, App } from 'antd';
 import { MapView } from '@/components/amap';
 import type {IMapLocation } from '@/components/amap';
-import { getAmapWebConfig } from '@/components/amap/service';
 
 const { Text } = Typography;
 
@@ -18,21 +17,17 @@ const PRESET_LOCATIONS= [
 ] as const;
 
 export const Route = createFileRoute('/home/demo/map-view')({
-    component: RouteComponent,
-    loader: async () => {
-        const { apiKey, securityJsCode } = await getAmapWebConfig();
-        return { apiKey, securityJsCode };
-    }
+    component: RouteComponent
 })
 
 function RouteComponent() {
-    const { apiKey, securityJsCode } = Route.useLoaderData();
     const [zoom, setZoom] = useState(10);
     const [center, setCenter] = useState<IMapLocation>({ lng: 0, lat: 0 });
     const [customCenter, setCustomCenter] = useState<IMapLocation>({ lng: 0, lat: 0 });
     const [selectedLocation, setSelectedLocation] = useState<{location: IMapLocation, address: any} | null>(null);
     const mapRef = useRef<AMap.Map | null>(null);
-
+    const { message } = App.useApp();
+    
     const changeCenter = (location: IMapLocation) => {
         mapRef.current?.setCenter([location.lng, location.lat]);
         setCustomCenter(location);
@@ -131,8 +126,6 @@ function RouteComponent() {
                 {/* 地图组件 */}
                 <div className="mb-4">
                     <MapView
-                        apiKey={apiKey}
-                        securityJsCode={securityJsCode}
                         height={500}
                         className="shadow-lg"
                         showSearch={true}

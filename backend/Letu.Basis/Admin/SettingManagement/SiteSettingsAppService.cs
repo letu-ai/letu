@@ -20,6 +20,7 @@ public class SiteSettingsAppService : BasisAppService, ISiteSettingsAppService
     {
         return new SiteSettingsDto
         {
+            SiteUrl = await SettingProvider.GetOrNullAsync(ApplicationSettingNames.Site.SiteUrl),
             Title = await SettingProvider.GetOrNullAsync(ApplicationSettingNames.Site.Title),
             Favicon = await SettingProvider.GetOrNullAsync(ApplicationSettingNames.Site.Favicon),
             Logo = await SettingProvider.GetOrNullAsync(ApplicationSettingNames.Site.Logo),
@@ -34,6 +35,9 @@ public class SiteSettingsAppService : BasisAppService, ISiteSettingsAppService
 
     public virtual async Task UpdateAsync(SiteSettingsDto input)
     {
+        var siteUrl = input.SiteUrl?.RemovePostFix("/");
+
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, ApplicationSettingNames.Site.SiteUrl, siteUrl);
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, ApplicationSettingNames.Site.Title, input.Title);
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, ApplicationSettingNames.Site.Favicon, input.Favicon);
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, ApplicationSettingNames.Site.Logo, input.Logo);

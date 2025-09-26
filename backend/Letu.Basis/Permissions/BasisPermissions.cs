@@ -192,12 +192,6 @@ public static class BasisPermissions
         /// 网站设置
         /// </summary>
         public const string Site = Default + ".Site";
-
-        /// <summary>
-        /// 高德地图设置
-        /// </summary>
-        public const string Amap = Default + ".Amap";
-
     }
 
     public static class Feature
@@ -223,6 +217,29 @@ public static class BasisPermissions
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
         public const string Log = Default + ".Log";
+    }
+
+    // 第三方集成管理
+    public static class Integration{
+        /// <summary>
+        /// 第三方集成设置
+        /// </summary>
+        public const string Default = SettingGroupName + ".Integration";
+
+        /// <summary>
+        /// 高德地图设置
+        /// </summary>
+        public const string Amap = Default + ".Amap";
+
+        /// <summary>
+        /// 支付设置
+        /// </summary>
+        public const string Payment = Default + ".Payment";
+
+        /// <summary>
+        /// 短信设置
+        /// </summary>
+        public const string Sms = Default + ".Sms";
     }
 
     // 租户管理

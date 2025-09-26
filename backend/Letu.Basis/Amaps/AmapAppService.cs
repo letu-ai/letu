@@ -1,19 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Web;
-using Letu.Basis.Settings;
+﻿using Letu.Basis.Admin.Integrations;
 using Letu.Basis.Amaps.Converters;
-using Volo.Abp;
 using Polly;
-using Polly.Extensions.Http;
 using System.Text.Json;
+using System.Web;
+using Volo.Abp;
 
 namespace Letu.Basis.Amaps;
 
 public class AmapAppService : BasisAppService, IAmapAppService
 {
     private readonly IHttpClientFactory httpClientFactory;
+    private readonly IIntegrationSettingsStore integrationSettingsStore;
     private readonly ILogger<AmapAppService> logger;
-    
+
     // 静态的 JsonSerializerOptions，避免重复创建
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -23,24 +22,26 @@ public class AmapAppService : BasisAppService, IAmapAppService
 
     // Polly重试策略：针对QPS限流错误
     private readonly IAsyncPolicy<string> retryPolicy;
-    
+
     public AmapAppService(
         IHttpClientFactory httpClientFactory,
+        IIntegrationSettingsStore integrationSettingsStore,
         ILogger<AmapAppService> logger)
     {
         this.httpClientFactory = httpClientFactory;
+        this.integrationSettingsStore = integrationSettingsStore;
         this.logger = logger;
 
         // 初始化Polly重试策略
         retryPolicy = Policy
-            .HandleResult<string>(response => IsRateLimitError(response))
+            .HandleResult<string>(IsRateLimitError)
             .WaitAndRetryAsync(
                 retryCount: 3,
-                sleepDurationProvider: retryAttempt => TimeSpan.FromMilliseconds(500 * Math.Pow(2, retryAttempt - 1)) + 
+                sleepDurationProvider: retryAttempt => TimeSpan.FromMilliseconds(500 * Math.Pow(2, retryAttempt - 1)) +
                                                       TimeSpan.FromMilliseconds(Random.Shared.Next(0, 100)), // 添加抖动
                 onRetry: (outcome, timespan, retryCount, context) =>
                 {
-                    logger.LogWarning("高德API调用遇到限流，第 {retryCount} 次重试，延迟 {delay}ms", 
+                    logger.LogWarning("高德API调用遇到限流，第 {retryCount} 次重试，延迟 {delay}ms",
                         retryCount, timespan.TotalMilliseconds);
                 });
     }
@@ -58,7 +59,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
         try
         {
             var response = JsonSerializer.Deserialize<AmapDistrictResponse>(responseContent, JsonOptions);
-            return response != null && 
+            return response != null &&
                    (response.Info?.Contains("CUQPS_HAS_EXCEEDED_THE_LIMIT") == true ||
                     response.Info?.Contains("QPS_HAS_EXCEEDED_THE_LIMIT") == true ||
                     response.Status == "0" && response.Info?.Contains("LIMIT") == true);
@@ -75,14 +76,14 @@ public class AmapAppService : BasisAppService, IAmapAppService
     /// <returns>省份列表</returns>
     public async Task<AmapDistrict[]> GetAllProvincesAsync()
     {
-        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey)
+        var apiKey = (await integrationSettingsStore.GetValuesAsync<AmapSettings>("amap"))?.ApiKey
             ?? throw new UserFriendlyException("高德地图API密钥未配置");
 
         var client = httpClientFactory.CreateClient("amap");
         var url = $"/v3/config/district?key={apiKey}&keywords=100000&subdistrict=1&extensions=base";
-        
+
         logger.LogInformation("正在调用高德API获取全国省份数据，URL: {url}", url);
-        
+
         try
         {
             // 使用Polly重试策略获取数据
@@ -92,47 +93,47 @@ public class AmapAppService : BasisAppService, IAmapAppService
                 return await client.GetStringAsync(url);
             });
             logger.LogDebug("高德API原始响应: {response}", responseString);
-            
+
             // 尝试反序列化
             var response = JsonSerializer.Deserialize<AmapDistrictResponse>(responseString, JsonOptions);
-            
+
             if (response == null)
             {
                 logger.LogError("反序列化高德API响应失败，响应内容: {response}", responseString);
                 throw new UserFriendlyException("解析高德地图数据失败");
             }
-            
+
             if (response.Status != "1" || response.InfoCode != "10000")
             {
-                logger.LogError("高德API返回错误，Status: {status}, Info: {info}, InfoCode: {infoCode}", 
+                logger.LogError("高德API返回错误，Status: {status}, Info: {info}, InfoCode: {infoCode}",
                     response.Status, response.Info, response.InfoCode);
                 throw new UserFriendlyException($"高德地图API错误: {response.Info}");
             }
-            
+
             if (response.Districts == null || response.Districts.Length == 0)
             {
                 logger.LogError("高德API返回的Districts为空");
                 return [];
             }
-            
+
             logger.LogInformation("成功获取到 {count} 个顶级行政区域", response.Districts.Length);
-            
-            if (response.Districts[0].Districts == null || response.Districts[0].Districts.Length == 0)
+
+            if (response.Districts[0].Districts == null || response.Districts[0].Districts?.Length == 0)
             {
                 logger.LogWarning("全国节点下没有省份数据");
                 return [];
             }
-            
-            logger.LogInformation("成功获取到 {count} 个省份", response.Districts[0].Districts.Length);
-            
+
+            logger.LogInformation("成功获取到 {count} 个省份", response.Districts[0].Districts?.Length);
+
             // 记录每个省份的信息
-            foreach (var province in response.Districts[0].Districts)
+            foreach (var province in response.Districts[0].Districts!)
             {
-                logger.LogDebug("省份: {name}, AdCode: {adCode}, Level: {level}", 
+                logger.LogDebug("省份: {name}, AdCode: {adCode}, Level: {level}",
                     province.Name, province.AdCode, province.Level);
             }
-            
-            return response.Districts[0].Districts;
+
+            return response.Districts[0].Districts!;
         }
         catch (HttpRequestException ex)
         {
@@ -153,14 +154,14 @@ public class AmapAppService : BasisAppService, IAmapAppService
     /// <returns></returns>
     public async Task<AmapDistrict[]> GetDistrictAsync(string adCode)
     {
-        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey)
+        var apiKey = (await integrationSettingsStore.GetValuesAsync<AmapSettings>("amap"))?.ApiKey
             ?? throw new UserFriendlyException("高德地图API密钥未配置");
 
         var client = httpClientFactory.CreateClient("amap");
         var url = $"/v3/config/district?&key={apiKey}&keywords={HttpUtility.UrlEncode(adCode)}&subdistrict=1&extensions=base";
 
         logger.LogInformation("正在获取行政区域 {adCode} 的子级数据", adCode);
-        
+
         try
         {
             // 使用Polly重试策略获取数据
@@ -170,38 +171,38 @@ public class AmapAppService : BasisAppService, IAmapAppService
                 return await client.GetStringAsync(url);
             });
             logger.LogDebug("行政区域 {adCode} 的API响应: {response}", adCode, responseString);
-            
+
             var response = JsonSerializer.Deserialize<AmapDistrictResponse>(responseString, JsonOptions);
-            
+
             if (response == null)
             {
                 logger.LogError("反序列化行政区域 {adCode} 响应失败", adCode);
                 return [];
             }
-            
+
             if (response.Status != "1" || response.InfoCode != "10000")
             {
-                logger.LogError("获取行政区域 {adCode} 失败，Status: {status}, Info: {info}", 
+                logger.LogError("获取行政区域 {adCode} 失败，Status: {status}, Info: {info}",
                     adCode, response.Status, response.Info);
                 return [];
             }
-            
+
             if (response.Districts == null || response.Districts.Length == 0)
             {
                 logger.LogWarning("行政区域 {adCode} 没有返回数据", adCode);
                 return [];
             }
-            
+
             if (response.Districts.Length > 0 && response.Districts[0].Districts != null)
             {
-                logger.LogInformation("行政区域 {adCode} 获取到 {count} 个子级区域", 
+                logger.LogInformation("行政区域 {adCode} 获取到 {count} 个子级区域",
                     adCode, response.Districts[0].Districts.Length);
             }
             else
             {
                 logger.LogInformation("行政区域 {adCode} 没有子级区域", adCode);
             }
-            
+
             return response.Districts;
         }
         catch (Exception ex)
@@ -213,7 +214,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
 
     public async Task<AmapGeoCode[]> GetGeoCodeAsync(string address, string city = "")
     {
-        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey)
+        var apiKey = (await integrationSettingsStore.GetValuesAsync<AmapSettings>("amap"))?.ApiKey
             ?? throw new UserFriendlyException("高德地图API密钥未配置");
 
         var client = httpClientFactory.CreateClient("amap");
@@ -240,7 +241,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
         int page = 1,
         int offset = 20)
     {
-        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey)
+        var apiKey = (await integrationSettingsStore.GetValuesAsync<AmapSettings>("amap"))?.ApiKey
             ?? throw new UserFriendlyException("高德地图API密钥未配置");
 
         var client = httpClientFactory.CreateClient("amap");
@@ -268,7 +269,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
 
     public async Task<AmapReGeoCode> GetReGeoCodeAsync(string location)
     {
-        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey)
+        var apiKey = (await integrationSettingsStore.GetValuesAsync<AmapSettings>("amap"))?.ApiKey
             ?? throw new UserFriendlyException("高德地图API密钥未配置");
 
         var client = httpClientFactory.CreateClient("amap");
@@ -287,7 +288,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
                 throw new UserFriendlyException("解析逆地理编码数据失败");
             }
 
-            if (response.Status != "1" || response.InfoCode != "10000")
+            if (response.Status != "1" || response.InfoCode != "10000" || response.ReGeocode == null)
             {
                 logger.LogError("逆地理编码API返回错误，Status: {status}, Info: {info}, InfoCode: {infoCode}",
                     response.Status, response.Info, response.InfoCode);
@@ -310,13 +311,12 @@ public class AmapAppService : BasisAppService, IAmapAppService
 
     public async Task<AmapWebConfig> GetWebConfigAsync()
     {
-        var apiKey = await SettingProvider.GetOrNullAsync(AmapSettingNames.ApiKey);
-        var securityJsCode = await SettingProvider.GetOrNullAsync(AmapSettingNames.SecurityJsCode);
+        var settings = await integrationSettingsStore.GetValuesAsync<AmapSettings>("amap");
 
         return new AmapWebConfig
         {
-            ApiKey = apiKey,
-            SecurityJsCode = securityJsCode
+            ApiKey = settings?.ApiKey,
+            SecurityJsCode = settings?.SecurityJsCode
         };
     }
 }

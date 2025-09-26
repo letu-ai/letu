@@ -12,13 +12,21 @@ public class ApplicationSettingDefinitionProvider : SettingDefinitionProvider
                 "乐途",
                 isVisibleToClients: true)
         );
+
         context.Add(
             new SettingDefinition(
                 ApplicationSettingNames.Site.Favicon,
                 "favicon.ico",
                 isVisibleToClients: true)
         );
-        
+
+        context.Add(
+            new SettingDefinition(
+                ApplicationSettingNames.Site.SiteUrl,
+                null,
+                isVisibleToClients: true)
+        );
+
         context.Add(
             new SettingDefinition(
                 ApplicationSettingNames.Site.Logo,

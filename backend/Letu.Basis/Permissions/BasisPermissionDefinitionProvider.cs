@@ -28,6 +28,7 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         DefineSettingManagement(settingGroup);
         DefineFeatureManagement(settingGroup);
         DefineScheduledTasks(settingGroup);
+        DefineIntegrationManagement(settingGroup);
 
         // 租户管理
         var saasGroup = context.AddGroup(BasisPermissions.SaasGroupName, L("Permission:Admin.Saas"));
@@ -166,7 +167,6 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         permission.AddChild(BasisPermissions.Setting.EmailingTest, L("Permission:EmailingTest"));
         permission.AddChild(BasisPermissions.Setting.TimeZone, L("Permission:TimeZone"));
         permission.AddChild(BasisPermissions.Setting.Site, L("Permission:Site"));
-        permission.AddChild(BasisPermissions.Setting.Amap, L("Permission:Amap"));
     }
 
     // 功能管理
@@ -199,6 +199,14 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         permission.AddChild(BasisPermissions.Edition.ManageFeatures, L("Permission:ManageFeatures"));
     }
 
+    // 系统集成管理
+    public void DefineIntegrationManagement(PermissionGroupDefinition group)
+    {
+        var permission = group.AddPermission(BasisPermissions.Integration.Default, L("Permission:IntegrationManagement"));
+        permission.AddChild(BasisPermissions.Integration.Amap, L("Permission:Amap"));
+        permission.AddChild(BasisPermissions.Integration.Payment, L("Permission:Payment"));
+        permission.AddChild(BasisPermissions.Integration.Sms, L("Permission:Sms"));
+    }
     private static LocalizableString L(string name)
     {
         return LocalizableString.Create<BasisResource>(name);

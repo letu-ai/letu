@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Letu.Abp.FreeSql\Letu.Abp.FreeSql.csproj" />
+		<ProjectReference Include="..\Letu.AI\Letu.AI.csproj" />
 		<ProjectReference Include="..\Letu.Basis\Letu.Basis.csproj" />
 	</ItemGroup>
 </Project>

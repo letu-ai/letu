@@ -1,4 +1,5 @@
 ﻿using Letu.Basis.Admin.Menus.Dtos;
+using Letu.Basis.Admin.Users.Dtos;
 using Volo.Abp.AspNetCore.Mvc.ApplicationConfigurations;
 
 namespace Letu.Basis.Application.Dtos;
@@ -12,4 +13,6 @@ public class LetuApplicationConfigurationDto : ApplicationConfigurationDto
     }
 
     public List<NavigationMenuDto> Menu { get; set; }
+
+    public required UserExtraInfo UserExtraInfo { get; set; }
 }

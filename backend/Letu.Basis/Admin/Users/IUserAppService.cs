@@ -73,5 +73,11 @@ namespace Letu.Basis.Admin.Users
         /// <returns></returns>
         Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword);
         Task<List<SelectOption>> GetUserSelectOptionsByIdsAsync(List<Guid> userIds);
+
+        /// <summary>
+        /// 获取用户扩展信息
+        /// </summary>
+        /// <returns></returns>
+        Task<UserExtraInfo> GetUserExtraInfoAsync();
     }
 }

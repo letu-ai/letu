@@ -3,7 +3,7 @@ import type { MenuProps } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { getRolePermissions, updateRolePermissions, type RoleListDto, type PermissionDto, type UpdatePermissionDto } from './-service';
-import useApp from 'antd/es/app/useApp';
+import {App} from 'antd';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ModalProps { }
@@ -61,7 +61,7 @@ const PermissionForm = forwardRef<PermissionModalRef, ModalProps>((_, ref) => {
     const [groupItems, setGroupItems] = useState<GroupItem[]>();
     const [selectedGroup, setSelectedGroup] = useState<GroupItem>();
     const [permissionItems, setPermissionItems] = useState<PermissionDto[]>([]);
-    const { message } = useApp();
+    const { message } = App.useApp();
 
     useImperativeHandle(ref, () => ({
         openModal,
@@ -118,27 +118,35 @@ const PermissionForm = forwardRef<PermissionModalRef, ModalProps>((_, ref) => {
     // 监听权限变更，更新groupItems的计数
     React.useEffect(() => {
         if (permissionItems.length > 0 && groupItems && groupItems.length > 0) {
-            const updatedGroups = groupItems.map(group => {
-                const groupPermissions = permissionItems.filter(p => p.name.startsWith(group.name));
-                const grantedCount = countGrantedPermission(groupPermissions);
-                return {
-                    ...group,
-                    grantedCount,
-                    isAllPermissionsGranted: grantedCount === groupPermissions.length
-                };
+            setGroupItems(prevGroups => {
+                if (!prevGroups) return prevGroups;
+                const updatedGroups = prevGroups.map(group => {
+                    const groupPermissions = permissionItems.filter(p => p.name.startsWith(group.name));
+                    const grantedCount = countGrantedPermission(groupPermissions);
+                    return {
+                        ...group,
+                        grantedCount,
+                        isAllPermissionsGranted: grantedCount === groupPermissions.length
+                    };
+                });
+                return updatedGroups;
             });
-
-            setGroupItems(updatedGroups);
 
             // 更新当前选中的组
             if (selectedGroup) {
-                const updatedSelectedGroup = updatedGroups.find(g => g.name === selectedGroup.name);
-                if (updatedSelectedGroup) {
-                    setSelectedGroup(updatedSelectedGroup);
-                }
+                setSelectedGroup(prevSelected => {
+                    if (!prevSelected) return prevSelected;
+                    const groupPermissions = permissionItems.filter(p => p.name.startsWith(prevSelected.name));
+                    const grantedCount = countGrantedPermission(groupPermissions);
+                    return {
+                        ...prevSelected,
+                        grantedCount,
+                        isAllPermissionsGranted: grantedCount === groupPermissions.length
+                    };
+                });
             }
         }
-    }, [permissionItems, selectedGroup, groupItems]);
+    }, [permissionItems]);
 
     const getGroupPermissions = (groupName?: string): PermissionDto[] | undefined => {
         if (groupName) {

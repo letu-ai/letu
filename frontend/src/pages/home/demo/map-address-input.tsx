@@ -2,23 +2,17 @@ import { useState } from "react";
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, Form, Button, Space, Typography, Divider, App, Row, Col } from "antd";
 import MapAddressInput, { type IDeviceAddressValue } from "@/components/amap/MapAddressInput";
-import { getAmapWebConfig } from "@/components/amap/service";
 
 const { Title, Text, Paragraph } = Typography;
 
 export const Route = createFileRoute('/home/demo/map-address-input')({
-    component: RouteComponent,
-    loader: async () => {
-        const { apiKey, securityJsCode } = await getAmapWebConfig();
-        return { apiKey, securityJsCode };
-    }   
+    component: RouteComponent
 })
 
 function RouteComponent() {
     const [form] = Form.useForm();
     const [selectedValue, setSelectedValue] = useState<IDeviceAddressValue>();
     const { message } = App.useApp();
-    const { apiKey, securityJsCode } = Route.useLoaderData();
     const handleSubmit = () => {
         form.validateFields().then((values) => {
             console.log("表单数据:", values);
@@ -86,8 +80,6 @@ function RouteComponent() {
                                     showStreet={true}
                                     height={400}
                                     onChange={handleValueChange}
-                                    apiKey={apiKey}
-                                    securityJsCode={securityJsCode}
                                 />
                             </Form.Item>
 

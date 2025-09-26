@@ -1,4 +1,5 @@
 ﻿using Letu.Abp;
+using Letu.AI;
 using Letu.Basis;
 using Letu.Basis.Middlewares;
 using Letu.Core.Identity.Jwt;
@@ -11,7 +12,6 @@ using Medallion.Threading;
 using Medallion.Threading.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -54,7 +54,8 @@ namespace Letu;
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpBlobStoringFileSystemModule),
     typeof(LetuAbpFreeSqlModule),
-    typeof(LetuBasisModule)
+    typeof(LetuBasisModule),
+    typeof(LetuAIModule)
 )]
 public class LetuServerModule : AbpModule
 {

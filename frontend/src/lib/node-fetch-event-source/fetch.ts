@@ -130,14 +130,14 @@ export async function fetchEventSource(input: RequestInfo, {
                         removeHeader(headers, LastEventId);
                     }
                 };
-                
+
                 const handleRetry = (retry: number) => {
                     retryInterval = retry;
                 };
-                
+
                 const messagesHandler = getMessages(handleId, handleRetry, onmessage);
                 const linesHandler = getLines(messagesHandler);
-                
+
                 await getBytes(response.body!, linesHandler);
 
                 onclose?.();
@@ -148,18 +148,19 @@ export async function fetchEventSource(input: RequestInfo, {
                     // if we haven't aborted the request ourselves:
                     try {
                         // check if we need to retry:
-                        const interval: number | null | undefined | void = onerror?.(err) ?? retryInterval;
-                        
-                        // 如果onerror返回null或-1，表示外部要停止重连
-                        if (interval === null || interval === -1) {
+                        const interval: number | null | undefined | void = onerror?.(err);
+
+                        // 如果onerror返回不是大于0的数，表示外部要停止重连
+                        if (interval && interval > 0) {
+                            clearTimeout(retryTimer);
+                            retryTimer = setTimeout(create, interval);
+                        }
+                        else {
                             console.log('SSE: External handler requested to stop reconnection');
                             dispose();
                             reject(err);
                             return;
                         }
-                        
-                        clearTimeout(retryTimer);
-                        retryTimer = setTimeout(create, interval);
                     } catch (innerErr) {
                         // we should not retry anymore:
                         dispose();
@@ -181,7 +182,7 @@ async function defaultOnOpen(response: Response) {
         (error as any).isAuthError = true;
         throw error;
     }
-    
+
     const contentType = response.headers.get('content-type');
     if (!contentType?.startsWith(EventStreamContentType)) {
         throw new Error(`Expected content-type to be ${EventStreamContentType}, Actual: ${contentType}`);

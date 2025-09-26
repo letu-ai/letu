@@ -8,7 +8,9 @@ import { getApiBaseUrl } from '@/utils/urlUtils';
 const { Text } = Typography
 
 export function UserInfo() {
-    const { currentUser: user } = useAppConfig();
+    const config = useAppConfig();
+    console.log(config)
+    const { currentUser: user, userExtraInfo } = useAppConfig();
 
     const menuItems: MenuProps["items"] = [
         {
@@ -69,13 +71,13 @@ export function UserInfo() {
                                     <div className="flex items-center gap-2">
                                         <span className="text-gray-500">👥</span>
                                         <Text type="secondary" className="text-sm">
-                                            {user.department}
+                                            {userExtraInfo.departmentName}
                                         </Text>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-gray-500">🏢</span>
                                         <Text type="secondary" className="text-sm">
-                                            {user.organization}
+                                            {userExtraInfo.organizationUnitName}
                                         </Text>
                                     </div>
                                 </div>

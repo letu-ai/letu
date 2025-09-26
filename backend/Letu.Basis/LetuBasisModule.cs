@@ -34,152 +34,151 @@ using Volo.Abp.Threading;
 using Volo.Abp.Timing;
 using Volo.Abp.VirtualFileSystem;
 
-namespace Letu.Basis
+namespace Letu.Basis;
+
+[DependsOn(
+    typeof(AbpAspNetCoreMvcModule),
+    typeof(AbpAutofacModule),
+    typeof(AbpAutoMapperModule),
+    typeof(AbpAspNetCoreMultiTenancyModule),
+    typeof(AbpAspNetCoreSerilogModule),
+    typeof(AbpAuthorizationModule),
+    typeof(AbpDistributedLockingModule),
+    typeof(AbpFeatureManagementDomainModule),
+    typeof(AbpMultiTenancyModule),
+    typeof(AbpPermissionManagementDomainModule),
+    typeof(AbpSettingManagementDomainModule),
+    typeof(AbpEventBusModule),
+    typeof(AbpEmailingModule),
+    typeof(AbpTimingModule),
+    typeof(LetuRepositoryModule),
+    typeof(LetuLoggingModule),
+    typeof(LetuObjectStorageModule),
+    typeof(LetuJobModule)
+)]
+public class LetuBasisModule : AbpModule
 {
-    [DependsOn(
-        typeof(AbpAspNetCoreMvcModule),
-        typeof(AbpAutofacModule),
-        typeof(AbpAutoMapperModule),
-        typeof(AbpAspNetCoreMultiTenancyModule),
-        typeof(AbpAspNetCoreSerilogModule),
-        typeof(AbpAuthorizationModule),
-        typeof(AbpDistributedLockingModule),
-        typeof(AbpFeatureManagementDomainModule),
-        typeof(AbpMultiTenancyModule),
-        typeof(AbpPermissionManagementDomainModule),
-        typeof(AbpSettingManagementDomainModule),
-        typeof(AbpEventBusModule),
-        typeof(AbpEmailingModule),
-        typeof(AbpTimingModule),
-        typeof(LetuRepositoryModule),
-        typeof(LetuLoggingModule),
-        typeof(LetuObjectStorageModule),
-        typeof(LetuJobModule)
-        )]
-    public class LetuBasisModule : AbpModule
+    public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        var services = context.Services;
+        var configuration = context.Configuration;
+
+        ConfigureAutoMapper(services);
+        ConfigurePermissionManagement();
+        ConfigureFeatureManagement();
+        ConfigureLocalization();
+        ConfigureMultiTenancy();
+
+        services.AddControllers()
+            .AddApplicationPart(typeof(LetuBasisModule).Assembly); // 添加外部程序集
+
+        PreConfigure<IMvcBuilder>(mvcBuilder =>
         {
-            var services = context.Services;
-            var configuration = context.Configuration;
+            mvcBuilder.AddApplicationPartIfNotExists(GetType().Assembly);
+        });
 
-            ConfigureAutoMapper(services);
-            ConfigurePermissionManagement();
-            ConfigureFeatureManagement();
-            ConfigureLocalization();
-            ConfigureMultiTenancy();
-
-            services.AddControllers()
-                .AddApplicationPart(typeof(LetuBasisModule).Assembly); // 添加外部程序集
-
-            PreConfigure<IMvcBuilder>(mvcBuilder =>
-            {
-                mvcBuilder.AddApplicationPartIfNotExists(GetType().Assembly);
-            });
-
-            services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add<HttpRequestValidationFilter>();
-            });
-
-
-            // services.AddSingleton<IAuthorizationMiddlewareResultHandler, IdentityMiddlewareResultHandler>();
-
-            services.AddHostedService<PreparationHostService>();
-
-            // 配置高德地图 HttpClient
-            services.AddHttpClient("amap", client =>
-            {
-                client.BaseAddress = new Uri("https://restapi.amap.com");
-                client.Timeout = TimeSpan.FromSeconds(30);
-            });
-
-            SnowflakeHelper.Init(short.Parse(configuration["Snowflake:WorkerId"]!), short.Parse(configuration["Snowflake:DataCenterId"]!));
-        }
-
-        private void ConfigureAutoMapper(IServiceCollection services)
+        services.Configure<MvcOptions>(options =>
         {
-            services.AddAutoMapperObjectMapper<LetuBasisModule>();
-            Configure<AbpAutoMapperOptions>(options =>
-            {
-                options.AddMaps<LetuBasisModule>(validate: true);
-            });
-        }
+            options.Filters.Add<HttpRequestValidationFilter>();
+        });
 
-        private void ConfigurePermissionManagement()
+
+        // services.AddSingleton<IAuthorizationMiddlewareResultHandler, IdentityMiddlewareResultHandler>();
+
+        services.AddHostedService<PreparationHostService>();
+
+        // 配置高德地图 HttpClient
+        services.AddHttpClient("amap", client =>
         {
-            Configure<PermissionManagementOptions>(options =>
-            {
-                options.ManagementProviders.Add<UserPermissionManagementProvider>();
-                options.ManagementProviders.Add<RolePermissionManagementProvider>();
+            client.BaseAddress = new Uri("https://restapi.amap.com");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
 
-                // 添加用户管理和角色管理的权限策略，用于配置权限管理页面的权限控制
-                options.ProviderPolicies[UserPermissionValueProvider.ProviderName] = BasisPermissions.User.ManagePermission;
-                options.ProviderPolicies[RolePermissionValueProvider.ProviderName] = BasisPermissions.Role.ManagePermission;
-            });
-        }
+        SnowflakeHelper.Init(short.Parse(configuration["Snowflake:WorkerId"]!), short.Parse(configuration["Snowflake:DataCenterId"]!));
+    }
 
-        private void ConfigureFeatureManagement()
+    private void ConfigureAutoMapper(IServiceCollection services)
+    {
+        services.AddAutoMapperObjectMapper<LetuBasisModule>();
+        Configure<AbpAutoMapperOptions>(options =>
         {
-            Configure<FeatureManagementOptions>(options =>
-            {
-                options.ProviderPolicies[EditionFeatureValueProvider.ProviderName] = BasisPermissions.Edition.ManageFeatures;
-                options.ProviderPolicies[TenantFeatureValueProvider.ProviderName] = BasisPermissions.Tenant.ManageFeatures;
-            });
+            options.AddMaps<LetuBasisModule>(validate: true);
+        });
+    }
 
-            Configure<AbpExceptionLocalizationOptions>(options =>
-            {
-                options.MapCodeNamespace("AbpFeatureManagement", typeof(AbpFeatureManagementResource));
-            });
-        }
-
-        private void ConfigureMultiTenancy()
+    private void ConfigurePermissionManagement()
+    {
+        Configure<PermissionManagementOptions>(options =>
         {
-            Configure<AbpMultiTenancyOptions>(options =>
-            {
-                options.IsEnabled = MultiTenancyConsts.IsEnabled;
-            });
-        }
+            options.ManagementProviders.Add<UserPermissionManagementProvider>();
+            options.ManagementProviders.Add<RolePermissionManagementProvider>();
 
-        private void ConfigureLocalization()
+            // 添加用户管理和角色管理的权限策略，用于配置权限管理页面的权限控制
+            options.ProviderPolicies[UserPermissionValueProvider.ProviderName] = BasisPermissions.User.ManagePermission;
+            options.ProviderPolicies[RolePermissionValueProvider.ProviderName] = BasisPermissions.Role.ManagePermission;
+        });
+    }
+
+    private void ConfigureFeatureManagement()
+    {
+        Configure<FeatureManagementOptions>(options =>
         {
-            Configure<AbpVirtualFileSystemOptions>(options =>
-            {
-                options.FileSets.AddEmbedded<LetuBasisModule>();
-            });
+            options.ProviderPolicies[EditionFeatureValueProvider.ProviderName] = BasisPermissions.Edition.ManageFeatures;
+            options.ProviderPolicies[TenantFeatureValueProvider.ProviderName] = BasisPermissions.Tenant.ManageFeatures;
+        });
 
-            Configure<AbpLocalizationOptions>(options =>
-            {
-                options.Resources
-                    .Add<BasisResource>("zh-Hans")
-                    .AddVirtualJson("/Letu/Basis/Localization/Resources");
-            });
-
-            Configure<AbpExceptionLocalizationOptions>(options =>
-            {
-                options.MapCodeNamespace("Volo.AbpIo.MultiTenancy", typeof(BasisResource));
-            });
-        }
-
-        //private void ConfigureDataSeed(IServiceCollection services)
-        //{
-        //    services.AddIdentityCore<IdentityUser>(setupAction)
-        //     .AddRoles<IdentityRole>()
-        //     .AddClaimsPrincipalFactory<AbpUserClaimsPrincipalFactory>();
-        //}
-
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        Configure<AbpExceptionLocalizationOptions>(options =>
         {
-            SeedBasisData(context);
-        }
+            options.MapCodeNamespace("AbpFeatureManagement", typeof(AbpFeatureManagementResource));
+        });
+    }
 
-        private static void SeedBasisData(ApplicationInitializationContext context)
+    private void ConfigureMultiTenancy()
+    {
+        Configure<AbpMultiTenancyOptions>(options =>
         {
-            using (var scope = context.ServiceProvider.CreateScope())
-            {
-                var dataSeeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
-                AsyncHelper.RunSync(async () => await dataSeeder.SeedAsync()); // 触发种子数据
-            }
+            options.IsEnabled = MultiTenancyConsts.IsEnabled;
+        });
+    }
+
+    private void ConfigureLocalization()
+    {
+        Configure<AbpVirtualFileSystemOptions>(options =>
+        {
+            options.FileSets.AddEmbedded<LetuBasisModule>();
+        });
+
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            options.Resources
+                .Add<BasisResource>("zh-Hans")
+                .AddVirtualJson("/Letu/Basis/Localization/Resources");
+        });
+
+        Configure<AbpExceptionLocalizationOptions>(options =>
+        {
+            options.MapCodeNamespace("Volo.AbpIo.MultiTenancy", typeof(BasisResource));
+        });
+    }
+
+    //private void ConfigureDataSeed(IServiceCollection services)
+    //{
+    //    services.AddIdentityCore<IdentityUser>(setupAction)
+    //     .AddRoles<IdentityRole>()
+    //     .AddClaimsPrincipalFactory<AbpUserClaimsPrincipalFactory>();
+    //}
+
+    public override void OnApplicationInitialization(ApplicationInitializationContext context)
+    {
+        SeedBasisData(context);
+    }
+
+    private static void SeedBasisData(ApplicationInitializationContext context)
+    {
+        using (var scope = context.ServiceProvider.CreateScope())
+        {
+            var dataSeeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+            AsyncHelper.RunSync(async () => await dataSeeder.SeedAsync()); // 触发种子数据
         }
     }
 }

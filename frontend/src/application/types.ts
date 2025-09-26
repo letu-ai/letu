@@ -15,15 +15,21 @@ export interface ICurrentUser {
     phoneNumberVerified: boolean;
     roles: string[];
     sessionId?: string | null;
-    avatar?: string | null;
-    department?: string | null;
-    organization?: string | null;
 }
 
 export interface ICurrentTenant {
     id?: string | null;
     name?: string | null;
     isAvailable: boolean;
+}
+
+export interface IUserExtraInfo {
+    organizationUnitId?: string | null;
+    organizationUnitName?: string | null;
+    departmentId?: string | null;
+    departmentName?: string | null;
+    positionId?: string | null;
+    positionName?: string | null;
 }
 
 export interface IAbpLanguage {
@@ -147,6 +153,8 @@ export interface ILetuApplicationConfiguration {
     extraProperties: Record<string, any>;
 
     menu: INavigationMenuDto[];
+
+    userExtraInfo: IUserExtraInfo;
 }
 
 export interface INavigationMenuDto {

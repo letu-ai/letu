@@ -1,10 +1,10 @@
-import React, { useEffect, useId, useRef, useState, useCallback } from 'react';
+import React, { useId, useRef, useState, useCallback, useEffect } from 'react';
 import AMapLoader from '@amap/amap-jsapi-loader';
 import "@amap/amap-jsapi-types";
 import { Empty, Input, List, Card, Spin } from 'antd';
 import { SearchOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { useDebounceFn } from 'ahooks';
-import { searchAddress, getAddressByLocation, type IAmapPoi } from './service';
+import { useAsyncEffect, useDebounceFn } from 'ahooks';
+import { searchAddress, getAddressByLocation, getAmapWebConfig, type IAmapPoi, type IAmapWebConfig } from './service';
 
 export interface IMapLocation {
     lng: number;
@@ -22,8 +22,6 @@ export interface IAddressInfo {
 
 // MapView 组件属性接口
 export interface IMapViewProps {
-    apiKey?: string;           // 高德地图API密钥
-    securityJsCode?: string;
     defaultCenter?: IMapLocation; // 地图中心点 [经度, 纬度]
     height?: string | number;  // 地图高度
     className?: string;        // 额外样式类
@@ -37,9 +35,7 @@ export interface IMapViewProps {
 
 const DEFAULT_CENTER = { lng: 116.397428, lat: 39.90923 }; // 默认北京天安门
 
-const MapView: React.FC<IMapViewProps> = ({
-    apiKey,
-    securityJsCode,
+function MapView({
     defaultCenter = DEFAULT_CENTER,
     height = 400,
     className = '',
@@ -49,7 +45,7 @@ const MapView: React.FC<IMapViewProps> = ({
     onMove,
     onZoom,
     onSelect
-}) => {
+}: IMapViewProps) {
 
     const mapRef = useRef<AMap.Map | null>(null);
     const markerRef = useRef<AMap.Marker | null>(null);
@@ -59,6 +55,9 @@ const MapView: React.FC<IMapViewProps> = ({
     const [searchResults, setSearchResults] = useState<IAmapPoi[]>([]);
     const [searching, setSearching] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [configLoaded, setConfigLoaded] = useState(false);
+    const apiConfigRef = useRef<IAmapWebConfig | null>(null);
 
     // 处理地图移动结束事件
     const handleMapMoveEnd = useCallback(() => {
@@ -196,17 +195,45 @@ const MapView: React.FC<IMapViewProps> = ({
         });
     }, [onSelect]);
 
-    useEffect(() => {
-        if (!securityJsCode || !apiKey) {
-            setKeyInvalid(true);
+    // 加载配置 - 第一步
+    useAsyncEffect(async () => {
+        if (apiConfigRef.current) {
             return;
         }
 
-        (window as any)._AMapSecurityConfig = {
-            securityJsCode: securityJsCode,
-        };
+        setLoading(true);
+        try {
+            const config = await getAmapWebConfig();
+            if (config.apiKey && config.securityJsCode) {
+                apiConfigRef.current = config;
+                // 设置安全配置
+                (window as any)._AMapSecurityConfig = {
+                    securityJsCode: config.securityJsCode,
+                };
+                setConfigLoaded(true);
+            }
+            else {
+                setKeyInvalid(true);
+            }
+        } catch (err) {
+            console.error('获取地图配置失败:', err);
+            setKeyInvalid(true);
+        }
+        finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // 初始化地图 - 配置加载成功后才执行
+    useEffect(() => {
+        if (!configLoaded || !apiConfigRef.current) return;
+
+        const config = apiConfigRef.current;
+        if (!config.apiKey)
+            return;
+
         AMapLoader.load({
-            key: apiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
+            key: config.apiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
             version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
             plugins: ["AMap.Scale", "AMap.Marker"], //需要使用的的插件列表，如比例尺'AMap.Scale'，支持添加多个如：['...','...']
         })
@@ -234,7 +261,8 @@ const MapView: React.FC<IMapViewProps> = ({
                 onReady?.(map);
             })
             .catch((e) => {
-                console.log(e);
+                console.log('地图加载失败:', e);
+                setKeyInvalid(true);
             });
 
         return () => {
@@ -245,7 +273,7 @@ const MapView: React.FC<IMapViewProps> = ({
             mapRef.current?.destroy();
             mapRef.current = null;
         };
-    }, [id]);
+    }, [configLoaded, id]);
 
     return (
         <div className="relative">
@@ -288,16 +316,25 @@ const MapView: React.FC<IMapViewProps> = ({
                     </Card>
                 </div>
             )}
-            <div
-                id={id}
-                className={className}
-                style={{ height: `${height}px` }}
-            >
-                {keyInvalid && <Empty description="API密钥无效" />}
-            </div>
+            {/* 地图容器 - 只在配置加载成功后渲染 */}
+            {loading ? (
+                <div className={`flex items-center justify-center ${className}`} style={{ height: `${height}px` }}>
+                    <Spin size="large" />
+                </div>
+            ) : keyInvalid ? (
+                <div className={`flex items-center justify-center ${className}`} style={{ height: `${height}px` }}>
+                    <Empty description="地图配置无效，请检查API密钥设置" />
+                </div>
+            ) : (
+                <div
+                    id={id}
+                    className={className}
+                    style={{ height: `${height}px` }}
+                />
+            )}
         </div>
     );
-};
+}
 
 MapView.displayName = 'MapView';
 

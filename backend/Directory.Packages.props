@@ -26,8 +26,9 @@
         <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="9.2.3" />
         <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain" Version="9.2.3" />
         <PackageVersion Include="Volo.Abp.FeatureManagement.Domain" Version="9.2.3" />
-        <PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="9.2.3" />
-        <PackageVersion Include="Volo.Abp.Emailing" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="9.2.3" />
+		<PackageVersion Include="Volo.Abp.Security" Version="9.2.3" />		
+		<PackageVersion Include="Volo.Abp.Emailing" Version="9.2.3" />
         <PackageVersion Include="Volo.Abp.BlobStoring" Version="9.2.3" />
         <PackageVersion Include="Volo.Abp.BlobStoring.FileSystem" Version="9.2.3" />
     </ItemGroup>

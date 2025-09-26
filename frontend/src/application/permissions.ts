@@ -156,6 +156,17 @@ export class BasisPermissions {
         Log: `${BasisPermissions.SettingGroupName}.ScheduledTask.Log`,
     } as const;
 
+    // 第三方集成管理权限
+    public static readonly Integration = {
+        /** 第三方集成管理 */
+        Default: `${BasisPermissions.SettingGroupName}.Integration`,
+        Amap: `${BasisPermissions.SettingGroupName}.Integration.Amap`,
+        Payment: `${BasisPermissions.SettingGroupName}.Integration.Payment`,
+        Sms: `${BasisPermissions.SettingGroupName}.Integration.Sms`,
+        FastGpt: `${BasisPermissions.SettingGroupName}.Integration.FastGpt`,
+        RagFlow: `${BasisPermissions.SettingGroupName}.Integration.RagFlow`,
+    } as const;
+
     // SaaS权限组
     public static readonly SaasGroupName = "Saas";
 

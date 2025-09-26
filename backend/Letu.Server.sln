@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Logging", "Letu.Loggin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Abp.FreeSql", "Letu.Abp.FreeSql\Letu.Abp.FreeSql.csproj", "{EA4F17E3-ED63-94ED-CC38-5E62DD3E80C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.AI", "Letu.AI\Letu.AI.csproj", "{AB9D9D6B-1D41-E269-463B-E405BAAD268B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{EA4F17E3-ED63-94ED-CC38-5E62DD3E80C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA4F17E3-ED63-94ED-CC38-5E62DD3E80C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA4F17E3-ED63-94ED-CC38-5E62DD3E80C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

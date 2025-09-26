@@ -1,5 +1,7 @@
-﻿using Letu.Basis.Admin.Employees;
+﻿using Letu.Basis.Admin.Departments;
+using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.OrganizationUnits;
+using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users.Dtos;
 using Letu.Basis.Oss;
@@ -307,6 +309,30 @@ namespace Letu.Basis.Admin.Users
                 .Limit(50)
                 .OrderBy(x => x.UserName)
                 .ToListAsync(x => new SelectOption { Value = x.Id.ToString(), Label = $"{x.UserName} {x.NickName}" });
+        }
+
+        public async Task<UserExtraInfo> GetUserExtraInfoAsync()
+        {
+            if (CurrentUser.IsAuthenticated == false)
+            {
+                return new UserExtraInfo();
+            }
+
+            return await userRepository.Select
+                .From<OrganizationUnit, Department, PositionGroup>((u, o, d, p) => u
+                    .LeftJoin(u1 => u1.OrganizationUnitId == o.Id)
+                    .LeftJoin(u1 => u1.DepartmentId == d.Id)
+                    .LeftJoin(u1 => u1.PositionId == p.Id))
+                .Where((u, o, d, p) => u.Id == CurrentUser.Id)
+                .FirstAsync((u, o, d, p) => new UserExtraInfo
+                {
+                    OrganizationUnitId = u.OrganizationUnitId,
+                    OrganizationUnitName = o.Name,
+                    DepartmentId = u.DepartmentId,
+                    DepartmentName = d.Name,
+                    PositionId = u.PositionId,
+                    PositionName = p.GroupName
+                });
         }
     }
 }

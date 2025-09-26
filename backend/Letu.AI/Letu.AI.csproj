@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\common.props" />
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Localization\Resources\zh-Hans.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Letu.Basis\Letu.Basis.csproj" />
+	</ItemGroup>
+
+
+</Project>

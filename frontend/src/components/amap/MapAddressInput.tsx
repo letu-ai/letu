@@ -21,8 +21,6 @@ interface IDeviceAddressInputProps {
     disabled?: boolean;
     height?: number;    // 地图高度
     showStreet?: boolean; // 是否显示街道选择
-    apiKey?: string;
-    securityJsCode?: string;
 }
 
 function MapAddressInput({
@@ -30,9 +28,7 @@ function MapAddressInput({
     onChange,
     disabled = false,
     height = 300,
-    showStreet = true,
-    apiKey,
-    securityJsCode
+    showStreet = true
 }: IDeviceAddressInputProps) {
     const [regionValue, setRegionValue] = useState<IRegionSelectValue>();
     const [addressText, setAddressText] = useState<string>("");
@@ -78,7 +74,7 @@ function MapAddressInput({
                 const regionInfo = await getRegionByCode(step.code);
                 if (regionInfo) {
                     // 更新城市限制
-                    if (step.level === 'city' || step.level === 'district') {
+                    if (step.level === 'city' || step.level === 'province') {
                         const cityName = regionInfo.cityName || regionInfo.name;
                         setCityLimit(cityName);
                     }
@@ -209,8 +205,6 @@ function MapAddressInput({
                     <div className="mb-4">
                         <Text strong className="block mb-2">3. 地图定位（可搜索或点击选择位置）</Text>
                         <MapView
-                            apiKey={apiKey}
-                            securityJsCode={securityJsCode}
                             defaultCenter={mapCenter}
                             height={height}
                             showSearch={true}

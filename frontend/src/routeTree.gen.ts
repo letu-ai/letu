@@ -34,6 +34,7 @@ import { Route as AdminOrganizationUnitsIndexRouteImport } from './pages/admin/o
 import { Route as AdminOnlineUsersIndexRouteImport } from './pages/admin/online-users/index'
 import { Route as AdminNotificationsIndexRouteImport } from './pages/admin/notifications/index'
 import { Route as AdminMenusIndexRouteImport } from './pages/admin/menus/index'
+import { Route as AdminIntegrationsIndexRouteImport } from './pages/admin/integrations/index'
 import { Route as AdminEmployeesIndexRouteImport } from './pages/admin/employees/index'
 import { Route as AdminEditionsIndexRouteImport } from './pages/admin/editions/index'
 import { Route as AdminDepartmentsIndexRouteImport } from './pages/admin/departments/index'
@@ -190,6 +191,11 @@ const AdminNotificationsIndexRoute = AdminNotificationsIndexRouteImport.update({
 const AdminMenusIndexRoute = AdminMenusIndexRouteImport.update({
   id: '/menus/',
   path: '/menus/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminIntegrationsIndexRoute = AdminIntegrationsIndexRouteImport.update({
+  id: '/integrations/',
+  path: '/integrations/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminEmployeesIndexRoute = AdminEmployeesIndexRouteImport.update({
@@ -390,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/admin/departments': typeof AdminDepartmentsIndexRoute
   '/admin/editions': typeof AdminEditionsIndexRoute
   '/admin/employees': typeof AdminEmployeesIndexRoute
+  '/admin/integrations': typeof AdminIntegrationsIndexRoute
   '/admin/menus': typeof AdminMenusIndexRoute
   '/admin/notifications': typeof AdminNotificationsIndexRoute
   '/admin/online-users': typeof AdminOnlineUsersIndexRoute
@@ -445,6 +452,7 @@ export interface FileRoutesByTo {
   '/admin/departments': typeof AdminDepartmentsIndexRoute
   '/admin/editions': typeof AdminEditionsIndexRoute
   '/admin/employees': typeof AdminEmployeesIndexRoute
+  '/admin/integrations': typeof AdminIntegrationsIndexRoute
   '/admin/menus': typeof AdminMenusIndexRoute
   '/admin/notifications': typeof AdminNotificationsIndexRoute
   '/admin/online-users': typeof AdminOnlineUsersIndexRoute
@@ -503,6 +511,7 @@ export interface FileRoutesById {
   '/admin/departments/': typeof AdminDepartmentsIndexRoute
   '/admin/editions/': typeof AdminEditionsIndexRoute
   '/admin/employees/': typeof AdminEmployeesIndexRoute
+  '/admin/integrations/': typeof AdminIntegrationsIndexRoute
   '/admin/menus/': typeof AdminMenusIndexRoute
   '/admin/notifications/': typeof AdminNotificationsIndexRoute
   '/admin/online-users/': typeof AdminOnlineUsersIndexRoute
@@ -562,6 +571,7 @@ export interface FileRouteTypes {
     | '/admin/departments'
     | '/admin/editions'
     | '/admin/employees'
+    | '/admin/integrations'
     | '/admin/menus'
     | '/admin/notifications'
     | '/admin/online-users'
@@ -617,6 +627,7 @@ export interface FileRouteTypes {
     | '/admin/departments'
     | '/admin/editions'
     | '/admin/employees'
+    | '/admin/integrations'
     | '/admin/menus'
     | '/admin/notifications'
     | '/admin/online-users'
@@ -674,6 +685,7 @@ export interface FileRouteTypes {
     | '/admin/departments/'
     | '/admin/editions/'
     | '/admin/employees/'
+    | '/admin/integrations/'
     | '/admin/menus/'
     | '/admin/notifications/'
     | '/admin/online-users/'
@@ -875,6 +887,13 @@ declare module '@tanstack/react-router' {
       path: '/menus'
       fullPath: '/admin/menus'
       preLoaderRoute: typeof AdminMenusIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/integrations/': {
+      id: '/admin/integrations/'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AdminIntegrationsIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/employees/': {
@@ -1146,6 +1165,7 @@ interface AdminRouteRouteChildren {
   AdminDepartmentsIndexRoute: typeof AdminDepartmentsIndexRoute
   AdminEditionsIndexRoute: typeof AdminEditionsIndexRoute
   AdminEmployeesIndexRoute: typeof AdminEmployeesIndexRoute
+  AdminIntegrationsIndexRoute: typeof AdminIntegrationsIndexRoute
   AdminMenusIndexRoute: typeof AdminMenusIndexRoute
   AdminNotificationsIndexRoute: typeof AdminNotificationsIndexRoute
   AdminOnlineUsersIndexRoute: typeof AdminOnlineUsersIndexRoute
@@ -1179,6 +1199,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminDepartmentsIndexRoute: AdminDepartmentsIndexRoute,
   AdminEditionsIndexRoute: AdminEditionsIndexRoute,
   AdminEmployeesIndexRoute: AdminEmployeesIndexRoute,
+  AdminIntegrationsIndexRoute: AdminIntegrationsIndexRoute,
   AdminMenusIndexRoute: AdminMenusIndexRoute,
   AdminNotificationsIndexRoute: AdminNotificationsIndexRoute,
   AdminOnlineUsersIndexRoute: AdminOnlineUsersIndexRoute,

@@ -1,5 +1,7 @@
 ﻿using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Menus.Dtos;
+using Letu.Basis.Admin.Users;
+using Letu.Basis.Admin.Users.Dtos;
 using Letu.Basis.Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -19,6 +21,7 @@ namespace Letu.Basis.Application;
 public class LetuApplicationConfigurationAppService : AbpApplicationConfigurationAppService, ILetuApplicationConfigurationAppService
 {
     private readonly IMenuItemAppService menuItemAppService;
+    private readonly IUserAppService userAppService;
 
     public LetuApplicationConfigurationAppService(
         IOptions<AbpLocalizationOptions> localizationOptions,
@@ -38,7 +41,8 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
         IOptions<AbpClockOptions> abpClockOptions,
         ICachedObjectExtensionsDtoService cachedObjectExtensionsDtoService,
         IOptions<AbpApplicationConfigurationOptions> options,
-        IMenuItemAppService menuItemAppService)
+        IMenuItemAppService menuItemAppService,
+        IUserAppService userAppService)
         : base(
             localizationOptions,
             multiTenancyOptions,
@@ -60,12 +64,14 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
         )
     {
         this.menuItemAppService = menuItemAppService;
+        this.userAppService = userAppService;
     }
 
     public async Task<LetuApplicationConfigurationDto> GetAsync(LetuApplicationConfigurationRequestOptions options)
     {
         var abpConfig = await base.GetAsync(options);
         var menu = options.ApplicationName == null ? [] : await GetNavigationMenusAsync(options.ApplicationName);
+        var userExtraInfo = await GetUserExtraInfoAsync();
 
         var result = new LetuApplicationConfigurationDto
         {
@@ -82,6 +88,7 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
             ObjectExtensions = abpConfig.ObjectExtensions,
             ExtraProperties = abpConfig.ExtraProperties,
             Menu = menu,
+            UserExtraInfo = userExtraInfo
         };
 
         return result;
@@ -94,5 +101,10 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
 
         var menu = await menuItemAppService.GetNavigationMenuAsync(applicationName);
         return menu;
+    }
+
+    private async Task<UserExtraInfo> GetUserExtraInfoAsync()
+    {
+        return await userAppService.GetUserExtraInfoAsync();
     }
 }
