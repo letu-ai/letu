@@ -10,12 +10,14 @@ using Letu.Server;
 using Letu.Shared.Consts;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -38,6 +40,7 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
 using Volo.Abp.Modularity;
+using Volo.Abp.Security.Claims;
 
 namespace Letu;
 
@@ -74,6 +77,7 @@ public class LetuServerModule : AbpModule
         ConfigureJsonOptions(services, configuration);
         ConfigureLogging(services, configuration);
         ConfigureBlobStoring();
+        ConfigureDynamicClaims();
     }
 
     private void ConfigureDistributedLock(IServiceCollection services, IConfiguration configuration)
@@ -267,6 +271,14 @@ public class LetuServerModule : AbpModule
         });
     }
 
+    private void ConfigureDynamicClaims()
+    {
+        Configure<AbpClaimsPrincipalFactoryOptions>(options =>
+        {
+            options.IsDynamicClaimsEnabled = true; //set it "true" to enable "Dynamic Claims" or "false" to disable it.
+        });
+    }
+
     public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         var app = context.GetApplicationBuilder();
@@ -304,19 +316,25 @@ public class LetuServerModule : AbpModule
         {
             app.UseMultiTenancy();
         }
+        app.UseUnitOfWork();
+        app.UseDynamicClaims();
         app.UseAuthorization();
 
         app.UseConfiguredEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+            // 优先处理未匹配的API请求
+            endpoints.MapFallback("/api/{*any}", context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                return Task.CompletedTask;
+            });
+
+            // 处理其他请求
+            endpoints.MapFallbackToFile("index.html");
         });
 
 
-        ////定时任务
-        //context.ServiceProvider.UseScheduler(sch =>
-        //{
-        //    sch.Schedule<NotificationJob>().EveryMinute().RunOnceAtStart();
-        //});
 
         return base.OnApplicationInitializationAsync(context);
     }

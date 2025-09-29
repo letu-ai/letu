@@ -33,6 +33,8 @@ function LoginPage() {
     const navigate = useNavigate();
     const copyright = getSetting("Letu.Application.Site.Copyright");
     const icp = getSetting("Letu.Application.Site.Icp");
+    const logoText = getSetting("Letu.Application.Site.LogoText");
+    const description = getSetting("Letu.Application.Site.Description");
     const loginSettings = Route.useLoaderData();
     const [switchTenantModelVisible, setSwitchTenantModelVisible] = useState(false);
     const [tenantName, setTenantName] = useState(loginSettings.tenantName);
@@ -130,8 +132,8 @@ function LoginPage() {
                         {/* 左侧背景图 */}
                         <div className="login-bg-side" style={{ backgroundImage: `url(${LoginBg})` }}>
                             <div className="bg-overlay bg-primary/70">
-                                <h2>欢迎使用乐途管理系统</h2>
-                                <p>基于.NET9+React18打造的通用权限管理平台</p>
+                                <h2>欢迎使用{logoText}</h2>
+                                <p>{description}</p>
                             </div>
                         </div>
 

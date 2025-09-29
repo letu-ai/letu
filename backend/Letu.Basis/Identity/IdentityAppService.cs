@@ -10,7 +10,6 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using Volo.Abp;
-using Volo.Abp.Auditing;
 using Volo.Abp.Caching;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.EventBus.Local;
@@ -114,7 +113,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         {
             loginLog.Address = RequestUtils.ResolveAddress(loginLog.Ip);
             loginLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
-            
+
             await localEventBus.PublishAsync(loginLog);
         }
     }
@@ -154,14 +153,14 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         // 获取该会话的 RefreshToken
         var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
         var refreshToken = await refreshTokenCache.GetAsync(sessionKey);
-        
+
         // 删除所有相关缓存
         if (!string.IsNullOrEmpty(refreshToken))
         {
             // 删除 RefreshToken 本身的缓存记录
             await refreshTokenCache.RemoveAsync(refreshToken);
         }
-        
+
         // 删除会话映射和 AccessToken
         await refreshTokenCache.RemoveAsync(sessionKey);
         await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId));
@@ -195,7 +194,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         var randomPart = parts[0];
         Guid userId;
         string sessionId;
-        
+
         try
         {
             userId = Guid.Parse(parts[1]);
@@ -303,7 +302,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
                         // 删除 RefreshToken 本身的缓存记录
                         await refreshTokenCache.RemoveAsync(oldRefreshToken);
                     }
-                    
+
                     await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(user.Id, sid));
                     await refreshTokenCache.RemoveAsync(IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sid));
                 }
@@ -346,7 +345,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
                     AbsoluteExpirationRelativeToNow = refreshTokenExpired
                 }
             );
-            
+
             // 2. userId:sessionId 作为键，值为 RefreshToken（用于会话管理）
             await refreshTokenCache.SetAsync(
                 IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sessionId),

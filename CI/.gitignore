@@ -1,0 +1,30 @@
+# 临时构建目录
+temp/
+build/
+
+# 运行时数据目录
+data/
+
+# 环境配置文件（包含敏感信息）
+.env
+
+# 日志文件
+*.log
+logs/
+
+# 备份文件
+*.backup
+*.bak
+
+# Docker 相关
+.dockerignore
+*.tar
+
+# IDE 配置
+.vs/
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db

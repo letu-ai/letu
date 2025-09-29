@@ -5,7 +5,6 @@ import crossFetch from 'cross-fetch'
 
 export const EventStreamContentType = 'text/event-stream';
 
-const DefaultRetryInterval = 1000;
 const LastEventId = 'last-event-id';
 
 export interface FetchEventSourceInit extends RequestInit {
@@ -86,7 +85,6 @@ export async function fetchEventSource(input: RequestInfo, {
             document.addEventListener('visibilitychange', onVisibilityChange);
         }
 
-        let retryInterval = DefaultRetryInterval;
         let retryTimer = undefined as any | undefined;
         function dispose() {
             if ((typeof document !== 'undefined') && !openWhenHidden) {
@@ -131,8 +129,7 @@ export async function fetchEventSource(input: RequestInfo, {
                     }
                 };
 
-                const handleRetry = (retry: number) => {
-                    retryInterval = retry;
+                const handleRetry = (_retry: number) => {
                 };
 
                 const messagesHandler = getMessages(handleId, handleRetry, onmessage);

@@ -50,6 +50,7 @@ export default function OrganizationUnitSelect({
     return (
         <TreeSelect
             value={value}
+            defaultValue={initialLabel}
             onChange={onChange}
             placeholder={placeholder}
             allowClear={allowClear}

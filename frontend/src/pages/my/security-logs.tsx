@@ -9,7 +9,7 @@ import {
     getSecurityLogStats,
     type ISecurityLogListOutput,
     type ISecurityLogListInput,
-    type SecurityLogStatsDto
+    type ISecurityLogStatsOutput
 } from './-service';
 import { formatTime } from '@/utils/timeUtils';
 
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/my/security-logs')({
 function SecurityLogsPage() {
     const tableRef = useRef<SmartTableRef>(null);
     const { message } = App.useApp();
-    const [stats, setStats] = useState<SecurityLogStatsDto>({
+    const [stats, setStats] = useState<ISecurityLogStatsOutput>({
         todayLoginCount: 0,
         recentLoginIp: '',
         abnormalLoginCount: 0,
@@ -60,7 +60,7 @@ function SecurityLogsPage() {
             title: '设备信息',
             dataIndex: 'device',
             width: 120,
-            render: (device: string, record) => (
+            render: (device: string, record: ISecurityLogListOutput) => (
                 <div>
                     <div className="flex items-center">
                         <LaptopOutlined className="mr-1 text-gray-400" />

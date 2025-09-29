@@ -27,7 +27,6 @@ function DictionaryDetails() {
         {
             title: '值',
             dataIndex: 'value',
-            search: false,
             render: (text: string) => {
                 return <Tag>{text}</Tag>;
             },
@@ -47,7 +46,6 @@ function DictionaryDetails() {
         {
             title: '启用',
             dataIndex: 'isEnabled',
-            search: false,
             render: (text: boolean) => {
                 return <Tag color={text ? 'success' : 'error'}>{text ? '启用' : '禁用'}</Tag>;
             },

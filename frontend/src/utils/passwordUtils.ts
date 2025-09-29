@@ -2,6 +2,8 @@
  * 密码验证相关工具函数
  */
 
+import type { Rule } from 'antd/es/form';
+
 /**
  * 密码配置接口
  */
@@ -258,8 +260,8 @@ export function calculatePasswordStrength(password: string, config: PasswordConf
 /**
  * 生成密码验证规则（用于Ant Design Form）
  */
-export function generatePasswordRules(config: PasswordConfig) {
-  const rules = [
+export function generatePasswordRules(config: PasswordConfig): Rule[] {
+  const rules: Rule[] = [
     {
       required: true,
       message: '请输入密码',

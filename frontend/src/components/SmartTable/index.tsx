@@ -2,7 +2,7 @@ import { Button, Card, Checkbox, Dropdown, Form, type MenuProps, Space, Table, t
 import React, { type ForwardedRef, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import type { SmartTableProps, SmartTableRef } from './type';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import { ColumnHeightOutlined, ReloadOutlined, SettingOutlined, TableOutlined } from '@ant-design/icons';
+import { ColumnHeightOutlined, ReloadOutlined, TableOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import useLayoutStore, { isSizeType } from '@/application/layoutStore';
 

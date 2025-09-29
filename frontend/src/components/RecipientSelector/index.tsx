@@ -95,6 +95,42 @@ const RecipientSelector: React.FC<RecipientSelectorProps> = ({
   // 用于跟踪已经加载过的用户IDs，避免重复请求
   const loadedUserIdsRef = useRef<Set<string>>(new Set());
 
+  const updateValue = useCallback(() => {
+    const sendScopeType = parseInt(activeTab) as SendScopeType;
+    let sendScopeValue: string | undefined;
+
+    switch (sendScopeType) {
+      case SendScopeTypeEnum.SPECIFIC_USERS:
+        sendScopeValue = selectedUsers.join(",");
+        break;
+      case SendScopeTypeEnum.BY_ROLE:
+        sendScopeValue = selectedRoles.join(",");
+        break;
+      case SendScopeTypeEnum.BY_DEPARTMENT:
+        sendScopeValue = selectedDepartments.join(",");
+        break;
+      case SendScopeTypeEnum.BY_POSITION:
+        sendScopeValue = selectedPositions.join(",");
+        break;
+      case SendScopeTypeEnum.ALL_USERS:
+        sendScopeValue = undefined;
+        break;
+    }
+
+    // 检查是否与当前值相同，避免不必要的更新
+    const newValue: RecipientValue = {
+      sendScopeType,
+      sendScopeValue,
+    };
+    
+    // 只有当值真正改变时才触发onChange
+    if (!value || 
+        value.sendScopeType !== newValue.sendScopeType || 
+        value.sendScopeValue !== newValue.sendScopeValue) {
+      onChange?.(newValue);
+    }
+  }, [activeTab, selectedUsers, selectedRoles, selectedDepartments, selectedPositions, onChange, value]);
+
   // 同步外部value到内部状态
   useEffect(() => {
     if (value) {
@@ -230,42 +266,6 @@ const RecipientSelector: React.FC<RecipientSelectorProps> = ({
     }, 300),
     []
   );
-
-  const updateValue = useCallback(() => {
-    const sendScopeType = parseInt(activeTab) as SendScopeType;
-    let sendScopeValue: string | undefined;
-
-    switch (sendScopeType) {
-      case SendScopeTypeEnum.SPECIFIC_USERS:
-        sendScopeValue = selectedUsers.join(",");
-        break;
-      case SendScopeTypeEnum.BY_ROLE:
-        sendScopeValue = selectedRoles.join(",");
-        break;
-      case SendScopeTypeEnum.BY_DEPARTMENT:
-        sendScopeValue = selectedDepartments.join(",");
-        break;
-      case SendScopeTypeEnum.BY_POSITION:
-        sendScopeValue = selectedPositions.join(",");
-        break;
-      case SendScopeTypeEnum.ALL_USERS:
-        sendScopeValue = undefined;
-        break;
-    }
-
-    // 检查是否与当前值相同，避免不必要的更新
-    const newValue: RecipientValue = {
-      sendScopeType,
-      sendScopeValue,
-    };
-    
-    // 只有当值真正改变时才触发onChange
-    if (!value || 
-        value.sendScopeType !== newValue.sendScopeType || 
-        value.sendScopeValue !== newValue.sendScopeValue) {
-      onChange?.(newValue);
-    }
-  }, [activeTab, selectedUsers, selectedRoles, selectedDepartments, selectedPositions, onChange, value]);
 
   // 转换部门数据为TreeSelect格式，只选择部门节点（type=1）
   const departmentTreeData = useMemo(() => {

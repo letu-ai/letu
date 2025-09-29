@@ -1,4 +1,4 @@
-import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider, ColorPicker } from 'antd';
+import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider } from 'antd';
 import {
     GithubOutlined,
     BookOutlined,
@@ -12,7 +12,7 @@ import {
 import './index.scss';
 import { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import useThemeStore from '@/application/themeStore';
+import '@/application/themeStore';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/home/')({

@@ -87,7 +87,7 @@ const AddressPicker: React.FC<IAddressPickerProps> = ({
     };
 
     // 处理选择搜索结果
-    const handleSelect = (selectedValue: string, option: any) => {
+    const handleSelect = (_selectedValue: string, option: any) => {
         const poi = option.poi as IAmapPoi;
         if (poi) {
             isSelecting.current = true;

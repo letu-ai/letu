@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Card, Button, Input, Slider, Typography, App } from 'antd';
 import { MapView } from '@/components/amap';

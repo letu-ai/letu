@@ -20,6 +20,10 @@ function TenantInvalidPage() {
     const handleSwitchTenantClose = () => {
         setSwitchTenantModelVisible(false);
     }
+    
+    const handleSwitchTenantOk = () => {
+        setSwitchTenantModelVisible(false);
+    }
 
     const handleClearTenant = () => {
         // 清空当前认证信息
@@ -69,7 +73,11 @@ function TenantInvalidPage() {
             </Card>
 
 
-            <SwitchTenantModel visible={switchTenantModelVisible} onClose={handleSwitchTenantClose} />
+            <SwitchTenantModel
+                visible={switchTenantModelVisible}
+                onClose={handleSwitchTenantClose}
+                onOk={handleSwitchTenantOk}
+            />
         </div>
     );
 }

@@ -76,8 +76,21 @@ namespace Letu.Basis.Admin.Users
 
             var user = await userRepository.Where(x => x.Id == id).FirstAsync()
                 ?? throw HttpFriendlyException.NotFound($"用户ID:{id}不存在。");
+
             ObjectMapper.Map(input, user);
             await userRepository.UpdateAsync(user);
+
+            // 发布用户更新事件
+            var userUpdatedEto = new EntityUpdatedEto<UserEto>(new UserEto()
+            {
+                Id = id,
+                UserName = user.UserName,
+                TenantId = user.TenantId,
+                Name = user.NickName,
+                IsActive = user.IsEnabled
+            });
+
+            await eventBus.PublishAsync(userUpdatedEto);
 
             return user.Id;
         }

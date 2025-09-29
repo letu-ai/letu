@@ -1,4 +1,4 @@
-import { Modal, Button, Space, Alert, Typography, Input, Progress, Switch, Divider } from "antd";
+import { Modal, Button, Space, Alert, Typography, Input, Progress, Switch } from "antd";
 import { ImportOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { importFromAmap, getImportProgress, type IRegionImportProgress } from "./-service";

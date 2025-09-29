@@ -9,9 +9,9 @@ import {
 } from "./-service";
 
 import { ImportOutlined } from "@ant-design/icons";
-import { Button, Tag, App, type TableColumnsType } from "antd";
+import { Button, Tag, App } from "antd";
 import { useRef, useState, useEffect, useCallback } from "react";
-import type { SmartTableRef } from "@/components/SmartTable/type.ts";
+import type { SmartTableColumnType, SmartTableRef } from "@/components/SmartTable/type.ts";
 import SmartTable from "@/components/SmartTable";
 import RegionImport, { type ImportModalRef } from "./-RegionImport";
 
@@ -157,7 +157,7 @@ function RegionList() {
         }
     }, [error, message]);
 
-    const columns: TableColumnsType<IRegionTreeNode> = [
+    const columns: SmartTableColumnType<IRegionTreeNode>[] = [
         {
             title: "区域名称",
             dataIndex: "name",

@@ -7,7 +7,6 @@ import {
     getUserList,
     switchUserEnabledStatus,
     type UserListOutput,
-    type IUserListInput,
 } from '@/pages/admin/users/-service';
 import UserEditForm, { type ModalRef } from './-UserModal';
 import AssignRoleForm, { type AssignRoleFormRef } from "./-AssignRoleForm";

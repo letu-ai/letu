@@ -92,7 +92,6 @@ function SiteSettings() {
                     label="网站URL"
                     rules={[
                         { type: 'url', message: '请输入正确的URL' },
-                        { required: true, message: '请输入站点URL' }
                     ]}
                     extra="用于生成对外分享链接时使用，例如：https://www.example.com"
                 >

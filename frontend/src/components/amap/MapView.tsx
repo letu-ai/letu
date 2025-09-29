@@ -93,12 +93,10 @@ function MapView({
 
                 // 如果点击位置附近有POI，使用最近的POI信息
                 let finalAddress = formattedAddress;
-                let poiName = '';
 
                 if (pois && pois.length > 0) {
                     // 使用第一个POI（通常是最近的）
                     const nearestPoi = pois[0];
-                    poiName = nearestPoi.name;
                     // 如果POI有详细地址，使用POI的地址，否则使用POI名称+格式化地址
                     finalAddress = nearestPoi.address || `${nearestPoi.name} (${formattedAddress})`;
                 }

@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  app:
+    image: letu:latest
+    container_name: letu-app
+    ports:
+      - "5000:80"
+    environment:
+      # 数据库连接字符串
+      # 注意：如果数据库也在 Docker 中，Host 应该使用服务名称（如下面的 postgres）
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=letu;User ID=postgres;Password=postgres123;
+
+      # Redis 连接配置
+      # 注意：如果 Redis 也在 Docker 中，使用服务名称（如下面的 redis）
+      # 格式：host:port,password=密码
+      - Redis__Configuration=redis:6379,password=redis123
+
+      # 运行环境
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - TZ=Asia/Shanghai
+
+    volumes:
+      # 应用日志目录
+      - ./data/app/logs:/app/logs
+
+      # 上传文件存储目录（OSS本地存储）
+      - ./data/app/blobs:/app/blobs
+
+      # 应用配置文件（可选，用于覆盖容器内的配置）
+      # - ./config/appsettings.Docker.json:/app/appsettings.Docker.json:ro
+
+    networks:
+      - letu-network
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  # PostgreSQL 数据库（可选，如果你已有外部数据库可以注释掉）
+  postgres:
+    image: bitnami/postgresql:latest
+    container_name: letu-postgres
+    environment:
+      - POSTGRES_DB=letu
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      # PostgreSQL 配置
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+      - TZ=Asia/Shanghai
+    volumes:
+      # 数据库数据目录（持久化到主机）
+      - ./data/postgres/data:/bitnami/postgresql
+
+      # 备份目录
+      - ./data/postgres/backup:/backup
+    ports:
+      - "5432:5432"
+    networks:
+      - letu-network
+    restart: unless-stopped
+
+  # Redis 缓存（可选，如果你已有外部 Redis 可以注释掉）
+  redis:
+    image: redis:latest
+    container_name: letu-redis
+    command: redis-server --appendonly yes --requirepass redis123
+    environment:
+      - TZ=Asia/Shanghai
+    # ports:
+    #   - "6379:6379"
+    volumes:
+      # Redis 数据持久化目录
+      - ./data/redis/data:/data
+
+      # Redis 配置文件（可选）
+      # - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - letu-network
+    restart: unless-stopped
+
+networks:
+  letu-network:
+    driver: bridge

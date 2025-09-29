@@ -24,10 +24,6 @@ const settingsMenu = [
         label: "时区",
     },
     {
-        key: "amap",
-        label: "高德地图",
-    },
-    {
         key: "feature",
         label: "功能管理",
     },

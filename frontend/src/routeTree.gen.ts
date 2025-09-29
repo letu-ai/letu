@@ -48,7 +48,6 @@ import { Route as AdminSettingsTimezoneRouteImport } from './pages/admin/setting
 import { Route as AdminSettingsSiteRouteImport } from './pages/admin/settings/site'
 import { Route as AdminSettingsFeatureRouteImport } from './pages/admin/settings/feature'
 import { Route as AdminSettingsEmailingRouteImport } from './pages/admin/settings/emailing'
-import { Route as AdminSettingsAmapRouteImport } from './pages/admin/settings/amap'
 import { Route as AdminSettingsAccountRouteImport } from './pages/admin/settings/account'
 import { Route as AdminPositionsGroupsRouteImport } from './pages/admin/positions/groups'
 import { Route as AdminNotificationsNotificationRouteImport } from './pages/admin/notifications/notification'
@@ -264,11 +263,6 @@ const AdminSettingsEmailingRoute = AdminSettingsEmailingRouteImport.update({
   path: '/emailing',
   getParentRoute: () => AdminSettingsRouteRoute,
 } as any)
-const AdminSettingsAmapRoute = AdminSettingsAmapRouteImport.update({
-  id: '/amap',
-  path: '/amap',
-  getParentRoute: () => AdminSettingsRouteRoute,
-} as any)
 const AdminSettingsAccountRoute = AdminSettingsAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -382,7 +376,6 @@ export interface FileRoutesByFullPath {
   '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
-  '/admin/settings/amap': typeof AdminSettingsAmapRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
@@ -438,7 +431,6 @@ export interface FileRoutesByTo {
   '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
-  '/admin/settings/amap': typeof AdminSettingsAmapRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
@@ -497,7 +489,6 @@ export interface FileRoutesById {
   '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
-  '/admin/settings/amap': typeof AdminSettingsAmapRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
   '/admin/settings/feature': typeof AdminSettingsFeatureRoute
   '/admin/settings/site': typeof AdminSettingsSiteRoute
@@ -557,7 +548,6 @@ export interface FileRouteTypes {
     | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
-    | '/admin/settings/amap'
     | '/admin/settings/emailing'
     | '/admin/settings/feature'
     | '/admin/settings/site'
@@ -613,7 +603,6 @@ export interface FileRouteTypes {
     | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
-    | '/admin/settings/amap'
     | '/admin/settings/emailing'
     | '/admin/settings/feature'
     | '/admin/settings/site'
@@ -671,7 +660,6 @@ export interface FileRouteTypes {
     | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
-    | '/admin/settings/amap'
     | '/admin/settings/emailing'
     | '/admin/settings/feature'
     | '/admin/settings/site'
@@ -987,13 +975,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsEmailingRouteImport
       parentRoute: typeof AdminSettingsRouteRoute
     }
-    '/admin/settings/amap': {
-      id: '/admin/settings/amap'
-      path: '/amap'
-      fullPath: '/admin/settings/amap'
-      preLoaderRoute: typeof AdminSettingsAmapRouteImport
-      parentRoute: typeof AdminSettingsRouteRoute
-    }
     '/admin/settings/account': {
       id: '/admin/settings/account'
       path: '/account'
@@ -1127,7 +1108,6 @@ const AccountRouteRouteWithChildren = AccountRouteRoute._addFileChildren(
 
 interface AdminSettingsRouteRouteChildren {
   AdminSettingsAccountRoute: typeof AdminSettingsAccountRoute
-  AdminSettingsAmapRoute: typeof AdminSettingsAmapRoute
   AdminSettingsEmailingRoute: typeof AdminSettingsEmailingRoute
   AdminSettingsFeatureRoute: typeof AdminSettingsFeatureRoute
   AdminSettingsSiteRoute: typeof AdminSettingsSiteRoute
@@ -1137,7 +1117,6 @@ interface AdminSettingsRouteRouteChildren {
 
 const AdminSettingsRouteRouteChildren: AdminSettingsRouteRouteChildren = {
   AdminSettingsAccountRoute: AdminSettingsAccountRoute,
-  AdminSettingsAmapRoute: AdminSettingsAmapRoute,
   AdminSettingsEmailingRoute: AdminSettingsEmailingRoute,
   AdminSettingsFeatureRoute: AdminSettingsFeatureRoute,
   AdminSettingsSiteRoute: AdminSettingsSiteRoute,

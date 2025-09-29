@@ -15,6 +15,26 @@ public class Program
 
         builder.Host.UseLetuLogging();
         builder.Host.UseAutofac();
+        if (builder.Environment.IsEnvironment("Docker"))
+        {
+            // 添加此代码块显式禁用 HTTPS
+            builder.WebHost.ConfigureKestrel(serverOptions =>
+            {
+                // 清除所有默认端点配置
+                serverOptions.ConfigureEndpointDefaults(options =>
+                {
+
+                });
+                serverOptions.ListenAnyIP(80); // 监听所有 IP 的 80 端口
+
+            });
+
+            // 添加此配置禁用 HTTPS 重定向
+            builder.Services.Configure<Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionOptions>(options =>
+            {
+                options.HttpsPort = null;
+            });
+        }
 
         await builder.AddApplicationAsync<LetuServerModule>();
 

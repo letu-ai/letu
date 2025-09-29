@@ -2,7 +2,7 @@
   "culture": "zh-Hans",
   "texts": {
     "Feature:AI": "AI功能",
-    "Feature:AI.Description": "大模型AI应用"
+    "Feature:AI.Description": "大模型AI应用",
 
     "Permission:FastGpt": "FastGPT",
     "Permission:RagFlow": "RAGFlow"

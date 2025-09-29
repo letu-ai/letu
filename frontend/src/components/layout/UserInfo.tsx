@@ -8,8 +8,6 @@ import { getApiBaseUrl } from '@/utils/urlUtils';
 const { Text } = Typography
 
 export function UserInfo() {
-    const config = useAppConfig();
-    console.log(config)
     const { currentUser: user, userExtraInfo } = useAppConfig();
 
     const menuItems: MenuProps["items"] = [
