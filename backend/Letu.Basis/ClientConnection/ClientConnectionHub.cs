@@ -110,6 +110,15 @@ public class ClientConnectionHub : IClientConnectionHub, ISingletonDependency
         }
     }
 
+    public async Task SendMessageToUsersAsync<T>(List<Guid> userIds, string type, T? payload)
+    {
+        var tasks = userIds.Select(async userId =>
+        {
+            await SendMessageToUserAsync(userId, type, payload);
+        });
+        await Task.WhenAll(tasks);
+    }
+
     public async Task SendMessageToAllAsync<T>(string type, T? payload)
     {
         var tasks = connections.Keys.Select(async connectionId =>

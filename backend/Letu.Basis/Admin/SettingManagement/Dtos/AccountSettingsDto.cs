@@ -106,6 +106,11 @@ public class AccountSettingsDto
     /// </summary>
     public bool SignInAllowMultipleLogin { get; set; }
 
+    /// <summary>
+    /// 登录时记住我时长(天)
+    /// </summary>
+    public int SignInRememberMeDurationDays { get; set; }
+
     // User * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     /// <summary>

@@ -51,7 +51,7 @@ const UserNotification = () => {
         return () => {
             clientConnection.off('notification', handleNewNotification);
         };
-    }, [notification]);
+    }, []);
 
 
 

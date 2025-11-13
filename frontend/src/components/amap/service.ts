@@ -232,7 +232,41 @@ export interface IMapMarker {
     location: IMapLocation;
     title?: string;
     content?: string;
+    icon?: string | IMarkerIcon;  // 自定义图标
     draggable?: boolean;
+    extData?: any;  // 扩展数据
+}
+
+// 标记图标配置
+export interface IMarkerIcon {
+    size?: [number, number];  // 图标尺寸
+    image?: string;  // 图标图片地址
+    imageSize?: [number, number];  // 图标显示大小
+    imageOffset?: [number, number];  // 图标偏移量
+}
+
+// 聚合配置选项
+export interface IClusterOptions {
+    gridSize?: number;  // 聚合计算时网格的像素大小，默认60
+    maxZoom?: number;  // 最大的聚合级别，大于该级别就不进行相应的聚合
+    averageCenter?: boolean;  // 是否平均聚合点的位置
+    renderClusterMarker?: (context: IClusterContext) => any;  // 自定义聚合点样式
+    renderMarker?: (context: IMarkerContext) => any;  // 自定义非聚合点样式
+    minClusterSize?: number;  // 最小聚合数量，默认2
+}
+
+// 聚合点上下文
+export interface IClusterContext {
+    count: number;  // 聚合点包含的标记数量
+    markers: any[];  // 聚合点包含的标记
+    marker: any;  // 聚合点标记实例
+    clusterData: any[];  // 聚合数据
+}
+
+// 标记上下文
+export interface IMarkerContext {
+    marker: any;  // 标记实例
+    data: IMapMarker;  // 标记数据
 }
 
 export interface IMapDisplayProps {

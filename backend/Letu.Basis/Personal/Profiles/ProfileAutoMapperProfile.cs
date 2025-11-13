@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Letu.Basis.Admin.Users;
-using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Personal.Profiles.Dtos;
 using Volo.Abp.AutoMapper;
+using Letu.Logging.SecurtyLogs;
 
 namespace Letu.Basis.Personal.Profiles
 {

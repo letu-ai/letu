@@ -39,12 +39,5 @@ namespace Letu.Basis.Admin.Roles
         /// </summary>
         /// <returns></returns>
         Task<List<SelectOption>> GetRoleOptionsAsync();
-
-        /// <summary>
-        /// 获取指定角色菜单
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<Guid[]> GetRoleMenuIdsAsync(Guid id);
     }
 }

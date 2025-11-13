@@ -2,8 +2,6 @@ using Letu.Basis.Admin.Departments;
 using Letu.Basis.Admin.Departments.Dtos;
 using Letu.Basis.Permissions;
 using Letu.Core.Applications;
-
-using Letu.Logging;
 using Letu.Shared.Consts;
 
 using Microsoft.AspNetCore.Authorization;
@@ -69,7 +67,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
         [Authorize(BasisPermissions.Department.Delete)]
-        [ApiAccessLog(operateName: "删除部门", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteDeptAsync(Guid id)
         {
             await _deptService.DeleteDeptAsync(id);

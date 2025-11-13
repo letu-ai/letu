@@ -1,12 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net;
-using Volo.Abp.Application.Dtos;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.Validation;
+using Letu.Core.Applications;
 
 namespace Letu.Basis.Admin.AuditLogging.AuditLogs.Dtos;
 
-public class GetAuditLogListInput : PagedAndSortedResultRequestDto
+public class GetAuditLogListInput : PagedResultRequest
 {
     /// <summary>
     /// 开始时间

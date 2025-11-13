@@ -14,6 +14,13 @@ namespace Letu.Basis.Admin.Roles
     [Table(Name = "sys_role")]
     public class Role : FullAuditedEntity<Guid>, IMultiTenant
     {
+        
+        /// <summary>
+        /// 租户ID
+        /// </summary>
+        [Column(IsNullable = true, StringLength = 18)]
+        public Guid? TenantId { get; set; }
+        
         /// <summary>
         /// 角色名
         /// </summary>
@@ -30,30 +37,25 @@ namespace Letu.Basis.Admin.Roles
         public string? Remark { get; set; }
 
         /// <summary>
-        /// 数据权限类型
+        /// 新建用户默认分配的角色
         /// </summary>
-        public int PowerDataType { get; set; } = 0;
+        public virtual bool IsDefault { get; set; }
+
+        /// <summary>
+        /// 静态角色，系统内置不能删除和修改的角色
+        /// </summary>
+        public virtual bool IsStatic { get; set; }
+
+        /// <summary>
+        /// 用户可以查看其他用户的公共角色。一些特殊角色如“超级管理员”不允许被设置为公共角色。
+        /// </summary>
+        public virtual bool IsPublic { get; set; }
 
         /// <summary>
         /// 用户角色
         /// </summary>
         public virtual ICollection<UserInRole>? Users { get; set; }
 
-        /// <summary>
-        /// 角色菜单
-        /// </summary>
-        public virtual ICollection<MenuInRole>? Menus { get; set; }
-
-        /// <summary>
-        /// 角色查看部门（数据权限类型=1时，指定部门时才存入）
-        /// </summary>
-        public virtual ICollection<DepartmentInRole>? Departments { get; set; }
-
-        /// <summary>
-        /// 租户ID
-        /// </summary>
-        [Column(IsNullable = true, StringLength = 18)]
-        public Guid? TenantId { get; set; }
 
         /// <summary>
         /// 是否启用

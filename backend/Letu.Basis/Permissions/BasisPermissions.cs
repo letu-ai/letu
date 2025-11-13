@@ -219,6 +219,17 @@ public static class BasisPermissions
         public const string Log = Default + ".Log";
     }
 
+    public static class Logging
+    {
+        public const string Default = SettingGroupName + ".Logging";
+        public const string OnlineUser = Default + ".OnlineUser";
+        public const string ScheduledTask = Default + ".ScheduledTask";
+        public const string Integration = Default + ".Integration";
+        public const string SecurityLog = Default + ".SecurityLog";
+        public const string BusinessLog = Default + ".BusinessLog";
+        public const string AuditLog = Default + ".AuditLog";
+    }   
+
     // 第三方集成管理
     public static class Integration{
         /// <summary>

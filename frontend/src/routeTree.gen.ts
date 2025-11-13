@@ -42,6 +42,7 @@ import { Route as AdminDataDictionariesIndexRouteImport } from './pages/admin/da
 import { Route as MyNotificationsIdRouteImport } from './pages/my/notifications/$id'
 import { Route as HomeDemoRegionSelectRouteImport } from './pages/home/demo/region-select'
 import { Route as HomeDemoMapViewRouteImport } from './pages/home/demo/map-view'
+import { Route as HomeDemoMapMarkersRouteImport } from './pages/home/demo/map-markers'
 import { Route as HomeDemoMapAddressInputRouteImport } from './pages/home/demo/map-address-input'
 import { Route as HomeDemoAddressPickerRouteImport } from './pages/home/demo/address-picker'
 import { Route as AdminSettingsTimezoneRouteImport } from './pages/admin/settings/timezone'
@@ -54,12 +55,10 @@ import { Route as AdminNotificationsNotificationRouteImport } from './pages/admi
 import { Route as AdminNotificationsIdRouteImport } from './pages/admin/notifications/$id'
 import { Route as AdminMenusAppNameRouteImport } from './pages/admin/menus/$appName'
 import { Route as AdminLoggingsSecurityRouteImport } from './pages/admin/loggings/security'
-import { Route as AdminLoggingsExceptionRouteImport } from './pages/admin/loggings/exception'
 import { Route as AdminLoggingsBusinessRouteImport } from './pages/admin/loggings/business'
-import { Route as AdminLoggingsAuditlogRouteImport } from './pages/admin/loggings/auditlog'
-import { Route as AdminLoggingsAccessRouteImport } from './pages/admin/loggings/access'
 import { Route as AdminEmployeesEmployeeRouteImport } from './pages/admin/employees/employee'
 import { Route as AdminDataDictionariesNameRouteImport } from './pages/admin/data-dictionaries/$name'
+import { Route as AdminLoggingsAuditLogRouteRouteImport } from './pages/admin/loggings/auditLog/route'
 import { Route as AdminLoggingsAuditLogRequestIndexRouteImport } from './pages/admin/loggings/auditLog/request/index'
 import { Route as AdminLoggingsAuditLogEntityIndexRouteImport } from './pages/admin/loggings/auditLog/entity/index'
 import { Route as AdminLoggingsAuditLogRequestIdRouteImport } from './pages/admin/loggings/auditLog/request/$id'
@@ -233,6 +232,11 @@ const HomeDemoMapViewRoute = HomeDemoMapViewRouteImport.update({
   path: '/demo/map-view',
   getParentRoute: () => HomeRouteRoute,
 } as any)
+const HomeDemoMapMarkersRoute = HomeDemoMapMarkersRouteImport.update({
+  id: '/demo/map-markers',
+  path: '/demo/map-markers',
+  getParentRoute: () => HomeRouteRoute,
+} as any)
 const HomeDemoMapAddressInputRoute = HomeDemoMapAddressInputRouteImport.update({
   id: '/demo/map-address-input',
   path: '/demo/map-address-input',
@@ -294,24 +298,9 @@ const AdminLoggingsSecurityRoute = AdminLoggingsSecurityRouteImport.update({
   path: '/loggings/security',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminLoggingsExceptionRoute = AdminLoggingsExceptionRouteImport.update({
-  id: '/loggings/exception',
-  path: '/loggings/exception',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const AdminLoggingsBusinessRoute = AdminLoggingsBusinessRouteImport.update({
   id: '/loggings/business',
   path: '/loggings/business',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLoggingsAuditlogRoute = AdminLoggingsAuditlogRouteImport.update({
-  id: '/loggings/auditlog',
-  path: '/loggings/auditlog',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLoggingsAccessRoute = AdminLoggingsAccessRouteImport.update({
-  id: '/loggings/access',
-  path: '/loggings/access',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminEmployeesEmployeeRoute = AdminEmployeesEmployeeRouteImport.update({
@@ -325,29 +314,35 @@ const AdminDataDictionariesNameRoute =
     path: '/data-dictionaries/$name',
     getParentRoute: () => AdminRouteRoute,
   } as any)
+const AdminLoggingsAuditLogRouteRoute =
+  AdminLoggingsAuditLogRouteRouteImport.update({
+    id: '/loggings/auditLog',
+    path: '/loggings/auditLog',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
 const AdminLoggingsAuditLogRequestIndexRoute =
   AdminLoggingsAuditLogRequestIndexRouteImport.update({
-    id: '/loggings/auditLog/request/',
-    path: '/loggings/auditLog/request/',
-    getParentRoute: () => AdminRouteRoute,
+    id: '/request/',
+    path: '/request/',
+    getParentRoute: () => AdminLoggingsAuditLogRouteRoute,
   } as any)
 const AdminLoggingsAuditLogEntityIndexRoute =
   AdminLoggingsAuditLogEntityIndexRouteImport.update({
-    id: '/loggings/auditLog/entity/',
-    path: '/loggings/auditLog/entity/',
-    getParentRoute: () => AdminRouteRoute,
+    id: '/entity/',
+    path: '/entity/',
+    getParentRoute: () => AdminLoggingsAuditLogRouteRoute,
   } as any)
 const AdminLoggingsAuditLogRequestIdRoute =
   AdminLoggingsAuditLogRequestIdRouteImport.update({
-    id: '/loggings/auditLog/request/$id',
-    path: '/loggings/auditLog/request/$id',
-    getParentRoute: () => AdminRouteRoute,
+    id: '/request/$id',
+    path: '/request/$id',
+    getParentRoute: () => AdminLoggingsAuditLogRouteRoute,
   } as any)
 const AdminLoggingsAuditLogEntityIdRoute =
   AdminLoggingsAuditLogEntityIdRouteImport.update({
-    id: '/loggings/auditLog/entity/$id',
-    path: '/loggings/auditLog/entity/$id',
-    getParentRoute: () => AdminRouteRoute,
+    id: '/entity/$id',
+    path: '/entity/$id',
+    getParentRoute: () => AdminLoggingsAuditLogRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -364,12 +359,10 @@ export interface FileRoutesByFullPath {
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
   '/home/': typeof HomeIndexRoute
+  '/admin/loggings/auditLog': typeof AdminLoggingsAuditLogRouteRouteWithChildren
   '/admin/data-dictionaries/$name': typeof AdminDataDictionariesNameRoute
   '/admin/employees/employee': typeof AdminEmployeesEmployeeRoute
-  '/admin/loggings/access': typeof AdminLoggingsAccessRoute
-  '/admin/loggings/auditlog': typeof AdminLoggingsAuditlogRoute
   '/admin/loggings/business': typeof AdminLoggingsBusinessRoute
-  '/admin/loggings/exception': typeof AdminLoggingsExceptionRoute
   '/admin/loggings/security': typeof AdminLoggingsSecurityRoute
   '/admin/menus/$appName': typeof AdminMenusAppNameRoute
   '/admin/notifications/$id': typeof AdminNotificationsIdRoute
@@ -382,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
   '/home/demo/address-picker': typeof HomeDemoAddressPickerRoute
   '/home/demo/map-address-input': typeof HomeDemoMapAddressInputRoute
+  '/home/demo/map-markers': typeof HomeDemoMapMarkersRoute
   '/home/demo/map-view': typeof HomeDemoMapViewRoute
   '/home/demo/region-select': typeof HomeDemoRegionSelectRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
@@ -419,12 +413,10 @@ export interface FileRoutesByTo {
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
   '/home': typeof HomeIndexRoute
+  '/admin/loggings/auditLog': typeof AdminLoggingsAuditLogRouteRouteWithChildren
   '/admin/data-dictionaries/$name': typeof AdminDataDictionariesNameRoute
   '/admin/employees/employee': typeof AdminEmployeesEmployeeRoute
-  '/admin/loggings/access': typeof AdminLoggingsAccessRoute
-  '/admin/loggings/auditlog': typeof AdminLoggingsAuditlogRoute
   '/admin/loggings/business': typeof AdminLoggingsBusinessRoute
-  '/admin/loggings/exception': typeof AdminLoggingsExceptionRoute
   '/admin/loggings/security': typeof AdminLoggingsSecurityRoute
   '/admin/menus/$appName': typeof AdminMenusAppNameRoute
   '/admin/notifications/$id': typeof AdminNotificationsIdRoute
@@ -437,6 +429,7 @@ export interface FileRoutesByTo {
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
   '/home/demo/address-picker': typeof HomeDemoAddressPickerRoute
   '/home/demo/map-address-input': typeof HomeDemoMapAddressInputRoute
+  '/home/demo/map-markers': typeof HomeDemoMapMarkersRoute
   '/home/demo/map-view': typeof HomeDemoMapViewRoute
   '/home/demo/region-select': typeof HomeDemoRegionSelectRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
@@ -477,12 +470,10 @@ export interface FileRoutesById {
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
   '/home/': typeof HomeIndexRoute
+  '/admin/loggings/auditLog': typeof AdminLoggingsAuditLogRouteRouteWithChildren
   '/admin/data-dictionaries/$name': typeof AdminDataDictionariesNameRoute
   '/admin/employees/employee': typeof AdminEmployeesEmployeeRoute
-  '/admin/loggings/access': typeof AdminLoggingsAccessRoute
-  '/admin/loggings/auditlog': typeof AdminLoggingsAuditlogRoute
   '/admin/loggings/business': typeof AdminLoggingsBusinessRoute
-  '/admin/loggings/exception': typeof AdminLoggingsExceptionRoute
   '/admin/loggings/security': typeof AdminLoggingsSecurityRoute
   '/admin/menus/$appName': typeof AdminMenusAppNameRoute
   '/admin/notifications/$id': typeof AdminNotificationsIdRoute
@@ -495,6 +486,7 @@ export interface FileRoutesById {
   '/admin/settings/timezone': typeof AdminSettingsTimezoneRoute
   '/home/demo/address-picker': typeof HomeDemoAddressPickerRoute
   '/home/demo/map-address-input': typeof HomeDemoMapAddressInputRoute
+  '/home/demo/map-markers': typeof HomeDemoMapMarkersRoute
   '/home/demo/map-view': typeof HomeDemoMapViewRoute
   '/home/demo/region-select': typeof HomeDemoRegionSelectRoute
   '/my/notifications/$id': typeof MyNotificationsIdRoute
@@ -536,12 +528,10 @@ export interface FileRouteTypes {
     | '/my/profile'
     | '/my/security-logs'
     | '/home/'
+    | '/admin/loggings/auditLog'
     | '/admin/data-dictionaries/$name'
     | '/admin/employees/employee'
-    | '/admin/loggings/access'
-    | '/admin/loggings/auditlog'
     | '/admin/loggings/business'
-    | '/admin/loggings/exception'
     | '/admin/loggings/security'
     | '/admin/menus/$appName'
     | '/admin/notifications/$id'
@@ -554,6 +544,7 @@ export interface FileRouteTypes {
     | '/admin/settings/timezone'
     | '/home/demo/address-picker'
     | '/home/demo/map-address-input'
+    | '/home/demo/map-markers'
     | '/home/demo/map-view'
     | '/home/demo/region-select'
     | '/my/notifications/$id'
@@ -591,12 +582,10 @@ export interface FileRouteTypes {
     | '/my/profile'
     | '/my/security-logs'
     | '/home'
+    | '/admin/loggings/auditLog'
     | '/admin/data-dictionaries/$name'
     | '/admin/employees/employee'
-    | '/admin/loggings/access'
-    | '/admin/loggings/auditlog'
     | '/admin/loggings/business'
-    | '/admin/loggings/exception'
     | '/admin/loggings/security'
     | '/admin/menus/$appName'
     | '/admin/notifications/$id'
@@ -609,6 +598,7 @@ export interface FileRouteTypes {
     | '/admin/settings/timezone'
     | '/home/demo/address-picker'
     | '/home/demo/map-address-input'
+    | '/home/demo/map-markers'
     | '/home/demo/map-view'
     | '/home/demo/region-select'
     | '/my/notifications/$id'
@@ -648,12 +638,10 @@ export interface FileRouteTypes {
     | '/my/profile'
     | '/my/security-logs'
     | '/home/'
+    | '/admin/loggings/auditLog'
     | '/admin/data-dictionaries/$name'
     | '/admin/employees/employee'
-    | '/admin/loggings/access'
-    | '/admin/loggings/auditlog'
     | '/admin/loggings/business'
-    | '/admin/loggings/exception'
     | '/admin/loggings/security'
     | '/admin/menus/$appName'
     | '/admin/notifications/$id'
@@ -666,6 +654,7 @@ export interface FileRouteTypes {
     | '/admin/settings/timezone'
     | '/home/demo/address-picker'
     | '/home/demo/map-address-input'
+    | '/home/demo/map-markers'
     | '/home/demo/map-view'
     | '/home/demo/region-select'
     | '/my/notifications/$id'
@@ -933,6 +922,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeDemoMapViewRouteImport
       parentRoute: typeof HomeRouteRoute
     }
+    '/home/demo/map-markers': {
+      id: '/home/demo/map-markers'
+      path: '/demo/map-markers'
+      fullPath: '/home/demo/map-markers'
+      preLoaderRoute: typeof HomeDemoMapMarkersRouteImport
+      parentRoute: typeof HomeRouteRoute
+    }
     '/home/demo/map-address-input': {
       id: '/home/demo/map-address-input'
       path: '/demo/map-address-input'
@@ -1017,32 +1013,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoggingsSecurityRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/loggings/exception': {
-      id: '/admin/loggings/exception'
-      path: '/loggings/exception'
-      fullPath: '/admin/loggings/exception'
-      preLoaderRoute: typeof AdminLoggingsExceptionRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/admin/loggings/business': {
       id: '/admin/loggings/business'
       path: '/loggings/business'
       fullPath: '/admin/loggings/business'
       preLoaderRoute: typeof AdminLoggingsBusinessRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/loggings/auditlog': {
-      id: '/admin/loggings/auditlog'
-      path: '/loggings/auditlog'
-      fullPath: '/admin/loggings/auditlog'
-      preLoaderRoute: typeof AdminLoggingsAuditlogRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/loggings/access': {
-      id: '/admin/loggings/access'
-      path: '/loggings/access'
-      fullPath: '/admin/loggings/access'
-      preLoaderRoute: typeof AdminLoggingsAccessRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/employees/employee': {
@@ -1059,33 +1034,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDataDictionariesNameRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/loggings/auditLog': {
+      id: '/admin/loggings/auditLog'
+      path: '/loggings/auditLog'
+      fullPath: '/admin/loggings/auditLog'
+      preLoaderRoute: typeof AdminLoggingsAuditLogRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/loggings/auditLog/request/': {
       id: '/admin/loggings/auditLog/request/'
-      path: '/loggings/auditLog/request'
+      path: '/request'
       fullPath: '/admin/loggings/auditLog/request'
       preLoaderRoute: typeof AdminLoggingsAuditLogRequestIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
+      parentRoute: typeof AdminLoggingsAuditLogRouteRoute
     }
     '/admin/loggings/auditLog/entity/': {
       id: '/admin/loggings/auditLog/entity/'
-      path: '/loggings/auditLog/entity'
+      path: '/entity'
       fullPath: '/admin/loggings/auditLog/entity'
       preLoaderRoute: typeof AdminLoggingsAuditLogEntityIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
+      parentRoute: typeof AdminLoggingsAuditLogRouteRoute
     }
     '/admin/loggings/auditLog/request/$id': {
       id: '/admin/loggings/auditLog/request/$id'
-      path: '/loggings/auditLog/request/$id'
+      path: '/request/$id'
       fullPath: '/admin/loggings/auditLog/request/$id'
       preLoaderRoute: typeof AdminLoggingsAuditLogRequestIdRouteImport
-      parentRoute: typeof AdminRouteRoute
+      parentRoute: typeof AdminLoggingsAuditLogRouteRoute
     }
     '/admin/loggings/auditLog/entity/$id': {
       id: '/admin/loggings/auditLog/entity/$id'
-      path: '/loggings/auditLog/entity/$id'
+      path: '/entity/$id'
       fullPath: '/admin/loggings/auditLog/entity/$id'
       preLoaderRoute: typeof AdminLoggingsAuditLogEntityIdRouteImport
-      parentRoute: typeof AdminRouteRoute
+      parentRoute: typeof AdminLoggingsAuditLogRouteRoute
     }
   }
 }
@@ -1127,14 +1109,34 @@ const AdminSettingsRouteRouteChildren: AdminSettingsRouteRouteChildren = {
 const AdminSettingsRouteRouteWithChildren =
   AdminSettingsRouteRoute._addFileChildren(AdminSettingsRouteRouteChildren)
 
+interface AdminLoggingsAuditLogRouteRouteChildren {
+  AdminLoggingsAuditLogEntityIdRoute: typeof AdminLoggingsAuditLogEntityIdRoute
+  AdminLoggingsAuditLogRequestIdRoute: typeof AdminLoggingsAuditLogRequestIdRoute
+  AdminLoggingsAuditLogEntityIndexRoute: typeof AdminLoggingsAuditLogEntityIndexRoute
+  AdminLoggingsAuditLogRequestIndexRoute: typeof AdminLoggingsAuditLogRequestIndexRoute
+}
+
+const AdminLoggingsAuditLogRouteRouteChildren: AdminLoggingsAuditLogRouteRouteChildren =
+  {
+    AdminLoggingsAuditLogEntityIdRoute: AdminLoggingsAuditLogEntityIdRoute,
+    AdminLoggingsAuditLogRequestIdRoute: AdminLoggingsAuditLogRequestIdRoute,
+    AdminLoggingsAuditLogEntityIndexRoute:
+      AdminLoggingsAuditLogEntityIndexRoute,
+    AdminLoggingsAuditLogRequestIndexRoute:
+      AdminLoggingsAuditLogRequestIndexRoute,
+  }
+
+const AdminLoggingsAuditLogRouteRouteWithChildren =
+  AdminLoggingsAuditLogRouteRoute._addFileChildren(
+    AdminLoggingsAuditLogRouteRouteChildren,
+  )
+
 interface AdminRouteRouteChildren {
   AdminSettingsRouteRoute: typeof AdminSettingsRouteRouteWithChildren
+  AdminLoggingsAuditLogRouteRoute: typeof AdminLoggingsAuditLogRouteRouteWithChildren
   AdminDataDictionariesNameRoute: typeof AdminDataDictionariesNameRoute
   AdminEmployeesEmployeeRoute: typeof AdminEmployeesEmployeeRoute
-  AdminLoggingsAccessRoute: typeof AdminLoggingsAccessRoute
-  AdminLoggingsAuditlogRoute: typeof AdminLoggingsAuditlogRoute
   AdminLoggingsBusinessRoute: typeof AdminLoggingsBusinessRoute
-  AdminLoggingsExceptionRoute: typeof AdminLoggingsExceptionRoute
   AdminLoggingsSecurityRoute: typeof AdminLoggingsSecurityRoute
   AdminMenusAppNameRoute: typeof AdminMenusAppNameRoute
   AdminNotificationsIdRoute: typeof AdminNotificationsIdRoute
@@ -1155,20 +1157,14 @@ interface AdminRouteRouteChildren {
   AdminScheduledTasksIndexRoute: typeof AdminScheduledTasksIndexRoute
   AdminTenantsIndexRoute: typeof AdminTenantsIndexRoute
   AdminUsersIndexRoute: typeof AdminUsersIndexRoute
-  AdminLoggingsAuditLogEntityIdRoute: typeof AdminLoggingsAuditLogEntityIdRoute
-  AdminLoggingsAuditLogRequestIdRoute: typeof AdminLoggingsAuditLogRequestIdRoute
-  AdminLoggingsAuditLogEntityIndexRoute: typeof AdminLoggingsAuditLogEntityIndexRoute
-  AdminLoggingsAuditLogRequestIndexRoute: typeof AdminLoggingsAuditLogRequestIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminSettingsRouteRoute: AdminSettingsRouteRouteWithChildren,
+  AdminLoggingsAuditLogRouteRoute: AdminLoggingsAuditLogRouteRouteWithChildren,
   AdminDataDictionariesNameRoute: AdminDataDictionariesNameRoute,
   AdminEmployeesEmployeeRoute: AdminEmployeesEmployeeRoute,
-  AdminLoggingsAccessRoute: AdminLoggingsAccessRoute,
-  AdminLoggingsAuditlogRoute: AdminLoggingsAuditlogRoute,
   AdminLoggingsBusinessRoute: AdminLoggingsBusinessRoute,
-  AdminLoggingsExceptionRoute: AdminLoggingsExceptionRoute,
   AdminLoggingsSecurityRoute: AdminLoggingsSecurityRoute,
   AdminMenusAppNameRoute: AdminMenusAppNameRoute,
   AdminNotificationsIdRoute: AdminNotificationsIdRoute,
@@ -1189,11 +1185,6 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminScheduledTasksIndexRoute: AdminScheduledTasksIndexRoute,
   AdminTenantsIndexRoute: AdminTenantsIndexRoute,
   AdminUsersIndexRoute: AdminUsersIndexRoute,
-  AdminLoggingsAuditLogEntityIdRoute: AdminLoggingsAuditLogEntityIdRoute,
-  AdminLoggingsAuditLogRequestIdRoute: AdminLoggingsAuditLogRequestIdRoute,
-  AdminLoggingsAuditLogEntityIndexRoute: AdminLoggingsAuditLogEntityIndexRoute,
-  AdminLoggingsAuditLogRequestIndexRoute:
-    AdminLoggingsAuditLogRequestIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
@@ -1204,6 +1195,7 @@ interface HomeRouteRouteChildren {
   HomeIndexRoute: typeof HomeIndexRoute
   HomeDemoAddressPickerRoute: typeof HomeDemoAddressPickerRoute
   HomeDemoMapAddressInputRoute: typeof HomeDemoMapAddressInputRoute
+  HomeDemoMapMarkersRoute: typeof HomeDemoMapMarkersRoute
   HomeDemoMapViewRoute: typeof HomeDemoMapViewRoute
   HomeDemoRegionSelectRoute: typeof HomeDemoRegionSelectRoute
 }
@@ -1212,6 +1204,7 @@ const HomeRouteRouteChildren: HomeRouteRouteChildren = {
   HomeIndexRoute: HomeIndexRoute,
   HomeDemoAddressPickerRoute: HomeDemoAddressPickerRoute,
   HomeDemoMapAddressInputRoute: HomeDemoMapAddressInputRoute,
+  HomeDemoMapMarkersRoute: HomeDemoMapMarkersRoute,
   HomeDemoMapViewRoute: HomeDemoMapViewRoute,
   HomeDemoRegionSelectRoute: HomeDemoRegionSelectRoute,
 }

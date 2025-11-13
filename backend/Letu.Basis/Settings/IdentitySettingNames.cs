@@ -84,6 +84,11 @@ public static class IdentitySettingNames
         /// 允许多设备登录 - 允许用户在多个设备上同时登录
         /// </summary>
         public const string AllowMultipleLogin = SignInPrefix + ".AllowMultipleLogin";
+
+        /// <summary>
+        /// 登录时记住我时长(天) 
+        /// </summary>
+        public const string RememberMeDurationDays = SignInPrefix + ".RememberMeDurationDays";
     }
 
     public static class User

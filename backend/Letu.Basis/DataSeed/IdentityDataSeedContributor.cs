@@ -1,6 +1,5 @@
 ﻿using Letu.Basis.Admin.Roles;
 using Letu.Basis.Admin.Users;
-using Letu.Basis.Identity;
 using Letu.Core.Utils;
 using Letu.Repository;
 using Letu.Shared.Consts;
@@ -93,6 +92,9 @@ public class IdentityDataSeedContributor : IDataSeedContributor, ITransientDepen
                 {
                     Name = adminRoleName,
                     Remark = "系统管理员角色",
+                    IsStatic = true,
+                    IsDefault = false,
+                    IsPublic = false,
                     IsEnabled = true,
                     TenantId = tenantId,
                 };

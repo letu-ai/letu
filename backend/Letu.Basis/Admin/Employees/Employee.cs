@@ -76,7 +76,7 @@ namespace Letu.Basis.Admin.Employees
         /// <summary>
         /// 入职时间
         /// </summary>
-        public DateTime InTime { get; set; }
+        public DateTime? InTime { get; set; }
 
         /// <summary>
         /// 离职时间

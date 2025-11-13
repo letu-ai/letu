@@ -80,6 +80,10 @@ public class IdentitySettingDefinitionProvider : SettingDefinitionProvider
                 true.ToString()),
 
             new SettingDefinition(
+                IdentitySettingNames.SignIn.RememberMeDurationDays,
+                7.ToString()),
+
+            new SettingDefinition(
                 IdentitySettingNames.User.IsUserNameUpdateEnabled,
                 true.ToString()),
 

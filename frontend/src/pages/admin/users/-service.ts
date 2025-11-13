@@ -61,6 +61,44 @@ export function resetPassword(dto: ResetPasswordInput) {
     return httpClient.put<string, void>('/api/admin/users/reset-password', dto);
 }
 
+// ==================== 用户标签相关API ====================
+
+/**
+ * 获取所有用户标签列表
+ */
+export function getAllUserTags() {
+    return httpClient.get<void, UserTagListOutput[]>('/api/admin/user-tags');
+}
+
+/**
+ * 创建用户标签
+ */
+export function createUserTag(dto: UserTagCreateInput) {
+    return httpClient.post<UserTagCreateInput, string>('/api/admin/user-tags', dto);
+}
+
+/**
+ * 更新用户标签
+ */
+export function updateUserTag(id: string, dto: UserTagUpdateInput) {
+    return httpClient.put<UserTagUpdateInput, boolean>(`/api/admin/user-tags/${id}`, dto);
+}
+
+/**
+ * 删除用户标签
+ */
+export function deleteUserTag(id: string) {
+    return httpClient.delete<void, boolean>(`/api/admin/user-tags/${id}`);
+}
+
+/**
+ * 获取标签选项列表（用于下拉选择）
+ */
+export function getUserTagOptions() {
+    return httpClient.get<void, UserTagOption[]>('/api/admin/user-tags/options');
+}
+
+// ==================== 接口定义 ====================
 
 export interface ICreateUserInput {
     userName: string;
@@ -73,6 +111,7 @@ export interface ICreateUserInput {
     positionId?: string | null;
     employeeId?: string | null;
     organizationUnitId?: string | null;
+    tagIds?: string[] | null;
 }
 
 export interface IUpdateUserInput {
@@ -84,12 +123,13 @@ export interface IUpdateUserInput {
     positionId?: string | null;
     employeeId?: string | null;
     organizationUnitId?: string | null;
+    tagIds?: string[] | null;
 }
-
 
 export interface IUserListInput extends PagedResultRequest {
     keyword?: string;
     organizationUnitId?: string;
+    tagIds?: string[] | null;
 }
 
 export interface UserListOutput {
@@ -108,6 +148,7 @@ export interface UserListOutput {
     employeeName?: string | null;
     organizationUnitId?: string | null;
     organizationUnitName?: string | null;
+    tags?: UserTagInfo[] | null;
 }
 
 export interface AssignRoleDto {
@@ -118,4 +159,36 @@ export interface AssignRoleDto {
 export interface ResetPasswordInput {
     userId: string;
     password: string;
+}
+
+// 用户标签相关接口
+
+export interface UserTagInfo {
+    id: string;
+    name: string | null;
+    color: string | null;
+}
+
+export interface UserTagListOutput {
+    id: string;
+    name: string | null;
+    color: string | null;
+    sort: number;
+    userCount: number;
+}
+
+export interface UserTagCreateInput {
+    name: string;
+    color?: string | null;
+}
+
+export interface UserTagUpdateInput {
+    name: string;
+    color?: string | null;
+}
+
+export interface UserTagOption {
+    label: string;
+    value: string;
+    color?: string | null;
 }

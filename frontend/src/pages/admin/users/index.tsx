@@ -1,6 +1,6 @@
-import { Button, Switch, Space, Form, Input, Avatar, Row, Col, Card, Tree } from 'antd';
+import { Button, Switch, Space, Form, Input, Avatar, Row, Col, Card, Tree, Tabs, Tag, Dropdown } from 'antd';
 import { useRef, useState, useEffect } from 'react';
-import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined, TeamOutlined, TagsOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { App } from 'antd';
 import {
     deleteUser,
@@ -10,11 +10,12 @@ import {
 } from '@/pages/admin/users/-service';
 import UserEditForm, { type ModalRef } from './-UserModal';
 import AssignRoleForm, { type AssignRoleFormRef } from "./-AssignRoleForm";
+import UserTagPanel from './-UserTagPanel';
 import SmartTable from '@/components/SmartTable';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import ResetUserPwdForm, { type ResetUserPwdFormRef } from './-ResetUserPwdForm';
 import ProIcon from '@/components/ProIcon';
-import Permission from '@/components/Permission';
+import Permission, { usePermission } from '@/components/Permission';
 import { BasisPermissions } from '@/application/permissions';
 import { createFileRoute } from '@tanstack/react-router';
 import { getApiBaseUrl } from '@/utils/urlUtils';
@@ -31,7 +32,13 @@ function UserTable() {
     const assignRoleRef = useRef<AssignRoleFormRef>(null);
     const resetUserPwdFormRef = useRef<ResetUserPwdFormRef>(null);
     const [selectedOrgUnitId, setSelectedOrgUnitId] = useState<string | undefined>();
+    const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
     const [orgTreeData, setOrgTreeData] = useState<OrganizationUnitTreeNode[]>([]);
+    const [activeTab, setActiveTab] = useState<string>('org');
+    const canResetPassword = usePermission({ permissions: BasisPermissions.User.ResetPassword });
+    const canAssignRole = usePermission({ permissions: BasisPermissions.User.ManagePermission });
+    const canDelete = usePermission({ permissions: BasisPermissions.User.Delete });
+
     const columns: SmartTableColumnType<UserListOutput>[] = [
         {
             title: '#',
@@ -75,6 +82,24 @@ function UserTable() {
             dataIndex: 'positionName',
         },
         {
+            title: '标签',
+            dataIndex: 'tags',
+            key: 'tags',
+            render: (tags: UserListOutput['tags']) => (
+                <>
+                    {tags && tags.length > 0 ? (
+                        tags.map(tag => (
+                            <Tag key={tag.id} color={tag.color || 'default'} style={{ marginBottom: 4 }}>
+                                {tag.name}
+                            </Tag>
+                        ))
+                    ) : (
+                        <span className="text-gray-400">-</span>
+                    )}
+                </>
+            ),
+        },
+        {
             title: '状态',
             dataIndex: 'isEnabled',
             key: 'isEnabled',
@@ -90,7 +115,7 @@ function UserTable() {
         {
             title: '操作',
             key: 'action',
-            width: 240,
+            width: 140,
             fixed: 'right',
             render: (_, record) => (
                 <Space>
@@ -102,34 +127,36 @@ function UserTable() {
                             编辑
                         </Button>
                     </Permission>
-
-                    <Permission permissions={BasisPermissions.User.ResetPassword}>
-                        <Button
-                            type="link"
-                            icon={<KeyOutlined />}
-                            onClick={() => {
-                                resetUserPwdFormRef?.current?.openModal(record);
-                            }}
-                        >
-                            重置密码
-                        </Button>
-                    </Permission>
-                    <Permission permissions={BasisPermissions.Role.ManagePermission}>
-                        <Button
-                            type="link"
-                            onClick={() => {
-                                assignRoleRef?.current?.openModal(record);
-                            }}
-                        >
-                            <ProIcon icon="iconify:simple-line-icons:check" />
-                            分配角色
-                        </Button>
-                    </Permission>
-                    <Permission permissions={BasisPermissions.User.Delete}>
-                        <Button type="link" icon={<DeleteOutlined />} danger onClick={() => rowDelete(record.id)}>
-                            删除
-                        </Button>
-                    </Permission>
+                    <Dropdown menu={{
+                        items: [
+                            {
+                                key: 'assignRole',
+                                icon: <ProIcon icon="iconify:simple-line-icons:check" />,
+                                label: '分配角色',
+                                disabled: !canAssignRole,
+                            },
+                            {
+                                key: 'resetPassword',
+                                icon: <KeyOutlined />,
+                                label: '重置密码',
+                                disabled: !canResetPassword,
+                            },
+                            {
+                                key: 'divider1',
+                                type: 'divider',
+                            },
+                            {
+                                key: 'delete',
+                                danger: true,
+                                icon: <DeleteOutlined />,
+                                label: '删除',
+                                disabled: !canDelete,
+                            },
+                        ],
+                        onClick: ({ key }) => handleMenuClick(key, record),
+                    }}>
+                        <Button type="link" icon={<EllipsisOutlined />} />
+                    </Dropdown>
                 </Space>
             ),
         },
@@ -162,8 +189,19 @@ function UserTable() {
     const onOrgTreeSelect = (selectedKeys: React.Key[]) => {
         const orgId = selectedKeys[0] as string | undefined;
         setSelectedOrgUnitId(orgId);
-        // 刷新表格数据
-        // tableRef.current?.reload();
+        setSelectedTagId(null); // 清除标签筛选
+    };
+
+    const onTagSelect = (tagId: string | null) => {
+        setSelectedTagId(tagId);
+        setSelectedOrgUnitId(undefined); // 清除机构筛选
+    };
+
+    const handleTabChange = (key: string) => {
+        setActiveTab(key);
+        // 切换Tab时清除筛选条件
+        setSelectedOrgUnitId(undefined);
+        setSelectedTagId(null);
     };
 
     const rowEdit = (record: UserListOutput) => {
@@ -189,34 +227,79 @@ function UserTable() {
         });
     };
 
+    const handleMenuClick = (key: string, record: UserListOutput) => {
+        switch (key) {
+            case 'assignRole':
+                assignRoleRef?.current?.openModal(record);
+                break;
+            case 'resetPassword':
+                resetUserPwdFormRef?.current?.openModal(record);
+                break;
+            case 'delete':
+                rowDelete(record.id);
+                break;
+        }
+    };
+
     return (
         <Row gutter={16} className="h-full">
             <Col span={6}>
                 <Card
-                    title="组织机构"
                     className="h-full"
                     styles={{
                         body: {
-                            padding: '12px'
+                            padding: '0',
+                            height: '100%'
                         }
                     }}
                 >
-                    <div className="mb-2">
-                        <Button
-                            type="link"
-                            onClick={() => {
-                                setSelectedOrgUnitId(undefined);
-                            }}
-                            className="p-0"
-                        >
-                            <TeamOutlined /> 全部用户
-                        </Button>
-                    </div>
-                    <Tree
-                        treeData={convertToTreeData(orgTreeData)}
-                        onSelect={onOrgTreeSelect}
-                        defaultExpandAll
-                        showIcon
+                    <Tabs
+                        activeKey={activeTab}
+                        onChange={handleTabChange}
+                        items={[
+                            {
+                                key: 'org',
+                                label: (
+                                    <span className="pl-3">
+                                        <TeamOutlined /> 组织机构
+                                    </span>
+                                ),
+                                children: (
+                                    <div className="p-3 h-full">
+                                        <div className="mb-2">
+                                            <Button
+                                                type="link"
+                                                onClick={() => {
+                                                    setSelectedOrgUnitId(undefined);
+                                                }}
+                                                className="p-0"
+                                            >
+                                                <TeamOutlined /> 全部用户
+                                            </Button>
+                                        </div>
+                                        <Tree
+                                            treeData={convertToTreeData(orgTreeData)}
+                                            onSelect={onOrgTreeSelect}
+                                            defaultExpandAll
+                                            showIcon
+                                        />
+                                    </div>
+                                ),
+                            },
+                            {
+                                key: 'tags',
+                                label: (
+                                    <span>
+                                        <TagsOutlined /> 用户标签
+                                    </span>
+                                ),
+                                children: (
+                                    <div className="h-full p-3">
+                                        <UserTagPanel onTagSelect={onTagSelect} selectedTagId={selectedTagId} />
+                                    </div>
+                                ),
+                            },
+                        ]}
                     />
                 </Card>
             </Col>
@@ -226,7 +309,8 @@ function UserTable() {
                     columns={columns}
                     ref={tableRef}
                     params={{
-                        organizationUnitId: selectedOrgUnitId
+                        organizationUnitId: selectedOrgUnitId,
+                        tagIds: selectedTagId ? selectedTagId : undefined
                     }}
                     request={async (params) => {
                         const data = await getUserList(params);

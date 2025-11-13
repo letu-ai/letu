@@ -13,7 +13,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Host.UseLetuLogging();
+        builder.Host.UseLetuLogging(appSettings);
         builder.Host.UseAutofac();
         if (builder.Environment.IsEnvironment("Docker"))
         {

@@ -1,4 +1,5 @@
-﻿using Letu.Repository;
+﻿using Letu.Logging.BusinessLogs;
+using Letu.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Auditing;
@@ -20,18 +21,13 @@ namespace Letu.Logging
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.OnRegistered(OperationLogInterceptorRegistrar.RegisterIfNeeded);
+            context.Services.OnRegistered(BusinessLogInterceptorRegistrar.RegisterIfNeeded);
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             // 注册审计日志存储
             ConfigureAutoMapper(context.Services);
-
-            context.Services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add<ExceptionLogFilter>(99);    // 99 为优先级，数字越小优先级越高
-            });
         }
 
         private void ConfigureAutoMapper(IServiceCollection services)

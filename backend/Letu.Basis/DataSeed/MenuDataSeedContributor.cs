@@ -1,6 +1,7 @@
 ﻿using Letu.Basis.Admin.Menus;
 using Letu.Basis.Permissions;
 using Letu.Repository;
+using NUglify.JavaScript.Syntax;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
@@ -36,7 +37,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
             {
                 return;
             }
-            
+
             await SeedAdminMenuAsync(context?.TenantId);
             await SeedAppMenuAsync(context?.TenantId);
         }
@@ -91,6 +92,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         }
 
         // 为需要权限配置的菜单预先生成 ID
+        var organizationUnitMenuId = guidGenerator.Create();
         var userMenuId = guidGenerator.Create();
         var roleMenuId = guidGenerator.Create();
         var departmentMenuId = guidGenerator.Create();
@@ -104,12 +106,32 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         var tenantManagementMenuId = guidGenerator.Create();
         var editionMenuId = guidGenerator.Create();
         var notificationMenuId = guidGenerator.Create();
+        var integrationMenuId = guidGenerator.Create();
+
+        // 系统监控下的菜单
+        var onlineUserMenuId = guidGenerator.Create();
         var scheduledTaskMenuId = guidGenerator.Create();
+        var securityLogMenuId = guidGenerator.Create();
+        var businessLogMenuId = guidGenerator.Create();
+        var auditLogMenuId = guidGenerator.Create();
 
         // 创建子菜单
         var childMenus = new List<MenuItem>
         {
             // 基础数据下的菜单
+            new MenuItem(organizationUnitMenuId)
+            {
+                Title = "组织机构",
+                Path = "/admin/organization-units",
+                ApplicationName = "admin",
+                MenuType = MenuType.Menu,
+                ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.OrganizationUnit.Default }],
+                Sort = 8,
+                Display = true,
+                IsExternal = false,
+            },
+
             new MenuItem(userMenuId)
             {
                 Title = "用户",
@@ -117,6 +139,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.User.Default }],
                 Sort = 10,
                 Display = true,
                 IsExternal = false,
@@ -128,6 +151,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.Role.Default }],
                 Sort = 20,
                 Display = true,
                 IsExternal = false,
@@ -139,10 +163,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.Department.Default }],
                 Sort = 30,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(positionGroupMenuId)
             {
@@ -151,10 +175,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.Position.Default }],
                 Sort = 40,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(positionMenuId)
             {
@@ -163,10 +187,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.Position.Default }],
                 Sort = 41,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(employeeMenuId)
             {
@@ -175,10 +199,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.Employee.Default }],
                 Sort = 50,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(regionMenuId)
             {
@@ -187,10 +211,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["基础数据"],
+                Permissions = [new () { Permission = BasisPermissions.Region.Default }],
                 Sort = 90,
                 Display = true,
                 IsExternal = false,
-
             },
             // 系统管理下的菜单
             new MenuItem(settingsMenuId)
@@ -200,10 +224,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.Setting.Default }],
                 Sort = 10,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(menuManagementMenuId)
             {
@@ -212,10 +236,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.MenuItem.Default }],
                 Sort = 20,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(dataDictionaryMenuId)
             {
@@ -224,10 +248,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.DataDictionary.Default }],
                 Sort = 40,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(tenantManagementMenuId)
             {
@@ -236,10 +260,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.Tenant.Default }],
                 Sort = 80,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(editionMenuId)
             {
@@ -248,10 +272,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.Edition.Default }],
                 Sort = 81,
                 Display = true,
                 IsExternal = false,
-
             },
             new MenuItem(notificationMenuId)
             {
@@ -260,35 +284,37 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.Notification.Default }],
                 Sort = 90,
                 Display = true,
                 IsExternal = false,
-
             },
+            new MenuItem(integrationMenuId)
+            {
+                Title = "系统集成",
+                Path = "/admin/integrations",
+                ApplicationName = "admin",
+                MenuType = MenuType.Menu,
+                ParentId = parentMenus["系统管理"],
+                Permissions = [new () { Permission = BasisPermissions.Integration.Default }],
+                Sort = 100,
+                Display = true,
+                IsExternal = false,
+            },
+
+
             // 系统监控下的菜单
-            new MenuItem(guidGenerator.Create())
+            new MenuItem(onlineUserMenuId)
             {
                 Title = "在线用户",
                 Path = "/admin/online-users",
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统监控"],
-                Sort = 1,
+                Permissions = [new () { Permission = BasisPermissions.Logging.Default }],
+                Sort = 10,
                 Display = true,
                 IsExternal = false,
-
-            },
-            new MenuItem(guidGenerator.Create())
-            {
-                Title = "异常日志",
-                Path = "/admin/loggings/exception",
-                ApplicationName = "admin",
-                MenuType = MenuType.Menu,
-                ParentId = parentMenus["系统监控"],
-                Sort = 2,
-                Display = true,
-                IsExternal = false,
-
             },
             new MenuItem(scheduledTaskMenuId)
             {
@@ -297,46 +323,46 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统监控"],
-                Sort = 10,
+                Permissions = [new () { Permission = BasisPermissions.ScheduledTask.Default }],
+                Sort = 20,
                 Display = true,
                 IsExternal = false,
-
             },
-            new MenuItem(guidGenerator.Create())
+            new MenuItem(securityLogMenuId)
             {
-                Title = "登录日志",
+                Title = "安全日志",
                 Path = "/admin/loggings/security",
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统监控"],
-                Sort = 10,
+                Permissions = [new () { Permission = BasisPermissions.Logging.Default }],
+                Sort = 30,
                 Display = true,
                 IsExternal = false,
-
             },
-            new MenuItem(guidGenerator.Create())
+            new MenuItem(businessLogMenuId)
             {
                 Title = "业务日志",
                 Path = "/admin/loggings/business",
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统监控"],
-                Sort = 11,
+                Permissions = [new () { Permission = BasisPermissions.Logging.Default }],
+                Sort = 40,
                 Display = true,
                 IsExternal = false,
-
             },
-            new MenuItem(guidGenerator.Create())
+            new MenuItem(auditLogMenuId)
             {
                 Title = "审计日志",
                 Path = "/admin/loggings/auditlog/request",
                 ApplicationName = "admin",
                 MenuType = MenuType.Menu,
                 ParentId = parentMenus["系统监控"],
-                Sort = 10,
+                Permissions = [new () { Permission = BasisPermissions.Logging.Default }],
+                Sort = 50,
                 Display = true,
                 IsExternal = false,
-
             }
         };
 
@@ -348,86 +374,104 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
             // 基础数据菜单权限
             new MenuItemPermission
             {
+                MenuItemId = organizationUnitMenuId,
+                Permission = BasisPermissions.OrganizationUnit.Default,
+            },
+            new MenuItemPermission
+            {
                 MenuItemId = userMenuId,
                 Permission = BasisPermissions.User.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = roleMenuId,
                 Permission = BasisPermissions.Role.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = departmentMenuId,
                 Permission = BasisPermissions.Department.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = positionMenuId,
                 Permission = BasisPermissions.Position.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = employeeMenuId,
                 Permission = BasisPermissions.Employee.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = regionMenuId,
                 Permission = BasisPermissions.Region.Default,
-
             },
+
             
             // 系统管理菜单权限
             new MenuItemPermission
             {
                 MenuItemId = settingsMenuId,
                 Permission = BasisPermissions.Setting.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = menuManagementMenuId,
                 Permission = BasisPermissions.MenuItem.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = dataDictionaryMenuId,
                 Permission = BasisPermissions.DataDictionary.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = tenantManagementMenuId,
                 Permission = BasisPermissions.Tenant.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = editionMenuId,
                 Permission = BasisPermissions.Edition.Default,
-
             },
             new MenuItemPermission
             {
                 MenuItemId = notificationMenuId,
                 Permission = BasisPermissions.Notification.Default,
-
             },
-            
+            new MenuItemPermission
+            {
+                MenuItemId = integrationMenuId,
+                Permission = BasisPermissions.Integration.Default,
+            },
+
             // 系统监控菜单权限
             new MenuItemPermission
             {
+                MenuItemId = onlineUserMenuId,
+                Permission = BasisPermissions.Logging.OnlineUser,
+            },
+            new MenuItemPermission
+            {
                 MenuItemId = scheduledTaskMenuId,
-                Permission = BasisPermissions.ScheduledTask.Default,
-
-            }
+                Permission = BasisPermissions.Logging.ScheduledTask,
+            },
+            new MenuItemPermission
+            {
+                MenuItemId = securityLogMenuId,
+                Permission = BasisPermissions.Logging.SecurityLog,
+            },
+            new MenuItemPermission
+            {
+                MenuItemId = businessLogMenuId,
+                Permission = BasisPermissions.Logging.BusinessLog,
+            },
+            new MenuItemPermission
+            {
+                MenuItemId = auditLogMenuId,
+                Permission = BasisPermissions.Logging.AuditLog,
+            },
         };
 
         // 插入菜单权限数据

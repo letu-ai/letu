@@ -1,9 +1,10 @@
 import httpClient from '@/utils/httpClient';
 import { getTenantInfo } from '@/utils/authUtils';
+import type { IHttpClientConfig } from '@/utils/httpClient';
 import type { AxiosRequestConfig } from 'axios';
 
 
-function buildTenantHeaders(): AxiosRequestConfig {
+function buildTenantHeaders(): IHttpClientConfig {
     const tenantInfo = getTenantInfo();
     const config = {} as AxiosRequestConfig;
     if (tenantInfo?.tenantId) {
@@ -21,6 +22,7 @@ function buildTenantHeaders(): AxiosRequestConfig {
  */
 export function loginByPassword(input: IPasswordLoginInput) {
     const config = buildTenantHeaders();
+    config.anonymous = true;
     config.withCredentials = true; //确保登录成功后设置的cookie能被浏览器正确接收
 
     return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/identity/login', input, config);
@@ -32,6 +34,7 @@ export function loginByPassword(input: IPasswordLoginInput) {
 export function loginBySms(input: ISmsLoginInput) {
     const config = buildTenantHeaders();
     config.withCredentials = true; //确保登录成功后设置的cookie能被浏览器正确接收
+    config.anonymous = true;
 
     return httpClient.post<ISmsLoginInput, IUserTokenOutput>('/api/identity/SmsLogin', input, config);
 }
@@ -51,7 +54,8 @@ export function logout() {
  * @param phone
  */
 export function sendLoginSmsCode(phone: string) {
-    return httpClient.post<string, string>('/api/identity/SendLoginSmsCode?phone=' + phone);
+    const config = {} as IHttpClientConfig;
+    return httpClient.post<string, string>('/api/identity/SendLoginSmsCode?phone=' + phone, undefined, config);
 }
 
 /**
@@ -60,14 +64,15 @@ export function sendLoginSmsCode(phone: string) {
  * @returns
  */
 export function refreshToken(refreshToken: string) {
-    const config = {} as AxiosRequestConfig;
+    const config = {} as IHttpClientConfig;
     config.withCredentials = true; //确保刷新token成功后，cookie能被浏览器正确接收
 
     return httpClient.post<string, IUserTokenOutput>('/api/identity/refresh-token', { refreshToken }, config);
 }
 
 export function getLoginSettings() {
-    const config = buildTenantHeaders();
+    const config = buildTenantHeaders() as IHttpClientConfig;
+    config.anonymous = true; // 匿名请求，不需要token认证
     return httpClient.get<ILoginSettingsOutput>('/api/account/login-settings', config);
 }
 

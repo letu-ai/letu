@@ -2,6 +2,7 @@ using Letu.Basis.Admin.OrganizationUnits.Dtos;
 using Letu.Repository;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp;
+using Letu.Logging.BusinessLogs;
 
 namespace Letu.Basis.Admin.OrganizationUnits
 {
@@ -15,6 +16,8 @@ namespace Letu.Basis.Admin.OrganizationUnits
             this.ouRepository = ouRepository;
         }
 
+        [BusinessLog("组织机构管理", BusinessOperateType.Create, "创建组织机构{{Name}}")]
+
         public async Task<bool> AddOrganizationUnitAsync(OrganizationUnitCreateOrUpdateInput input)
         {
             // 同级、忽略大小写的重名校验（仅应用层）
@@ -25,10 +28,16 @@ namespace Letu.Basis.Admin.OrganizationUnits
             var entity = ObjectMapper.Map<OrganizationUnitCreateOrUpdateInput, OrganizationUnit>(input);
             // 生成层级编码 Code（物化路径）
             entity.Code = await GenerateNextCodeAsync(input.ParentId);
-            await ouRepository.InsertAsync(entity);
+            entity = await ouRepository.InsertAsync(entity);
+
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+
             return true;
         }
 
+        
+        [BusinessLog("组织机构管理", BusinessOperateType.Delete, "删除组织机构{{Name}}")]
 
         public async Task<bool> DeleteOrganizationUnitAsync(Guid id)
         {
@@ -40,6 +49,9 @@ namespace Letu.Basis.Admin.OrganizationUnits
             }
             var codePrefix = entity.Code;
             await ouRepository.DeleteAsync(x => x.Code.StartsWith(codePrefix));
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 
@@ -52,6 +64,8 @@ namespace Letu.Basis.Admin.OrganizationUnits
 
             return result;
         }
+
+        [BusinessLog("组织机构管理", BusinessOperateType.Update, "更新组织机构{{Name}}")]
 
         public async Task<bool> UpdateOrganizationUnitAsync(Guid id, OrganizationUnitCreateOrUpdateInput input)
         {
@@ -79,6 +93,9 @@ namespace Letu.Basis.Admin.OrganizationUnits
             }
 
             await ouRepository.UpdateAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 

@@ -74,6 +74,11 @@ namespace Letu.Basis.Admin.Users
         public virtual ICollection<UserInRole>? Roles { get; set; }
 
         /// <summary>
+        /// 用户标签
+        /// </summary>
+        public virtual ICollection<UserInTag>? Tags { get; set; }
+
+        /// <summary>
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]

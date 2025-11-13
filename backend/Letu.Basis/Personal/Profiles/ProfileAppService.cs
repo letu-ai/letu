@@ -1,10 +1,10 @@
-﻿using Letu.Basis.Admin.Loggings;
-using Letu.Basis.Admin.Users;
+﻿using Letu.Basis.Admin.Users;
 using Letu.Basis.Oss;
 using Letu.Basis.Personal.Profiles.Dtos;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Utils;
+using Letu.Logging.SecurtyLogs;
 using Letu.Repository;
 using Volo.Abp.BlobStoring;
 using Volo.Abp.EventBus.Local;

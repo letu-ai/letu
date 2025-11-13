@@ -8,28 +8,63 @@ const SAVED_USERNAME_KEY = 'auth-saved-username';
 const TENANT_ID_KEY = 'auth-tenant-id';
 const TENANT_KEY_KEY = 'auth-tenant-key';
 
+// 跨标签页同步频道名称
+const SYNC_CHANNEL_NAME = 'auth-token-sync';
+
+// 消息类型
+type SyncMessageType = 'request-token' | 'response-token' | 'token-set' | 'token-clear';
+
+interface SyncMessage {
+    type: SyncMessageType;
+    token?: string; // token 的 JSON 字符串
+    rememberMe?: boolean; // 是否记住我
+}
+
+// BroadcastChannel 实例（单例）
+let syncChannel: BroadcastChannel | null = null;
 
 /**
- * 获取存储对象（根据记住我状态）
+ * 发送跨标签页同步消息
+ * @param message 要发送的消息
  */
-function getStorage(): Storage {
-    const rememberMe = localStorage.getItem(REMEMBER_ME_KEY) === 'true';
-    return rememberMe ? localStorage : sessionStorage;
+function broadcastMessage(message: SyncMessage): void {
+    if (typeof BroadcastChannel === 'undefined') {
+        return;
+    }
+
+    // 确保频道已初始化
+    if (!syncChannel) {
+        initTokenSync();
+    }
+
+    // 发送消息
+    if (syncChannel) {
+        syncChannel.postMessage(message);
+    }
 }
 
 /**
- * 设置 Token
+ * 设置 Token，用于登录时写入并保持rememberMe状态。
  */
 export function setToken(token: IUserTokenOutput, rememberMe: boolean = false): void {
     localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
 
-    const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem(TOKEN_KEY, JSON.stringify(token));
-
-    // 清除另一个存储中的 token
-    if (!rememberMe) {
+    if (rememberMe) {
+        // 记住我：保存到 localStorage，持久保存
+        localStorage.setItem(TOKEN_KEY, JSON.stringify(token));
+        sessionStorage.removeItem(TOKEN_KEY);
+    } else {
+        // 不记住我：保存到 sessionStorage，关闭浏览器后自动清除
+        sessionStorage.setItem(TOKEN_KEY, JSON.stringify(token));
         localStorage.removeItem(TOKEN_KEY);
     }
+
+    // 通知其他标签页 token 已设置
+    broadcastMessage({
+        type: 'token-set',
+        token: JSON.stringify(token),
+        rememberMe,
+    });
 }
 
 /**
@@ -37,18 +72,106 @@ export function setToken(token: IUserTokenOutput, rememberMe: boolean = false): 
  */
 export function getToken(): IUserTokenOutput | null {
     try {
-        const storage = getStorage();
-        const tokenStr = storage.getItem(TOKEN_KEY);
-        return tokenStr ? JSON.parse(tokenStr) : null;
+        const rememberMe = getRememberMe();
+
+        if (rememberMe) {
+            // 记住我：从 localStorage 获取
+            const tokenStr = localStorage.getItem(TOKEN_KEY);
+            return tokenStr ? JSON.parse(tokenStr) : null;
+        } else {
+            // 不记住我：优先从 sessionStorage 获取
+            const tokenStr = sessionStorage.getItem(TOKEN_KEY);
+
+            // 如果 sessionStorage 没有，尝试通过 BroadcastChannel 请求同步
+            if (!tokenStr) {
+                // 如果频道已初始化但还没有 token，发送请求（可能是初始化后新打开的标签页）
+                if (syncChannel) {
+                    broadcastMessage({ type: 'request-token' });
+                } else {
+                    // 如果频道未初始化，初始化时会自动发送请求
+                    initTokenSync();
+                }
+            }
+
+            return tokenStr ? JSON.parse(tokenStr) : null;
+        }
     } catch {
         return null;
     }
 }
 
 /**
- * 写入新的 Token（用于刷新token）
+ * 初始化跨标签页 token 同步机制
+ * 使用 BroadcastChannel 监听消息，处理同步请求和响应
  */
-export function refreshToken(accessToken: string, refreshToken?: string, expiredTime?: Date): void {
+function initTokenSync(): void {
+    // 检查浏览器是否支持 BroadcastChannel
+    if (typeof BroadcastChannel === 'undefined') {
+        return;
+    }
+
+    // 如果已经初始化，直接返回
+    if (syncChannel) {
+        return;
+    }
+
+    // 创建 BroadcastChannel 实例
+    syncChannel = new BroadcastChannel(SYNC_CHANNEL_NAME);
+
+    // 监听消息
+    syncChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
+        const syncMessage = event.data;
+
+        if (syncMessage.type === 'request-token') {
+            // 收到同步请求：如果当前标签页的 sessionStorage 有 token，广播响应
+            const myToken = sessionStorage.getItem(TOKEN_KEY);
+            if (myToken) {
+                broadcastMessage({
+                    type: 'response-token',
+                    token: myToken,
+                });
+            }
+        } else if (syncMessage.type === 'response-token' && syncMessage.token) {
+            // 收到同步 token：如果当前标签页的 sessionStorage 没有 token，写入
+            if (!sessionStorage.getItem(TOKEN_KEY)) {
+                try {
+                    sessionStorage.setItem(TOKEN_KEY, syncMessage.token);
+                } catch {
+                    // 忽略写入错误
+                }
+            }
+        } else if (syncMessage.type === 'token-set' && syncMessage.token) {
+            // 收到 token 设置通知：同步到当前标签页
+            const rememberMe = syncMessage.rememberMe ?? false;
+            if (rememberMe) {
+                // 记住我：保存到 localStorage
+                localStorage.setItem(TOKEN_KEY, syncMessage.token);
+                sessionStorage.removeItem(TOKEN_KEY);
+            } else {
+                // 不记住我：保存到 sessionStorage
+                sessionStorage.setItem(TOKEN_KEY, syncMessage.token);
+                localStorage.removeItem(TOKEN_KEY);
+            }
+            // 同步 rememberMe 状态
+            localStorage.setItem(REMEMBER_ME_KEY, rememberMe.toString());
+        } else if (syncMessage.type === 'token-clear') {
+            // 收到 token 清除通知：清除当前标签页的 token
+            localStorage.removeItem(TOKEN_KEY);
+            sessionStorage.removeItem(TOKEN_KEY);
+        }
+    };
+
+    // 初始化时，如果当前标签页没有 token 且 rememberMe = false，主动发送一次请求
+    const rememberMe = getRememberMe();
+    if (!rememberMe && !sessionStorage.getItem(TOKEN_KEY)) {
+        broadcastMessage({ type: 'request-token' });
+    }
+}
+
+/**
+ * 更新 Token，用于刷新token时写入。
+ */
+export function updateToken(accessToken: string, refreshToken?: string, expiredTime?: Date): void {
     const currentToken = getToken();
     if (currentToken) {
         const updatedToken: IUserTokenOutput = {
@@ -67,6 +190,11 @@ export function refreshToken(accessToken: string, refreshToken?: string, expired
 export function clearToken(): void {
     localStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
+
+    // 通知其他标签页 token 已清除
+    broadcastMessage({
+        type: 'token-clear',
+    });
 }
 
 /**
@@ -124,6 +252,7 @@ export function getSavedUserName(): string {
 
 /**
  * 判断 Token 是否有效（精确判断，不含缓冲时间）
+ * token过期且没有refresh token才视为无效
  */
 export function isTokenValid(): boolean {
     const token = getToken();
@@ -136,7 +265,20 @@ export function isTokenValid(): boolean {
     if (token.expiredTime) {
         const expiredTime = new Date(token.expiredTime).getTime();
         const now = Date.now();
-        return now < expiredTime;
+        const isExpired = now >= expiredTime;
+        
+        // 如果未过期，返回 true
+        if (!isExpired) {
+            return true;
+        }
+        
+        // 如果过期了，但有 refreshToken，仍然认为有效（可以刷新）
+        if (token.refreshToken) {
+            return true;
+        }
+        
+        // 如果过期了且没有 refreshToken，视为无效
+        return false;
     }
 
     // 如果没有过期时间，只要有 accessToken 就认为有效
@@ -160,28 +302,7 @@ export function requireAuth({ href }: { href: string }): void {
     }
 }
 
-/**
- * 检查token是否需要刷新
- * @returns {boolean} 是否需要刷新token
- */
-export function shouldRefreshToken(): boolean {
-    const token = getToken();
-
-    if (!token || !token.accessToken || !token.refreshToken) {
-        return false;
-    }
-
-    const now = Date.now();
-    const expiredTime = token.expiredTime ? new Date(token.expiredTime).getTime() : 0;
-
-    if (!expiredTime) {
-        return false;
-    }
-    // 判断是否需要刷新：已过期或1分钟内即将过期
-    const tenMinutesFromNow = now + 1 * 60 * 1000;
-    return now >= expiredTime || expiredTime < tenMinutesFromNow;
-
-    // // 判断是否需要刷新：已过期或10分钟内即将过期
-    // const tenMinutesFromNow = now + 10 * 60 * 1000;
-    // return now >= expiredTime || expiredTime < tenMinutesFromNow;
+// 在模块加载时初始化跨标签页同步机制
+if (typeof window !== 'undefined') {
+    initTokenSync();
 }

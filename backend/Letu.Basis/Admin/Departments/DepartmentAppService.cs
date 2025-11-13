@@ -3,6 +3,7 @@ using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Users;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
@@ -22,6 +23,7 @@ namespace Letu.Basis.Admin.Departments
             _userRepository = userRepository;
         }
 
+        [BusinessLog("部门管理", BusinessOperateType.Create, "创建部门{{Name}}")]
         public async Task<bool> AddDeptAsync(DepartmentCreateOrUpdateInput dto)
         {
             if (await _deptRepository.Where(x => x.Code.ToLower() == dto.Code!.ToLower()).AnyAsync())
@@ -39,7 +41,10 @@ namespace Letu.Basis.Admin.Departments
                 entity.ParentIds = GetParentIds(all, entity.ParentId.Value, ref layer);
                 entity.Layer = layer;
             }
-            await _deptRepository.InsertAsync(entity);
+            entity = await _deptRepository.InsertAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+
             return true;
         }
 
@@ -51,11 +56,15 @@ namespace Letu.Basis.Admin.Departments
             return GetParentIds(all, parentId.Value, ref layer) + "," + id;
         }
 
+
+        [BusinessLog("部门管理", BusinessOperateType.Delete, "删除部门")]
         public async Task<bool> DeleteDeptAsync(Guid id)
         {
             var hasUsers = await _userRepository.Select.AnyAsync(x => x.DepartmentId == id);
             if (hasUsers)
                 throw HttpFriendlyException.BadRequest("部门内有用户，不能删除。");
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             await _deptRepository.DeleteAsync(x => id == x.Id);
             return true;
         }
@@ -130,6 +139,7 @@ namespace Letu.Basis.Admin.Departments
             }
         }
 
+        [BusinessLog("部门管理", BusinessOperateType.Update, "更新部门{{Name}}")]
         public async Task<bool> UpdateDeptAsync(Guid id, DepartmentCreateOrUpdateInput input)
         {
             var entity = await _deptRepository.Where(x => x.Id == id).FirstAsync();
@@ -162,6 +172,9 @@ namespace Letu.Basis.Admin.Departments
                 entity.Layer = layer;
             }
             await _deptRepository.UpdateAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 

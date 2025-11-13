@@ -128,7 +128,7 @@ function AccountSettings() {
                     <Form.Item
                         name="allowPasswordRecovery"
                         valuePropName="checked"
-                        help="通过邮件、手机短信等方式找回密码"
+                        extra="通过邮件、手机短信等方式找回密码"
                     >
                         <Checkbox>允许用户找回遗忘的密码</Checkbox>
                     </Form.Item>
@@ -136,7 +136,7 @@ function AccountSettings() {
                     <Form.Item
                         name="signInAllowMultipleLogin"
                         valuePropName="checked"
-                        help="允许用户在多个设备上同时登录"
+                        extra="允许用户在多个设备上同时登录"
                     >
                         <Checkbox>允许多个会话</Checkbox>
                     </Form.Item>
@@ -148,7 +148,7 @@ function AccountSettings() {
                     <Title level={4}>密码设置</Title>
                     <Form.Item
                         name="passwordRequiredLength"
-                        label="密码最小长度"
+                        extra="密码最小长度"
                         rules={[
                             { required: true, message: '请输入密码最小长度' },
                             { type: 'number', min: 3, max: 64, message: '密码最小长度必须在3-64之间' }
@@ -158,7 +158,7 @@ function AccountSettings() {
                     </Form.Item>
                     <Form.Item
                         name="passwordRequiredUniqueChars"
-                        label="唯一字符数量"
+                        extra="唯一字符数量"
                         help="密码中不重复的字符数量"
                         rules={[
                             { required: true, message: '请输入唯一字符数量' },
@@ -228,7 +228,7 @@ function AccountSettings() {
                     <Form.Item
                         name="maxFailedAccessAttempts"
                         label="密码错误尝试次数"
-                        help="超过此次数后，账户将被锁定"
+                        extra="超过此次数后，账户将被锁定"
                         rules={[
                             { required: true, message: '请输入密码错误尝试次数' },
                             { type: 'number', min: 1, max: 999, message: '密码错误尝试次数必须在1-999之间' }
@@ -238,7 +238,7 @@ function AccountSettings() {
                     </Form.Item>
                     <Form.Item
                         name="lockoutDuration"
-                        label="锁定时长（秒）"
+                        extra="锁定时长（秒）"
                         rules={[
                             { required: true, message: '请输入锁定时长' },
                             { type: 'number', min: 1, message: '锁定时长必须在1秒以上' }
@@ -255,24 +255,35 @@ function AccountSettings() {
                     <Form.Item
                         name="signInRequireConfirmedEmail"
                         valuePropName="checked"
-                        help={<p>邮箱没有通过验证的用户将无法登录，包括<strong className="text-warning">管理员</strong></p>}
+                        extra={<p>邮箱没有通过验证的用户将无法登录，包括<strong className="text-warning">管理员</strong></p>}
                     >
                         <Checkbox>要求验证邮箱</Checkbox>
                     </Form.Item>
                     <Form.Item
                         name="signInRequireConfirmedPhoneNumber"
                         valuePropName="checked"
-                        help={<p>手机号没有通过验证的用户将无法登录，包括<strong className="text-warning">管理员</strong></p>}
+                        extra={<p>手机号没有通过验证的用户将无法登录，包括<strong className="text-warning">管理员</strong></p>}
                     >
                         <Checkbox>要求验证手机号</Checkbox>
                     </Form.Item>
                     <Form.Item
                         name="signInEnablePhoneNumberConfirmation"
                         valuePropName="checked"
-                        help="在个人信息管理页面启用验证码确认手机号功能"
+                        extra="在个人信息管理页面启用验证码确认手机号功能"
                     >
                         <Checkbox>允许用户确认他的电话号码</Checkbox>
                     </Form.Item>
+                    <Form.Item
+                        name="signInRememberMeDurationDays"
+                        label="登录时记住我时长（天）"
+                        rules={[
+                            { required: true, message: '请输入登录时记住我时长' },
+                            { type: 'number', min: 1, max: 365, message: '登录时记住我时长必须在1-365之间' }
+                        ]}
+                    >
+                        <InputNumber />
+                    </Form.Item>
+
                 </div>
 
                 <Divider />

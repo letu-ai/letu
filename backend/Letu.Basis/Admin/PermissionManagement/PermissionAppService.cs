@@ -1,4 +1,5 @@
 ﻿using Letu.Basis.Admin.PermissionManagement.Dtos;
+using Letu.Logging.BusinessLogs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
@@ -144,6 +145,7 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
         };
     }
 
+    [BusinessLog("权限管理", BusinessOperateType.Update, "更新权限{{Provider}}:{{Key}}")]
     public async Task UpdateAsync(string providerName, string providerKey, UpdatePermissionsDto input)
     {
         await CheckProviderPolicy(providerName);
@@ -152,6 +154,8 @@ public class PermissionAppService : BasisAppService, IPermissionAppService
         {
             await permissionManager.SetAsync(permissionDto.Name, providerName, providerKey, permissionDto.IsGranted);
         }
+        BusinessLogManager.Current?.AddVariable("Provider", providerName);
+        BusinessLogManager.Current?.AddVariable("Key", providerKey);
     }
 
     private async Task CheckProviderPolicy(string providerName)

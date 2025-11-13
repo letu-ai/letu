@@ -5,6 +5,7 @@ using Letu.Basis.Settings;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Identity.Jwt;
 using Letu.Core.Utils;
+using Letu.Logging.SecurtyLogs;
 using Letu.Repository;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -88,13 +89,12 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
 
             var claims = await CreateUserClaims(user, sessionId);
             var token = CreateToken(claims, user.Id, sessionId);
-            loginLog.SessionId = sessionId;
+            CreateCookie(token.Token, token.ExpiresAt); // 设置 JWT Token 到 Cookie 中，用于图片等资源的认证
 
+
+            loginLog.SessionId = sessionId;
             // 保存用户登录信息到缓存
             await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
-
-            // 设置 JWT Token 到 Cookie 中，用于图片等资源的认证
-            SetJwtCookie(token.Token, token.ExpiresAt);
 
             return new UserTokenOutput
             {
@@ -120,6 +120,10 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
 
     public async Task LogoutAsync()
     {
+
+        // 清除 JWT Cookie
+        ClearJwtCookie();
+
         if (!CurrentUser.IsAuthenticated)
             return;
 
@@ -127,9 +131,6 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         var sessionId = CurrentUser.GetSessionId();
 
         await LogoutAsync(userId, sessionId);
-
-        // 清除 JWT Cookie
-        ClearJwtCookie();
 
         await localEventBus.PublishAsync(new SecurityLog
         {
@@ -212,15 +213,15 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             throw HttpFriendlyException.BadRequest("token刷新请求过于频繁，请稍后重试");
         }
 
-        // 创建安全日志记录
-        var securityLog = new SecurityLog
-        {
-            IsSuccess = true,
-            Ip = RequestUtils.GetIp(_httpContext),
-            OperationMsg = "刷新令牌成功",
-            UserName = "", // 稍后填充
-            SessionId = sessionId
-        };
+        // // 创建安全日志记录
+        // var securityLog = new SecurityLog
+        // {
+        //     IsSuccess = true,
+        //     Ip = RequestUtils.GetIp(_httpContext),
+        //     OperationMsg = "刷新令牌成功",
+        //     UserName = "", // 稍后填充
+        //     SessionId = sessionId
+        // };
 
         try
         {
@@ -244,7 +245,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             if (user == null)
                 throw HttpFriendlyException.NotFound("用户不存在");
 
-            securityLog.UserName = user.UserName;
+            // securityLog.UserName = user.UserName;
 
             // 5. 创建用户声明和生成令牌
             var claims = await CreateUserClaims(user, sessionId);
@@ -254,7 +255,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
 
             // 7. 更新 Cookie 中的 JWT Token
-            SetJwtCookie(token.Token, token.ExpiresAt);
+            CreateCookie(token.Token, token.ExpiresAt);
 
             return new UserTokenOutput
             {
@@ -265,15 +266,15 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         }
         catch (Exception ex)
         {
-            securityLog.IsSuccess = false;
-            securityLog.OperationMsg = ex.Message;
+            // securityLog.IsSuccess = false;
+            // securityLog.OperationMsg = ex.Message;
             throw;
         }
         finally
         {
-            securityLog.Address = RequestUtils.ResolveAddress(securityLog.Ip);
-            securityLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
-            await localEventBus.PublishAsync(securityLog);
+            // securityLog.Address = RequestUtils.ResolveAddress(securityLog.Ip);
+            // securityLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
+            // await localEventBus.PublishAsync(securityLog);
         }
     }
 
@@ -311,7 +312,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         }
 
         var accessTokenExpired = TimeSpan.FromSeconds(jwtOptions.Issuance.ExpirySeconds);
-        var refreshTokenExpired = TimeSpan.FromDays(30); // TODO: RefreshToken过期时间应该从Settings系统读取
+        var refreshTokenExpired = TimeSpan.FromDays(Convert.ToInt32(await SettingProvider.GetAsync<int>(IdentitySettingNames.SignIn.RememberMeDurationDays)));
 
         // 获取现有会话ID集合或创建新集合
         var userSessionIds = await _userSessionIdsCache.GetAsync(
@@ -400,7 +401,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
     /// </summary>
     /// <param name="token">JWT Token</param>
     /// <param name="expiredTime">过期时间</param>
-    private void SetJwtCookie(string token, DateTimeOffset expiredTime)
+    private void CreateCookie(string token, DateTimeOffset expiredTime)
     {
         var cookieOptions = new CookieOptions
         {

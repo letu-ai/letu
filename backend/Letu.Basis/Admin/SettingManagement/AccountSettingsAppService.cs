@@ -53,6 +53,8 @@ public class AccountSettingsAppService : BasisAppService, IAccountSettingsAppSer
             SignInEnablePhoneNumberConfirmation = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(IdentitySettingNames.SignIn.EnablePhoneNumberConfirmation)),
             SignInRequireConfirmedPhoneNumber = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(IdentitySettingNames.SignIn.RequireConfirmedPhoneNumber)),
             SignInAllowMultipleLogin = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(IdentitySettingNames.SignIn.AllowMultipleLogin)),
+            SignInRememberMeDurationDays = Convert.ToInt32(await SettingProvider.GetOrNullAsync(IdentitySettingNames.SignIn.RememberMeDurationDays)),
+            
             // User
             IsUserNameUpdateEnabled = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(IdentitySettingNames.User.IsUserNameUpdateEnabled)),
             IsEmailUpdateEnabled = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(IdentitySettingNames.User.IsEmailUpdateEnabled)),
@@ -99,6 +101,7 @@ public class AccountSettingsAppService : BasisAppService, IAccountSettingsAppSer
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.EnablePhoneNumberConfirmation, input.SignInEnablePhoneNumberConfirmation.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.RequireConfirmedPhoneNumber, input.SignInRequireConfirmedPhoneNumber.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.AllowMultipleLogin, input.SignInAllowMultipleLogin.ToString());
+        await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.SignIn.RememberMeDurationDays, input.SignInRememberMeDurationDays.ToString());
 
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.User.IsUserNameUpdateEnabled, input.IsUserNameUpdateEnabled.ToString());
         await settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, IdentitySettingNames.User.IsEmailUpdateEnabled, input.IsEmailUpdateEnabled.ToString());

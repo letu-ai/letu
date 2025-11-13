@@ -29,35 +29,16 @@ public class EntityChangeLogAppService : BasisAppService, IEntityChangeLogAppSer
 
     public virtual async Task<PagedResultDto<EntityChangeDto>> GetEntityChangesAsync(GetEntityChangesInput input)
     {
-        var query = _freeSql.Select<EntityChange>()
+        var list = await _freeSql.Select<EntityChange>()
             .WhereIf(input.AuditLogId.HasValue, x => x.AuditLogId == input.AuditLogId)
             .WhereIf(input.StartDate.HasValue, x => x.ChangeTime >= input.StartDate!.Value)
             .WhereIf(input.EndDate.HasValue, x => x.ChangeTime <= input.EndDate!.Value)
             .WhereIf(input.ChangeType.HasValue, x => x.ChangeType == input.ChangeType)
             .WhereIf(!string.IsNullOrEmpty(input.EntityId), x => x.EntityId == input.EntityId)
-            .WhereIf(!string.IsNullOrEmpty(input.EntityTypeFullName), x => x.EntityTypeFullName == input.EntityTypeFullName);
-
-        var totalCount = await query.CountAsync();
-        if (totalCount == 0)
-        {
-            return new PagedResultDto<EntityChangeDto>();
-        }
-
-        // Handle sorting
-        if (!string.IsNullOrEmpty(input.Sorting))
-        {
-            query = query.OrderByPropertyNameIf(!string.IsNullOrEmpty(input.Sorting), input.Sorting, false);
-        }
-        else
-        {
-            query = query.OrderByDescending(x => x.ChangeTime);
-        }
-
-        // Pagination and include property changes
-        var list = await query
-            .Skip(input.SkipCount)
-            .Take(input.MaxResultCount)
-            .Include(x => x.PropertyChanges)
+            .WhereIf(!string.IsNullOrEmpty(input.EntityTypeFullName), x => x.EntityTypeFullName == input.EntityTypeFullName)
+            .OrderByDescending(x => x.ChangeTime)
+            .Count(out var totalCount)
+            .Page(input.Current, input.PageSize)
             .ToListAsync();
 
         return new PagedResultDto<EntityChangeDto>(totalCount, ObjectMapper.Map<List<EntityChange>, List<EntityChangeDto>>(list));

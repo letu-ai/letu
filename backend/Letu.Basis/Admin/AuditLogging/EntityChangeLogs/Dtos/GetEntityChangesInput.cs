@@ -1,9 +1,10 @@
+using Letu.Core.Applications;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Auditing;
 
 namespace Letu.Basis.Admin.AuditLogging.EntityChangeLogs.Dtos;
 
-public class GetEntityChangesInput : PagedAndSortedResultRequestDto
+public class GetEntityChangesInput : PagedResultRequest
 {
     public Guid? AuditLogId { get; set; }
 

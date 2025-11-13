@@ -1,7 +1,6 @@
 ﻿using Letu.Basis.Admin.OrganizationUnits;
 using Letu.Basis.Admin.OrganizationUnits.Dtos;
 using Letu.Basis.Permissions;
-using Letu.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,7 +61,6 @@ public class OrganizationController : ControllerBase
     /// <returns></returns>
     [HttpDelete("{id:guid}")]
     [Authorize(BasisPermissions.OrganizationUnit.Delete)]
-    [ApiAccessLog(operateName: "删除组织单元", operateType: [OperateType.Delete], reponseEnable: true)]
     public async Task DeleteOrganizationUnitAsync(Guid id)
     {
         await ouAppService.DeleteOrganizationUnitAsync(id);

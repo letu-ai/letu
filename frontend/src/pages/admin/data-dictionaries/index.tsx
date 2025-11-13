@@ -30,16 +30,16 @@ function DictList() {
     const columns: SmartTableColumnType<IDictionaryListOutput>[] = [
         {
             title: '字典',
-            dataIndex: 'displayName',
-            width: 200,
-        },
-        {
-            title: '名称',
             dataIndex: 'name',
             width: 200,
             render: (text: string) => {
-                return <Paragraph copyable={{ text }}><Tag>{text}</Tag></Paragraph>
+                return <Paragraph copyable={{ text }}><span className="font-bold">{text}</span></Paragraph>
             },
+        },
+        {
+            title: '名称',
+            dataIndex: 'displayName',
+            width: 200,
         },
         {
             title: '启用',

@@ -9,6 +9,7 @@ import {
   updateEmployee,
 } from '@/pages/admin/employees/-service';
 import useApp from 'antd/es/app/useApp';
+import dayjs from 'dayjs';
 
 interface ModalProps {
   refresh?: () => void;
@@ -37,7 +38,13 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
       getEmployeeInfo(row.id).then((data) => {
         setLoading(false);
         setRow(data);
-        form.setFieldsValue(data);
+        // 转换日期字段为 dayjs 对象
+        const formData = {
+          ...data,
+          inTime: data.inTime ? dayjs(data.inTime) : null,
+          outTime: data.outTime ? dayjs(data.outTime) : null,
+        };
+        form.setFieldsValue(formData);
         setEmployeeStatus(data.status);
       });
     } else {
@@ -66,7 +73,7 @@ const EmployeeForm = forwardRef<EmployeeModalRef, ModalProps>((props, ref) => {
 
   const onFinish = async (values: EmployeeDto) => {
     if (row?.id) {
-      await updateEmployee({ ...values, id: row.id });
+      await updateEmployee(row.id, values);
       handleSuccess('编辑成功');
     } else {
       await addEmployee(values);

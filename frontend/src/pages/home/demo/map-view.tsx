@@ -126,8 +126,7 @@ function RouteComponent() {
                 {/* 地图组件 */}
                 <div className="mb-4">
                     <MapView
-                        height={500}
-                        className="shadow-lg"
+                        className="h-96 shadow-lg"
                         showSearch={true}
                         onReady={(map) => {
                             mapRef.current = map;

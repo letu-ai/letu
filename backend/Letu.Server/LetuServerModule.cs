@@ -5,19 +5,16 @@ using Letu.Basis.Middlewares;
 using Letu.Core.Identity.Jwt;
 using Letu.Core.JsonConverters;
 using Letu.Core.MultiTenancy;
-using Letu.Logging.Options;
 using Letu.Server;
 using Letu.Shared.Consts;
 using Medallion.Threading;
 using Medallion.Threading.Redis;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -36,7 +33,6 @@ using Volo.Abp.BlobStoring.FileSystem;
 using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.DistributedLocking;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
 using Volo.Abp.Modularity;
@@ -75,7 +71,6 @@ public class LetuServerModule : AbpModule
         ConfigureRateLimiter(services, configuration);
         ConfigureSwagger(services, configuration);
         ConfigureJsonOptions(services, configuration);
-        ConfigureLogging(services, configuration);
         ConfigureBlobStoring();
         ConfigureDynamicClaims();
     }
@@ -246,14 +241,6 @@ public class LetuServerModule : AbpModule
             options.JsonSerializerOptions.Converters.Add(new StringJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new DateTimeNullableJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
-        });
-    }
-
-    private void ConfigureLogging(IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<LetuLoggingOption>(options =>
-        {
-            options.IgnoreExceptionTypes = [typeof(BusinessException), typeof(EntityNotFoundException)];
         });
     }
 

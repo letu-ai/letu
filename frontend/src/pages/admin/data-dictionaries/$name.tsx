@@ -28,12 +28,12 @@ function DictionaryDetails() {
             title: '值',
             dataIndex: 'value',
             render: (text: string) => {
-                return <Tag>{text}</Tag>;
+                return <Tag color="blue" className="font-bold">{text}</Tag>
             },
 
         },
         {
-            title: '显示排序',
+            title: '显示顺序',
             dataIndex: 'sort',
             render: (text: number) => {
                 return <span className="text-muted">{text}</span>;

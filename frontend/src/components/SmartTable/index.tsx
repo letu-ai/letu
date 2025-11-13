@@ -1,10 +1,11 @@
-import { Button, Card, Checkbox, Dropdown, Form, type MenuProps, Space, Table, type TablePaginationConfig, Tooltip } from 'antd';
+import { Button, Card, Checkbox, Dropdown, Form, type MenuProps, Table, type TablePaginationConfig, Tooltip } from 'antd';
 import React, { type ForwardedRef, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import type { SmartTableProps, SmartTableRef } from './type';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { ColumnHeightOutlined, ReloadOutlined, TableOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import useLayoutStore, { isSizeType } from '@/application/layoutStore';
+import { Undo2 } from 'lucide-react';
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 const defaultPagination: TablePaginationConfig =
@@ -96,7 +97,7 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                 current: queryParams.current,
                 pageSize: queryParams.pageSize,
             };
-        }, [paginationProps]);
+        }, [paginationProps, total, queryParams]);
 
         // 处理columns，根据columnVisibility设置hidden属性
         const processedColumns = useMemo(() => {
@@ -112,19 +113,22 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
         const fetchData = async () => {
             if (props.request) {
                 setLoading(true);
-                const result = await props.request({ ...queryParams, ...params });
-                //判断当前页是否有数据，无数据设置第1页
-                if (result.items === null || result.items.length === 0) {
-                    if (result.totalCount > 0) {
-                        setQueryParams({
-                            ...queryParams,
-                            current: 1,
-                        });
+                try {
+                    const result = await props.request({ ...queryParams, ...params });
+                    //判断当前页是否有数据，无数据设置第1页
+                    if (result.items === null || result.items.length === 0) {
+                        if (result.totalCount > 0) {
+                            setQueryParams({
+                                ...queryParams,
+                                current: 1,
+                            });
+                        }
                     }
+                    setTotal(result.totalCount);
+                    setDataSource(result.items);
+                } finally {
+                    setLoading(false);
                 }
-                setTotal(result.totalCount);
-                setDataSource(result.items);
-                setLoading(false);
             }
         };
 
@@ -137,12 +141,18 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                 setTableSize(key);
         };
 
-        const handleTableChange = (pagination: TablePaginationConfig) => {
-            setQueryParams({
-                ...queryParams,
+        const handleTableChange = (
+            pagination: TablePaginationConfig,
+            filters?: Record<string, any>,
+            sorter?: any
+        ) => {
+            setQueryParams(prev => ({
+                ...prev,
+                ...filters,
+                ...sorter,
                 current: pagination.current ?? 1,
                 pageSize: pagination.pageSize ?? 10,
-            });
+            }));
         };
 
         const onSearch = () => {
@@ -164,26 +174,29 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
             <div className="letu-table-wrapper">
                 {props.searchItems && (
                     <Card className="mb-1">
-                        <Form layout="inline" form={form} initialValues={{ layout: 'inline' }} style={{ maxWidth: 'none' }}>
-                            {Array.isArray(props.searchItems)
-                                ? React.Children.map(props.searchItems, (child, index) => {
-                                    if (React.isValidElement(child)) {
-                                        return React.cloneElement(child, {
-                                            key: child.key || `child-${index}`,
-                                        });
-                                    }
-                                    return child;
-                                })
-                                : props.searchItems}
-                            <Form.Item>
-                                <Space>
-                                    <Button type="primary" onClick={onSearch}>
-                                        查询
-                                    </Button>
-                                    <Button onClick={onReset}>重置</Button>
-                                </Space>
-                            </Form.Item>
-                        </Form>
+                        <div className="flex justify-between">
+                            <Form form={form} className='flex-1'
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4">
+                                    {Array.isArray(props.searchItems)
+                                        ? React.Children.map(props.searchItems, (child, index) => {
+                                            if (React.isValidElement(child)) {
+                                                return React.cloneElement(child, {
+                                                    key: child.key || `child-${index}`,
+                                                });
+                                            }
+                                            return child;
+                                        })
+                                        : props.searchItems}
+                                </div>
+                            </Form>
+                            <div className="flex gap-2 pl-4">
+                                <Button type="primary" onClick={onSearch}>
+                                    查询
+                                </Button>
+                                <Button type="text" onClick={onReset}><Undo2 color="gray" /></Button>
+                            </div>
+                        </div>
                     </Card>
                 )}
 
@@ -228,8 +241,8 @@ const SmartTable = forwardRef<SmartTableRef, SmartTableProps<any>>(
                                     trigger={['click']}
                                     popupRender={() => (
                                         <div
-                                         className="rounded-md border-primary-border p-2 max-h-400 min-w-40 overflow-y-auto bg-white shadow-md"
-                                         >
+                                            className="rounded-md border-primary-border p-2 max-h-400 min-w-40 overflow-y-auto bg-white shadow-md"
+                                        >
                                             {columns
                                                 .filter(col => col.hideable !== false)
                                                 .map((col, index) => {

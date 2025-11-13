@@ -30,7 +30,6 @@ public class TenantController : ControllerBase
     [HttpPost]
     [Authorize(BasisPermissions.Tenant.Create)]
     [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
-    [ApiAccessLog(operateName: "添加租户", operateType: [OperateType.Create], reponseEnable: true)]
     public async Task AddTenantAsync([FromBody] TenantCreateOrUpdateInput dto)
     {
         await tenantService.AddTenantAsync(dto);
@@ -56,7 +55,6 @@ public class TenantController : ControllerBase
     /// <returns></returns>
     [HttpPut("{id:guid}")]
     [Authorize(BasisPermissions.Tenant.Update)]
-    [ApiAccessLog(operateName: "修改租户", operateType: [OperateType.Update], reponseEnable: true)]
     public async Task UpdateTenantAsync([FromRoute] Guid id, [FromBody] TenantCreateOrUpdateInput dto)
     {
         await tenantService.UpdateTenantAsync(id, dto);
@@ -69,7 +67,6 @@ public class TenantController : ControllerBase
     /// <returns></returns>
     [HttpDelete("{id:guid}")]
     [Authorize(BasisPermissions.Tenant.Delete)]
-    [ApiAccessLog(operateName: "删除租户", operateType: [OperateType.Delete], reponseEnable: true)]
     public async Task DeleteTenantAsync([FromRoute] Guid id)
     {
         await tenantService.DeleteTenantAsync(id);

@@ -20,6 +20,16 @@ namespace Letu.Basis.Admin.Roles.Dtos
         public string? Remark { get; set; }
 
         /// <summary>
+        /// 新建用户默认分配的角色
+        /// </summary>
+        public bool IsDefault { get; set; }
+
+        /// <summary>
+        /// 用户可以查看其他用户的公共角色。一些特殊角色如“超级管理员”不允许被设置为公共角色。
+        /// </summary>
+        public bool IsPublic { get; set; }
+
+        /// <summary>
         /// 是否启用
         /// </summary>
         [NotNull]

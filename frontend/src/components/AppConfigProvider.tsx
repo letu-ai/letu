@@ -94,7 +94,7 @@ export const AppConfigProvider = ({ config, children }: IAppConfigProviderProps)
         if (!isReady || !configuration) return;
 
         // 尝试多种可能的配置键获取站点主色调
-        const primaryColor = configuration.setting.values['Letu.Application.Site.PrimaryColor'];
+        const primaryColor = configuration?.setting?.values?.['Letu.Application.Site.PrimaryColor'];
         
         if (primaryColor && primaryColor !== '#7E57C2') {
             // 只有当颜色值存在且不是默认值时才更新主题

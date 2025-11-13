@@ -1,4 +1,4 @@
-﻿using Letu.Basis.Admin.Loggings;
+﻿using Letu.Logging.SecurtyLogs;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EventBus;
 

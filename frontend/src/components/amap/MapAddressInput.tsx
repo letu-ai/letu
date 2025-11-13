@@ -8,18 +8,17 @@ import { getRegionByCode } from "@/pages/admin/regions/-service";
 
 const { Text } = Typography;
 
-export interface IDeviceAddressValue {
+export interface IMapAddressValue {
     code: string;       // 行政区划代码
     street: string;     // 街道
     address: string;    // 详细地址
     location: string;   // 经纬度，格式："lng,lat"
 }
 
-interface IDeviceAddressInputProps {
-    value?: IDeviceAddressValue;
-    onChange?: (value: IDeviceAddressValue | undefined) => void;
+interface IMapAddressInputProps {
+    value?: IMapAddressValue;
+    onChange?: (value: IMapAddressValue | undefined) => void;
     disabled?: boolean;
-    height?: number;    // 地图高度
     showStreet?: boolean; // 是否显示街道选择
 }
 
@@ -27,9 +26,8 @@ function MapAddressInput({
     value ,
     onChange,
     disabled = false,
-    height = 300,
     showStreet = true
-}: IDeviceAddressInputProps) {
+}: IMapAddressInputProps) {
     const [regionValue, setRegionValue] = useState<IRegionSelectValue>();
     const [addressText, setAddressText] = useState<string>("");
     const [mapCenter, setMapCenter] = useState<IMapLocation>();
@@ -173,7 +171,7 @@ function MapAddressInput({
 
 
     return (
-        <Card className="device-address-input">
+        <Card>
             <Row gutter={16}>
                 <Col span={24}>
                     <div className="mb-4">
@@ -206,11 +204,10 @@ function MapAddressInput({
                         <Text strong className="block mb-2">3. 地图定位（可搜索或点击选择位置）</Text>
                         <MapView
                             defaultCenter={mapCenter}
-                            height={height}
                             showSearch={true}
                             searchCity={cityLimit}
                             onSelect={handleMapSelect}
-                            className="border border-gray-200 rounded"
+                            className="h-96 border border-gray-200 rounded"
                             onReady={(map) => {
                                 mapRef.current = map;
                             }}

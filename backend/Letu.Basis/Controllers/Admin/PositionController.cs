@@ -2,7 +2,7 @@ using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.Positions.Dtos;
 using Letu.Basis.Permissions;
 using Letu.Core.Applications;
-using Letu.Logging;
+using Letu.Logging.BusinessLogs;
 using Letu.Shared.Consts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -68,7 +68,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize(BasisPermissions.Position.Delete)]
-        [ApiAccessLog(operateName: "删除职位", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeletePositionAsync(Guid id)
         {
             await _positionService.DeletePositionAsync(id);
@@ -132,7 +131,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete("groups/{id}")]
         [Authorize(BasisPermissions.Position.Update)]
-        [ApiAccessLog(operateName: "删除职位分组", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeletePositionGroupAsync(Guid id)
         {
             await _positionService.DeletePositionGroupAsync(id);

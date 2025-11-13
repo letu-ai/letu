@@ -7,7 +7,7 @@ import type { SelectOption } from "@/types/api";
  * @returns
  */
 export function getDictionaryOptions(name: string) {
-    return httpClient.get<string, SelectOption[]>(`/api/admin/data-dictionaries/${name}/options`);
+    return httpClient.get<string, SelectOption[]>(`/api/data-dictionaries/${name}/options`);
 }
 
 /**
@@ -16,7 +16,7 @@ export function getDictionaryOptions(name: string) {
  * @returns
  */
 export function getDictionaryOptionsBatch(names: string[]) {
-    return httpClient.get<string[], Record<string, SelectOption[]>>("/api/admin/data-dictionaries/options", {
+    return httpClient.get<string[], Record<string, SelectOption[]>>("/api/data-dictionaries/options", {
         params: names,
     });
 }

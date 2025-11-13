@@ -1,8 +1,6 @@
 using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Menus.Dtos;
 using Letu.Basis.Permissions;
-
-using Letu.Logging;
 using Letu.Shared.Consts;
 
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +40,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        [ApiAccessLog(operateType: [OperateType.Query])]
         public async Task<List<MenuItemListOutput>> GetMenuListAsync([FromQuery] MenuItemListInput dto)
         {
             return await _menuService.GetMenuListAsync(dto);
@@ -56,7 +53,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(BasisPermissions.MenuItem.Update)]
-        [ApiAccessLog(operateName: "修改菜单", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task UpdateMenuAsync(Guid id, [FromBody] MenuItemCreateOrUpdateInput input)
         {
             await _menuService.UpdateMenuAsync(id, input);
@@ -69,7 +65,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete]
         [Authorize(BasisPermissions.MenuItem.Delete)]
-        [ApiAccessLog(operateName: "删除菜单", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteMenusAsync([FromBody] Guid[] ids)
         {
             await _menuService.DeleteMenusAsync(ids);

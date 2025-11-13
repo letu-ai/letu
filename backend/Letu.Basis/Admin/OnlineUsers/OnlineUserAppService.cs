@@ -1,9 +1,9 @@
 ﻿using FreeSql;
-using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Identity;
 using Letu.Core.Applications;
+using Letu.Logging.SecurtyLogs;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Volo.Abp.Application.Services;
@@ -33,6 +33,13 @@ public class OnlineUserAppService : BasisAppService, IOnlineUserAppService
             .Where(x => x.IsSuccess && !string.IsNullOrEmpty(x.SessionId))
             .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
             .OrderByDescending(x => x.CreationTime).ToListAsync();
+
+        // 对同一个 SessionId,只保留最新的那条日志,避免重复显示同一会话
+        loginLogs = loginLogs
+            .GroupBy(x => x.SessionId)
+            .Select(g => g.First())
+            .ToList();
+
         var userNames = loginLogs.Select(x => x.UserName).ToList();
         var users = await _userRepository.Where(x => userNames.Contains(x.UserName)).ToListAsync(x => new { x.Id, x.UserName });
 

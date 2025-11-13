@@ -13,22 +13,31 @@ export function getSelectedMenuKey(currentPath: string, menus: INavigationMenuDt
         matchPath = currentPath.replace('/external/', '');
     }
 
+    // 规范化路径：移除末尾斜杠，转为小写
+    const normalizePath = (path: string) => path.toLowerCase().replace(/\/$/, '');
+    const normalizedMatchPath = normalizePath(matchPath);
+
     // 递归查找匹配的菜单项
     function findMatchingMenu(menuList: INavigationMenuDto[]): INavigationMenuDto | null {
         for (const menu of menuList) {
+            // 优先检查当前菜单项是否匹配（精确匹配或子路由匹配）
+            // 如果匹配，直接返回当前菜单项，不再递归检查子菜单
+            // 这样可以确保父菜单项能够匹配其所有子路由
             if (menu.path) {
+                const normalizedMenuPath = normalizePath(menu.path);
+                
                 // 精确匹配
-                if (menu.path === matchPath) {
+                if (normalizedMenuPath === normalizedMatchPath) {
                     return menu;
                 }
                 
                 // 前缀匹配 - 当前路径是菜单路径的子路径
-                if (matchPath.startsWith(menu.path + '/')) {
+                if (normalizedMatchPath.startsWith(normalizedMenuPath + '/')) {
                     return menu;
                 }
             }
             
-            // 递归查找子菜单
+            // 如果当前菜单项不匹配，再递归查找子菜单
             const childMatch = findMatchingMenu(getChildMenus(menu.id, menus));
             if (childMatch) {
                 return childMatch;

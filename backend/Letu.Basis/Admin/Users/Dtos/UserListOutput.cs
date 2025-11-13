@@ -1,3 +1,5 @@
+using Letu.Basis.Admin.UserTags.Dtos;
+
 namespace Letu.Basis.Admin.Users.Dtos
 {
     public class UserListOutput
@@ -76,5 +78,10 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 组织单元名称
         /// </summary>
         public string? OrganizationUnitName { get; set; }
+
+        /// <summary>
+        /// 用户标签列表
+        /// </summary>
+        public List<UserTagInfo>? Tags { get; set; }
     }
 }

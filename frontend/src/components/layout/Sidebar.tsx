@@ -39,57 +39,81 @@ function convertToAntdMenuItems(menus: INavigationMenuDto[]): MenuItem[] {
     sortRecursive(roots);
 
     // 3) 映射为 Antd 的 MenuItem
-    const toMenuItem = (node: MenuTreeNode): MenuItem => {
+    const toMenuItem = (node: MenuTreeNode): MenuItem | null => {
         if (node.children.length > 0) {
+            // 有子菜单，先递归处理子菜单
+            const childrenItems = node.children.map(toMenuItem).filter((item): item is MenuItem => item !== null);
+            
+            // 如果子菜单全部被过滤掉（为空），则不显示该父菜单文件夹
+            if (childrenItems.length === 0) {
+                return null;
+            }
+            
             // 有子菜单，返回 SubMenuType
             const subMenu: SubMenuType = {
                 key: node.path ?? node.id,
                 icon: node.icon ? <ProIcon icon={node.icon} /> : null,
                 label: node.title,
-                children: node.children.map(toMenuItem),
+                children: childrenItems,
             };
             return subMenu;
         } else {
-            // 叶子节点，返回 MenuItemType
+            // 叶子节点
+            // 如果没有路径且没有子菜单，说明这是一个空的文件夹，应该隐藏
+            if (!node.path) {
+                return null;
+            }
+            
+            // 有路径的叶子节点，返回 MenuItemType
             const menuItem: MenuItemType = {
                 key: node.path ?? node.id,
                 icon: node.icon ? <ProIcon icon={node.icon} /> : null,
                 label: node.title,
             };
 
-            if (node.path) {
-                // 有路径，创建可点击的链接
-                let menuPath = node.path;
-                if (node.isExternal) {
-                    menuPath = `/external/${node.path}`;
-                }
-                menuItem.label = (
-                    <Link to={menuPath}>
-                        <span>{node.title}</span>
-                    </Link>
-                );
+            // 有路径，创建可点击的链接
+            let menuPath = node.path;
+            if (node.isExternal) {
+                menuPath = `/external/${node.path}`;
             }
+            menuItem.label = (
+                <Link to={menuPath}>
+                    <span>{node.title}</span>
+                </Link>
+            );
 
             return menuItem;
         }
     };
 
-    return roots.map(toMenuItem);
+    return roots.map(toMenuItem).filter((item): item is MenuItem => item !== null);
 }
 
 function getSelectedKeyFromItems(pathname: string, items: MenuItem[]): string | null {
+    // 规范化路径：移除末尾斜杠，转为小写
+    const normalizePath = (path: string) => path.toLowerCase().replace(/\/$/, '');
+    const normalizedPathname = normalizePath(pathname);
+    
     for (const item of items) {
         const key = item.key as string;
+        if (!key) continue;
+        
+        const normalizedKey = normalizePath(key);
 
-        // 精确匹配或路径包含匹配
-        if (pathname === key || pathname.startsWith(key + '/')) {
+        // 优先检查当前菜单项是否匹配（精确匹配或子路由匹配）
+        // 如果匹配，直接返回当前菜单项的 key，不再递归检查子菜单
+        // 这样可以确保父菜单项能够匹配其所有子路由
+        // 使用大小写不敏感的比较，并处理末尾斜杠
+        if (normalizedPathname === normalizedKey || normalizedPathname.startsWith(normalizedKey + '/')) {
             return key;
         }
 
-        // 递归检查子菜单
+        // 如果当前菜单项不匹配，再递归检查子菜单
         if ('children' in item && item.children) {
             const found = getSelectedKeyFromItems(pathname, item.children as MenuItem[]);
-            if (found) return found;
+            if (found) {
+                return found;
+            }
         }
     }
     return null;

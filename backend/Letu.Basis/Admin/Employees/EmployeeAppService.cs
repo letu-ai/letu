@@ -6,6 +6,7 @@ using Letu.Basis.Admin.Users;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Utils;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Uow;
@@ -26,6 +27,7 @@ namespace Letu.Basis.Admin.Employees
             _userRepository = userRepository;
         }
 
+        [BusinessLog("员工管理", BusinessOperateType.Create, "新增员工{{Name}}")]
         [UnitOfWork]
         public async Task<bool> AddEmployeeAsync(EmployeeCreateOrUpdateInput dto)
         {
@@ -40,13 +42,18 @@ namespace Letu.Basis.Admin.Employees
 
             var entity = ObjectMapper.Map<EmployeeCreateOrUpdateInput, Employee>(dto);
             await employeeRepository.InsertAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
 
             return true;
         }
 
+        [BusinessLog("员工管理", BusinessOperateType.Delete, "删除员工")]
         public async Task<bool> DeleteEmployeeAsync(Guid id)
         {
             await employeeRepository.DeleteAsync(x => x.Id == id);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 
@@ -68,6 +75,7 @@ namespace Letu.Basis.Admin.Employees
                 .ToListAsync<EmployeeCreateOrUpdateInput>();
         }
 
+        [BusinessLog("员工管理", BusinessOperateType.Update, "更新员工{{Name}}")]
         public async Task<bool> UpdateEmployeeAsync(Guid id, EmployeeCreateOrUpdateInput input)
         {
             var entity = await employeeRepository.Where(x => x.Id == id).FirstAsync() ?? throw new EntityNotFoundException(typeof(Employee), id);
@@ -83,6 +91,9 @@ namespace Letu.Basis.Admin.Employees
 
             ObjectMapper.Map(input, entity);
             await employeeRepository.UpdateAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 

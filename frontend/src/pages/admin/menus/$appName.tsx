@@ -31,7 +31,7 @@ const tabItems = [
 function MenuTable() {
     const modalRef = useRef<ModalRef>(null);
     const tableRef = useRef<SmartTableRef>(null);
-    const { appName} = Route.useParams();
+    const { appName } = Route.useParams();
     const navigate = useNavigate();
     const { message, modal } = App.useApp();
 
@@ -44,6 +44,7 @@ function MenuTable() {
             title: '菜单名称',
             dataIndex: 'title',
             key: 'title',
+            width: 240,
             render: (text: string, record) => (
                 <div>
                     {record.menuType === MenuType.Folder && <FolderFilled className="mr-1" />}
@@ -60,6 +61,21 @@ function MenuTable() {
             title: '路由地址',
             dataIndex: 'path',
             key: 'path',
+        },
+        {
+            title: '显示顺序',
+            dataIndex: 'sort',
+            key: 'sort',
+            width: 100,
+            render: (sort: number, record: IMenuItemListOutput) => {
+                if(record.menuType === MenuType.Folder) {
+                    return <Tag color="blue" className="font-bold">{sort}</Tag>;
+                }
+                else
+                {
+                    return <Tag color="green">{sort}</Tag>;
+                }
+            },
         },
         {
             title: '依赖权限',

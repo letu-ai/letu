@@ -9,14 +9,14 @@ namespace Letu.Basis.Admin.Departments.Dtos
         /// </summary>
         [Required]
         [MaxLength(64)]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 部门编号
         /// </summary>
         [Required]
         [MaxLength(32)]
-        public string? Code { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// 排序

@@ -1,278 +1,385 @@
-import { Card, Row, Col, Typography, Timeline, Button, Space, Tooltip, Tag, Divider } from 'antd';
+import { Card, Row, Col, Statistic, Button, Table, Tag, Avatar, List } from 'antd';
 import {
-    GithubOutlined,
-    BookOutlined,
-    CodeOutlined,
+    UserOutlined,
+    TeamOutlined,
+    BellOutlined,
+    ClockCircleOutlined,
+    SettingOutlined,
+    SafetyOutlined,
+    DatabaseOutlined,
+    ScheduleOutlined,
+    FileTextOutlined,
+    AppstoreOutlined,
+    ApartmentOutlined,
+    IdcardOutlined,
     HistoryOutlined,
-    GiftOutlined,
-    StarOutlined,
-    ForkOutlined,
-    EyeOutlined,
+    NotificationOutlined,
+    ArrowUpOutlined,
+    ArrowDownOutlined,
 } from '@ant-design/icons';
-import './index.scss';
-import { useEffect, useState } from 'react';
-import { Link } from '@tanstack/react-router';
-import '@/application/themeStore';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export const Route = createFileRoute('/home/')({
     component: HomePage
 });
 
-const { Title, Text, Paragraph } = Typography;
-// 更新日志数据
-const changelog = [
-    {
-        date: '2025-07-18',
-        items: ['通知管理、我的通知、动态管理定时任务'],
-    },
-    {
-        date: '2025-07-15',
-        items: ['租户管理、菜单支持外链'],
-    },
-    {
-        date: '2025-07-14',
-        items: ['创建sqlite分支，内置letu-admin.db文件、配置管理、修复已知BUG'],
-    },
-    {
-        date: '2025-07-10',
-        items: ['头像上传功能、使用mobx进行状态同步、修复已知BUG'],
-    },
-    {
-        date: '2025-07-09',
-        items: ['访问日志,异常日志增加详情、登录页样式优化，增加备案号'],
-    },
-    {
-        date: '2025-07-05',
-        items: ['增加员工绑定用户、样式调整、消除React警告'],
-    },
-    {
-        date: '2025-07-02',
-        items: ['系统雏形、建立仓库，代码开源'],
-    },
+// 模拟数据 - 统计指标
+const statisticsData = {
+    totalUsers: 1286,
+    onlineUsers: 45,
+    todayNotifications: 23,
+    pendingTasks: 8,
+    userGrowth: 12.5,
+    onlineChange: -3.2,
+};
+
+// 模拟数据 - 访问趋势（最近7天）
+const visitTrendData = [
+    { date: '10-03', visits: 245, activeUsers: 186 },
+    { date: '10-04', visits: 312, activeUsers: 223 },
+    { date: '10-05', visits: 289, activeUsers: 198 },
+    { date: '10-06', visits: 356, activeUsers: 267 },
+    { date: '10-07', visits: 423, activeUsers: 312 },
+    { date: '10-08', visits: 398, activeUsers: 289 },
+    { date: '10-09', visits: 467, activeUsers: 334 },
 ];
 
-// 技术栈数据
-const techStack = [
-    { name: '.NET Core' },
-    { name: 'PostgreSQL' },
-    { name: 'FreeSql' },
-    { name: 'Aop' },
-    { name: 'Redis' },
-    { name: 'EventBus' },
-    { name: 'AutoMapper' },
-    { name: 'Serilog' },
-    { name: 'React' },
-    { name: 'Ant Design' },
-    { name: 'Vite' },
-    { name: 'Sass/SCSS' },
+// 模拟数据 - 用户分布
+const userDistributionData = [
+    { name: '管理员', value: 12, color: '#1890ff' },
+    { name: '员工', value: 856, color: '#52c41a' },
+    { name: '访客', value: 418, color: '#faad14' },
 ];
 
-// 仓库地址
-const repoLinks = [
-    { name: 'GitHub', icon: <GithubOutlined />, url: 'https://github.com/letu-ai/letu' },
-    { name: '文档', icon: <BookOutlined />, url: 'https://docs.letu.run' },
+// 模拟数据 - 最近登录记录
+const recentLogins = [
+    { id: 1, user: '张三', role: '管理员', ip: '192.168.1.100', time: '2025-10-09 14:23:12', status: 'success' },
+    { id: 2, user: '李四', role: '员工', ip: '192.168.1.101', time: '2025-10-09 14:15:32', status: 'success' },
+    { id: 3, user: '王五', role: '员工', ip: '192.168.1.102', time: '2025-10-09 13:58:45', status: 'failed' },
+    { id: 4, user: '赵六', role: '访客', ip: '192.168.1.103', time: '2025-10-09 13:42:18', status: 'success' },
+    { id: 5, user: '钱七', role: '员工', ip: '192.168.1.104', time: '2025-10-09 13:28:56', status: 'success' },
+];
+
+// 模拟数据 - 系统通知
+const systemNotifications = [
+    { id: 1, title: '系统维护通知', content: '系统将于今晚22:00进行例行维护', time: '2小时前', type: 'warning' },
+    { id: 2, title: '新功能上线', content: '用户标签功能已上线，欢迎体验', time: '5小时前', type: 'info' },
+    { id: 3, title: '安全提醒', content: '检测到异常登录尝试，请注意账号安全', time: '1天前', type: 'error' },
+    { id: 4, title: '数据备份完成', content: '数据库备份任务已成功完成', time: '1天前', type: 'success' },
+];
+
+// 常用功能入口配置
+const quickActions = [
+    {
+        title: '用户管理',
+        icon: <UserOutlined className="text-2xl" />,
+        color: 'bg-blue-500',
+        items: [
+            { name: '用户列表', path: '/admin/users', icon: <UserOutlined /> },
+            { name: '角色管理', path: '/admin/roles', icon: <SafetyOutlined /> },
+            { name: '部门管理', path: '/admin/departments', icon: <ApartmentOutlined /> },
+            { name: '职位管理', path: '/admin/positions', icon: <IdcardOutlined /> },
+        ],
+    },
+    {
+        title: '系统配置',
+        icon: <SettingOutlined className="text-2xl" />,
+        color: 'bg-green-500',
+        items: [
+            { name: '系统设置', path: '/admin/settings', icon: <SettingOutlined /> },
+            { name: '菜单管理', path: '/admin/menus', icon: <AppstoreOutlined /> },
+            { name: '租户管理', path: '/admin/tenants', icon: <TeamOutlined /> },
+            { name: '数据字典', path: '/admin/data-dictionaries', icon: <DatabaseOutlined /> },
+        ],
+    },
+    {
+        title: '日志监控',
+        icon: <FileTextOutlined className="text-2xl" />,
+        color: 'bg-orange-500',
+        items: [
+            { name: '访问日志', path: '/admin/loggings/auditLog/request', icon: <HistoryOutlined /> },
+            { name: '实体日志', path: '/admin/loggings/auditLog/entity', icon: <FileTextOutlined /> },
+            { name: '业务日志', path: '/admin/loggings/business', icon: <FileTextOutlined /> },
+            { name: '在线用户', path: '/admin/online-users', icon: <TeamOutlined /> },
+        ],
+    },
+    {
+        title: '通知任务',
+        icon: <BellOutlined className="text-2xl" />,
+        color: 'bg-purple-500',
+        items: [
+            { name: '通知管理', path: '/admin/notifications', icon: <BellOutlined /> },
+            { name: '定时任务', path: '/admin/scheduled-tasks', icon: <ScheduleOutlined /> },
+            { name: '我的通知', path: '/my/notifications', icon: <NotificationOutlined /> },
+        ],
+    },
 ];
 
 function HomePage() {
-    const [githubRepoInfo, setGithubRepoInfo] = useState<any>({
-        starCount: 26,
-        forkCount: 6,
-        watchCount: 2,
-    });
-
-    useEffect(() => {
-        fetch('https://api.github.com/repos/letu-ai/letu').then(async (data) => {
-            const json = await data.json();
-            if (json instanceof Object) {
-                setGithubRepoInfo({
-                    starCount: json['stargazers_count'],
-                    forkCount: json['forks'],
-                    watchCount: json['subscribers_count'],
-                });
-            }
-        });
-    }, []);
-
+    const loginColumns = [
+        {
+            title: '用户',
+            dataIndex: 'user',
+            key: 'user',
+            render: (text: string, record: any) => (
+                <div className="flex items-center gap-2">
+                    <Avatar size="small" icon={<UserOutlined />} />
+                    <div>
+                        <div className="font-medium">{text}</div>
+                        <div className="text-xs text-gray-500">{record.role}</div>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            title: 'IP地址',
+            dataIndex: 'ip',
+            key: 'ip',
+        },
+        {
+            title: '登录时间',
+            dataIndex: 'time',
+            key: 'time',
+        },
+        {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string) => (
+                <Tag color={status === 'success' ? 'success' : 'error'}>
+                    {status === 'success' ? '成功' : '失败'}
+                </Tag>
+            ),
+        },
+    ];
 
     return (
-        <div className="home-page">
-            {/* 主要内容区域 */}
-            <Row gutter={[24, 24]} className="main-content">
-                {/* 左侧列 - 项目介绍和技术栈 */}
-                <Col xs={24} md={16}>
-                    <Row gutter={[24, 24]}>
-                        {/* 开源项目介绍 */}
-                        <Col span={24}>
-                            <Card
-                                title={
-                                    <Space>
-                                        <BookOutlined />
-                                        <Title level={5} style={{ margin: 0 }}>
-                                            主题测试
-                                        </Title>
-                                    </Space>
-                                }
-                                className="dashboard-card hover:shadow-lg transition-all duration-300"
-                            >
-                                
-                            </Card>
-                        </Col>
-
-                        <Col span={24}>
-                            <Card
-                                title={
-                                    <Space>
-                                        <BookOutlined />
-                                        <Title level={5} style={{ margin: 0 }}>
-                                            项目介绍
-                                        </Title>
-                                    </Space>
-                                }
-                                className="dashboard-card hover:shadow-lg transition-all duration-300"
-                            >
-                                <Paragraph>
-                                    乐途管理系统，使用.NET9+React18构建的RBAC通用权限管理系统（支持按钮级别权限），支持多租户功能，简单易上手，不使用任何三方Admin框架，完全作者独立开发；旨在为个人、企业提供高效、美观的后台管理解决方案，为.NET+React后台方案添砖加瓦，
-                                    系统采用最新最稳定的技术栈，具有良好的扩展性和可维护性，支持快速定制开发。
-                                </Paragraph>
-                                <Paragraph>
-                                    <Text strong>核心特点：</Text>
-                                    <ul className="project-features">
-                                        <li>支持多租户</li>
-                                        <li>按钮级别权限控制</li>
-                                        <li>简洁高效的用户界面</li>
-                                        <li>模块化的系统架构</li>
-                                        <li>可读性高代码结构</li>
-                                    </ul>
-                                </Paragraph>
-
-                                <Divider dashed />
-
-                                <Space direction="vertical" style={{ width: '100%' }}>
-                                    <Text strong>仓库地址：</Text>
-                                    <div className="repo-buttons">
-                                        {repoLinks.map((link, index) => (
-                                            <Button
-                                                key={index}
-                                                icon={link.icon}
-                                                size="middle"
-                                                onClick={() => window.open(link.url, '_blank')}
-                                                className="repo-button bg-primary-bg text-primary-text hover:bg-primary hover:text-white transition-all duration-300"
-                                            >
-                                                {link.name}
-                                            </Button>
-                                        ))}
-                                    </div>
-                                    <div className="repo-stats">
-                                        <Tooltip title="Stars">
-                                            <Space>
-                                                <StarOutlined />
-                                                <Text strong>{githubRepoInfo.starCount}</Text>
-                                            </Space>
-                                        </Tooltip>
-                                        <Tooltip title="Forks">
-                                            <Space>
-                                                <ForkOutlined />
-                                                <Text strong>{githubRepoInfo.forkCount}</Text>
-                                            </Space>
-                                        </Tooltip>
-                                        <Tooltip title="Watchers">
-                                            <Space>
-                                                <EyeOutlined />
-                                                <Text strong>{githubRepoInfo.watchCount}</Text>
-                                            </Space>
-                                        </Tooltip>
-                                    </div>
-                                </Space>
-                            </Card>
-                        </Col>
-
-                        {/* 使用技术列表 */}
-                        <Col span={24}>
-                            <Card
-                                title={
-                                    <Space>
-                                        <CodeOutlined />
-                                        <Title level={5} style={{ margin: 0 }}>
-                                            使用技术列表
-                                        </Title>
-                                    </Space>
-                                }
-                                className="dashboard-card hover:shadow-lg transition-all duration-300"
-                            >
-                                <div className="tech-stack">
-                                    {techStack.map((tech, index) => (
-                                        <Tag key={index} className="tech-tag bg-primary-bg text-primary-text hover:bg-primary hover:text-white transition-all duration-300">
-                                            {tech.name}
-                                        </Tag>
-                                    ))}
-                                </div>
-                                <Paragraph type="secondary" style={{ marginTop: 16 }}>
-                                    前端基于React和Ant Design在Vite下构建，后端使用.NETCore
-                                    WebAPI，数据库默认使用PostgreSQL（支持MySQL,SQLServer,Oracle等多种数据库）；
-                                    后端实现了服务自动注册、服务属性注入、模块化动态加载、Aop拦截特性特色功能，并且系统记录了API访问日志、异常日志、业务日志、登录日志。
-                                </Paragraph>
-                            </Card>
-                        </Col>
-                    </Row>
+        <div className="p-6 bg-gray-50 min-h-full">
+            {/* 顶部统计卡片 */}
+            <Row gutter={[16, 16]} className="mb-6">
+                <Col xs={24} sm={12} lg={6}>
+                    <Card variant="borderless" className="shadow-sm hover:shadow-md transition-shadow">
+                        <Statistic
+                            title="总用户数"
+                            value={statisticsData.totalUsers}
+                            prefix={<UserOutlined />}
+                            suffix={
+                                <span className="text-sm ml-2">
+                                    <ArrowUpOutlined className="text-green-500" />
+                                    <span className="text-green-500">{statisticsData.userGrowth}%</span>
+                                </span>
+                            }
+                        />
+                    </Card>
                 </Col>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card variant="borderless" className="shadow-sm hover:shadow-md transition-shadow">
+                        <Statistic
+                            title="在线用户"
+                            value={statisticsData.onlineUsers}
+                            prefix={<TeamOutlined />}
+                            valueStyle={{ color: '#52c41a' }}
+                            suffix={
+                                <span className="text-sm ml-2">
+                                    <ArrowDownOutlined className="text-red-500" />
+                                    <span className="text-red-500">{Math.abs(statisticsData.onlineChange)}%</span>
+                                </span>
+                            }
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card variant="borderless" className="shadow-sm hover:shadow-md transition-shadow">
+                        <Statistic
+                            title="今日通知"
+                            value={statisticsData.todayNotifications}
+                            prefix={<BellOutlined />}
+                            valueStyle={{ color: '#faad14' }}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card variant="borderless" className="shadow-sm hover:shadow-md transition-shadow">
+                        <Statistic
+                            title="待办任务"
+                            value={statisticsData.pendingTasks}
+                            prefix={<ClockCircleOutlined />}
+                            valueStyle={{ color: '#f5222d' }}
+                        />
+                    </Card>
+                </Col>
+            </Row>
 
-                {/* 右侧列 - 更新日志和捐赠 */}
-                <Col xs={24} md={8}>
-                    <Row gutter={[24, 24]}>
-                        {/* 打赏二维码 */}
-                        <Col span={24}>
-                            <Card
-                                title={
-                                    <Space>
-                                        <GiftOutlined />
-                                        <Title level={5} style={{ margin: 0 }}>
-                                            支持作者
-                                        </Title>
-                                    </Space>
-                                }
-                                className="dashboard-card hover:shadow-lg transition-all duration-300"
-                            >
-                                <Link to="/admin/users">系统设置</Link>
-                            </Card>
-                        </Col>
+            {/* 常用功能入口 */}
+            <Row gutter={[16, 16]} className="mb-6">
+                {quickActions.map((action, index) => (
+                    <Col xs={24} sm={12} lg={6} key={index}>
+                        <Card
+                            variant="borderless"
+                            className="shadow-sm hover:shadow-md transition-all h-full"
+                            title={
+                                <div className="flex items-center gap-3">
+                                    <div className={`${action.color} text-white p-2 rounded-lg`}>
+                                        {action.icon}
+                                    </div>
+                                    <span className="font-semibold">{action.title}</span>
+                                </div>
+                            }
+                        >
+                            <div className="space-y-2">
+                                {action.items.map((item, idx) => (
+                                    <Link key={idx} to={item.path}>
+                                        <Button
+                                            type="text"
+                                            icon={item.icon}
+                                            block
+                                            className="text-left hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                        >
+                                            {item.name}
+                                        </Button>
+                                    </Link>
+                                ))}
+                            </div>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
 
-                        {/* 更新日志 */}
-                        <Col span={24}>
-                            <Card
-                                title={
-                                    <Space>
-                                        <HistoryOutlined />
-                                        <Title level={5} style={{ margin: 0 }}>
-                                            更新日志
-                                        </Title>
-                                    </Space>
-                                }
-                                className="dashboard-card hover:shadow-lg transition-all duration-300"
-                            >
-                                <Timeline
-                                    mode="left"
-                                    items={changelog.map((log, index) => {
-                                        return {
-                                            color: '#7E57C2',
-                                            children: (
-                                                <div className="changelog-item" key={index}>
-                                                    <Space>
-                                                        <Text strong>{log.date}</Text>
-                                                    </Space>
-                                                    <ul className="changelog-list">
-                                                        {log.items.map((item, i) => (
-                                                            <li key={i}>{item}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ),
-                                        };
-                                    })}
-                                />
-                            </Card>
-                        </Col>
-                    </Row>
+            {/* 数据可视化区域 */}
+            <Row gutter={[16, 16]} className="mb-6">
+                <Col xs={24} lg={16}>
+                    <Card
+                        variant="borderless"
+                        className="shadow-sm"
+                        title={
+                            <div className="flex items-center gap-2">
+                                <HistoryOutlined />
+                                <span className="font-semibold">访问趋势（最近7天）</span>
+                            </div>
+                        }
+                    >
+                        <ResponsiveContainer width="100%" height={300}>
+                            <AreaChart data={visitTrendData}>
+                                <defs>
+                                    <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#1890ff" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#1890ff" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#52c41a" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#52c41a" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip />
+                                <Area type="monotone" dataKey="visits" stroke="#1890ff" fillOpacity={1} fill="url(#colorVisits)" name="访问量" />
+                                <Area type="monotone" dataKey="activeUsers" stroke="#52c41a" fillOpacity={1} fill="url(#colorActive)" name="活跃用户" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </Card>
+                </Col>
+                <Col xs={24} lg={8}>
+                    <Card
+                        variant="borderless"
+                        className="shadow-sm"
+                        title={
+                            <div className="flex items-center gap-2">
+                                <TeamOutlined />
+                                <span className="font-semibold">用户分布</span>
+                            </div>
+                        }
+                    >
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={userDistributionData}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={(entry) => `${entry.name}: ${entry.value}`}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                >
+                                    {userDistributionData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </Card>
+                </Col>
+            </Row>
+
+            {/* 最近活动 */}
+            <Row gutter={[16, 16]}>
+                <Col xs={24} lg={14}>
+                    <Card
+                        variant="borderless"
+                        className="shadow-sm"
+                        title={
+                            <div className="flex items-center gap-2">
+                                <HistoryOutlined />
+                                <span className="font-semibold">最近登录记录</span>
+                            </div>
+                        }
+                    >
+                        <Table
+                            columns={loginColumns}
+                            dataSource={recentLogins}
+                            pagination={false}
+                            size="small"
+                            rowKey="id"
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} lg={10}>
+                    <Card
+                        variant="borderless"
+                        className="shadow-sm"
+                        title={
+                            <div className="flex items-center gap-2">
+                                <BellOutlined />
+                                <span className="font-semibold">系统通知</span>
+                            </div>
+                        }
+                    >
+                        <List
+                            dataSource={systemNotifications}
+                            renderItem={(item) => (
+                                <List.Item className="hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <List.Item.Meta
+                                        avatar={
+                                            <Avatar
+                                                icon={<BellOutlined />}
+                                                style={{
+                                                    backgroundColor:
+                                                        item.type === 'warning'
+                                                            ? '#faad14'
+                                                            : item.type === 'error'
+                                                            ? '#f5222d'
+                                                            : item.type === 'success'
+                                                            ? '#52c41a'
+                                                            : '#1890ff',
+                                                }}
+                                            />
+                                        }
+                                        title={<span className="font-medium">{item.title}</span>}
+                                        description={
+                                            <div>
+                                                <div className="text-sm text-gray-600">{item.content}</div>
+                                                <div className="text-xs text-gray-400 mt-1">{item.time}</div>
+                                            </div>
+                                        }
+                                    />
+                                </List.Item>
+                            )}
+                        />
+                    </Card>
                 </Col>
             </Row>
         </div>

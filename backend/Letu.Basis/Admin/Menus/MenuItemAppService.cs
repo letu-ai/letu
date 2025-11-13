@@ -2,6 +2,7 @@ using FreeSql;
 using Letu.Basis.Admin.Menus.Dtos;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Utils;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
 using Volo.Abp;
 using Volo.Abp.Authorization.Permissions;
@@ -29,6 +30,7 @@ namespace Letu.Basis.Admin.Menus
             this.featureDefinitionManager = featureDefinitionManager;
         }
 
+        [BusinessLog("菜单管理", BusinessOperateType.Create, "新增菜单{{Name}}")]
         public async Task AddMenuAsync(MenuItemCreateOrUpdateInput dto)
         {
             if (dto.MenuType == MenuType.Menu && string.IsNullOrWhiteSpace(dto.Path))
@@ -47,11 +49,15 @@ namespace Letu.Basis.Admin.Menus
             }
 
             var entity = ObjectMapper.Map<MenuItemCreateOrUpdateInput, MenuItem>(dto);
-            await menuRepository.InsertAsync(entity);
+            entity = await menuRepository.InsertAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Title);
+            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
 
             // 设置权限和功能关联
             await SetMenuPermissionsAndFeaturesAsync(entity.Id, dto.Permissions, dto.Features);
         }
+
+        [BusinessLog("菜单管理", BusinessOperateType.Update, "更新菜单{{Name}}")]
 
         public async Task UpdateMenuAsync(Guid id, MenuItemCreateOrUpdateInput input)
         {
@@ -78,12 +84,16 @@ namespace Letu.Basis.Admin.Menus
 
             ObjectMapper.Map(input, entity);
             await menuRepository.UpdateAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Title);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
 
             // 清除并重新设置权限和功能关联
             await ClearMenuPermissionsAndFeaturesAsync(id);
             await SetMenuPermissionsAndFeaturesAsync(id, input.Permissions, input.Features);
+
         }
 
+        [BusinessLog("菜单管理", BusinessOperateType.Delete, "批量删除菜单{{Names}}")]
         public async Task DeleteMenusAsync(Guid[] ids)
         {
             // 批量获取所有要删除的菜单项
@@ -95,6 +105,8 @@ namespace Letu.Basis.Admin.Menus
 
                 await DeleteMenuItemAsync(item.Id);
             }
+
+            BusinessLogManager.Current?.AddVariable("Names", string.Join(',', menuItems.Select(x => x.Title)));
         }
 
         // 检查是否存在以该ID为父级的子菜单

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Caching.Distributed;
+using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.EventBus.Distributed;
@@ -11,9 +11,9 @@ public class UserUpdatedEventHandler :
 {
     private const string UserClaimsCacheKeyPrefix = "user_claims:";
 
-    protected IDistributedCache DistributedCache { get; }
+    protected IDistributedCache<UserExtraClaims> DistributedCache { get; }
 
-    public UserUpdatedEventHandler(IDistributedCache distributedCache)
+    public UserUpdatedEventHandler(IDistributedCache<UserExtraClaims> distributedCache)
     {
         DistributedCache = distributedCache;
     }

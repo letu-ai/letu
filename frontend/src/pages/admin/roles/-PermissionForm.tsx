@@ -2,14 +2,14 @@ import { Badge, Checkbox, Col, Divider, List, Menu, Modal, Row } from 'antd';
 import type { MenuProps } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { getRolePermissions, updateRolePermissions, type RoleListDto, type PermissionDto, type UpdatePermissionDto } from './-service';
+import { getRolePermissions, updateRolePermissions, type RoleListOutput, type PermissionDto, type UpdatePermissionDto } from './-service';
 import {App} from 'antd';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ModalProps { }
 
 export interface PermissionModalRef {
-    openModal: (row: RoleListDto) => void; // 定义 ref 的类型
+    openModal: (row: RoleListOutput) => void; // 定义 ref 的类型
 }
 
 interface GroupItem {
@@ -57,7 +57,7 @@ const mapToGroupMenuItem = (groups: GroupItem[] | undefined) => {
 const PermissionForm = forwardRef<PermissionModalRef, ModalProps>((_, ref) => {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [currentRow, setCurrentRow] = useState<RoleListDto>();
+    const [currentRow, setCurrentRow] = useState<RoleListOutput>();
     const [groupItems, setGroupItems] = useState<GroupItem[]>();
     const [selectedGroup, setSelectedGroup] = useState<GroupItem>();
     const [permissionItems, setPermissionItems] = useState<PermissionDto[]>([]);
@@ -67,7 +67,7 @@ const PermissionForm = forwardRef<PermissionModalRef, ModalProps>((_, ref) => {
         openModal,
     }));
 
-    const openModal = (row: RoleListDto) => {
+    const openModal = (row: RoleListOutput) => {
         setCurrentRow(row);
         setIsOpenModal(true);
         loadPermissions(row.name);

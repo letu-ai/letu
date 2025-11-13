@@ -1,5 +1,6 @@
 using Letu.Basis.Admin.Loggings.Dtos;
 using Letu.Core.Applications;
+using Letu.Logging.SecurtyLogs;
 using Letu.Repository;
 
 namespace Letu.Basis.Admin.Loggings

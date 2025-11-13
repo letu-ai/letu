@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Space, Form, Input, Button, Tag } from 'antd';
 import { useRef } from 'react';
-import { PlusOutlined, ExclamationCircleFilled, EditOutlined, HddOutlined, DeleteOutlined } from '@ant-design/icons';
-import { deleteRole, getRoleList, type RoleListDto } from '@/pages/admin/roles/-service';
+import { PlusOutlined, ExclamationCircleFilled, EditOutlined, HddOutlined, DeleteOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { deleteRole, getRoleList, type RoleListOutput } from '@/pages/admin/roles/-service';
 import RoleForm, { type ModalRef } from './-RoleForm';
 import PermissionForm, { type PermissionModalRef } from './-PermissionForm';
 import SmartTable from '@/components/SmartTable';
@@ -11,6 +11,7 @@ import { PermissionConstant } from '@/utils/globalValue';
 import { App } from 'antd';
 import Permission from '@/components/Permission';
 import { BasisPermissions } from '@/application/permissions';
+import dayjs from 'dayjs';
 
 export const Route = createFileRoute('/admin/roles/')({
     component: Role
@@ -21,20 +22,13 @@ function Role() {
     const permissionForRef = useRef<PermissionModalRef>(null);
     const tableRef = useRef<SmartTableRef>(null);
     const { message, modal } = App.useApp();
-    const columns: SmartTableColumnType<RoleListDto>[] = [
+    const columns: SmartTableColumnType<RoleListOutput>[] = [
         {
             title: '角色名',
             dataIndex: 'name',
             key: 'name',
-        },
-        {
-            title: '状态',
-            dataIndex: 'isEnabled',
-            render: (isEnabled: boolean) => {
-                if (isEnabled) {
-                    return <Tag color="success">启用</Tag>;
-                }
-                return <Tag>禁用</Tag>;
+            render: (name: string) => {
+                return <span className="font-bold">{name}</span>;
             },
         },
         {
@@ -43,15 +37,53 @@ function Role() {
             key: 'remark',
         },
         {
+            title: '状态',
+            dataIndex: 'isEnabled',
+            width: 60,
+            render: (isEnabled: boolean) => {
+                if (isEnabled) {
+                    return <Tag color="success">启用</Tag>;
+                }
+                return <Tag>禁用</Tag>;
+            },
+        },
+        {
+            title: '默认',
+            dataIndex: 'isDefault',
+            width: 60,
+            render: (isDefault: boolean) => {
+                return isDefault ? <CheckCircleFilled /> : "";
+            },
+        },
+        {
+            title: '公共',
+            dataIndex: 'isPublic',
+            width: 60,
+            render: (isPublic: boolean) => {
+                return isPublic ? <CheckCircleFilled /> : "";
+            },
+        },
+        {
+            title: '系统',
+            dataIndex: 'isStatic',
+            width: 60,
+            render: (isStatic: boolean) => {
+                return isStatic ? <CheckCircleFilled /> : "";
+            },
+        },
+        {
             title: '创建时间',
             dataIndex: 'creationTime',
+            render: (creationTime: string) => {
+                return <span>{dayjs(creationTime).format('YYYY-MM-DD')}</span>;
+            },
         },
         {
             title: '操作',
             key: 'action',
             width: 210,
             fixed: 'right',
-            render: (_: any, record: RoleListDto) => {
+            render: (_: any, record: RoleListOutput) => {
                 if (record.name === PermissionConstant.SuperAdmin) return <></>;
                 return (
                     <Space>
@@ -76,7 +108,7 @@ function Role() {
         },
     ];
 
-    const openPermissionModal = (row: RoleListDto) => {
+    const openPermissionModal = (row: RoleListOutput) => {
         permissionForRef?.current?.openModal(row);
     };
 
@@ -98,7 +130,7 @@ function Role() {
             },
         });
     };
-    const rowEdit = (record: RoleListDto) => {
+    const rowEdit = (record: RoleListOutput) => {
         modalRef.current?.openModal(record);
     };
 

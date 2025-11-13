@@ -3,7 +3,6 @@ using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Employees.Dtos;
 using Letu.Basis.Permissions;
 using Letu.Core.Applications;
-using Letu.Logging;
 using Letu.Shared.Consts;
 
 using Microsoft.AspNetCore.Authorization;
@@ -65,7 +64,7 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="id"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        [HttpPut()]
+        [HttpPut("{id:guid}")]
         [Authorize(BasisPermissions.Employee.Update)]
         public async Task UpdateEmployeeAsync(Guid id, [FromBody] EmployeeCreateOrUpdateInput input)
         {
@@ -79,7 +78,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
         [Authorize(BasisPermissions.Employee.Delete)]
-        [ApiAccessLog(operateName: "删除员工", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteEmployeeAsync(Guid id)
         {
             await _employeeService.DeleteEmployeeAsync(id);

@@ -6,5 +6,6 @@ public interface IClientConnectionHub
     Task RemoveConnectionAsync(string connectionId);
     Task RemoveConnectionsBySessionAsync(Guid userId, string sessionId);
     Task SendMessageToUserAsync<T>(Guid userId, string type, T? payload);
+    Task SendMessageToUsersAsync<T>(List<Guid> userIds, string type, T? payload);
     Task SendMessageToAllAsync<T>(string type, T? payload);
 }

@@ -13,7 +13,7 @@ public class JwtAccessTokenProvider(IOptions<JwtOptions> jwtOptions)
 {
     private readonly JwtOptions jwtOptions = jwtOptions.Value;
 
-    public JwtAccessToken CreateToken(IEnumerable<Claim> claims, int? expiresSeconds = null)
+    public JwtAccessToken CreateToken(IEnumerable<Claim> claims, int? expiresSeconds = null, string? audience = null, string? issuer = null)
     {
         if (expiresSeconds.HasValue && expiresSeconds <= 0)
         {
@@ -25,8 +25,8 @@ public class JwtAccessTokenProvider(IOptions<JwtOptions> jwtOptions)
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Audience = jwtOptions.Issuance.Audience,
-            Issuer = jwtOptions.Issuance.Issuer,
+            Audience = audience ?? jwtOptions.Issuance.Audience,
+            Issuer = issuer ?? jwtOptions.Issuance.Issuer,
             IssuedAt = DateTime.UtcNow,
             NotBefore = DateTime.UtcNow,
             Expires = expires.UtcDateTime,

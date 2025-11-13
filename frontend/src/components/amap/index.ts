@@ -8,6 +8,10 @@ export { default as MapAddressInput } from './MapAddressInput';
 export type {
     IMapLocation,
     IMapMarker,
+    IMarkerIcon,
+    IClusterOptions,
+    IClusterContext,
+    IMarkerContext,
     IMapDisplayProps,
     IMapDisplayRef,
     IAddressPickerValue,

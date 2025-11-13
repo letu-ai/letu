@@ -20,44 +20,26 @@ public class AuditLogAppService : BasisAppService, IAuditLogAppService
 
     public virtual async Task<PagedResultDto<AuditLogListOutput>> GetListAsync(GetAuditLogListInput input)
     {
-        var query = auditLogRepository.Select
+        var list = await auditLogRepository.Select
             .WhereIf(input.StartTime.HasValue, x => x.ExecutionTime >= input.StartTime!.Value)
             .WhereIf(input.EndTime.HasValue, x => x.ExecutionTime <= input.EndTime!.Value)
             .WhereIf(!string.IsNullOrEmpty(input.HttpMethod), x => x.HttpMethod == input.HttpMethod)
-            .WhereIf(!string.IsNullOrEmpty(input.Url), x => x.Url != null && x.Url.Contains(input.Url))
+            .WhereIf(!string.IsNullOrEmpty(input.Url), x => x.Url != null && x.Url.Contains(input.Url!))
             .WhereIf(!string.IsNullOrEmpty(input.ClientId), x => x.ClientId != null && x.ClientId == input.ClientId)
             .WhereIf(input.UserId.HasValue, x => x.UserId == input.UserId)
-            .WhereIf(!string.IsNullOrEmpty(input.UserName), x => x.UserName != null && x.UserName.Contains(input.UserName))
+            .WhereIf(!string.IsNullOrEmpty(input.UserName), x => x.UserName != null && x.UserName.Contains(input.UserName!))
             .WhereIf(!string.IsNullOrEmpty(input.ApplicationName), x => x.ApplicationName != null && x.ApplicationName == input.ApplicationName)
             .WhereIf(!string.IsNullOrEmpty(input.ClientIpAddress), x => x.ClientIpAddress != null && x.ClientIpAddress == input.ClientIpAddress)
             .WhereIf(!string.IsNullOrEmpty(input.CorrelationId), x => x.CorrelationId != null && x.CorrelationId == input.CorrelationId)
             .WhereIf(input.MaxExecutionDuration.HasValue, x => x.ExecutionDuration <= input.MaxExecutionDuration!.Value)
             .WhereIf(input.MinExecutionDuration.HasValue, x => x.ExecutionDuration >= input.MinExecutionDuration!.Value)
-            .WhereIf(input.HasException.HasValue, x => (x.Exceptions != null && x.Exceptions.Length > 0) == input.HasException.Value)
-            .WhereIf(input.HttpStatusCode.HasValue, x => x.HttpStatusCode == (int)input.HttpStatusCode!.Value);
-
-        var totalCount = await query.CountAsync();
-        if (totalCount == 0)
-        {
-            return new PagedResultDto<AuditLogListOutput>();
-        }
-
-        // 处理排序
-        if (!string.IsNullOrEmpty(input.Sorting))
-        {
-            // 默认按执行时间降序排列
-            query = query.OrderByPropertyNameIf(!string.IsNullOrEmpty(input.Sorting), input.Sorting, false);
-        }
-        else
-        {
-            query = query.OrderByDescending(x => x.ExecutionTime);
-        }
-
-        // 分页
-        var list = await query
-            .Skip(input.SkipCount)
-            .Take(input.MaxResultCount)
+            .WhereIf(input.HasException.HasValue, x => (x.Exceptions != null && x.Exceptions.Length > 0) == input.HasException!.Value)
+            .WhereIf(input.HttpStatusCode.HasValue, x => x.HttpStatusCode == (int)input.HttpStatusCode!.Value)
+            .OrderByDescending(x => x.ExecutionTime)
+            .Count(out var totalCount)
+            .Page(input.Current, input.PageSize)
             .ToListAsync();
+
 
         return new PagedResultDto<AuditLogListOutput>(totalCount, ObjectMapper.Map<List<AuditLog>, List<AuditLogListOutput>>(list));
     }

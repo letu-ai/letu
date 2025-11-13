@@ -33,7 +33,6 @@ namespace Letu.Basis.Controllers.Admin
         [HttpPost]
         [Authorize(BasisPermissions.User.Create)]
         [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
-        [ApiAccessLog(operateName: "新增用户", operateType: [OperateType.Create], reponseEnable: true)]
         public async Task AddUserAsync([FromBody] UserCreateInput input)
         {
             await userService.AddUserAsync(input);
@@ -53,7 +52,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <param name="input"></param>
         /// <returns></returns>
         [HttpGet]
-        [ApiAccessLog(operateName: "用户分页列表")]
         public async Task<PagedResult<UserListOutput>> GetUserListAsync([FromQuery] UserListInput input)
         {
             return await userService.GetUserListAsync(input);
@@ -109,7 +107,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpPost("{id:Guid}/assign-role")]
         [Authorize(BasisPermissions.User.Update)]
-        [ApiAccessLog(operateName: "分配角色", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task AssignRoleAsync(Guid id, [FromBody] AssignRoleDto input)
         {
             await userService.AssignRoleAsync(id, input);
@@ -122,7 +119,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpPut("{id:Guid}/enabled")]
         [Authorize(BasisPermissions.User.Update)]
-        [ApiAccessLog(operateName: "切换用户启用状态", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task SwitchUserEnabledStatusAsync(Guid id)
         {
             await userService.SwitchUserEnabledStatusAsync(id);
@@ -146,7 +142,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpPut("reset-password")]
         [Authorize(BasisPermissions.User.Update)]
-        [ApiAccessLog(operateName: "重置用户密码", operateType: [OperateType.Update], reponseEnable: true)]
         public async Task ResetUserPasswordAsync([FromBody] ResetUserPwdDto input)
         {
             await userService.ResetUserPasswordAsync(input);

@@ -2,7 +2,6 @@ using Letu.Basis.Admin.DataDictionaries;
 using Letu.Basis.Admin.DataDictionaries.Dtos;
 using Letu.Basis.Permissions;
 using Letu.Core.Applications;
-using Letu.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,7 +63,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize(BasisPermissions.DataDictionary.Delete)]
-        [ApiAccessLog(operateName: "删除字典", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteDictionaryAsync(Guid id)
         {
             await dictAppService.DeleteDictionaryAsync(id);
@@ -77,34 +75,11 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete]
         [Authorize(BasisPermissions.DataDictionary.Delete)]
-        [ApiAccessLog(operateName: "批量删除字典", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteDictionariesAsync([FromBody] Guid[] ids)
         {
             await dictAppService.DeleteDictionariesAsync(ids);
         }
-
-        /// <summary>
-        /// 批量获取字典选项
-        /// </summary>
-        /// <param name="dictNames"></param>
-        /// <returns></returns>
-        [HttpGet("options")]
-        public async Task<Dictionary<string, List<SelectOption>?>> GetDictionaryOptionsBatchAsync([FromQuery] string[] dictNames)
-        {
-            return await dictAppService.GetDictionaryOptionsBatchAsync(dictNames);
-        }
-
-        /// <summary>
-        /// 字典选项
-        /// </summary>
-        /// <param name="dictName"></param>
-        /// <returns></returns>
-        [HttpGet("{dictName}/options")]
-        public async Task<List<SelectOption>> GetDictDataOptionsAsync(string dictName)
-        {
-            return await dictAppService.GetDictionaryOptionsAsync(dictName);
-        }
-
+        
         /// <summary>
         /// 新增字典项
         /// </summary>
@@ -152,7 +127,6 @@ namespace Letu.Basis.Controllers.Admin
         /// <returns></returns>
         [HttpDelete("{dictName}/items")]
         [Authorize(BasisPermissions.DataDictionary.Update)]
-        [ApiAccessLog(operateName: "删除字典数据", operateType: [OperateType.Delete], reponseEnable: true)]
         public async Task DeleteItemAsync(string dictName, [FromBody] Guid[] ids)
         {
             await dictAppService.DeleteItemAsync(dictName, ids);

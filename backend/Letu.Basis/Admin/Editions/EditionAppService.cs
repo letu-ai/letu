@@ -2,13 +2,12 @@ using Letu.Basis.Admin.Editions.Dtos;
 using Letu.Basis.Admin.Tenants;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
-using Volo.Abp;
-using Volo.Abp.Application.Services;
 
 namespace Letu.Basis.Admin.Editions
 {
-    public class EditionAppService : ApplicationService, IEditionAppService
+    public class EditionAppService : BasisAppService, IEditionAppService
     {
         private readonly IFreeSqlRepository<Edition> _editionRepository;
 
@@ -28,6 +27,7 @@ namespace Letu.Basis.Admin.Editions
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [BusinessLog("版本管理", BusinessOperateType.Create, "新增版本{{Name}}")]
         public async Task<bool> AddEditionAsync(EditionCreateOrUpdateInput dto)
         {
             var exist = await _editionRepository.Select.Where(x => x.Name == dto.Name).AnyAsync();
@@ -36,6 +36,8 @@ namespace Letu.Basis.Admin.Editions
 
             var edition = ObjectMapper.Map<EditionCreateOrUpdateInput, Edition>(dto);
             var result = await _editionRepository.InsertAsync(edition);
+            BusinessLogManager.Current?.AddVariable("Name", edition.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", edition.Id);
 
             return result != null;
         }
@@ -86,6 +88,7 @@ namespace Letu.Basis.Admin.Editions
         /// <param name="id">版本ID</param>
         /// <param name="input">版本信息</param>
         /// <returns></returns>
+        [BusinessLog("版本管理", BusinessOperateType.Update, "更新版本{{Name}}")]
         public async Task<bool> UpdateEditionAsync(Guid id, EditionCreateOrUpdateInput input)
         {
             var edition = await _editionRepository.Select
@@ -105,6 +108,9 @@ namespace Letu.Basis.Admin.Editions
 
             var result = await _editionRepository.UpdateAsync(edition);
 
+            BusinessLogManager.Current?.AddVariable("Name", edition.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return result > 0;
         }
 
@@ -113,6 +119,7 @@ namespace Letu.Basis.Admin.Editions
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [BusinessLog("版本管理", BusinessOperateType.Delete, "删除版本{{Name}}")]
         public async Task<bool> DeleteEditionAsync(Guid id)
         {
             var edition = await _editionRepository.Select
@@ -130,6 +137,9 @@ namespace Letu.Basis.Admin.Editions
                 throw HttpFriendlyException.BadRequest("此版本下有租户，无法删除");
 
             var result = await _editionRepository.DeleteAsync(x => x.Id == id);
+
+            BusinessLogManager.Current?.AddVariable("Name", edition.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
 
             return result > 0;
         }

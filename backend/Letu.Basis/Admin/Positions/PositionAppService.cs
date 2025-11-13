@@ -9,6 +9,7 @@ using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
+using Letu.Logging.BusinessLogs;
 
 namespace Letu.Basis.Admin.Positions
 {
@@ -28,6 +29,7 @@ namespace Letu.Basis.Admin.Positions
             _userRepository = userRepository;
         }
 
+        [BusinessLog("职位管理", BusinessOperateType.Create, "创建职位分组{{Name}}")]
         public async Task<bool> AddPositionGroupAsync(PositionGroupCreateOrUpdateInput dto)
         {
             var entity = ObjectMapper.Map<PositionGroupCreateOrUpdateInput, PositionGroup>(dto);
@@ -37,7 +39,11 @@ namespace Letu.Basis.Admin.Positions
                 var all = await _positionGroupRepository.Select.ToListAsync();
                 entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
             }
-            await _positionGroupRepository.InsertAsync(entity);
+
+            entity = await _positionGroupRepository.InsertAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
+            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+
             return true;
         }
 
@@ -48,6 +54,7 @@ namespace Letu.Basis.Admin.Positions
             return GetParentIds(all, parentId.Value) + "," + id;
         }
 
+        [BusinessLog("职位管理", BusinessOperateType.Delete, "删除职位分组{{Name}}")]
         public async Task<bool> DeletePositionGroupAsync(Guid id)
         {
             var hasPositions = await _positionRepository.Select.AnyAsync(x => x.GroupId == id);
@@ -55,7 +62,11 @@ namespace Letu.Basis.Admin.Positions
             {
                 throw HttpFriendlyException.BadRequest("分组下有职位，不能删除");
             }
-            await _positionGroupRepository.DeleteAsync(x => x.Id == id);
+            var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
+            await _positionGroupRepository.DeleteAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 
@@ -69,6 +80,7 @@ namespace Letu.Basis.Admin.Positions
             return ObjectMapper.Map<List<PositionGroup>, List<PositionGroupListOutput>>(rawTree);
         }
 
+        [BusinessLog("职位管理", BusinessOperateType.Update, "更新职位分组{{Name}}")]
         public async Task<bool> UpdatePositionGroupAsync(Guid id, PositionGroupCreateOrUpdateInput dto)
         {
             var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
@@ -87,6 +99,9 @@ namespace Letu.Basis.Admin.Positions
                 entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
             }
             await _positionGroupRepository.UpdateAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 
@@ -118,6 +133,7 @@ namespace Letu.Basis.Admin.Positions
             return list;
         }
 
+        [BusinessLog("职位管理", BusinessOperateType.Create, "创建职位{{Name}}")]
         public async Task<bool> AddPositionAsync(PositionCreateOrUpdateInput dto)
         {
             if (_positionRepository.Select.Any(x => x.Code.ToLower() == dto.Code!.ToLower()))
@@ -125,15 +141,23 @@ namespace Letu.Basis.Admin.Positions
                 throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
             }
             var entity = ObjectMapper.Map<PositionCreateOrUpdateInput, Position>(dto);
-            await _positionRepository.InsertAsync(entity);
+            entity = await _positionRepository.InsertAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+
             return true;
         }
 
+        [BusinessLog("职位管理", BusinessOperateType.Delete, "删除职位{{Name}}")]
         public async Task<bool> DeletePositionAsync(Guid id)
         {
             var hasUsers = await _userRepository.Select.AnyAsync(x => x.PositionId == id);
             if (hasUsers) throw HttpFriendlyException.BadRequest("职位正在使用，不能删除");
-            await _positionRepository.DeleteAsync(x => x.Id == id);
+            var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync();
+            await _positionRepository.DeleteAsync(entity);
+            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+            BusinessLogManager.Current?.AddVariable("EntityId", id);
+
             return true;
         }
 

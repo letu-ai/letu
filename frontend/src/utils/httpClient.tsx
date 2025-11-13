@@ -1,7 +1,22 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { getToken, shouldRefreshToken } from '@/utils/authUtils';
+import { getToken } from '@/utils/authUtils';
 import { getApiBaseUrl } from './urlUtils';
-import { tokenRefreshManager } from './tokenRefreshManager';
+import { refreshToken } from '@/utils/tokenRefreshManager';
+
+// 扩展AxiosRequestConfig，添加anonymous属性
+export interface IHttpClientConfig extends AxiosRequestConfig {
+    /**
+     * 是否为匿名请求（不需要token认证和刷新）
+     * 设置为true时，不会添加Authorization header，也不会在401时进行token刷新
+     */
+    anonymous?: boolean;
+
+    /**
+     * 是否显示全局错误消息,true时显示全局错误消息
+     * 默认值为true
+     */
+    showGlobalErrorMessage?: boolean;
+}
 
 interface IAbpFormatError {
     message: string;
@@ -15,6 +30,7 @@ export interface IResponseError {
     message: string;
     jumpLogin?: boolean;
     jumpTenantError?: boolean;
+    showGlobalErrorMessage?: boolean;
     code?: string;
     details?: string | string[];
     data?: any;
@@ -142,175 +158,168 @@ const getErrorInfo = async (error: AxiosError): Promise<IResponseError> => {
     return errorInfo;
 }
 
-class HttpClient {
-    private readonly instance: AxiosInstance;
-    refreshTokenWhiteApis: string[] = [ //不需要刷新token接口
-        '/api/identity/login',
-        '/api/identity/refresh-token',
-        '/api/identity/logout',
-        "/api/application/configuration"
-    ]; 
-    private errorHandler: (error: IResponseError) => void = () => { };
+// ==================== 适配函数 ====================
 
-    // 工具函数：统一URL小写；是否“跳过刷新token”的接口（匿名 或 刷新/注销）
-    private toUrl(url?: string): string { return (url || '').toLowerCase(); }
-    private isSkipRefreshApi(url?: string): boolean {
-        const u = this.toUrl(url);
-        return this.refreshTokenWhiteApis.some(x => u.endsWith(x.toLowerCase()));
-    }
-
-    // 工具函数：给请求附带当前本地token（即使已过期也附带）
-    private attachTokenHeader(config: AxiosRequestConfig) {
-        const token = getToken();
-        if (token?.accessToken) {
-            config.headers = config.headers || {};
-            (config.headers as any).Authorization = `Bearer ${token.accessToken}`;
-        }
-    }
-
-    // 使用共享的token刷新管理器
-    private async refreshTokenInternal(): Promise<boolean> {
-        return tokenRefreshManager.refreshToken();
-    }
-
-    // 处理请求前：受保护接口需要确保token有效；匿名/刷新白名单跳过"刷新token"
-    private async prepareAuthForRequest(config: AxiosRequestConfig): Promise<void> {
-        const skipRefresh = this.isSkipRefreshApi(config.url);
-        
-        // 如果不是白名单接口，检查是否需要刷新token
-        if (!skipRefresh && shouldRefreshToken()) {
-            const refreshed = await this.refreshTokenInternal();
-            if (!refreshed) {
-                const token = getToken();
-                // 如果刷新失败且token已过期，抛出错误
-                if (!token || !token.accessToken) {
-                    const err = new Error('Token is invalid or expired');
-                    err.name = 'TokenInvalidError';
-                    throw err;
-                }
-            }
-        }
-
-        // 无论是否匿名/刷新白名单，都附带当前本地token（如果有的话）
-        this.attachTokenHeader(config);
-    }
-
-    // 响应401时尝试刷新并重试一次（排除“跳过刷新token”的接口）
-    private async tryRefreshAndRetry(error: any): Promise<any> {
-        const originalConfig = error?.config as (AxiosRequestConfig & { __isRetry?: boolean }) | undefined;
-        const status = error?.response?.status as number | undefined;
-        if (!originalConfig || status !== 401) return Promise.reject(error);
-
-        const skipRefresh = this.isSkipRefreshApi(originalConfig.url);
-        if (skipRefresh || originalConfig.__isRetry) {
-            return Promise.reject(error);
-        }
-
-        try {
-            const refreshed = await this.refreshTokenInternal();
-            if (!refreshed) {
-                const tokenError: IResponseError = { message: '登录已过期，请重新登录', jumpLogin: true };
-                this.errorHandler(tokenError);
-                return Promise.reject(error);
-            }
-
-            // 使用最新token重试一次
-            this.attachTokenHeader(originalConfig);
-            originalConfig.__isRetry = true;
-            return this.instance.request(originalConfig);
-        } catch {
-            const tokenError: IResponseError = { message: '登录已过期，请重新登录', jumpLogin: true };
-            this.errorHandler(tokenError);
-            return Promise.reject(error);
-        }
-    }
-
-    constructor(config?: AxiosRequestConfig) {
-        this.instance = axios.create(config);
-
-        // 请求拦截器
-        this.instance.interceptors.request.use(
-            async (config) => {
-                await this.prepareAuthForRequest(config);
-                return config;
-            },
-            (error) => Promise.reject(error),
-        );
-
-        // 响应拦截器
-        this.instance.interceptors.response.use(
-            (response) => {
-                return response.data;
-            },
-            async (error) => {
-                // 401兜底重试
-                const maybeRetried = await this.tryRefreshAndRetry(error).catch(() => undefined);
-                if (maybeRetried !== undefined) 
-                    return maybeRetried;
-
-                const errorInfo = await getErrorInfo(error);
-                this.errorHandler(errorInfo);
-                return Promise.reject(error);
-            },
-        );
-    }
-
-    public setErrorHandler(handler: (error: IResponseError) => void) {
-        this.errorHandler = handler;
-    }
-
-    // GET请求
-    public get<TRequest = any, TResponse = any>(url: string, config?: AxiosRequestConfig): Promise<TResponse> {
-        return this.instance.get<TRequest, TResponse>(url, config);
-    }
-
-    // POST请求
-    public post<TRequest = any, TResponse = any>(
-        url: string,
-        data?: any,
-        config?: AxiosRequestConfig,
-    ): Promise<TResponse> {
-        return this.instance.post<TRequest, TResponse>(url, data, config);
-    }
-
-    // PUT请求
-    public put<TRequest = any, TResponse = any>(
-        url: string,
-        data?: any,
-        config?: AxiosRequestConfig,
-    ): Promise<TResponse> {
-        return this.instance.put<TRequest, TResponse>(url, data, config);
-    }
-
-    // DELETE请求
-    public delete<TRequest = any, TResponse = any>(url: string, config?: AxiosRequestConfig): Promise<TResponse> {
-        return this.instance.delete<TRequest, TResponse>(url, config);
-    }
-
-    // PATCH请求
-    public patch<TRequest = any, TResponse = any>(
-        url: string,
-        data?: any,
-        config?: AxiosRequestConfig,
-    ): Promise<TResponse> {
-        return this.instance.patch<TRequest, TResponse>(url, data, config);
-    }
-
-    // 获取原始Axios实例
-    public getInstance(): AxiosInstance {
-        return this.instance;
-    }
+/**
+ * 从存储中获取accessToken
+ */
+function getAccessTokenFromStore(): string | null {
+    const token = getToken();
+    return token?.accessToken || null;
 }
 
-// 默认配置
+
+// ==================== 默认配置 ====================
+
 const defaultConfig: AxiosRequestConfig = {
     baseURL: getApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
-    }
+    },
+    timeout: 10000,
 };
 
-// 创建默认实例
-const httpClient = new HttpClient(defaultConfig);
+// 创建axios实例
+const instance = axios.create(defaultConfig);
+
+// 使用闭包维护状态
+let errorHandler: (error: IResponseError) => void = () => { };
+let isRefreshing = false;
+let requests: Array<() => void> = [];
+
+// 请求拦截器：在发送请求之前，从存储获取 token 并添加到请求头
+instance.interceptors.request.use(
+    config => {
+        const httpConfig = config as IHttpClientConfig;
+        // 如果是匿名请求，不添加token
+        if (httpConfig.anonymous) {
+            return config;
+        }
+        const accessToken = getAccessTokenFromStore();
+        if (accessToken) {
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${accessToken}`;
+        }
+        return config;
+    },
+    error => Promise.reject(error)
+);
+
+// 响应拦截器：处理401错误，实现双token刷新机制
+instance.interceptors.response.use(
+    response => response.data, // 对成功响应直接返回data
+    async error => {
+        const config = error?.config as IHttpClientConfig | undefined;
+        const status = error?.response?.status as number | undefined;
+        const showGlobalErrorMessage = config?.showGlobalErrorMessage ?? true;
+
+        // 1. 如果不是 401 错误，直接返回错误
+        if (status !== 401) {
+            const errorInfo = await getErrorInfo(error);
+            errorInfo.showGlobalErrorMessage = showGlobalErrorMessage;
+            errorHandler(errorInfo);
+            return Promise.reject(error);
+        }
+
+        // 2. 如果没有config或config无效，直接返回错误
+        if (!config) {
+            const errorInfo = await getErrorInfo(error);
+            errorInfo.showGlobalErrorMessage = showGlobalErrorMessage;
+            errorHandler(errorInfo);
+            return Promise.reject(error);
+        }
+
+        // 3. 如果是匿名请求，不进行token刷新，直接返回错误
+        if (config.anonymous) {
+            const errorInfo = await getErrorInfo(error);
+            errorInfo.showGlobalErrorMessage = showGlobalErrorMessage;
+            errorHandler(errorInfo);
+            return Promise.reject(error);
+        }
+
+        // 4. 避免重复刷新：如果正在刷新 token，将后续请求暂存
+        if (isRefreshing) {
+            return new Promise(resolve => {
+                requests.push(() => resolve(instance.request(config)));
+            });
+        }
+
+        isRefreshing = true;
+
+        try {
+            // 5. 使用 tokenRefreshManager 刷新 token
+            const refreshSuccess = await refreshToken();
+
+            if (!refreshSuccess) {
+                throw new Error('刷新token失败');
+            }
+
+            // 6. 从存储中获取更新后的 access token
+            const updatedToken = getToken();
+            if (!updatedToken?.accessToken) {
+                throw new Error('刷新token后无法获取新的accessToken');
+            }
+
+            // 7. 更新请求头中的 token
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${updatedToken.accessToken}`;
+
+            // 8. 重新执行所有被挂起的请求
+            requests.forEach(cb => cb());
+            requests = []; // 清空队列
+
+            // 9. 重试刚才失败的请求
+            return instance.request(config);
+        } catch (refreshError) {
+            // 10. 如果刷新 token 也失败了，则执行登出操作
+            console.error('刷新token失败，', refreshError);
+            requests = []; // 清空队列
+            const errorInfo: IResponseError = {
+                message: '登录已过期，请重新登录',
+                jumpLogin: true,
+                showGlobalErrorMessage: showGlobalErrorMessage
+            };
+            errorHandler(errorInfo);
+            return Promise.reject(refreshError);
+        } finally {
+            isRefreshing = false;
+        }
+    }
+);
+
+// 导出httpClient对象
+const httpClient = {
+    setErrorHandler: (handler: (error: IResponseError) => void) => {
+        errorHandler = handler;
+    },
+    get: <TRequest = any, TResponse = any>(url: string, config?: IHttpClientConfig): Promise<TResponse> => {
+        return instance.get<TRequest, TResponse>(url, config);
+    },
+    post: <TRequest = any, TResponse = any>(
+        url: string,
+        data?: any,
+        config?: IHttpClientConfig,
+    ): Promise<TResponse> => {
+        return instance.post<TRequest, TResponse>(url, data, config);
+    },
+    put: <TRequest = any, TResponse = any>(
+        url: string,
+        data?: any,
+        config?: IHttpClientConfig,
+    ): Promise<TResponse> => {
+        return instance.put<TRequest, TResponse>(url, data, config);
+    },
+    delete: <TRequest = any, TResponse = any>(url: string, config?: IHttpClientConfig): Promise<TResponse> => {
+        return instance.delete<TRequest, TResponse>(url, config);
+    },
+    patch: <TRequest = any, TResponse = any>(
+        url: string,
+        data?: any,
+        config?: IHttpClientConfig,
+    ): Promise<TResponse> => {
+        return instance.patch<TRequest, TResponse>(url, data, config);
+    },
+    getInstance: (): AxiosInstance => instance,
+};
 
 export default httpClient;

@@ -1,6 +1,7 @@
 ﻿using Letu.Basis.Admin.Regions.Dtos;
 using Letu.Basis.Amaps;
 using Letu.Core.AspNetCore.Mvc;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -94,11 +95,13 @@ public class RegionAppService : BasisAppService, IRegionAppService
         return path;
     }
 
+    [BusinessLog("行政区域管理", BusinessOperateType.Import, "从高德地图导入行政区域数据, 包含街道{{IncludeStreets}}")]
     public async Task<RegionImportResultDto> ImportFromAmapAsync(bool includeStreets)
     {
         logger.LogInformation("开始从高德地图导入行政区域数据，includeStreets: {includeStreets}", includeStreets);
         var result = new RegionImportResultDto();
-
+        BusinessLogManager.Current?.AddVariable("IncludeStreets", includeStreets);
+        
         try
         {
             // 初始化进度

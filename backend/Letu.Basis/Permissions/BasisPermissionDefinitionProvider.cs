@@ -28,6 +28,7 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         DefineSettingManagement(settingGroup);
         DefineFeatureManagement(settingGroup);
         DefineScheduledTasks(settingGroup);
+        DefineLoggingManagement(settingGroup);
         DefineIntegrationManagement(settingGroup);
 
         // 租户管理
@@ -176,6 +177,18 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         group.AddPermission(BasisPermissions.Feature.ManageHostFeatures,
             L("Permission:ManageHostFeatures"),
             multiTenancySide: MultiTenancySides.Host);
+    }
+
+    // 日志管理
+    public void DefineLoggingManagement(PermissionGroupDefinition group)
+    {
+        group.AddPermission(BasisPermissions.Logging.Default, L("Permission:LoggingManagement"));
+        group.AddPermission(BasisPermissions.Logging.OnlineUser, L("Permission:OnlineUser"));
+        group.AddPermission(BasisPermissions.Logging.ScheduledTask, L("Permission:ScheduledTask"));
+        group.AddPermission(BasisPermissions.Logging.Integration, L("Permission:Integration"));
+        group.AddPermission(BasisPermissions.Logging.SecurityLog, L("Permission:SecurityLog"));
+        group.AddPermission(BasisPermissions.Logging.BusinessLog, L("Permission:BusinessLog"));
+        group.AddPermission(BasisPermissions.Logging.AuditLog, L("Permission:AuditLog"));
     }
 
     // 租户管理

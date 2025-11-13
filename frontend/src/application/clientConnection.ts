@@ -124,15 +124,19 @@ class ClientConnectionManager {
 
                 onmessage: async (event) => {
                     try {
-                        if (!event.event || event.event === 'message') {
-                            const data = JSON.parse(event.data);
-                            this.emit('message', data);
-                        } else if (event.event === 'notification') {
-                            const data = JSON.parse(event.data);
-                            this.emit('notification', data);
-                        } else if (event.event === 'heartbeat') {
-                            // 心跳事件，不需要处理
+                        // 心跳事件不需要处理，直接返回
+                        if (event.event === 'heartbeat') {
+                            return;
                         }
+
+                        // 解析数据
+                        const data = event.data ? JSON.parse(event.data) : null;
+                        
+                        // 获取事件类型：如果没有 event 字段，默认为 'message'
+                        const eventType = event.event || 'message';
+                        
+                        // 动态触发对应的事件类型
+                        this.emit(eventType, data);
                     } catch (error) {
                         console.error('Failed to parse server message:', error);
                     }
@@ -182,7 +186,6 @@ class ClientConnectionManager {
 
                         // 启动token刷新
                         tokenRefreshManager.refreshToken().then(refreshed => {
-                            this.isRefreshingToken = false; // 刷新完成，清除标记
 
                             if (refreshed) {
                                 console.log('SSE: Token refreshed successfully, reconnecting with new token...');
@@ -199,10 +202,11 @@ class ClientConnectionManager {
                                 // 保持DESTROYED状态
                             }
                         }).catch(refreshError => {
-                            this.isRefreshingToken = false; // 错误时也要清除标记
                             console.error('SSE: Error during token refresh:', refreshError);
                             this.emit('auth-failed', { message: 'Authentication failed' });
                             // 保持DESTROYED状态
+                        }).finally(() => {
+                            this.isRefreshingToken = false;
                         });
 
                         // 返回null阻止fetchEventSource内部重连

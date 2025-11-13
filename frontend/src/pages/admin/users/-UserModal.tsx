@@ -6,6 +6,7 @@ import DepartmentSelect from '@/components/DepartmentSelect';
 import PositionSelect from '@/components/PositionSelect';
 import EmployeeSelect from '@/components/EmployeeSelect';
 import OrganizationUnitSelect from '@/components/OrganizationUnitSelect';
+import UserTagSelect from '@/components/UserTagSelect';
 import { useAppConfig } from '@/components/AppConfigProvider';
 import { generatePasswordRules, type PasswordConfig } from '@/utils/passwordUtils';
 import { Patterns } from '@/utils/globalValue';
@@ -43,7 +44,12 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         setIsOpenModal(true);
         if (row) {
             setRow(row);
-            form.setFieldsValue(row);
+            // 处理标签ID转换
+            const tagIds = row.tags?.map(tag => tag.id) || [];
+            form.setFieldsValue({
+                ...row,
+                tagIds: tagIds,
+            });
         } else {
             setRow(null);
             form.resetFields();
@@ -73,6 +79,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         positionId?: string | null;
         employeeId?: string | null;
         organizationUnitId?: string | null;
+        tagIds?: string[] | null;
     }
 
     const onFinish = async (values: FormFields) => {
@@ -90,6 +97,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     positionId: values.positionId,
                     employeeId: values.employeeId,
                     organizationUnitId: values.organizationUnitId,
+                    tagIds: values.tagIds,
                 };
                 await updateUser(row.id, updateData);
                 message.success('编辑成功');
@@ -103,6 +111,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     ...values,
                     userName: values.userName,
                     password: values.password,
+                    tagIds: values.tagIds,
                 } as ICreateUserInput;
                 await addUser(createData);
                 message.success('新增成功');
@@ -182,10 +191,13 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     <PositionSelect initialLabel={row?.positionName} />
                 </Form.Item>
                 <Form.Item label="关联员工" name="employeeId">
-                    <EmployeeSelect placeholder="请选择关联员工（可选）" />
+                    <EmployeeSelect placeholder="请选择关联员工（可选）" initialLabel={row?.employeeName} />
                 </Form.Item>
                 <Form.Item label="所属机构" name="organizationUnitId">
                     <OrganizationUnitSelect />
+                </Form.Item>
+                <Form.Item label="用户标签" name="tagIds">
+                    <UserTagSelect placeholder="请选择用户标签（可选）" />
                 </Form.Item>
             </Form>
         </Modal>

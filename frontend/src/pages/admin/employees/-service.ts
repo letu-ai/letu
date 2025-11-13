@@ -45,10 +45,11 @@ export function getEmployeesByIds(employeeIds: string[]) {
 
 /**
  * 修改员工
- * @param dto
+ * @param id
+ * @param input
  */
-export function updateEmployee(dto: EmployeeDto) {
-  return httpClient.put<EmployeeDto, void>('/api/admin/employees', dto);
+export function updateEmployee(id: string, input: EmployeeDto) {
+  return httpClient.put<EmployeeDto, void>(`/api/admin/employees/${id}`, input);
 }
 
 /**

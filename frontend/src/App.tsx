@@ -75,6 +75,7 @@ function InnerApp({ children }: IAppProps) {
         '--color-error-text': token.colorErrorText,
         '--color-error-text-active': token.colorErrorTextActive,
     } as React.CSSProperties), [token]);
+
     const { message } = AntApp.useApp();
     useEffect(() => {
         httpClient.setErrorHandler((errorInfo) => {
@@ -82,12 +83,14 @@ function InnerApp({ children }: IAppProps) {
                 window.location.href = StaticRoutes.tenantError;
                 return
             }
-            
-            message.error(<ResponseErrorMessage error={errorInfo} />, 3, () => {
-                if (errorInfo.jumpLogin && window.location.pathname !== StaticRoutes.login) {
-                    window.location.href = StaticRoutes.logout; //去注销登页面清除登录信息
-                }
-            });
+
+            if (errorInfo.showGlobalErrorMessage || errorInfo.jumpLogin) {
+                message.error(<ResponseErrorMessage error={errorInfo} />, 3, () => {
+                    if (errorInfo.jumpLogin && window.location.pathname !== StaticRoutes.login) {
+                        window.location.href = StaticRoutes.logout; //去注销登页面清除登录信息
+                    }
+                });
+            }
         });
     }, [message]);
 

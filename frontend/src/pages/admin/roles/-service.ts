@@ -5,8 +5,8 @@ import type { PagedResult, PagedResultRequest, SelectOption } from '@/types/api'
  * 新增角色
  * @param dto
  */
-export function addRole(dto: RoleDto) {
-  return httpClient.post<RoleDto, void>('/api/admin/roles', dto);
+export function addRole(dto: RoleCreateOrUpDateInput) {
+  return httpClient.post<RoleCreateOrUpDateInput, void>('/api/admin/roles', dto);
 }
 
 /**
@@ -14,15 +14,15 @@ export function addRole(dto: RoleDto) {
  * @param dto
  */
 export function getRoleList(dto: RoleQueryDto) {
-  return httpClient.get<RoleQueryDto, PagedResult<RoleListDto>>('/api/admin/roles', { params: dto });
+  return httpClient.get<RoleQueryDto, PagedResult<RoleListOutput>>('/api/admin/roles', { params: dto });
 }
 
 /**
  * 修改角色
  * @param dto
  */
-export function updateRole(id: string, dto: RoleDto) {
-  return httpClient.put<RoleDto, void>(`/api/admin/roles/${id}`, dto);
+export function updateRole(id: string, dto: RoleCreateOrUpDateInput) {
+  return httpClient.put<RoleCreateOrUpDateInput, void>(`/api/admin/roles/${id}`, dto);
 }
 
 /**
@@ -34,34 +34,10 @@ export function deleteRole(id: string) {
 }
 
 /**
- * 分配菜单
- * @param dto
- */
-export function assignMenu(dto: AssignMenuDto) {
-  return httpClient.put<AssignMenuDto, void>(`/api/admin/roles/${dto.roleId}/menus`, dto);
-}
-
-/**
  * 获取角色
  */
 export function getRoleOptions() {
   return httpClient.get<unknown, SelectOption[]>('/api/admin/roles/options');
-}
-
-/**
- * 获取指定角色菜单
- * @param id
- */
-export function getRoleMenuIds(id: string) {
-  return httpClient.get<string, string[]>(`/api/admin/roles/${id}/menus`);
-}
-
-/**
- * 分配数据
- * @param dto
- */
-export function assignData(dto: AssignDataDto) {
-  return httpClient.put<AssignDataDto, void>(`/api/admin/roles/${dto.roleId}/data`, dto);
 }
 
 /**
@@ -86,34 +62,27 @@ export function updateRolePermissions(roleId: string, permissions: UpdatePermiss
   );
 }
 
-export interface RoleDto {
-  id?: string | null;
+export interface RoleCreateOrUpDateInput {
   name: string;
   remark?: string | null;
   isEnabled: boolean;
+  isDefault: boolean;
+  isPublic: boolean;
 }
 
-export interface RoleListDto {
+export interface RoleListOutput {
   id: string;
   name: string;
   remark: string | null;
   isEnabled: boolean;
+  isDefault: boolean;
+  isPublic: boolean;
+  isStatic: boolean;
   creationTime: string;
 }
 
 export interface RoleQueryDto extends PagedResultRequest {
   name?: string | null;
-}
-
-export interface AssignMenuDto {
-  menuIds: string[] | null;
-  roleId: string;
-}
-
-export interface AssignDataDto {
-  roleId: string;
-  powerDataType: number;
-  deptIds: string[] | null;
 }
 
 export interface GetPermissionListResultDto {

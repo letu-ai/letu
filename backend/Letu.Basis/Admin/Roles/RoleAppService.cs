@@ -3,6 +3,7 @@ using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
 using Letu.Shared.Consts;
 using Volo.Abp.Domain.Entities;
@@ -31,6 +32,7 @@ public class RoleAppService : BasisAppService, IRoleAppService
         this.eventBus = eventBus;
     }
 
+    [BusinessLog("角色管理", BusinessOperateType.Create, "创建角色{{Name}}")]
     public async Task<bool> AddRoleAsync(RoleCreateOrUpdateInput dto)
     {
         var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == dto.Name.ToLower());
@@ -38,33 +40,52 @@ public class RoleAppService : BasisAppService, IRoleAppService
         {
             throw HttpFriendlyException.BadRequest($"角色名{dto.Name}已存在");
         }
+
         var entity = new Role
         {
             Name = dto.Name,
-            Remark = dto.Remark
+            Remark = dto.Remark,
+            IsDefault = dto.IsDefault,
+            IsPublic = dto.IsPublic,
+            IsStatic = false,
+            IsEnabled = dto.IsEnabled
         };
-        await _roleRepository.InsertAsync(entity);
+        entity = await _roleRepository.InsertAsync(entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+
         return true;
     }
 
+    [BusinessLog("角色管理", BusinessOperateType.Delete, "删除角色{{Name}}")]
     public async Task<bool> DeleteRoleAsync(Guid id)
     {
-        var hasUsers = await _userRoleRepository.Select.AnyAsync(x => x.RoleId == id);
-        if (hasUsers) throw HttpFriendlyException.BadRequest("角色已分配给用户，不能删除");
+        var role = await _roleRepository.Where(x => x.Id == id).FirstAsync()
+            ?? throw new EntityNotFoundException(typeof(Role), id);
 
-        var role = await _roleRepository.Where(x => x.Id == id).FirstAsync();
-        if (role.Name == AdminConsts.SuperAdminRole)
+        if (role.IsStatic)
         {
-            throw HttpFriendlyException.BadRequest($"{role.Name}不能删除");
+            throw HttpFriendlyException.BadRequest("静态角色不能删除");
         }
+
+        var hasUsers = await _userRoleRepository.Select.AnyAsync(x => x.RoleId == id);
+        if (hasUsers)
+            throw HttpFriendlyException.BadRequest("角色已分配给用户，不能删除");
+
         await _roleRepository.DeleteAsync(x => x.Id == id);
+
+        BusinessLogManager.Current?.AddVariable("Name", role.Name);
+        BusinessLogManager.Current?.AddVariable("EntityId", id);
 
         var roleDeleteEto = new EntityDeletedEto<RoleEto>(new RoleEto()
         {
             Id = role.Id,
             Name = role.Name,
+            IsStatic = role.IsStatic,
+            IsPublic = role.IsPublic,
+            IsDefault = role.IsDefault,
             TenantId = role.TenantId,
         });
+
         await eventBus.PublishAsync(roleDeleteEto);
 
         return true;
@@ -91,19 +112,21 @@ public class RoleAppService : BasisAppService, IRoleAppService
         });
     }
 
+    [BusinessLog("角色管理", BusinessOperateType.Update, "更新角色{{Name}}")]
     public async Task<bool> UpdateRoleAsync(Guid id, RoleCreateOrUpdateInput input)
     {
         var entity = await _roleRepository.Where(x => x.Id == id).FirstAsync()
             ?? throw new EntityNotFoundException(typeof(Role), id);
 
-        var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == input.Name.ToLower());
-        if (entity.Name.ToLower() != input.Name.ToLower() && isExist)
+        if (entity.IsStatic)
+        {
+            throw HttpFriendlyException.BadRequest("静态角色不允许修改");
+        }
+
+        var isExist = await _roleRepository.Select.AnyAsync(x => x.Name.ToLower() == input.Name.ToLower() && x.Id != id);
+        if (isExist)
         {
             throw HttpFriendlyException.BadRequest($"角色名{input.Name}已存在");
-        }
-        if (entity.Name == AdminConsts.SuperAdminRole)
-        {
-            throw HttpFriendlyException.BadRequest($"{entity.Name}不允许编辑");
         }
 
         RoleNameChangedEto? roleNameChangedEto = null;
@@ -114,14 +137,20 @@ public class RoleAppService : BasisAppService, IRoleAppService
                 Id = entity.Id,
                 OldName = entity.Name,
                 Name = input.Name,
-                TenantId = entity.TenantId
+                TenantId = entity.TenantId,
             };
         }
 
         entity.Name = input.Name;
         entity.Remark = input.Remark;
         entity.IsEnabled = input.IsEnabled;
+        entity.IsDefault = input.IsDefault;
+        entity.IsPublic = input.IsPublic;
+        
         await _roleRepository.UpdateAsync(entity);
+
+        BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+        BusinessLogManager.Current?.AddVariable("EntityId", id);
 
         if (roleNameChangedEto != null)
             await eventBus.PublishAsync(roleNameChangedEto);
@@ -131,10 +160,5 @@ public class RoleAppService : BasisAppService, IRoleAppService
             // TODO: 禁用角色时发出Event通知？
         }
         return true;
-    }
-
-    public async Task<Guid[]> GetRoleMenuIdsAsync(Guid id)
-    {
-        return [.. await _roleMenuRepository.Where(x => x.RoleId == id).ToListAsync(x => x.MenuId)];
     }
 }

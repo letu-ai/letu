@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, Form, Button, Space, Typography, Divider, App, Row, Col } from "antd";
-import MapAddressInput, { type IDeviceAddressValue } from "@/components/amap/MapAddressInput";
+import MapAddressInput, { type IMapAddressValue } from "@/components/amap/MapAddressInput";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/home/demo/map-address-input')({
 
 function RouteComponent() {
     const [form] = Form.useForm();
-    const [selectedValue, setSelectedValue] = useState<IDeviceAddressValue>();
+    const [selectedValue, setSelectedValue] = useState<IMapAddressValue>();
     const { message } = App.useApp();
     const handleSubmit = () => {
         form.validateFields().then((values) => {
@@ -31,7 +31,7 @@ function RouteComponent() {
     };
 
     const handleLoadTestData = () => {
-        const testData: IDeviceAddressValue = {
+        const testData: IMapAddressValue = {
             code: "110105",
             street: "东华门街道",
             address: "北京市朝阳区望京SOHO T3",
@@ -44,7 +44,7 @@ function RouteComponent() {
         message.success("已加载测试数据");
     };
 
-    const handleValueChange = (value: IDeviceAddressValue | undefined) => {
+    const handleValueChange = (value: IMapAddressValue | undefined) => {
         setSelectedValue(value);
         console.log("设备地址变化:", value);
     };
@@ -78,7 +78,6 @@ function RouteComponent() {
                             >
                                 <MapAddressInput
                                     showStreet={true}
-                                    height={400}
                                     onChange={handleValueChange}
                                 />
                             </Form.Item>

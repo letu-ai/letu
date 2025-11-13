@@ -10,5 +10,10 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 组织单元ID（包含子孙机构）
         /// </summary>
         public Guid? OrganizationUnitId { get; set; }
+
+        /// <summary>
+        /// 标签ID列表（OR筛选）
+        /// </summary>
+        public List<Guid>? TagIds { get; set; }
     }
 }

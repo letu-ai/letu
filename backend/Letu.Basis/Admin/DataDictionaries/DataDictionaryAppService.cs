@@ -1,9 +1,8 @@
 ﻿using Letu.Basis.Admin.DataDictionaries.Dtos;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
-using Letu.Logging;
+using Letu.Logging.BusinessLogs;
 using Letu.Repository;
-using Letu.Shared.Consts;
 using Volo.Abp.Domain.Entities;
 
 namespace Letu.Basis.Admin.DataDictionaries;
@@ -12,19 +11,16 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
 {
     private readonly IFreeSqlRepository<DataDictionary> dictRepository;
     private readonly IFreeSqlRepository<DataDictionaryItem> itemRepository;
-    private readonly IOperationLogManager operationLogManager;
 
     public DataDictionaryAppService(
         IFreeSqlRepository<DataDictionary> dictRepository,
-        IFreeSqlRepository<DataDictionaryItem> itemRepository,
-        IOperationLogManager operationLogManager)
+        IFreeSqlRepository<DataDictionaryItem> itemRepository)
     {
         this.dictRepository = dictRepository;
         this.itemRepository = itemRepository;
-        this.operationLogManager = operationLogManager;
     }
 
-    [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictAddSubType, "{{dict.Id}}", LogRecordConsts.SysDictAddContent)]
+    [BusinessLog("数据字典", BusinessOperateType.Create, "添加数据字典{{Name}}")]
     public async Task AddDictionaryAsync(DictionaryCreateInput input)
     {
         if (await dictRepository.Select.AnyAsync(x => x.Name.ToLower() == input.Name.ToLower()))
@@ -40,12 +36,12 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
             Remark = input.Remark
         };
 
-        operationLogManager.Current?.AddVariable("dict", entity);
+        BusinessLogManager.Current?.AddVariable("Name", input.Name);
 
         await dictRepository.InsertAsync(entity);
     }
 
-    [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictDeleteSubType, "{{dict.Name}}", LogRecordConsts.SysDictDeleteContent)]
+    [BusinessLog("数据字典", BusinessOperateType.Delete,  "删除数据字典{{Name}}")]
     public async Task DeleteDictionaryAsync(Guid id)
     {
         var dict = await dictRepository.OneAsync(x => x.Id == id)
@@ -54,17 +50,17 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         await itemRepository.DeleteAsync(x => x.DictionaryName == dict.Name);
         await dictRepository.DeleteAsync(dict);
 
-        operationLogManager.Current?.AddVariable("dict", dict);
+        BusinessLogManager.Current?.AddVariable("Name", dict.Name);
     }
 
-    [OperationLog(LogRecordConsts.SysDictType, LogRecordConsts.SysDictBatchDeleteSubType, "{{ids}}", LogRecordConsts.SysDictBatchDeleteContent)]
+    [BusinessLog("数据字典", BusinessOperateType.Delete,  "批量删除数据字典{{Names}}")]
     public async Task DeleteDictionariesAsync(Guid[] ids)
     {
         var dictNames = await dictRepository.Where(x => ids.Contains(x.Id)).ToListAsync(x => x.Name);
         itemRepository.Delete(x => dictNames.Contains(x.DictionaryName));
         await dictRepository.DeleteAsync(x => ids.Contains(x.Id));
 
-        operationLogManager.Current?.AddVariable("ids", string.Join(',', ids));
+        BusinessLogManager.Current?.AddVariable("Names", string.Join(',', dictNames));
     }
 
     public async Task<PagedResult<DictionaryListOutput>> GetDictionaryListAsync(DictionaryListInput input)
@@ -91,12 +87,14 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         };
     }
 
+    [BusinessLog("数据字典", BusinessOperateType.Update,  "更新数据字典{{Name}}")]
     public async Task UpdateDictionaryAsync(Guid id, DictionaryUpdateInput input)
     {
         var entity = await dictRepository.Where(x => x.Id == id).FirstAsync()
             ?? throw new EntityNotFoundException(typeof(DataDictionary), id);
 
         ObjectMapper.Map(input, entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.Name);
 
         await dictRepository.UpdateAsync(entity);
     }
@@ -152,8 +150,9 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
     }
 
 
+    [BusinessLog("数据字典", BusinessOperateType.Update,  "添加值{{Name}}/{{Value}}")]
     public async Task<bool> AddItemAsync(string dictName, ItemCreateOrUpdateInput input)
-    {   
+    {
         var isExist = await itemRepository.Select.AnyAsync(x => x.DictionaryName == dictName && x.Value == input.Value);
         if (isExist)
         {
@@ -163,17 +162,21 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         var entity = ObjectMapper.Map<ItemCreateOrUpdateInput, DataDictionaryItem>(input);
         entity.DictionaryName = dictName;
 
+        BusinessLogManager.Current?.AddVariable("Name", dictName);
+        BusinessLogManager.Current?.AddVariable("Name", input.Value);
+
         await itemRepository.InsertAsync(entity);
 
         return true;
     }
 
-    [OperationLog(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataDeleteSubType, "{{ids}}", LogRecordConsts.SysDictDataDeleteContent)]
+    [BusinessLog("数据字典", BusinessOperateType.Delete,  "删除值{{Name}}/{{IDs}}")]
     public async Task<bool> DeleteItemAsync(string dictName, Guid[] ids)
     {
         await itemRepository.DeleteAsync(x => x.DictionaryName == dictName && ids.Contains(x.Id));
 
-        operationLogManager.Current?.AddVariable("ids", string.Join(',', ids));
+        BusinessLogManager.Current?.AddVariable("Name", dictName);
+        BusinessLogManager.Current?.AddVariable("IDs", string.Join(',', ids));
 
         return true;
     }
@@ -192,7 +195,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         return new PagedResult<ItemListOutput>(total, rows);
     }
 
-    [OperationLog(LogRecordConsts.SysDictData, LogRecordConsts.SysDictDataUpdateSubType, "{{id}}", LogRecordConsts.SysDictDataUpdateContent)]
+    [BusinessLog("数据字典", BusinessOperateType.Update,  "更新值{{Name}}/{{Value}} =>{NewValue}")]
     public async Task<bool> UpdateItemAsync(string dictName, Guid id, ItemCreateOrUpdateInput input)
     {
         var isExist = await itemRepository.Select.AnyAsync(x => x.DictionaryName == dictName && x.Value == input.Value && x.Id != id);
@@ -208,11 +211,13 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
             throw new HttpFriendlyException($"未找到ID为{id}的字典项");
         }
 
+        BusinessLogManager.Current?.AddVariable("Name", dictName);
+        BusinessLogManager.Current?.AddVariable("Value", item.Value);
+        BusinessLogManager.Current?.AddVariable("after", input.Value);
+
         ObjectMapper.Map(input, item);
         await itemRepository.UpdateAsync(item);
 
-        operationLogManager.Current?.AddVariable("id", item.Id);
-        operationLogManager.Current?.AddVariable("after", item);
         return true;
     }
 }
