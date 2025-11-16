@@ -84,6 +84,7 @@ export interface IDictionaryListOutput {
     displayName: string;
     name: string;
     isEnabled: boolean;
+    isStatic: boolean;
     remark?: string;
     creationTime: string;
 }
@@ -153,6 +154,7 @@ export interface IDictionaryItemListOutput {
     remark?: string | null;
     sort: number;
     isEnabled: boolean;
+    isStatic: boolean;
 }
 
 export interface IDictionaryItemListInput extends PagedResultRequest {

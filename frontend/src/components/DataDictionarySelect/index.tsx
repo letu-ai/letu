@@ -27,6 +27,9 @@ const DataDictionarySelect: React.FC<IDataDictionarySelectProps> = ({
     const getDictionary = useDictionaryStore(state => state.getDictionary);
     const refreshDictionary = useDictionaryStore(state => state.refreshDictionary);
 
+    // 统一将 value 转换为字符串，确保类型匹配
+    const stringValue = value != null ? String(value) : undefined;
+
     // 加载字典数据
     const loadDictionary = async () => {
         if (!dictName) return;
@@ -62,15 +65,35 @@ const DataDictionarySelect: React.FC<IDataDictionarySelectProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dictName]);
 
+    // 检查 value 是否在 options 中存在（使用字符串比较）
+    const findOptionByValue = (val: string | number | undefined) => {
+        if (val == null) return undefined;
+        const valStr = String(val);
+        return options.find((item) => item.value === valStr);
+    };
+
     // 纯文本显示模式
     if (isPlainText) {
-        const displayText = options?.find((item) => item.value === value)?.label || value;
+        const matchedOption = findOptionByValue(value);
+        const displayText = matchedOption?.label || value;
         return <span>{displayText}</span>;
     }
 
     // 处理初始值显示
-    const displayOptions = options.length > 0 ? options : 
-        (value && initialLabel ? [{ value, label: initialLabel }] : []);
+    // 1. 如果 options 已加载，使用 options
+    // 2. 如果 options 为空但 value 存在且提供了 initialLabel，使用 initialLabel 创建临时选项
+    // 3. 如果 options 已加载但找不到匹配项，且提供了 initialLabel，也使用 initialLabel 创建临时选项
+    let displayOptions: SelectOption[] = [];
+    if (options.length > 0) {
+        displayOptions = options;
+        // 如果 value 存在但在 options 中找不到匹配项，且提供了 initialLabel，添加临时选项
+        if (stringValue && !findOptionByValue(stringValue) && initialLabel) {
+            displayOptions = [...options, { value: stringValue, label: initialLabel }];
+        }
+    } else if (stringValue && initialLabel) {
+        // options 为空但 value 存在且提供了 initialLabel
+        displayOptions = [{ value: stringValue, label: initialLabel }];
+    }
 
     // Radio 模式
     if (valueType === "radio") {
@@ -79,7 +102,7 @@ const DataDictionarySelect: React.FC<IDataDictionarySelectProps> = ({
                 <Radio.Group 
                     {...restProps}
                     options={displayOptions} 
-                    value={value} 
+                    value={stringValue} 
                 />
             </Spin>
         );
@@ -92,7 +115,7 @@ const DataDictionarySelect: React.FC<IDataDictionarySelectProps> = ({
             allowClear={allowClear}
             {...restProps}
             options={displayOptions}
-            value={value}
+            value={stringValue}
             loading={loading}
             notFoundContent={loading ? <Spin size="small" /> : "暂无数据"}
             popupRender={(menu) => (

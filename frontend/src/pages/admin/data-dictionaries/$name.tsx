@@ -51,6 +51,14 @@ function DictionaryDetails() {
             },
         },
         {
+            title: '静态',
+            dataIndex: 'isStatic',
+            width: 80,
+            render: (text: boolean) => {
+                return text ? <Tag color="warning">静态</Tag> : null;
+            },
+        },
+        {
             title: '操作',
             width: 210,
             fixed: 'right',
@@ -61,6 +69,7 @@ function DictionaryDetails() {
                             type="link"
                             icon={<EditOutlined />}
                             key="edit"
+                            disabled={record.isStatic}
                             onClick={() => {
                                 modalRef?.current?.openModal(record);
                             }}
@@ -73,6 +82,7 @@ function DictionaryDetails() {
                             key="copy"
                             type="link"
                             icon={<CopyOutlined />}
+                            disabled={record.isStatic}
                             onClick={() => {
                                 const row = record as IDictionaryItemOutput;
                                 row.id = undefined;
@@ -87,6 +97,7 @@ function DictionaryDetails() {
                             key="delete"
                             title="确定删除吗？"
                             description="删除后无法撤销"
+                            disabled={record.isStatic}
                             onConfirm={() => {
                                 deleteDictionaryItem(name, [record.id!]).then(() => {
                                     message.success('删除成功');
@@ -94,7 +105,7 @@ function DictionaryDetails() {
                                 });
                             }}
                         >
-                            <Button type="link" danger icon={<DeleteOutlined />}>
+                            <Button type="link" danger icon={<DeleteOutlined />} disabled={record.isStatic}>
                                 删除
                             </Button>
                         </Popconfirm>

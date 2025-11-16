@@ -1,5 +1,9 @@
 import httpClient from '@/utils/httpClient';
 
+// 字典常量
+export const ORGANIZATION_UNIT_CATEGORY_DICT = 'organization-unit-category';
+export const ORGANIZATION_UNIT_TYPE_DICT = 'organization-unit-type';
+
 /**
  * 新增组织单元
  * @param input
@@ -37,16 +41,35 @@ export interface OrganizationUnitListOutput {
     parentId?: string;
     name: string;
     sort: number;
+    category: string;
+    type?: string;
+    regionCode?: string;
+    streetName?: string;
+    address?: string;
+    contactPerson?: string;
+    contactPhone?: string;
+    longitude?: number;
+    latitude?: number;
 }
 
 export interface OrganizationUnitListInput {
     name?: string;
+    category?: string;
 }
 
 export interface OrganizationUnitCreateOrUpdateInput {
     name: string;
     sort: number;
     parentId?: string;
+    category: string;
+    type?: string;
+    regionCode?: string;
+    streetName?: string;
+    address?: string;
+    contactPerson?: string;
+    contactPhone?: string;
+    longitude?: number;
+    latitude?: number;
 }
 
 export interface OrganizationUnitTreeNode extends OrganizationUnitListOutput {

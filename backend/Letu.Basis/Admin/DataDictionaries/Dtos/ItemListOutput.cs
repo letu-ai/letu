@@ -34,5 +34,10 @@ public class ItemListOutput
     /// </summary>
     public bool IsEnabled { get; set; }
 
+    /// <summary>
+    /// 是否静态数据
+    /// </summary>
+    public bool IsStatic { get; set; }
+
     public DateTime CreationTime { get; set; }
 }

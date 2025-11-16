@@ -10,6 +10,8 @@ public class DictionaryListOutput
 
     public bool IsEnabled { get; set; }
 
+    public bool IsStatic { get; set; }
+
     public string? Remark { get; set; }
 
     public DateTime CreationTime { get; set; }

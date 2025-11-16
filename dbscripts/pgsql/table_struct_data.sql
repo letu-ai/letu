@@ -1327,7 +1327,16 @@ CREATE TABLE public.sys_organization_unit (
     tenant_id uuid,
     code character varying(32) NOT NULL,
     name character varying(64) NOT NULL,
-    sort integer NOT NULL
+    sort integer NOT NULL,
+    category integer,
+    type integer,
+    region_code character varying(12),
+    street_name character varying(64),
+    address character varying(256),
+    contact_person character varying(64),
+    contact_phone character varying(64),
+    longitude numeric(18,6),
+    latitude numeric(18,6)
 );
 
 
@@ -1373,6 +1382,69 @@ COMMENT ON COLUMN public.sys_organization_unit.name IS '组织机构单元名称
 --
 
 COMMENT ON COLUMN public.sys_organization_unit.sort IS '排序';
+
+
+--
+-- Name: COLUMN sys_organization_unit.category; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.category IS '分类（用于机构种类）';
+
+
+--
+-- Name: COLUMN sys_organization_unit.type; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.type IS '类型（值来自字典项的 Value 转换为 int）';
+
+
+--
+-- Name: COLUMN sys_organization_unit.region_code; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.region_code IS '所属行政区域（关联 Region.Code）';
+
+
+--
+-- Name: COLUMN sys_organization_unit.street_name; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.street_name IS '行政区域街道名称';
+
+
+--
+-- Name: COLUMN sys_organization_unit.address; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.address IS '地址';
+
+
+--
+-- Name: COLUMN sys_organization_unit.contact_person; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.contact_person IS '联系人';
+
+
+--
+-- Name: COLUMN sys_organization_unit.contact_phone; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.contact_phone IS '联系电话';
+
+
+--
+-- Name: COLUMN sys_organization_unit.longitude; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.longitude IS '经度';
+
+
+--
+-- Name: COLUMN sys_organization_unit.latitude; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sys_organization_unit.latitude IS '纬度';
 
 
 --

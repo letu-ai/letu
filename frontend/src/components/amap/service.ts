@@ -76,6 +76,14 @@ export const getAmapWebConfig = async (): Promise<IAmapWebConfig> => {
     return await httpClient.get<void, IAmapWebConfig>("/api/amap/web-config");
 };
 
+/**
+ * 获取高德地图是否启用
+ * @returns 是否启用
+ */
+export const getAmapEnabled = async (): Promise<boolean> => {
+    return await httpClient.get<void, boolean>("/api/admin/integrations/enable-status/amap");
+};
+
 // Map-related utility functions
 
 /**

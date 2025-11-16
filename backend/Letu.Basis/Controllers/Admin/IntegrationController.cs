@@ -1,5 +1,7 @@
 using Letu.Basis.Admin.Integrations;
 using Microsoft.AspNetCore.Mvc;
+using Letu.Basis.Permissions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Letu.Basis.Controllers.Admin;
 
@@ -27,6 +29,7 @@ public class IntegrationController : ControllerBase
     }
 
     [HttpPut("enable-status/{name}")]
+    [Authorize(BasisPermissions.Integration.Default)]
     public async Task SetIntegrationEnableStatusAsync(string name, bool enabled)
     {
         await settingStore.SetEnabledAsync(name, enabled);

@@ -10,7 +10,7 @@ public class DictionaryCreateInput
     /// </summary>
     [Required]
     [MaxLength(128)]
-    [RegularExpression(@"^[a-zA-Z0-9]+$")]
+    [RegularExpression(@"^[a-zA-Z0-9_-]+$")]
     public required string Name { get; set; }
 
     /// <summary>

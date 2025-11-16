@@ -28,6 +28,8 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         {
             await SeedPositionLevelAsync();
             await SeedUserSexAsync();
+            await SeedOrganizationUnitCategoryAsync();
+            await SeedOrganizationUnitTypeAsync();
         }
     }
 
@@ -43,6 +45,7 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         {
             Name = "position-level",
             DisplayName = "职位职级",
+            IsStatic = true,
             IsEnabled = true
         });
 
@@ -54,8 +57,7 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
                 DictionaryName = dictionary.Name,
                 Value = i.ToString("D2"),
                 Label = $"L{i:D2}",
-                IsEnabled = true
-                
+                IsEnabled = true,                  
             });
         }
         await itemRepository.InsertAsync(items);
@@ -73,7 +75,8 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         {
             Name = "user-sex",
             DisplayName = "用户性别",
-            IsEnabled = true
+            IsEnabled = true,
+            IsStatic = true
         });
 
         var items = new List<DataDictionaryItem>([
@@ -99,4 +102,48 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         await itemRepository.InsertAsync(items);
     }
 
+    private async Task SeedOrganizationUnitCategoryAsync()
+    {
+        var exists = await dictionaryRepository.Select.Where(x => x.Name == "organization-unit-category").AnyAsync();
+        if (exists)
+        {
+            return;
+        }
+
+        var dictionary = await dictionaryRepository.InsertAsync(new DataDictionary
+        {
+            Name = "organization-unit-category",
+            DisplayName = "机构种类",
+            IsEnabled = true,
+            IsStatic = true
+        });
+
+        var items = new List<DataDictionaryItem>([
+            new (){
+                DictionaryName = dictionary.Name,
+                Value = "0",
+                Label = "默认",
+                IsEnabled = true,
+                IsStatic = true 
+            }
+        ]);
+        await itemRepository.InsertAsync(items);
+    }
+
+    private async Task SeedOrganizationUnitTypeAsync()
+    {
+        var exists = await dictionaryRepository.Select.Where(x => x.Name == "organization-unit-type").AnyAsync();
+        if (exists)
+        {
+            return;
+        }
+
+        var dictionary = await dictionaryRepository.InsertAsync(new DataDictionary
+        {
+            Name = "organization-unit-type",
+            DisplayName = "机构类型",
+            IsEnabled = true,
+            IsStatic = true
+        });
+    }
 }

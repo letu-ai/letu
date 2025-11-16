@@ -59,6 +59,8 @@ namespace Letu.Basis.Admin.OrganizationUnits
         {
             var filter = await ouRepository
                 .WhereIf(!string.IsNullOrEmpty(input.Name), x => x.Name.Contains(input.Name!))
+                .WhereIf(!string.IsNullOrEmpty(input.Category), x => x.Category == input.Category)
+                .WhereIf(!string.IsNullOrEmpty(input.Type), x => x.Type == input.Type)
                 .OrderBy(x => x.Sort).ToListAsync();
             var result = ObjectMapper.Map<List<OrganizationUnit>, List<OrganizationUnitListOutput>>(filter);
 
@@ -84,6 +86,17 @@ namespace Letu.Basis.Admin.OrganizationUnits
             }
             entity.Name = newName;
             entity.Sort = input.Sort;
+            
+            // 更新其他字段
+            entity.Category = input.Category;
+            entity.Type = input.Type;
+            entity.RegionCode = input.RegionCode;
+            entity.StreetName = input.StreetName;
+            entity.Address = input.Address;
+            entity.ContactPerson = input.ContactPerson;
+            entity.ContactPhone = input.ContactPhone;
+            entity.Longitude = input.Longitude;
+            entity.Latitude = input.Latitude;
 
             // 父级是否发生变化
             var parentChanged = entity.ParentId != input.ParentId;

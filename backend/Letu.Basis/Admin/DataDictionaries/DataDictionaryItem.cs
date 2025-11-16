@@ -45,6 +45,11 @@ public class DataDictionaryItem : AuditedEntity<Guid>, IMultiTenant
     public bool IsEnabled { get; set; }
 
     /// <summary>
+    /// 是否静态数据（系统初始化数据，不允许修改和删除）
+    /// </summary>
+    public bool IsStatic { get; set; }
+
+    /// <summary>
     /// 租户ID
     /// </summary>
     [Column(IsNullable = true, StringLength = 18)]

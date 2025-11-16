@@ -1,4 +1,5 @@
 ﻿using Letu.Core.Utils;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -82,11 +83,13 @@ public class BusinessLogInterceptor : AbpInterceptor, ITransientDependency
         var msg = new BusinessLogEto();
         try
         {
+            object? entityId = null;
             var map = logManager.Current?.GetVariables();
+            map?.TryGetValue("EntityId", out entityId);
             msg.Type = TemplateUtils.Render(operationLogAttribute.Type!, map);
             msg.SubType = TemplateUtils.Render(operationLogAttribute.SubType!, map);
             msg.Content = TemplateUtils.Render(operationLogAttribute.Content!, map);
-            msg.EntityId = map?["EntityId"]?.ToString();
+            msg.EntityId = entityId?.ToString();
             msg.CreationTime = DateTime.Now;
             msg.Duration = duration;
             var httpContext = httpContextAccessor?.HttpContext;

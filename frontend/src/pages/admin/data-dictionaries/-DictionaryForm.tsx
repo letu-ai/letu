@@ -85,9 +85,9 @@ const DictTypeForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     rules={[
                         { required: true },
                         { max: 128 },
-                        { pattern: /^[a-zA-Z0-9]+$/, message: '只能包含字母和数字' },
+                        { pattern: /^[a-zA-Z0-9_-]+$/, message: '只能包含字母、数字和下划线、中划线' },
                     ]}
-                    help="只能包含字母和数字"
+                    help="只能包含字母、数字和下划线、中划线"
                 >
                     <Input />
                 </Form.Item>

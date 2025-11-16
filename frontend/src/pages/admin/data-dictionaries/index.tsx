@@ -10,7 +10,7 @@ import {
 } from './-service';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Popconfirm, Space, Tag, Typography } from 'antd';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import SmartTable from '@/components/SmartTable';
@@ -27,11 +27,12 @@ function DictList() {
     const tableRef = useRef<SmartTableRef>(null);
     const modalRef = useRef<ModalRef>(null);
     const { message, modal } = useApp();
+    const [currentPageData, setCurrentPageData] = useState<IDictionaryListOutput[]>([]);
     const columns: SmartTableColumnType<IDictionaryListOutput>[] = [
         {
             title: '字典',
             dataIndex: 'name',
-            width: 200,
+            width: 240,
             render: (text: string) => {
                 return <Paragraph copyable={{ text }}><span className="font-bold">{text}</span></Paragraph>
             },
@@ -50,6 +51,14 @@ function DictList() {
             },
         },
         {
+            title: '静态',
+            dataIndex: 'isStatic',
+            width: 80,
+            render: (text: boolean) => {
+                return text ? <Tag color="warning">静态</Tag> : null;
+            },
+        },
+        {
             title: '备注',
             dataIndex: 'remark',
         },
@@ -64,6 +73,7 @@ function DictList() {
                             type="link"
                             icon={<EditOutlined />}
                             key="edit"
+                            disabled={record.isStatic}
                             onClick={() => {
                                 modalRef?.current?.openModal(record as IDictionaryOutput);
                             }}
@@ -87,6 +97,7 @@ function DictList() {
                             key="delete"
                             title="确定删除吗？"
                             description="删除后无法撤销"
+                            disabled={record.isStatic}
                             onConfirm={() => {
                                 deleteDictionary(record.id).then(() => {
                                     message.success('删除成功');
@@ -94,7 +105,7 @@ function DictList() {
                                 });
                             }}
                         >
-                            <Button type="link" danger icon={<DeleteOutlined />}>
+                            <Button type="link" danger icon={<DeleteOutlined />} disabled={record.isStatic}>
                                 删除
                             </Button>
                         </Popconfirm>
@@ -110,6 +121,12 @@ function DictList() {
             message.warning('请选择一条数据进行操作');
             return;
         }
+        const selectedRows = currentPageData.filter(row => ids.includes(row.id));
+        const staticRows = selectedRows.filter(row => row.isStatic);
+        if (staticRows.length > 0) {
+            message.warning(`选中的数据中包含${staticRows.length}条系统初始化的静态数据，不允许删除`);
+            return;
+        }
         modal.confirm({
             title: `确认删除选中的${ids!.length}条数据？`,
             icon: <ExclamationCircleFilled />,
@@ -117,6 +134,8 @@ function DictList() {
                 deleteDictionaries(ids as string[]).then(() => {
                     message.success('删除成功');
                     tableRef?.current?.reload();
+                }).catch((error) => {
+                    // 后端也会验证，如果包含静态数据会返回错误
                 });
             },
         });
@@ -131,6 +150,7 @@ function DictList() {
                 selection
                 request={async (params) => {
                     const data = await getDictionaryList(params);
+                    setCurrentPageData(data.items);
                     return data;
                 }}
                 searchItems={[

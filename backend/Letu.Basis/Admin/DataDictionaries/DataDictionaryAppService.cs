@@ -47,6 +47,11 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         var dict = await dictRepository.OneAsync(x => x.Id == id)
             ?? throw new EntityNotFoundException();
 
+        if (dict.IsStatic)
+        {
+            throw HttpFriendlyException.BadRequest("系统初始化的静态数据不允许删除");
+        }
+
         await itemRepository.DeleteAsync(x => x.DictionaryName == dict.Name);
         await dictRepository.DeleteAsync(dict);
 
@@ -56,7 +61,16 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
     [BusinessLog("数据字典", BusinessOperateType.Delete,  "批量删除数据字典{{Names}}")]
     public async Task DeleteDictionariesAsync(Guid[] ids)
     {
-        var dictNames = await dictRepository.Where(x => ids.Contains(x.Id)).ToListAsync(x => x.Name);
+        var dicts = await dictRepository.Where(x => ids.Contains(x.Id)).ToListAsync();
+        var staticDicts = dicts.Where(x => x.IsStatic).ToList();
+        
+        if (staticDicts.Any())
+        {
+            var staticNames = string.Join(",", staticDicts.Select(x => x.DisplayName));
+            throw HttpFriendlyException.BadRequest($"以下系统初始化的静态数据不允许删除：{staticNames}");
+        }
+
+        var dictNames = dicts.Select(x => x.Name).ToList();
         itemRepository.Delete(x => dictNames.Contains(x.DictionaryName));
         await dictRepository.DeleteAsync(x => ids.Contains(x.Id));
 
@@ -75,6 +89,7 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
                 DisplayName = x.DisplayName,
                 Id = x.Id,
                 IsEnabled = x.IsEnabled,
+                IsStatic = x.IsStatic,
                 Name = x.Name,
                 Remark = x.Remark,
                 CreationTime = x.CreationTime
@@ -92,6 +107,11 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
     {
         var entity = await dictRepository.Where(x => x.Id == id).FirstAsync()
             ?? throw new EntityNotFoundException(typeof(DataDictionary), id);
+
+        if (entity.IsStatic)
+        {
+            throw HttpFriendlyException.BadRequest("系统初始化的静态数据不允许修改");
+        }
 
         ObjectMapper.Map(input, entity);
         BusinessLogManager.Current?.AddVariable("Name", entity.Name);
@@ -173,6 +193,15 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
     [BusinessLog("数据字典", BusinessOperateType.Delete,  "删除值{{Name}}/{{IDs}}")]
     public async Task<bool> DeleteItemAsync(string dictName, Guid[] ids)
     {
+        var items = await itemRepository.Where(x => x.DictionaryName == dictName && ids.Contains(x.Id)).ToListAsync();
+        var staticItems = items.Where(x => x.IsStatic).ToList();
+        
+        if (staticItems.Any())
+        {
+            var staticValues = string.Join(",", staticItems.Select(x => x.Value));
+            throw HttpFriendlyException.BadRequest($"以下系统初始化的静态数据不允许删除：{staticValues}");
+        }
+
         await itemRepository.DeleteAsync(x => x.DictionaryName == dictName && ids.Contains(x.Id));
 
         BusinessLogManager.Current?.AddVariable("Name", dictName);
@@ -209,6 +238,11 @@ public class DataDictionaryAppService : BasisAppService, IDataDictionaryAppServi
         if (item == null)
         {
             throw new HttpFriendlyException($"未找到ID为{id}的字典项");
+        }
+
+        if (item.IsStatic)
+        {
+            throw HttpFriendlyException.BadRequest("系统初始化的静态数据不允许修改");
         }
 
         BusinessLogManager.Current?.AddVariable("Name", dictName);
