@@ -43,7 +43,7 @@ namespace Letu.Basis.Admin.Employees
             var entity = ObjectMapper.Map<EmployeeCreateOrUpdateInput, Employee>(dto);
             await employeeRepository.InsertAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+            BusinessLogManager.Current?.AddEntityId(entity.Id);
 
             return true;
         }
@@ -52,7 +52,7 @@ namespace Letu.Basis.Admin.Employees
         public async Task<bool> DeleteEmployeeAsync(Guid id)
         {
             await employeeRepository.DeleteAsync(x => x.Id == id);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }
@@ -92,7 +92,7 @@ namespace Letu.Basis.Admin.Employees
             ObjectMapper.Map(input, entity);
             await employeeRepository.UpdateAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }

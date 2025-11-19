@@ -112,6 +112,7 @@ export interface ICreateUserInput {
     employeeId?: string | null;
     organizationUnitId?: string | null;
     tagIds?: string[] | null;
+    description?: string | null;
 }
 
 export interface IUpdateUserInput {
@@ -124,6 +125,7 @@ export interface IUpdateUserInput {
     employeeId?: string | null;
     organizationUnitId?: string | null;
     tagIds?: string[] | null;
+    description?: string | null;
 }
 
 export interface IUserListInput extends PagedResultRequest {
@@ -149,6 +151,7 @@ export interface UserListOutput {
     organizationUnitId?: string | null;
     organizationUnitName?: string | null;
     tags?: UserTagInfo[] | null;
+    description?: string | null;
 }
 
 export interface AssignRoleDto {

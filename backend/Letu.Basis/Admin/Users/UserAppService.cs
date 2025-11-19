@@ -63,6 +63,7 @@ public class UserAppService : BasisAppService, IUserAppService
             PasswordSalt = salt,
             PasswordHash = EncryptionUtils.CalcPasswordHash(input.Password, salt),
             NickName = input.NickName,
+            Description = input.Description,
             IsEnabled = true
         };
 
@@ -82,7 +83,7 @@ public class UserAppService : BasisAppService, IUserAppService
 
         businessLogManager.Current?.AddVariable("UserName", input.UserName);
         businessLogManager.Current?.AddVariable("Email", input.Email ?? "无邮箱");
-        businessLogManager.Current?.AddVariable("EntityId", user.Id);
+        businessLogManager.Current?.AddEntityId(user.Id);
 
         return user.Id;
     }
@@ -97,7 +98,7 @@ public class UserAppService : BasisAppService, IUserAppService
 
         businessLogManager.Current?.AddVariable("UserName", user.UserName);
         businessLogManager.Current?.AddVariable("Email", user.Email ?? "无邮箱");
-        businessLogManager.Current?.AddVariable("EntityId", id);
+        businessLogManager.Current?.AddEntityId(id);
 
         ObjectMapper.Map(input, user);
         await userRepository.UpdateAsync(user);
@@ -168,7 +169,7 @@ public class UserAppService : BasisAppService, IUserAppService
     {
         businessLogManager.Current?.AddVariable("UserId", userId);
         businessLogManager.Current?.AddVariable("RoleId", string.Join(',', input.RoleIds ?? []));
-        businessLogManager.Current?.AddVariable("EntityId", userId);
+        businessLogManager.Current?.AddEntityId(userId);
 
         await userRoleRepository.DeleteAsync(x => x.UserId == userId);
         if (input.RoleIds != null)
@@ -200,7 +201,7 @@ public class UserAppService : BasisAppService, IUserAppService
         var user = await userRepository.Where(x => x.Id == id).FirstAsync();
         await userRepository.DeleteAsync(x => x.Id == id);
         businessLogManager.Current?.AddVariable("UserName", user.UserName);
-        businessLogManager.Current?.AddVariable("EntityId", id);
+        businessLogManager.Current?.AddEntityId(id);
 
         var userDeleteEto = new EntityDeletedEto<UserEto>(new UserEto()
         {
@@ -272,7 +273,9 @@ public class UserAppService : BasisAppService, IUserAppService
                 EmployeeId = u.EmployeeId,
                 EmployeeName = e.Name,
                 OrganizationUnitId = u.OrganizationUnitId,
+                Description = u.Description,
                 OrganizationUnitName = o.Name
+
             });
 
         // 为每个用户加载标签信息
@@ -357,7 +360,7 @@ public class UserAppService : BasisAppService, IUserAppService
         await userRepository.UpdateAsync(entity);
         businessLogManager.Current?.AddVariable("UserName", entity.UserName);
         businessLogManager.Current?.AddVariable("IsEnabled", entity.IsEnabled);
-        businessLogManager.Current?.AddVariable("EntityId", id);
+        businessLogManager.Current?.AddEntityId(id);
 
         // TODO: 启用用户时发出Event通知？
 
@@ -373,7 +376,7 @@ public class UserAppService : BasisAppService, IUserAppService
             throw HttpFriendlyException.BadRequest("密码格式不正确");
         }
         businessLogManager.Current?.AddVariable("UserName", user.UserName);
-        businessLogManager.Current?.AddVariable("EntityId", user.Id);
+        businessLogManager.Current?.AddEntityId(user.Id);
 
         user.PasswordSalt = EncryptionUtils.GetPasswordSalt();
         user.PasswordHash = EncryptionUtils.CalcPasswordHash(dto.Password!, user.PasswordSalt);
@@ -413,7 +416,7 @@ public class UserAppService : BasisAppService, IUserAppService
             return new UserExtraInfo();
         }
 
-        return await userRepository.Select
+        var extraInfo = await userRepository.Select
             .From<OrganizationUnit, Department, PositionGroup>((u, o, d, p) => u
                 .LeftJoin(u1 => u1.OrganizationUnitId == o.Id)
                 .LeftJoin(u1 => u1.DepartmentId == d.Id)
@@ -428,13 +431,21 @@ public class UserAppService : BasisAppService, IUserAppService
                 PositionId = u.PositionId,
                 PositionName = p.GroupName
             });
+
+        // 查询用户标签名称
+        extraInfo.Tags = await userTagRepository.Select
+            .From<UserTag>((ut, t) => ut.InnerJoin(ut1 => ut1.TagId == t.Id))
+            .Where((ut, t) => ut.UserId == CurrentUser.Id)
+            .ToListAsync((ut, t) => new UserTagInfo { Id = t.Id, Name = t.Name, Color = t.Color });
+
+        return extraInfo;
     }
 
     [BusinessLog("用户管理", BusinessOperateType.Update, "分配用户{{UserId}}的标签")]
     public async Task<bool> AssignTagsAsync(Guid userId, List<Guid> tagIds)
     {
         businessLogManager.Current?.AddVariable("UserId", userId);
-        businessLogManager.Current?.AddVariable("EntityId", userId);
+        businessLogManager.Current?.AddEntityId(userId);
 
         await SaveUserTagsAsync(userId, tagIds);
         return true;

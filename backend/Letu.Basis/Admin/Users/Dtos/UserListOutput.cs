@@ -83,5 +83,8 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 用户标签列表
         /// </summary>
         public List<UserTagInfo>? Tags { get; set; }
+
+
+        public string? Description { get; set; }
     }
 }

@@ -37,7 +37,7 @@ namespace Letu.Basis.Admin.Editions
             var edition = ObjectMapper.Map<EditionCreateOrUpdateInput, Edition>(dto);
             var result = await _editionRepository.InsertAsync(edition);
             BusinessLogManager.Current?.AddVariable("Name", edition.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", edition.Id);
+            BusinessLogManager.Current?.AddEntityId(edition.Id);
 
             return result != null;
         }
@@ -109,7 +109,7 @@ namespace Letu.Basis.Admin.Editions
             var result = await _editionRepository.UpdateAsync(edition);
 
             BusinessLogManager.Current?.AddVariable("Name", edition.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return result > 0;
         }
@@ -139,7 +139,7 @@ namespace Letu.Basis.Admin.Editions
             var result = await _editionRepository.DeleteAsync(x => x.Id == id);
 
             BusinessLogManager.Current?.AddVariable("Name", edition.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return result > 0;
         }

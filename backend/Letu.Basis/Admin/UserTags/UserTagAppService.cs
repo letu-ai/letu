@@ -63,7 +63,7 @@ public class UserTagAppService : BasisAppService, IUserTagAppService
         entity = await tagRepository.InsertAsync(entity);
 
         BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-        BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+        BusinessLogManager.Current?.AddEntityId(entity.Id);
 
         return entity.Id;
     }
@@ -88,7 +88,7 @@ public class UserTagAppService : BasisAppService, IUserTagAppService
         await tagRepository.UpdateAsync(entity);
 
         BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-        BusinessLogManager.Current?.AddVariable("EntityId", id);
+        BusinessLogManager.Current?.AddEntityId(id);
 
         return true;
     }
@@ -108,7 +108,7 @@ public class UserTagAppService : BasisAppService, IUserTagAppService
         await tagRepository.DeleteAsync(x => x.Id == id);
 
         BusinessLogManager.Current?.AddVariable("Name", tag.Name);
-        BusinessLogManager.Current?.AddVariable("EntityId", id);
+        BusinessLogManager.Current?.AddEntityId(id);
 
         return true;
     }

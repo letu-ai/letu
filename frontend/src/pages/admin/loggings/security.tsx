@@ -3,6 +3,7 @@ import { Form, Input, Tag } from 'antd';
 import type { SmartTableColumnType } from '@/components/SmartTable/type';
 import SmartTable from '@/components/SmartTable';
 import { createFileRoute } from '@tanstack/react-router';
+import dayjs from 'dayjs';
 
 export const Route = createFileRoute('/admin/loggings/security')({
     component: LoginLogList,
@@ -40,6 +41,7 @@ function LoginLogList() {
         {
             title: '登录时间',
             dataIndex: 'creationTime',
+            render: (text: string) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
         },
     ];
 

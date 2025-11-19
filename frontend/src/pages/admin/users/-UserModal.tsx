@@ -80,6 +80,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         employeeId?: string | null;
         organizationUnitId?: string | null;
         tagIds?: string[] | null;
+        description?: string | null;
     }
 
     const onFinish = async (values: FormFields) => {
@@ -98,6 +99,7 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                     employeeId: values.employeeId,
                     organizationUnitId: values.organizationUnitId,
                     tagIds: values.tagIds,
+                    description: values.description,
                 };
                 await updateUser(row.id, updateData);
                 message.success('编辑成功');
@@ -198,6 +200,9 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
                 <Form.Item label="用户标签" name="tagIds">
                     <UserTagSelect placeholder="请选择用户标签（可选）" />
+                </Form.Item>
+                <Form.Item label="描述" name="description">
+                    <Input.TextArea  />
                 </Form.Item>
             </Form>
         </Modal>

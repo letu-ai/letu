@@ -53,13 +53,12 @@ function UserTable() {
                 return (
                     <div className="flex items-center gap-2">
                         <Avatar size={32} src={record.avatar ? `${getApiBaseUrl()}/api/admin/users/avatars/${record.avatar}` : undefined} icon={<img src="/images/avatar/male.png" />} />
-                        <span className="font-medium">{text}</span>
+                        <div className="flex flex-col">
+                            <span className="font-medium">{text}</span>
+                            <span className="text-sm text-gray-500">{record.nickName}</span>
+                        </div>
                     </div>)
             },
-        },
-        {
-            title: '昵称',
-            dataIndex: 'nickName',
         },
         {
             title: '手机号',
@@ -74,12 +73,15 @@ function UserTable() {
             dataIndex: 'organizationUnitName',
         },
         {
-            title: '部门',
+            title: '部门 & 职位',
             dataIndex: 'departmentName',
-        },
-        {
-            title: '职位',
-            dataIndex: 'positionName',
+            render: (text, record) => {
+                return (
+                    <div>
+                        <span className="font-medium">{text}</span> / <span className="text-sm text-gray-500">{record.positionName}</span>
+                    </div>
+                )
+            },
         },
         {
             title: '标签',
@@ -98,6 +100,10 @@ function UserTable() {
                     )}
                 </>
             ),
+        },
+        {
+            title: '描述',
+            dataIndex: 'description',
         },
         {
             title: '状态',

@@ -1,3 +1,5 @@
+using Letu.Basis.Admin.UserTags.Dtos;
+
 namespace Letu.Basis.Admin.Users.Dtos;
 
 /// <summary>
@@ -34,4 +36,9 @@ public class UserExtraInfo
     /// 职位名称
     /// </summary>
     public string? PositionName { get; set; }
+
+    /// <summary>
+    /// 用户标签
+    /// </summary>
+    public List<UserTagInfo>? Tags { get; set; }
 }

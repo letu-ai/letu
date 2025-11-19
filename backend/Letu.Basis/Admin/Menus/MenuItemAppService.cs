@@ -51,7 +51,7 @@ namespace Letu.Basis.Admin.Menus
             var entity = ObjectMapper.Map<MenuItemCreateOrUpdateInput, MenuItem>(dto);
             entity = await menuRepository.InsertAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Title);
-            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+            BusinessLogManager.Current?.AddEntityId(entity.Id);
 
             // 设置权限和功能关联
             await SetMenuPermissionsAndFeaturesAsync(entity.Id, dto.Permissions, dto.Features);
@@ -85,7 +85,7 @@ namespace Letu.Basis.Admin.Menus
             ObjectMapper.Map(input, entity);
             await menuRepository.UpdateAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Title);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             // 清除并重新设置权限和功能关联
             await ClearMenuPermissionsAndFeaturesAsync(id);

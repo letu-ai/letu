@@ -43,7 +43,7 @@ namespace Letu.Basis.Admin.Departments
             }
             entity = await _deptRepository.InsertAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+            BusinessLogManager.Current?.AddEntityId(entity.Id);
 
             return true;
         }
@@ -63,7 +63,7 @@ namespace Letu.Basis.Admin.Departments
             var hasUsers = await _userRepository.Select.AnyAsync(x => x.DepartmentId == id);
             if (hasUsers)
                 throw HttpFriendlyException.BadRequest("部门内有用户，不能删除。");
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             await _deptRepository.DeleteAsync(x => id == x.Id);
             return true;
@@ -173,7 +173,7 @@ namespace Letu.Basis.Admin.Departments
             }
             await _deptRepository.UpdateAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }

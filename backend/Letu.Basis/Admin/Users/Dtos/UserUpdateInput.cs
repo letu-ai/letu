@@ -55,5 +55,11 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// 标签ID列表
         /// </summary>
         public List<Guid>? TagIds { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [StringLength(256)]
+        public string? Description { get; set; }
     }
 }

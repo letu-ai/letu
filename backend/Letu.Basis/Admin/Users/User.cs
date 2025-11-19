@@ -11,10 +11,6 @@ namespace Letu.Basis.Admin.Users
     [Table(Name = "sys_user")]
     public class User : FullAuditedEntity<Guid>, IMultiTenant
     {
-        //public User()
-        //{
-        //}
-
         protected User()
         {
         }
@@ -27,44 +23,42 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 用户名
         /// </summary>
-        [StringLength(32)]
         [Column(IsNullable = false, StringLength = 32)]
         public string UserName { get; set; }
 
         /// <summary>
         /// 密码哈希
         /// </summary>
-        [StringLength(512)]
         [Column(IsNullable = false, StringLength = 512)]
         public required string PasswordHash { get; set; }
 
         /// <summary>
         /// 密码盐
         /// </summary>
-        [StringLength(256)]
         [Column(IsNullable = false, StringLength = 256)]
         public required string PasswordSalt { get; set; }
 
         /// <summary>
         /// 头像
         /// </summary>
-        [StringLength(256)]
-        [Column(IsNullable = true, StringLength = 256)]
+        [Column(StringLength = 256)]
         public string? Avatar { get; set; }
 
         /// <summary>
         /// 昵称
         /// </summary>
-        [Required]
-        [StringLength(32)]
         [Column(IsNullable = false, StringLength = 32)]
         public required string NickName { get; set; }
 
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [Column(StringLength = 256)]
+        public string? Description { get; set; }
 
         /// <summary>
         /// 是否启用
         /// </summary>
-        [Required]
         [Column(IsNullable = false)]
         public bool IsEnabled { get; set; }
 
@@ -81,21 +75,18 @@ namespace Letu.Basis.Admin.Users
         /// <summary>
         /// 租户ID
         /// </summary>
-        [Column(IsNullable = true, StringLength = 18)]
+        [Column(StringLength = 18)]
         public Guid? TenantId { get; set; }
 
         /// <summary>
         /// 手机号码
         /// </summary>
-        [StringLength(16)]
         [Column(StringLength = 16)]
         public string? Phone { get; set; }
 
         /// <summary>
         /// 邮箱
         /// </summary>
-        [StringLength(64)]
-        [EmailAddress]
         [Column(StringLength = 64)]
         public string? Email { get; set; }
 

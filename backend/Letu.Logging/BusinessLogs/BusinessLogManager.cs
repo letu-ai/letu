@@ -7,7 +7,7 @@ namespace Letu.Logging.BusinessLogs;
 public class BusinessLogManager : IBusinessLogManager, ITransientDependency
 {
 
-    private const string AmbientContextKey = "Letu.Logging.IOperationLogScope";
+    private const string AmbientContextKey = "Letu.Logging.BusinessLogScope";
 
     private readonly IAmbientScopeProvider<IBusinessLogScope> ambientScopeProvider;
 
@@ -23,7 +23,7 @@ public class BusinessLogManager : IBusinessLogManager, ITransientDependency
     {
         var ambientScope = ambientScopeProvider.BeginScope(
             AmbientContextKey,
-            new OperationLogScope()
+            new BusinessLogScope()
         );
 
         Debug.Assert(Current != null, "Current != null");

@@ -2,11 +2,11 @@
 
 namespace Letu.Logging.BusinessLogs;
 
-public class OperationLogScope : IBusinessLogScope
+public class BusinessLogScope : IBusinessLogScope
 {
     private readonly ConcurrentDictionary<string, object> items;
 
-    public OperationLogScope()
+    public BusinessLogScope()
     {
         items = new ConcurrentDictionary<string, object>();
     }

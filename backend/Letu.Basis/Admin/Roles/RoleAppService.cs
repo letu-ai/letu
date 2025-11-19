@@ -74,7 +74,7 @@ public class RoleAppService : BasisAppService, IRoleAppService
         await _roleRepository.DeleteAsync(x => x.Id == id);
 
         BusinessLogManager.Current?.AddVariable("Name", role.Name);
-        BusinessLogManager.Current?.AddVariable("EntityId", id);
+        BusinessLogManager.Current?.AddEntityId(id);
 
         var roleDeleteEto = new EntityDeletedEto<RoleEto>(new RoleEto()
         {
@@ -150,7 +150,7 @@ public class RoleAppService : BasisAppService, IRoleAppService
         await _roleRepository.UpdateAsync(entity);
 
         BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-        BusinessLogManager.Current?.AddVariable("EntityId", id);
+        BusinessLogManager.Current?.AddEntityId(id);
 
         if (roleNameChangedEto != null)
             await eventBus.PublishAsync(roleNameChangedEto);

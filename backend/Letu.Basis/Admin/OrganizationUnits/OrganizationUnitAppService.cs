@@ -31,7 +31,7 @@ namespace Letu.Basis.Admin.OrganizationUnits
             entity = await ouRepository.InsertAsync(entity);
 
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+            BusinessLogManager.Current?.AddEntityId(entity.Id);
 
             return true;
         }
@@ -50,7 +50,7 @@ namespace Letu.Basis.Admin.OrganizationUnits
             var codePrefix = entity.Code;
             await ouRepository.DeleteAsync(x => x.Code.StartsWith(codePrefix));
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }
@@ -107,7 +107,7 @@ namespace Letu.Basis.Admin.OrganizationUnits
 
             await ouRepository.UpdateAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }

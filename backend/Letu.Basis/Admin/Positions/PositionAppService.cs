@@ -42,7 +42,7 @@ namespace Letu.Basis.Admin.Positions
 
             entity = await _positionGroupRepository.InsertAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
-            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+            BusinessLogManager.Current?.AddEntityId(entity.Id);
 
             return true;
         }
@@ -65,7 +65,7 @@ namespace Letu.Basis.Admin.Positions
             var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
             await _positionGroupRepository.DeleteAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }
@@ -100,7 +100,7 @@ namespace Letu.Basis.Admin.Positions
             }
             await _positionGroupRepository.UpdateAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }
@@ -143,7 +143,7 @@ namespace Letu.Basis.Admin.Positions
             var entity = ObjectMapper.Map<PositionCreateOrUpdateInput, Position>(dto);
             entity = await _positionRepository.InsertAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", entity.Id);
+            BusinessLogManager.Current?.AddEntityId(entity.Id);
 
             return true;
         }
@@ -156,7 +156,7 @@ namespace Letu.Basis.Admin.Positions
             var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync();
             await _positionRepository.DeleteAsync(entity);
             BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddVariable("EntityId", id);
+            BusinessLogManager.Current?.AddEntityId(id);
 
             return true;
         }

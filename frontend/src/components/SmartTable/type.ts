@@ -16,6 +16,7 @@ export interface SmartTableProps<T> extends Omit<TableProps<T>, 'columns'> {
     extraContent?: React.ReactNode | React.ReactNode[];
     selection?: boolean;
     params?: Record<string, any>;
+    syncUrl?: boolean; // 是否同步参数到 URL，默认 true
 }
 
 export interface SmartTableRef {
