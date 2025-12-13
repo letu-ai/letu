@@ -150,7 +150,7 @@ function DataBackfillDemo() {
         <Card title="数据回填（编辑模式）">
             <div className="mb-4">
                 <p className="text-gray-600 mb-4">模拟编辑场景，自动回填已保存的地区数据</p>
-                <Space direction="vertical" className="w-full">
+                <Space orientation="vertical" className="w-full">
                     <div>
                         <Button onClick={handleSimulateEdit} className="mb-3">
                             加载内蒙古自治区锡林郭勒盟镶黄旗数据
@@ -206,7 +206,7 @@ function SpecialCasesDemo() {
         <Card title="特殊场景">
             <div className="mb-4">
                 <p className="text-gray-600 mb-4">处理直辖市等特殊情况（某些市可能没有区县级）</p>
-                <Space direction="vertical" className="w-full">
+                <Space orientation="vertical" className="w-full">
                     <div>
                         <Space>
                             <Button onClick={handleSimulateDirectCity}>
@@ -314,7 +314,7 @@ function TestPage() {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">行政区域选择组件测试</h1>
 
-            <Space direction="vertical" size="large" className="w-full">
+            <Space orientation="vertical" size="large" className="w-full">
                 <BasicUsageDemo />
                 <BasicUsageDemoWithStreet />
                 <FormIntegrationDemo />

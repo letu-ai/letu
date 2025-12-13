@@ -27,7 +27,7 @@ namespace Letu.Repository
                 .UseAdoConnectionPool(true)
                 .UseNameConvert(NameConvertType.PascalCaseToUnderscoreWithLower)
 #if DEBUG
-                .UseMonitorCommand(cmd => logger.LogTrace("SQL: {CommandText}", cmd.CommandText))
+                //.UseMonitorCommand(cmd => logger.LogDebug("SQL: {CommandText}", cmd.CommandText))
                 .UseAutoSyncStructure(true) //自动同步实体结构到数据库，只有CRUD时才会生成表
 #endif
                 .Build();

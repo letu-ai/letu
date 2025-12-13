@@ -38,7 +38,6 @@ namespace Letu.Basis.Admin.Employees
         [Column(IsNullable = false)]
         public SexType Sex { get; set; }
 
-
         /// <summary>
         /// 身份证
         /// </summary>
@@ -72,24 +71,20 @@ namespace Letu.Basis.Admin.Employees
         [Column(StringLength = 512)]
         public string? Address { get; set; }
 
-
         /// <summary>
         /// 入职时间
         /// </summary>
-        public DateTime? InTime { get; set; }
+        public DateOnly? InTime { get; set; }
 
         /// <summary>
         /// 离职时间
         /// </summary>
-        public DateTime? OutTime { get; set; }
+        public DateOnly? OutTime { get; set; }
 
         /// <summary>
         /// 状态 1正常2离职
         /// </summary>
         public int Status { get; set; }
-
-
-
 
         /// <summary>
         /// 租户ID

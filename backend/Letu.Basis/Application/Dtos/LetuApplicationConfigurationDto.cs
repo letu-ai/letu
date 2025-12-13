@@ -15,4 +15,6 @@ public class LetuApplicationConfigurationDto : ApplicationConfigurationDto
     public List<NavigationMenuDto> Menu { get; set; }
 
     public required UserExtraInfo UserExtraInfo { get; set; }
+
+    public OssOptions? Oss { get; set; }
 }

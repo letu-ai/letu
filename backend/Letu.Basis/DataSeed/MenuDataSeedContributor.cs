@@ -1,7 +1,6 @@
 ﻿using Letu.Basis.Admin.Menus;
 using Letu.Basis.Permissions;
 using Letu.Repository;
-using NUglify.JavaScript.Syntax;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
@@ -110,10 +109,10 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
 
         // 系统监控下的菜单
         var onlineUserMenuId = guidGenerator.Create();
-        var scheduledTaskMenuId = guidGenerator.Create();
         var securityLogMenuId = guidGenerator.Create();
         var businessLogMenuId = guidGenerator.Create();
         var auditLogMenuId = guidGenerator.Create();
+        var systemLogMenuId = guidGenerator.Create();
 
         // 创建子菜单
         var childMenus = new List<MenuItem>
@@ -316,18 +315,6 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 Display = true,
                 IsExternal = false,
             },
-            new MenuItem(scheduledTaskMenuId)
-            {
-                Title = "定时任务",
-                Path = "/admin/scheduled-tasks",
-                ApplicationName = "admin",
-                MenuType = MenuType.Menu,
-                ParentId = parentMenus["系统监控"],
-                Permissions = [new () { Permission = BasisPermissions.ScheduledTask.Default }],
-                Sort = 20,
-                Display = true,
-                IsExternal = false,
-            },
             new MenuItem(securityLogMenuId)
             {
                 Title = "安全日志",
@@ -363,7 +350,19 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 Sort = 50,
                 Display = true,
                 IsExternal = false,
-            }
+            },
+            new MenuItem(systemLogMenuId)
+            {
+                Title = "系统日志",
+                Path = "/admin/loggings/system",
+                ApplicationName = "admin",
+                MenuType = MenuType.Menu,
+                ParentId = parentMenus["系统监控"],
+                Permissions = [new () { Permission = BasisPermissions.Logging.Default }],
+                Sort = 60,
+                Display = true,
+                IsExternal = false,
+            },
         };
 
         await menuRepository.InsertAsync(childMenus);
@@ -454,11 +453,6 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
             },
             new MenuItemPermission
             {
-                MenuItemId = scheduledTaskMenuId,
-                Permission = BasisPermissions.Logging.ScheduledTask,
-            },
-            new MenuItemPermission
-            {
                 MenuItemId = securityLogMenuId,
                 Permission = BasisPermissions.Logging.SecurityLog,
             },
@@ -471,6 +465,11 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
             {
                 MenuItemId = auditLogMenuId,
                 Permission = BasisPermissions.Logging.AuditLog,
+            },
+            new MenuItemPermission
+            {
+                MenuItemId = systemLogMenuId,
+                Permission = BasisPermissions.Logging.SystemLog,
             },
         };
 

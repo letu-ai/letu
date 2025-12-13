@@ -2,6 +2,7 @@ using Letu.Basis.Admin.AuditLogging.AuditLogs;
 using Letu.Basis.Admin.AuditLogging.AuditLogs.Dtos;
 using Letu.Basis.Admin.AuditLogging.EntityChangeLogs;
 using Letu.Basis.Admin.AuditLogging.EntityChangeLogs.Dtos;
+using Letu.Basis.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Dtos;
@@ -9,9 +10,9 @@ using Volo.Abp.Auditing;
 
 namespace Letu.Basis.Controllers.Admin;
 
-[Authorize()]
+[Authorize(BasisPermissions.Logging.AuditLog)]
 [ApiController]
-[Route("api/admin/auditlog")]
+[Route("api/admin/logs/audit")]
 [DisableAuditing]
 
 public class AuditLogController : ControllerBase

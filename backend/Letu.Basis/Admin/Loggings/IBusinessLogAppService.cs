@@ -10,7 +10,7 @@ namespace Letu.Basis.Admin.Loggings
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<PagedResult<BusinessLogListDto>> GetBusinessLogListAsync(BusinessLogQueryDto dto);
+        Task<PagedResult<BusinessLogListOutput>> GetBusinessLogListAsync(BusinessLogListInput dto);
 
         /// <summary>
         /// 获取所有业务类型选项

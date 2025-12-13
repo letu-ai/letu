@@ -21,10 +21,6 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [editionOptions, setEditionOptions] = useState<IEditionOption[]>([]);
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     useEffect(() => {
         if (isOpenModal) {
             getEditionOptions().then((data) => {
@@ -53,6 +49,10 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.setFieldValue('isActive', true);
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

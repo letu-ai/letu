@@ -6,7 +6,7 @@ import { Button, Form, Input, Popconfirm, Space, Tag } from 'antd';
 import { useRef } from 'react';
 import { deleteEmployee, getEmployeePagedList, type EmployeeListDto } from './-service';
 import SmartTable from '@/components/SmartTable';
-import EmployeeForm, { type EmployeeModalRef } from './-EmployeeForm';
+import EmployeeForm, { type IEmployeeFormRef } from './-EmployeeForm';
 import type { SmartTableRef, SmartTableColumnType } from '@/components/SmartTable/type.ts';
 import { App } from 'antd';
 
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/admin/employees/')({
 
 function EmployeeList() {
     const tableRef = useRef<SmartTableRef>(null);
-    const modalRef = useRef<EmployeeModalRef>(null);
+    const modalRef = useRef<IEmployeeFormRef>(null);
     const { message } = App.useApp();
     const columns: SmartTableColumnType<EmployeeListDto>[] = [
         {
@@ -96,7 +96,7 @@ function EmployeeList() {
                     return data;
                 }}
                 searchItems={[
-                    <Form.Item label="关键词" name="keyword">
+                    <Form.Item key="keyword" label="关键词" name="keyword">
                         <Input placeholder="请输入姓名/工号" />
                     </Form.Item>,
                 ]}

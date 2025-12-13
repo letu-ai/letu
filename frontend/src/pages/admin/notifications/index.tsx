@@ -197,7 +197,7 @@ function NotificationList() {
         {
             title: "操作",
             dataIndex: "option",
-            width: 60,
+            width: 120,
             render: (_, record) => (
                 <Space>
                     {/* 编辑按钮 - 只有草稿状态才能编辑 */}
@@ -312,24 +312,24 @@ function NotificationList() {
                     return data;
                 }}
                 searchItems={[
-                    <Form.Item label="通知标题" name="title">
+                    <Form.Item key="title" label="通知标题" name="title">
                         <Input placeholder="请输入通知标题" />
                     </Form.Item>,
-                    <Form.Item label="通知类型" name="notificationType">
+                    <Form.Item key="notificationType" label="通知类型" name="notificationType">
                         <Select
                             allowClear
                             placeholder="请选择通知类型"
                             options={NOTIFICATION_TYPE_OPTIONS}
                         />
                     </Form.Item>,
-                    <Form.Item label="通知状态" name="status">
+                    <Form.Item key="status" label="通知状态" name="status">
                         <Select
                             allowClear
                             placeholder="请选择通知状态"
                             options={NOTIFICATION_STATUS_OPTIONS}
                         />
                     </Form.Item>,
-                    <Form.Item label="优先级" name="priority">
+                    <Form.Item key="priority" label="优先级" name="priority">
                         <Select
                             allowClear
                             placeholder="请选择优先级"

@@ -291,7 +291,7 @@ Write-ColorOutput "Green" @"
 3. 或使用 docker run 命令:
    docker run -d \
      --name letu \
-     -p 5000:5000 \
+     -p 5050:5050 \
      -v ${RootDir}\CI\data\app\logs:/app/logs \
      -v ${RootDir}\CI\data\app\upload:/app/upload \
      -e ConnectionStrings__Default="Host=postgres;Port=5432;Database=letu;User ID=postgres;Password=yourpassword;" \

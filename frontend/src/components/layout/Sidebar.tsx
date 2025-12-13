@@ -157,7 +157,7 @@ interface ILogoProps {
 
 function Logo({ logo, collapsed }: ILogoProps) {
     if (logo && logo !== '') {
-        return <img src={logo} className={cn('text-2xl pr-1 ', collapsed ? 'mx-auto' : '')} />
+        return <img title="logo" src={logo} className={cn('text-2xl pr-1 ', collapsed ? 'mx-auto' : '')} />
     } else {
         return <HomeOutlined className={cn('text-2xl pr-1 ', collapsed ? 'mx-auto' : '')} />
     }

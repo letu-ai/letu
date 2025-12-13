@@ -146,16 +146,6 @@ export class BasisPermissions {
         ManageHostFeatures: `${BasisPermissions.SettingGroupName}.ManageHostFeatures`,
     } as const;
 
-    // 定时任务管理权限
-    public static readonly ScheduledTask = {
-        /** 定时任务管理 */
-        Default: `${BasisPermissions.SettingGroupName}.ScheduledTask`,
-        Create: `${BasisPermissions.SettingGroupName}.ScheduledTask.Create`,
-        Update: `${BasisPermissions.SettingGroupName}.ScheduledTask.Update`,
-        Delete: `${BasisPermissions.SettingGroupName}.ScheduledTask.Delete`,
-        Log: `${BasisPermissions.SettingGroupName}.ScheduledTask.Log`,
-    } as const;
-
     // 第三方集成管理权限
     public static readonly Integration = {
         /** 第三方集成管理 */

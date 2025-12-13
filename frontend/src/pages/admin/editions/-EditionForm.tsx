@@ -17,10 +17,6 @@ const EditionForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
   const [row, setRow] = useState<EditionListOutput | null>();
   const { message } = useApp();
 
-  useImperativeHandle(ref, () => ({
-    openModal,
-  }));
-
   const openModal = (row?: EditionListOutput) => {
     setIsOpenModal(true);
     if (row) {
@@ -33,6 +29,10 @@ const EditionForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
       form.resetFields();
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    openModal,
+  }));
 
   const onCancel = () => {
     form.resetFields();

@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { requireAuth } from '@/utils/authUtils'
 import { Outlet } from '@tanstack/react-router';
 import Sidebar from '@/components/layout/Sidebar';
@@ -10,6 +10,7 @@ import { useEffect, useRef } from 'react';
 import useLayoutStore from '@/application/layoutStore';
 import Navbar from '@/components/layout/Navbar';
 import { AppConfigProvider, loadConfiguration } from '@/components/AppConfigProvider';
+import RouteErrorComponent from '@/components/RouteErrorComponent';
 
 const { Content, Sider } = Layout;
 
@@ -23,19 +24,7 @@ export const Route = createFileRoute('/admin')({
         return { config }
     },
     staleTime: 1000 * 60 * 30, // 30分钟过期
-    errorComponent: ({ error }) => {
-        const router = useRouter();
-
-        const handleRetry = () => {
-            router.invalidate();
-        };
-
-        return (
-            <div className='h-screen'>
-                <ErrorFallback error={error} resetErrorBoundary={handleRetry} />
-            </div>
-        )
-    }
+    errorComponent: RouteErrorComponent
 })
 
 function AdminLayout() {

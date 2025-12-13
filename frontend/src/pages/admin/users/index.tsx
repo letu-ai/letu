@@ -1,5 +1,5 @@
 import { Button, Switch, Space, Form, Input, Avatar, Row, Col, Card, Tree, Tabs, Tag, Dropdown } from 'antd';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, KeyOutlined, PlusOutlined, TeamOutlined, TagsOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { App } from 'antd';
 import {
@@ -20,6 +20,7 @@ import { BasisPermissions } from '@/application/permissions';
 import { createFileRoute } from '@tanstack/react-router';
 import { getApiBaseUrl } from '@/utils/urlUtils';
 import { getOrganizationUnitList, buildOrganizationUnitTree, type OrganizationUnitTreeNode } from '@/pages/admin/organization-units/-service';
+import { useAsyncEffect } from 'ahooks';
 
 export const Route = createFileRoute('/admin/users/')({
     component: UserTable
@@ -52,7 +53,7 @@ function UserTable() {
             render: (text, record) => {
                 return (
                     <div className="flex items-center gap-2">
-                        <Avatar size={32} src={record.avatar ? `${getApiBaseUrl()}/api/admin/users/avatars/${record.avatar}` : undefined} icon={<img src="/images/avatar/male.png" />} />
+                        <Avatar size={32} src={record.avatar ? `${getApiBaseUrl()}/api/admin/users/avatars/${record.avatar}` : undefined} icon={<img title="头像" src="/images/avatar/male.png" />} />
                         <div className="flex flex-col">
                             <span className="font-medium">{text}</span>
                             <span className="text-sm text-gray-500">{record.nickName}</span>
@@ -61,29 +62,47 @@ function UserTable() {
             },
         },
         {
-            title: '手机号',
-            dataIndex: 'phone',
-        },
-        {
-            title: '邮箱',
-            dataIndex: 'email',
-        },
-        {
-            title: '所属机构',
-            dataIndex: 'organizationUnitName',
-        },
-        {
-            title: '部门 & 职位',
-            dataIndex: 'departmentName',
-            render: (text, record) => {
+            title:  "角色",
+            dataIndex: 'roles',
+            render: (_, record) => {
                 return (
-                    <div>
-                        <span className="font-medium">{text}</span> / <span className="text-sm text-gray-500">{record.positionName}</span>
+                    <div className="flex flex-wrap gap-2">
+                        {record.roles && record.roles!.map(role => (
+                            <Tag key={role} color="blue">
+                                {role}
+                            </Tag>
+                        ))}
                     </div>
                 )
             },
         },
         {
+            title: '联系方式',
+            dataIndex: 'phone',
+            render: (_, record) => {
+                return (
+                    <div className="flex flex-col">
+                        {record.phone && <span className="font-medium">{record.phone}</span>}
+                        {record.email && <span className="text-sm text-gray-500">{record.email}</span>}
+                    </div>
+                )
+            },
+        },
+        {
+            title: '机构/部门/职位',
+            dataIndex: 'organizationUnitName',
+            render: (_, record) => {
+                return (
+                    <div className="flex flex-col">
+                        {record.organizationUnitName && <span className="font-medium">{record.organizationUnitName}</span>}
+                        <div>
+                            {record.departmentName && <span className="text-sm text-gray-500">{record.departmentName} / </span>  }
+                            {record.positionName && <span className="text-sm text-gray-500">{record.positionName}</span>}
+                        </div>
+                    </div>
+                )
+            },
+        }, {
             title: '标签',
             dataIndex: 'tags',
             key: 'tags',
@@ -169,10 +188,6 @@ function UserTable() {
 
     ];
 
-    useEffect(() => {
-        loadOrganizationUnits();
-    }, []);
-
     const loadOrganizationUnits = async () => {
         try {
             const data = await getOrganizationUnitList({});
@@ -182,6 +197,10 @@ function UserTable() {
             console.error('Failed to load organization units:', error);
         }
     };
+
+    useAsyncEffect(async () => {
+        await loadOrganizationUnits();
+    }, []);
 
     const convertToTreeData = (nodes: OrganizationUnitTreeNode[]): any[] => {
         return nodes.map(node => ({

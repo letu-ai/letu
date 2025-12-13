@@ -19,7 +19,7 @@ export function getAllRoles() {
  * 获取所有职位
  */
 export function getAllPositions() {
-  return httpClient.get<void, PositionOption[]>("/api/admin/positions/tree");
+  return httpClient.get<void, PositionOption[]>("/api/admin/positions/tree-options");
 }
 
 /**

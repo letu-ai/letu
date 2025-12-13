@@ -3,6 +3,7 @@ using Letu.Basis.Admin.Menus.Dtos;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Admin.Users.Dtos;
 using Letu.Basis.Application.Dtos;
+using Letu.Basis.Oss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Volo.Abp.AspNetCore.Mvc.ApplicationConfigurations;
@@ -22,6 +23,7 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
 {
     private readonly IMenuItemAppService menuItemAppService;
     private readonly IUserAppService userAppService;
+    private readonly OssOptions ossOptions;
 
     public LetuApplicationConfigurationAppService(
         IOptions<AbpLocalizationOptions> localizationOptions,
@@ -41,6 +43,7 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
         IOptions<AbpClockOptions> abpClockOptions,
         ICachedObjectExtensionsDtoService cachedObjectExtensionsDtoService,
         IOptions<AbpApplicationConfigurationOptions> options,
+        IOptions<OssOptions> ossOptions,
         IMenuItemAppService menuItemAppService,
         IUserAppService userAppService)
         : base(
@@ -65,6 +68,7 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
     {
         this.menuItemAppService = menuItemAppService;
         this.userAppService = userAppService;
+        this.ossOptions = ossOptions.Value;
     }
 
     public async Task<LetuApplicationConfigurationDto> GetAsync(LetuApplicationConfigurationRequestOptions options)
@@ -88,7 +92,8 @@ public class LetuApplicationConfigurationAppService : AbpApplicationConfiguratio
             ObjectExtensions = abpConfig.ObjectExtensions,
             ExtraProperties = abpConfig.ExtraProperties,
             Menu = menu,
-            UserExtraInfo = userExtraInfo
+            UserExtraInfo = userExtraInfo,
+            Oss = ossOptions
         };
 
         return result;

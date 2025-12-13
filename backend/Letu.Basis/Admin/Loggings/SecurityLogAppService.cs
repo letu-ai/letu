@@ -14,7 +14,7 @@ namespace Letu.Basis.Admin.Loggings
             this.securityLogRepository = securityLogRepository;
         }
 
-        public async Task<PagedResult<LoginLogListDto>> GetLoginLogListAsync(LoginLogQueryDto dto)
+        public async Task<PagedResult<SecurityLogListOutput>> GetSecurityLogListAsync(SecurityLogListInput dto)
         {
             var rows = await securityLogRepository.Select
                 .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
@@ -24,9 +24,9 @@ namespace Letu.Basis.Admin.Loggings
                 .OrderByDescending(x => x.CreationTime)
                 .Count(out var total)
                 .Page(dto.Current, dto.PageSize)
-                .ToListAsync<LoginLogListDto>();
+                .ToListAsync<SecurityLogListOutput>();
 
-            return new PagedResult<LoginLogListDto>(total, rows);
+            return new PagedResult<SecurityLogListOutput>(total, rows);
         }
     }
 }

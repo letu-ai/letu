@@ -51,7 +51,6 @@ namespace Letu.Basis.Controllers.Admin
         /// </summary>
         /// <param name="id"></param>
         /// <param name="input"></param>
-        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(BasisPermissions.Department.Update)]

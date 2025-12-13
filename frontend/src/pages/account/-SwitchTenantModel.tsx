@@ -24,7 +24,7 @@ function SwitchTenantModel({ visible, onOk, onClose }: ISwitchTenantModelProps) 
                 message.error("租户不存在");
                 return;
             }
-        } catch (error) {
+        } catch {
             message.error('切换租户失败');
             return;
         }

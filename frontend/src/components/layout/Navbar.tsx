@@ -37,7 +37,7 @@ const Navbar = () => {
                     <UserNotification />
                     {/** 尺寸 */}
                     <SizeChanger />
-                    <Button type="text" className="" onClick={searchModalRef?.current?.openModal}>
+                    <Button type="text" className="" onClick={() => searchModalRef.current?.openModal()}>
                         <ProIcon icon="antd:SearchOutlined" />
                     </Button>
                     {/* 搜索框 */}

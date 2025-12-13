@@ -86,9 +86,9 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ open, onClose, id }) =>
       
       {details?.exceptions && (
         <>
-          <Divider orientation="left">异常信息</Divider>
-          <Card type="inner" title="异常详情" bordered={false}>
-            <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+          <Divider orientation="horizontal">异常信息</Divider>
+          <Card type="inner" title="异常详情" variant="borderless">
+            <pre className="whitespace-pre-wrap break-words">
               {details.exceptions}
             </pre>
           </Card>
@@ -210,8 +210,8 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ open, onClose, id }) =>
                 }
               >
                 {entityChange.propertyChanges && entityChange.propertyChanges.length > 0 ? (
-                  <div style={{ marginTop: '8px' }}>
-                    <Divider orientation="left">属性变更</Divider>
+                  <div className="mt-2">
+                    <Divider orientation="horizontal">属性变更</Divider>
                     <Table
                       dataSource={entityChange.propertyChanges}
                       columns={[

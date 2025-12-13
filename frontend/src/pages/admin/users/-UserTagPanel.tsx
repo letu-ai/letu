@@ -15,10 +15,6 @@ const UserTagPanel: React.FC<UserTagPanelProps> = ({ onTagSelect, selectedTagId 
     const [loading, setLoading] = useState<boolean>(false);
     const tagModalRef = useRef<ModalRef>(null);
 
-    useEffect(() => {
-        loadTags();
-    }, []);
-
     const loadTags = async () => {
         setLoading(true);
         try {
@@ -31,6 +27,10 @@ const UserTagPanel: React.FC<UserTagPanelProps> = ({ onTagSelect, selectedTagId 
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadTags();
+    }, []);
 
     const handleTagClick = (tagId: string) => {
         if (selectedTagId === tagId) {

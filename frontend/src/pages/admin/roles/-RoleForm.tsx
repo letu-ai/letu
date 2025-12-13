@@ -17,10 +17,6 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [row, setRow] = useState<RoleListOutput | null>();
     const { message } = App.useApp();
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     const openModal = (row?: RoleListOutput) => {
         setIsOpenModal(true);
         if (row) {
@@ -34,6 +30,10 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.setFieldValue('isPublic', true);
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

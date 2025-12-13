@@ -1,9 +1,9 @@
-
 import ErrorFallback from '@/components/ErrorFallback';
-import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { Layout } from 'antd';
 import { AppConfigProvider, loadConfiguration } from '@/components/AppConfigProvider';
 import { ErrorBoundary } from 'react-error-boundary';
+import RouteErrorComponent from '@/components/RouteErrorComponent';
 
 export const Route = createFileRoute("/account")({
     component: AccountLayout,
@@ -14,19 +14,7 @@ export const Route = createFileRoute("/account")({
         }
     },
     staleTime: 1000 * 60 * 30, // 30分钟过期
-    errorComponent: ({ error }) => {
-        const router = useRouter();
-        
-        const handleRetry = () => {
-            router.invalidate();
-        };
-
-        return (
-            <div className='h-screen'>
-                <ErrorFallback error={error} resetErrorBoundary={handleRetry} />
-            </div>
-        )
-    }
+    errorComponent: RouteErrorComponent
 })
 
 function AccountLayout() {

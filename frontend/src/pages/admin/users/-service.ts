@@ -151,6 +151,7 @@ export interface UserListOutput {
     organizationUnitId?: string | null;
     organizationUnitName?: string | null;
     tags?: UserTagInfo[] | null;
+    roles?: string[] | null;
     description?: string | null;
 }
 

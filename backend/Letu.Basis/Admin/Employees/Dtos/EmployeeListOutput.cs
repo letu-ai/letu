@@ -54,12 +54,12 @@ namespace Letu.Basis.Admin.Employees.Dtos
         /// <summary>
         /// 入职时间
         /// </summary>
-        public DateTime? InTime { get; set; }
+        public DateOnly? InTime { get; set; }
 
         /// <summary>
         /// 离职时间
         /// </summary>
-        public DateTime? OutTime { get; set; }
+        public DateOnly? OutTime { get; set; }
 
         /// <summary>
         /// 是否离职

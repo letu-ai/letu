@@ -20,10 +20,6 @@ const ItemForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const { name } = useParams({ strict: false });
     const { message } = useApp();
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     const openModal = (row?: IDictionaryItemOutput) => {
         setIsOpenModal(true);
         if (row) {
@@ -35,6 +31,10 @@ const ItemForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.setFieldValue('isEnabled', true);
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

@@ -7,20 +7,20 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import App from './App';
 
-// 屏蔽Ant Design 组件的findDOMNode警告
-// 保存原始 console.error
-const originalError = window.console.error;
-// 覆盖 console.error
-window.console.error = (...args) => {
-  if (
-    args[0] &&
-    typeof args[0] === 'string' &&
-    (args[0].includes('findDOMNode is deprecated') || args[0].includes('is deprecated in StrictMode'))
-  ) {
-    return;
-  }
-  originalError.apply(console, args);
-};
+// // 屏蔽Ant Design 组件的findDOMNode警告
+// // 保存原始 console.error
+// const originalError = window.console.error;
+// // 覆盖 console.error
+// window.console.error = (...args) => {
+//   if (
+//     args[0] &&
+//     typeof args[0] === 'string' &&
+//     (args[0].includes('findDOMNode is deprecated') || args[0].includes('is deprecated in StrictMode'))
+//   ) {
+//     return;
+//   }
+//   originalError.apply(console, args);
+// };
 
 // Create a new router instance
 const router = createRouter({ routeTree })

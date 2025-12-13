@@ -14,6 +14,11 @@ const SearchModal = forwardRef<SearchModalRef, any>((_, ref) => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const appConfig = useAppConfig();
   const { menu } = appConfig;
+  
+  const openModal = () => {
+    setIsOpenModal(true);
+  };
+  
   useImperativeHandle(ref, () => ({
     openModal,
   }));
@@ -46,9 +51,6 @@ const SearchModal = forwardRef<SearchModalRef, any>((_, ref) => {
     }
   }, [searchText, menu]);
 
-  const openModal = () => {
-    setIsOpenModal(true);
-  };
 
   const onCancel = () => {
     setIsOpenModal(false);

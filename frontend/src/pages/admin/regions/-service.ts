@@ -48,7 +48,7 @@ export const getRegionChildren = async (parentCode?: string): Promise<IRegionLis
  * 根据代码获取区域信息
  */
 export const getRegionByCode = async (code: string): Promise<IRegionListOutput | null> => {
-    return await httpClient.get<void, IRegionListOutput>(`/api/admin/regions/by-code/${code}`);
+    return await httpClient.get<void, IRegionListOutput>(`/api/regions/by-code/${code}`);
 };
 
 
@@ -141,7 +141,7 @@ export const getLevelColor = (level: number): string | undefined => {
  * 根据父级code获取子级区域列表
  */
 export const getRegionChildrenByCode = async (parentCode?: string): Promise<IRegionListOutput[]> => {
-    const path = parentCode ? `/api/admin/regions/children-by-code/${parentCode}` : "/api/admin/regions/children-by-code";
+    const path = parentCode ? `/api/regions/children-by-code/${parentCode}` : "/api/regions/children-by-code";
     return await httpClient.get<void, IRegionListOutput[]>(path);
 };
 
@@ -149,12 +149,12 @@ export const getRegionChildrenByCode = async (parentCode?: string): Promise<IReg
  * 根据code获取区域完整路径
  */
 export const getRegionPathByCodes = async (code: string): Promise<IRegionListOutput[]> => {
-    return await httpClient.get<void, IRegionListOutput[]>(`/api/admin/regions/path-by-code/${code}`);
+    return await httpClient.get<void, IRegionListOutput[]>(`/api/regions/path-by-code/${code}`);
 };
 
 /**
  * 根据区域代码获取街道列表
  */
 export const getStreets = async (regionCode: string): Promise<string[]> => {
-    return await httpClient.get<void, string[]>(`/api/admin/regions/streets/${regionCode}`);
+    return await httpClient.get<void, string[]>(`/api/regions/streets/${regionCode}`);
 };

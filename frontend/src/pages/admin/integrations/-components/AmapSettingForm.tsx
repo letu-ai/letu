@@ -46,7 +46,7 @@ export default function AmapSettings({ loading, saving, isError, onRequest, onSa
                 name="apiKey"
                 label="API Key"
                 rules={[{ required: true, message: '请输入高德地图API密钥' }]}
-                extra={<a href="https://lbs.amap.com/api/javascript-api/guide/abc/prepare" target="_blank">高德地图API密钥申请 <ExportOutlined /> </a>}
+                extra={<a title="高德地图API密钥申请" href="https://lbs.amap.com/api/javascript-api/guide/abc/prepare" target="_blank" rel="noopener noreferrer">高德地图API密钥申请 <ExportOutlined /> </a>}
             >
                 <Input.Password />
             </Form.Item>

@@ -49,13 +49,13 @@ namespace Letu.Basis.Admin.Tenants.Dtos
         /// 管理员邮箱
         /// </summary>
         [StringLength(128)]
-        public string AdminEmail { get; set; }
+        public required string AdminEmail { get; set; }
 
         /// <summary>
         /// 管理员密码
         /// </summary>
         [StringLength(128)]
-        public string AdminPassword { get; set; }
+        public required string AdminPassword { get; set; }
 
         /// <summary>
         /// 网站名称

@@ -2,173 +2,362 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 常用开发命令
+## 项目概述
 
-### 开发和构建
-- `pnpm install` - 安装依赖
-- `pnpm dev` - 启动开发服务器 (http://localhost:8080，绑定0.0.0.0支持外部访问)
-- `pnpm build` - 构建生产版本 (需要先运行 tsc -b 编译TypeScript)
-- `pnpm lint` - 运行ESLint代码检查
-- `pnpm preview` - 预览构建版本
+Letu AI 是基于风汐管理系统改进的企业级通用Web框架，采用前后端分离架构：
+- **前端**: React 18 + TypeScript + Vite + TanStack Router + Ant Design + Shadcn UI + TailwindCSS
+- **后端**: .NET 9 + ABP Framework + FreeSql + PostgreSQL
 
-### 开发调试
-- 开发服务器支持HMR热更新，关闭了错误覆盖层
-- 集成了TanStack Router DevTools用于路由调试
-
-## 技术栈
+## 前端技术栈
 
 ### 核心框架
-- **React 18** + **TypeScript 5.9** - 现代React开发
+- **React 18.3.1** + **TypeScript 5.9** (strict mode)
+- **Vite 6.3** - 构建工具，支持多应用打包 (admin + ai)
 - **TanStack Router 1.131** - 基于文件系统的类型安全路由
-- **Vite 6.3** - 下一代构建工具
-
-### 状态管理
-- **Zustand 5.0** - 轻量级状态管理
 - **TanStack Query 5.81** - 服务端状态管理和缓存
 
-### UI和样式
-- **Ant Design 5.25** - 企业级UI组件库
-- **TailwindCSS 4.1** - 原子化CSS框架 + Vite插件
-- **Sass** - CSS预处理器
-- **@iconify/react** - 图标组件库
+### UI 框架
+- **Ant Design 5.25** - 企业级UI组件库（主要用于管理后台）
+- **Shadcn UI + Radix UI** - 组件库（20+组件，用于AI模块）
+- **TailwindCSS 4.1** - 原子化CSS框架
+- **Lucide React** - 图标库
+
+### 状态管理
+- **Zustand 5.0** - 轻量级全局状态管理
+- **TanStack Query** - 服务端状态管理
 
 ### 工具库
-- **axios 1.9** - HTTP客户端
-- **dayjs** - 日期处理库
-- **lodash** - 实用工具库
-- **zod** - 运行时类型验证
-- **clsx + tailwind-merge** - 条件样式合并
+- **axios 1.9** - HTTP客户端（支持token自动刷新）
+- **dayjs** - 日期处理
+- **lodash** - 工具函数
+- **zod 4.1.1** - 运行时类型验证
+- **react-hook-form** - 表单管理
 
-### 开发工具
-- **ESLint 9** - 代码质量检查
-- **Prettier** - 代码格式化
-- **TypeScript ESLint** - TypeScript代码规范
-
-## 项目架构
-
-### 目录结构
+## 前端项目结构
 
 ```
-src/
-├── api/                    # API相关
-│   ├── mqtt.ts            # MQTT实时通信
-│   └── oss/               # 对象存储服务
-├── application/           # 应用层核心配置
-│   ├── appConfigStore.ts  # 全局应用配置状态
-│   ├── clientConnection.ts # 客户端连接管理
-│   ├── layoutStore.ts     # 布局状态管理
-│   ├── themeStore.ts      # 主题配置
-│   ├── permissions.ts     # 权限管理
-│   ├── types.ts           # 核心类型定义
-│   └── string-values/     # 字符串常量
-├── components/            # 可复用组件
-│   ├── SmartTable/        # 智能表格组件（核心业务组件）
-│   ├── Permission.tsx     # 权限控制组件
-│   ├── RecipientSelector/ # 收件人选择器
-│   ├── layout/            # 布局相关组件
-│   └── ...               # 其他通用组件
-├── pages/                 # 页面组件（TanStack Router文件系统路由）
-│   ├── __root.tsx        # 根路由配置
-│   ├── account/          # 账户系统（登录、认证等）
-│   ├── admin/            # 管理后台功能模块
-│   │   ├── users/        # 用户管理
-│   │   ├── roles/        # 角色权限
-│   │   ├── departments/  # 部门管理
-│   │   ├── notifications/ # 通知管理
-│   │   └── ...          # 其他管理功能
-│   ├── my/               # 个人中心
-│   └── home/             # 首页
-├── utils/                # 工具函数
-│   ├── httpClient.tsx    # Axios HTTP客户端配置
-│   ├── authUtils.ts      # 认证工具
-│   └── ...              # 其他工具
-├── types/                # 全局类型定义
-└── lib/                  # 第三方库扩展
+frontend/
+├── src/
+│   ├── api/                    # API集成
+│   │   ├── mqtt.ts            # MQTT实时通信
+│   │   └── oss/               # 对象存储服务
+│   ├── application/           # 应用层配置
+│   │   ├── layoutStore.ts     # 布局状态（Zustand）
+│   │   ├── themeStore.ts      # 主题配置
+│   │   ├── permissions.ts     # 权限常量（与后端同步）
+│   │   └── types.ts           # 核心类型定义
+│   ├── components/            # 通用组件
+│   │   ├── SmartTable/        # 智能表格（核心组件）
+│   │   ├── Permission.tsx     # 权限控制组件
+│   │   └── layout/            # 布局组件
+│   ├── pages/                 # 页面（TanStack Router文件系统路由）
+│   │   ├── __root.tsx        # 根路由
+│   │   ├── account/          # 账户系统（登录/登出）
+│   │   ├── admin/            # 管理后台
+│   │   │   ├── users/        # 用户管理
+│   │   │   ├── roles/        # 角色权限
+│   │   │   ├── departments/  # 部门管理
+│   │   │   ├── employees/    # 员工管理
+│   │   │   ├── menus/        # 菜单管理
+│   │   │   └── route.tsx     # 管理路由配置
+│   │   ├── ai/               # AI模块（独立应用）
+│   │   │   ├── workflows/    # 工作流管理
+│   │   │   ├── file-manager/ # 文件管理
+│   │   │   └── route.tsx     # AI路由配置
+│   │   ├── my/               # 个人中心
+│   │   └── routeTree.gen.ts  # 自动生成的路由树（不要手动编辑）
+│   ├── utils/                # 工具函数
+│   │   ├── httpClient.tsx    # Axios配置和封装
+│   │   ├── authUtils.ts      # 认证工具
+│   │   └── tokenRefreshManager.ts # Token刷新管理
+│   ├── App.tsx              # 管理后台入口
+│   ├── App-ai.tsx           # AI应用入口
+│   ├── main.tsx             # 管理后台主入口
+│   └── main-ai.tsx          # AI应用主入口
+├── index.html               # 管理后台HTML
+├── ai.html                  # AI应用HTML
+├── package.json
+├── vite.config.ts           # Vite配置（双应用）
+└── tsconfig.json            # TypeScript配置
 ```
 
-### 路由系统
+## 开发命令
 
-使用TanStack Router的文件系统路由：
-- `src/pages/` 目录结构自动映射为路由
-- `index.tsx` - 目录默认路由
-- `$param.tsx` - 动态路由参数
-- `__root.tsx` - 根路由配置，集成DevTools
-- `routeTree.gen.ts` - 自动生成的路由树
-- 支持自动代码分割
+```powershell
+# 安装依赖（必须使用pnpm）
+pnpm install
 
-### 核心架构模式
+# 启动开发服务器（http://localhost:8080）
+pnpm dev
 
-#### 业务模块组织
-- 每个功能页面包含对应的 `-service.ts` 文件处理业务逻辑和API调用
-- 表单组件使用 `-Form.tsx` 后缀（如 `UserForm.tsx`）
-- 模态框组件使用 `-Modal.tsx` 后缀（如 `RecipientModal.tsx`）
-- 常量文件使用 `-constants.ts` 后缀
+# 构建生产版本
+pnpm build
 
-#### 状态管理架构
-- **全局应用状态**：使用Zustand (`layoutStore`, `themeStore`)
-- **服务端状态**：使用TanStack Query管理API数据
-- **组件状态**：优先使用React useState
-- **表单状态**：使用Ant Design Form组件
+# 代码检查
+pnpm lint
 
-#### 权限控制系统
-- **多租户架构**：支持租户隔离和切换
-- **角色权限**：基于角色的权限控制系统
-- **组件级权限**：使用 `<Permission />` 组件包装需要权限控制的内容
-- **路由级权限**：在路由配置中集成权限检查
+# 预览构建结果
+pnpm preview
+```
 
-#### HTTP客户端架构
-- 基于axios的统一HTTP客户端，配置在 `utils/httpClient.tsx`
-- 支持Token自动刷新和请求拦截
-- 统一错误处理和响应格式化
-- RFC标准错误格式支持
+## 路由系统
 
-## 开发规范
+### 文件系统路由规则
 
-### 代码规范
-- **包管理**：必须使用pnpm
-- **TypeScript**：严格模式 + 复合项目配置，ESLint允许使用any类型
-- **组件导出**：使用默认导出
-- **路径别名**：使用 `@/` 指向 `src/` 目录
+TanStack Router 自动将 `src/pages/` 目录结构映射为路由：
 
-### 文件命名规范
-- 组件文件使用PascalCase（如 `SmartTable.tsx`）
-- 服务文件使用 `-service.ts` 后缀
-- 表单组件使用 `-Form.tsx` 后缀
-- 模态框组件使用 `-Modal.tsx` 后缀
-- 样式文件使用 `.scss` 扩展名
+- `src/pages/admin/users/index.tsx` → `/admin/users`
+- `src/pages/admin/users/$id.tsx` → `/admin/users/:id`
+- `src/pages/admin/route.tsx` → 自定义路由配置（布局、认证等）
 
-### 样式开发
-- **主要方案**：TailwindCSS 4.1 + Vite插件
-- **特殊样式**：使用SCSS文件
-- **样式合并**：使用 `clsx` 和 `tailwind-merge`
-- **响应式**：使用 `react-responsive` 库
+### 路由配置文件 (route.tsx)
 
-### API集成规范
-- HTTP请求统一使用配置好的axios客户端
-- API类型定义放在对应的 `-service.ts` 文件中
-- 错误处理使用 `ResponseErrorMessage` 组件
-- 支持MQTT实时通信集成
+`route.tsx` 文件用于配置路由级别的布局、认证和权限：
 
-### 构建和部署
-- Vite配置支持路径别名和插件集成
-- TanStack Router插件自动生成路由树和代码分割
-- 生产构建前需要TypeScript编译检查 (`tsc -b`)
-- ESLint配置包含TanStack Router和React相关规则
-- 构建输出目录为 `dist/`
+```typescript
+// src/pages/admin/route.tsx
+export const Route = createRoute({
+  getParentRoute: () => rootRoute,
+  id: "admin",
+  component: AdminLayout,
+  beforeLoad: async ({ context }) => {
+    // 路由守卫：检查认证
+    if (!context.auth.isAuthenticated) {
+      throw redirect({ to: "/account/login" });
+    }
+  },
+});
+```
 
-## 核心业务组件
+### 多应用支持
 
-### SmartTable组件
-- 企业级智能表格组件，支持分页、排序、筛选
-- 集成了布局状态管理和响应式设计
-- 支持行选择、自定义操作和导出功能
+项目支持两个独立应用：
 
-### 权限系统
-- 基于角色的多租户权限控制
-- 支持功能级和组件级权限验证
-- 集成用户身份验证和会话管理
+1. **管理后台** (`index.html` + `main.tsx`)
+   - 路径: `/`
+   - 功能: 用户管理、角色权限、部门员工等
 
-### 实时通信
-- MQTT客户端集成，支持实时消息推送
-- 客户端连接状态管理和自动重连
-- 支持业务事件和系统通知
+2. **AI应用** (`ai.html` + `main-ai.tsx`)
+   - 路径: `/ai`
+   - 功能: AI工作流、文件管理等
+   - 开发环境自动路由重写支持
+
+## HTTP 客户端
+
+### 基本使用
+
+```typescript
+import { httpClient } from "@/utils/httpClient";
+
+// GET 请求
+const users = await httpClient.get<UserDto[]>("/api/admin/users");
+
+// POST 请求
+const newUser = await httpClient.post<CreateUserDto, UserDto>(
+  "/api/admin/users",
+  { name: "张三", email: "zhangsan@example.com" }
+);
+
+// PUT 请求
+await httpClient.put(`/api/admin/users/${id}`, updateData);
+
+// DELETE 请求
+await httpClient.delete(`/api/admin/users/${id}`);
+```
+
+### 特殊配置
+
+```typescript
+// 匿名请求（不需要token）
+await httpClient.get("/api/public/config", { anonymous: true });
+
+// 不显示全局错误消息
+await httpClient.post("/api/admin/users", data, {
+  showGlobalErrorMessage: false
+});
+```
+
+### Token自动刷新
+
+- 当收到401响应时，自动调用刷新token接口
+- 刷新成功后重试原请求
+- 刷新失败则跳转登录页
+
+### 错误处理
+
+系统自动处理以下错误格式：
+- **ABP标准错误**: `{ error: { message, code, details } }`
+- **RFC 9110验证错误**: `{ type: "https://tools.ietf.org/html/rfc9110#section-15.5.1", errors: {} }`
+- **租户解析错误**: 自动跳转到租户错误页
+
+## 权限控制
+
+### 权限定义
+
+权限定义在 [src/application/permissions.ts](src/application/permissions.ts)，与后端 `BasisPermissions.cs` 保持同步：
+
+```typescript
+export class BasisPermissions {
+  public static readonly User = {
+    Default: "Basis.User",
+    Create: "Basis.User.Create",
+    Update: "Basis.User.Update",
+    Delete: "Basis.User.Delete",
+  } as const;
+}
+```
+
+### 组件级权限控制
+
+```typescript
+import { Permission } from "@/components/Permission";
+import { BasisPermissions } from "@/application/permissions";
+
+<Permission name={BasisPermissions.User.Create}>
+  <Button onClick={handleCreate}>创建用户</Button>
+</Permission>
+```
+
+### 路由级权限控制
+
+在 `route.tsx` 中配置：
+
+```typescript
+beforeLoad: async ({ context }) => {
+  const hasPermission = await context.auth.checkPermission(
+    BasisPermissions.User.Default
+  );
+  if (!hasPermission) {
+    throw redirect({ to: "/403" });
+  }
+}
+```
+
+## 状态管理
+
+### 全局状态 (Zustand)
+
+```typescript
+// src/application/layoutStore.ts
+import { create } from "zustand";
+
+export const useLayoutStore = create<LayoutState>((set) => ({
+  sidebarCollapsed: false,
+  toggleSidebar: () => set((state) => ({
+    sidebarCollapsed: !state.sidebarCollapsed
+  })),
+}));
+
+// 使用
+import { useLayoutStore } from "@/application/layoutStore";
+
+const { sidebarCollapsed, toggleSidebar } = useLayoutStore();
+```
+
+### 服务端状态 (TanStack Query)
+
+```typescript
+import { useQuery, useMutation } from "@tanstack/react-query";
+
+// 查询数据
+const { data, isLoading } = useQuery({
+  queryKey: ["users"],
+  queryFn: () => httpClient.get<UserDto[]>("/api/admin/users"),
+});
+
+// 修改数据
+const mutation = useMutation({
+  mutationFn: (data: CreateUserDto) =>
+    httpClient.post("/api/admin/users", data),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["users"] });
+  },
+});
+```
+
+## 常见开发任务
+
+### 添加新页面
+
+1. 在 `src/pages/` 下创建文件（如 `src/pages/admin/my-feature/index.tsx`）
+2. 路由自动生成（重启dev服务器）
+3. 如需布局/认证，创建 `route.tsx`
+4. 添加权限检查（如需要）
+
+### 添加权限
+
+1. 在 [src/application/permissions.ts](src/application/permissions.ts) 添加权限常量
+2. 与后端 `BasisPermissions.cs` 保持一致
+3. 使用 `<Permission>` 组件包装需要权限的内容
+
+### API集成
+
+1. 使用 `httpClient` 进行请求
+2. 类型使用 TypeScript 接口定义
+3. 使用 TanStack Query 管理缓存和状态
+4. 错误处理由 `httpClient` 自动处理
+
+### SmartTable使用
+
+SmartTable是核心的表格组件，支持：
+- 分页、排序、筛选
+- 批量操作
+- 列配置
+- 导出功能
+
+参考 `src/pages/admin/users/index.tsx` 了解详细用法。
+
+## 样式规范
+
+### TailwindCSS优先
+
+优先使用 TailwindCSS 类名：
+
+```typescript
+<div className="flex items-center gap-4 p-4 bg-white rounded-lg">
+  <Button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600">
+    提交
+  </Button>
+</div>
+```
+
+### 条件样式
+
+使用 `clsx` 或 `cn` (tailwind-merge) 合并类名：
+
+```typescript
+import { cn } from "@/lib/utils";
+
+<div className={cn(
+  "base-class",
+  isActive && "active-class",
+  isDisabled && "disabled-class"
+)}>
+  内容
+</div>
+```
+
+### Ant Design主题
+
+使用 Ant Design 组件时，遵循统一主题配置（在 `App.tsx` 中配置）。
+
+## 重要提醒
+
+1. **必须使用pnpm**: 不要使用npm或yarn
+2. **不要手动编辑 routeTree.gen.ts**: 该文件由TanStack Router自动生成
+3. **权限常量同步**: 修改权限时，确保前后端一致
+4. **字符串使用双引号**: 遵循项目代码风格
+5. **成员变量不使用下划线**: C#代码规范，前端保持一致性
+6. **Token自动刷新**: 不需要手动处理401错误，httpClient已处理
+7. **多应用架构**: 修改 `vite.config.ts` 时注意不要破坏双应用配置
+
+## 后端API地址
+
+开发环境: `http://localhost:5050`
+- API文档: `/swagger`
+- 健康检查: `/health`
+
+## 相关文档
+
+- [README.md](README.md) - 项目整体介绍
+- [docs/frontend-routing.md](docs/frontend-routing.md) - 路由系统详细说明（如存在）

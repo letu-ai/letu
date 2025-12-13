@@ -63,7 +63,7 @@ function PasswordPage() {
             <Card title="修改密码">
                 {/* 安全提示 */}
                 <Alert
-                    message="密码安全提示"
+                    title="密码安全提示"
                     description={`为了账户安全，请确保密码符合以下要求。`}
                     type="info"
                     showIcon

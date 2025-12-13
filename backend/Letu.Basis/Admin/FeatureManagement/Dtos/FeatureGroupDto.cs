@@ -6,7 +6,7 @@ public class FeatureGroupDto
 
     public string? DisplayName { get; set; }
 
-    public List<FeatureDto> Features { get; set; }
+    public List<FeatureDto> Features { get; set; } = [];
 
     public string GetNormalizedGroupName()
     {

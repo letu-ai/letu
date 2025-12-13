@@ -1,7 +1,12 @@
 ﻿using FreeSql.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
+using Letu.Basis.Admin.Roles;
+using Letu.Basis.Admin.Departments;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
+using Letu.Basis.Admin.Positions;
+using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.OrganizationUnits;
+using Letu.Basis.Admin.UserTags;
 
 namespace Letu.Basis.Admin.Users
 {
@@ -13,6 +18,7 @@ namespace Letu.Basis.Admin.Users
     {
         protected User()
         {
+            UserName = "";
         }
 
         public User(Guid id, string userName) : base(id)
@@ -62,15 +68,18 @@ namespace Letu.Basis.Admin.Users
         [Column(IsNullable = false)]
         public bool IsEnabled { get; set; }
 
+
         /// <summary>
         /// 用户角色
         /// </summary>
-        public virtual ICollection<UserInRole>? Roles { get; set; }
+        [Navigate(ManyToMany = typeof(UserInRole))]
+        public virtual ICollection<Role>? Roles { get; set; }
 
         /// <summary>
         /// 用户标签
         /// </summary>
-        public virtual ICollection<UserInTag>? Tags { get; set; }
+        [Navigate(ManyToMany = typeof(UserInTag))]
+        public virtual ICollection<UserTag>? Tags { get; set; }
 
         /// <summary>
         /// 租户ID
@@ -96,9 +105,21 @@ namespace Letu.Basis.Admin.Users
         public Guid? DepartmentId { get; set; }
 
         /// <summary>
+        /// 所属部门
+        /// </summary>
+        [Navigate(nameof(DepartmentId))]
+        public Department? Department { get; set; }
+
+        /// <summary>
         /// 职位ID
         /// </summary>
         public Guid? PositionId { get; set; }
+
+        /// <summary>
+        /// 所属职位
+        /// </summary>
+        [Navigate(nameof(PositionId))]
+        public Position? Position { get; set; }
 
         /// <summary>
         /// 关联员工ID
@@ -106,8 +127,20 @@ namespace Letu.Basis.Admin.Users
         public Guid? EmployeeId { get; set; }
 
         /// <summary>
+        /// 关联员工
+        /// </summary>
+        [Navigate(nameof(EmployeeId))]
+        public Employee? Employee { get; set; }
+
+        /// <summary>
         /// 组织单元ID
         /// </summary>
         public Guid? OrganizationUnitId { get; set; }
+
+        /// <summary>
+        /// 所属组织单元
+        /// </summary>
+        [Navigate(nameof(OrganizationUnitId))]
+        public OrganizationUnit? OrganizationUnit { get; set; }
     }
 }

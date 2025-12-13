@@ -84,6 +84,8 @@ namespace Letu.Basis.Admin.Users.Dtos
         /// </summary>
         public List<UserTagInfo>? Tags { get; set; }
 
+        public List<string>? Roles { get; set; }
+
 
         public string? Description { get; set; }
     }

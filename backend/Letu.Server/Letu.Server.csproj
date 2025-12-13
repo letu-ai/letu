@@ -9,14 +9,16 @@
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.AspNetCore" />
 		<PackageReference Include="Volo.Abp.Autofac" />
-		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" />
 		<PackageReference Include="Volo.Abp.BlobStoring.FileSystem" />
-	</ItemGroup>
-
+		<PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" />
+		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" />
+		<PackageReference Include="Hangfire.PostgreSql" />
+    </ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Letu.Abp.FreeSql\Letu.Abp.FreeSql.csproj" />
 		<ProjectReference Include="..\Letu.AI\Letu.AI.csproj" />
 		<ProjectReference Include="..\Letu.Basis\Letu.Basis.csproj" />
+		<ProjectReference Include="..\Letu.Mqtt\Letu.Mqtt.csproj" />
 	</ItemGroup>
 </Project>

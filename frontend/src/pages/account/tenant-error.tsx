@@ -61,7 +61,7 @@ function TenantInvalidPage() {
 
                 <Alert
                     type="info"
-                    message="可能的解决方案："
+                    title="可能的解决方案："
                     description={
                         <ul>
                             <li>点击"切换租户"选择正确的租户</li>

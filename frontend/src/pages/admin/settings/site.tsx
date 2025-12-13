@@ -58,7 +58,7 @@ function SiteSettings() {
     };
 
 
-    const handleFormValuesChange = (changedValues: any, _allValues: any) => {
+    const handleFormValuesChange = (changedValues: any) => {
         if (changedValues.primaryColor) {
             const color = changedValues.primaryColor;
             const hexColor = typeof color === 'string' ? color : color.toHexString();

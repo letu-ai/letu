@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace Letu.Basis.Admin.FeatureManagement.Dtos;
+﻿namespace Letu.Basis.Admin.FeatureManagement.Dtos;
 
 public class GetFeatureListResultDto
 {
-    public List<FeatureGroupDto> Groups { get; set; }
+    public List<FeatureGroupDto> Groups { get; set; } = [];
 }

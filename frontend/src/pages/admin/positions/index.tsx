@@ -115,10 +115,10 @@ const Position: React.FC = () => {
           return data;
         }}
         searchItems={[
-          <Form.Item label="关键词" name="keyword">
+          <Form.Item key="keyword" label="关键词" name="keyword">
             <Input placeholder="请输入职位名称/编号" />
           </Form.Item>,
-          <Form.Item label="职级" name="level">
+          <Form.Item key="level" label="职级" name="level">
             <DataDictionarySelect
               dictName={DictType.PositionLevel}
               placeholder="请选择职位职级"
@@ -127,7 +127,7 @@ const Position: React.FC = () => {
               }}
             />
           </Form.Item>,
-          <Form.Item label="状态" name="status">
+          <Form.Item key="status" label="状态" name="status">
             <Input placeholder="请输入状态" />
           </Form.Item>,
         ]}

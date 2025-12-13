@@ -23,10 +23,6 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
     const [positionLevel, setPositionLevel] = useState<number>(0);
     const { message } = useApp();
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     const fetchTreeData = (groupName?: string) => {
         getPositionGroupList({ groupName }).then((data) => {
             setTreeData(data);
@@ -52,6 +48,10 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
             form.setFieldValue('status', 1);
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();
@@ -79,7 +79,7 @@ const PositionForm = forwardRef<PositionModalRef, ModalProps>((props, ref) => {
             handleSuccess('新增成功');
         }
     };
-    
+
     const positionLevelChange = (value: any) => {
         form.setFieldValue('positionLevel', value);
         setPositionLevel(value);

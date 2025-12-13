@@ -36,10 +36,6 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         requireDigit: getSettingBoolean('Letu.Identity.Password.RequireDigit') || false,
     };
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     const openModal = (row?: UserListOutput) => {
         setIsOpenModal(true);
         if (row) {
@@ -57,6 +53,10 @@ const UserModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
         // 数据加载由公共组件自己处理
     };
 
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

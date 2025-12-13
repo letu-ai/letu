@@ -129,7 +129,7 @@ export async function fetchEventSource(input: RequestInfo, {
                     }
                 };
 
-                const handleRetry = (_retry: number) => {
+                const handleRetry = () => {
                 };
 
                 const messagesHandler = getMessages(handleId, handleRetry, onmessage);

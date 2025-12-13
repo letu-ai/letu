@@ -57,6 +57,7 @@ namespace Letu.Basis.Admin.Positions
         /// <summary>
         /// 修改职位分组
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<bool> UpdatePositionGroupAsync(Guid id, PositionGroupCreateOrUpdateInput dto);

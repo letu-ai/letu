@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 import { requireAuth } from '@/utils/authUtils'
 
 import { Outlet } from '@tanstack/react-router';
@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import useLayoutStore from '@/application/layoutStore';
 import { AppConfigProvider, loadConfiguration } from '@/components/AppConfigProvider';
 import Navbar from '@/components/layout/Navbar';
+import RouteErrorComponent from '@/components/RouteErrorComponent';
 
 export const Route = createFileRoute('/home')({
     component: AppLayout,
@@ -24,19 +25,7 @@ export const Route = createFileRoute('/home')({
         }
     },
     staleTime: 1000 * 60 * 30, // 30分钟过期
-    errorComponent: ({ error }) => {
-        const router = useRouter();
-        
-        const handleRetry = () => {
-            router.invalidate();
-        };
-
-        return (
-            <div className='h-screen'>
-                <ErrorFallback error={error} resetErrorBoundary={handleRetry} />
-            </div>
-        )
-    }
+    errorComponent: RouteErrorComponent,
 })
 
 

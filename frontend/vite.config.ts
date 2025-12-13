@@ -15,10 +15,30 @@ export default defineConfig({
         }),
         react(),
         tailwindcss(),
+        {
+            name: 'ai-route-rewrite',
+            configureServer(server) {
+                server.middlewares.use((req, _res, next) => {
+                    // 将 /ai 开头的路由重写到 ai.html
+                    if (req.url?.startsWith('/ai')) {
+                        req.url = '/ai.html';
+                    }
+                    next();
+                });
+            },
+        },
     ],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
+        },
+    },
+    build: {
+        rollupOptions: {
+            input: {
+                admin: path.resolve(__dirname, 'index.html'),
+                ai: path.resolve(__dirname, 'ai.html'),
+            },
         },
     },
     server: {

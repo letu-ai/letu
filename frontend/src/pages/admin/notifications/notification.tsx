@@ -98,10 +98,10 @@ function NotificationList() {
                     return data;
                 }}
                 searchItems={[
-                    <Form.Item label="通知标题" name="title">
+                    <Form.Item key="title" label="通知标题" name="title">
                         <Input placeholder="请输入通知标题" />
                     </Form.Item>,
-                    <Form.Item label="通知状态" name="isReaded">
+                    <Form.Item key="isReaded" label="通知状态" name="isReaded">
                         <Select
                             allowClear
                             placeholder="请选择通知状态"

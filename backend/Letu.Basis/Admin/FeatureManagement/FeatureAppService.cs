@@ -56,7 +56,7 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
 
             SetFeatureDepth(groupDto.Features, providerName, providerKey);
 
-            if (groupDto.Features.Any())
+            if (groupDto.Features.Count != 0)
             {
                 result.Groups.Add(groupDto);
             }
@@ -77,11 +77,10 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
 
     private FeatureDto CreateFeatureDto(FeatureNameValueWithGrantedProvider featureNameValueWithGrantedProvider, FeatureDefinition featureDefinition)
     {
-        return new FeatureDto
+        var feature = new FeatureDto
         {
             Name = featureDefinition.Name,
             DisplayName = featureDefinition.DisplayName?.Localize(StringLocalizerFactory) ?? featureDefinition.Name,
-            Description = featureDefinition.Description?.Localize(StringLocalizerFactory),
 
             ValueType = featureDefinition.ValueType,
 
@@ -93,6 +92,13 @@ public class FeatureAppService : BasisAppService, IFeatureAppService
                 Key = featureNameValueWithGrantedProvider.Provider?.Key
             }
         };
+
+        if (featureDefinition.Description != null)
+        {
+            feature.Description = featureDefinition.Description.Localize(StringLocalizerFactory);
+        }
+
+        return feature;
     }
 
     public virtual async Task UpdateAsync([NotNull] string providerName, string? providerKey, UpdateFeaturesDto input)

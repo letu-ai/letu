@@ -1,5 +1,4 @@
 ﻿using Letu.Basis.Admin.Departments;
-using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.OrganizationUnits;
 using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.Roles.Dtos;
@@ -137,13 +136,13 @@ public class UserAppService : BasisAppService, IUserAppService
         if (!string.IsNullOrWhiteSpace(phone))
         {
             var lowerPhone = phone.ToLower();
-            condition = condition.Or(u => u.Phone.ToLower() == lowerPhone);
+            condition = condition.Or(u => u.Phone!.ToLower() == lowerPhone);
         }
 
         if (!string.IsNullOrWhiteSpace(email))
         {
             var lowerEmail = email.ToLower();
-            condition = condition.Or(u => u.Email.ToLower() == lowerEmail);
+            condition = condition.Or(u => u.Email!.ToLower() == lowerEmail);
         }
 
         var existUser = await userRepository.Select
@@ -226,82 +225,27 @@ public class UserAppService : BasisAppService, IUserAppService
             organizationUnitIds = await GetOrganizationUnitIdsWithChildren(input.OrganizationUnitId.Value);
         }
 
-        var query = userRepository.Select
-            .From<Department, PositionGroup, Employee, OrganizationUnit>((u, d, p, e, o) => u
-                .LeftJoin(u1 => u1.DepartmentId == d.Id)
-                .LeftJoin(u1 => u1.PositionId == p.Id)
-                .LeftJoin(u1 => u1.EmployeeId == e.Id)
-                .LeftJoin(u1 => u1.OrganizationUnitId == o.Id))
-            .WhereIf(!string.IsNullOrEmpty(input.Keyword), (u, d, p, e, o) => u.UserName.Contains(input.Keyword!) || u.NickName.Contains(input.Keyword!) || u.Phone.Contains(input.Keyword!) || u.Email.Contains(input.Keyword!))
-            .WhereIf(organizationUnitIds != null && organizationUnitIds.Count > 0, (u, d, p, e, o) => organizationUnitIds!.Contains(u.OrganizationUnitId!.Value));
-
-        // 标签筛选（OR逻辑）
-        if (input.TagIds != null && input.TagIds.Count > 0)
-        {
-            var userIdsWithTags = await userTagRepository.Select
-                .Where(ut => input.TagIds.Contains(ut.TagId))
-                .ToListAsync(ut => ut.UserId);
-
-            if (userIdsWithTags.Count > 0)
-            {
-                query = query.Where((u, d, p, e, o) => userIdsWithTags.Contains(u.Id));
-            }
-            else
-            {
-                // 如果没有用户匹配标签，返回空结果
-                return new PagedResult<UserListOutput>(0, new List<UserListOutput>());
-            }
-        }
-
-        var rows = await query
-            .OrderByDescending((u, d, p, e, o) => u.CreationTime)
+        var items = await userRepository.Select
+            .IncludeMany(u => u.Roles)
+            .IncludeMany(u => u.Tags)
+            .Include(u => u.Department)
+            .Include(u => u.Position)
+            .Include(u => u.Employee)
+            .Include(u => u.OrganizationUnit)
+            .WhereIf(!string.IsNullOrEmpty(input.Keyword), u => u.UserName.Contains(input.Keyword!)
+             || u.NickName.Contains(input.Keyword!)
+             || u.Phone!.Contains(input.Keyword!)
+             || u.Email!.Contains(input.Keyword!)
+            )
+            .WhereIf(organizationUnitIds != null && organizationUnitIds.Count > 0, u => organizationUnitIds!.Contains(u.OrganizationUnitId!.Value))
+            .WhereIf(input.TagIds != null && input.TagIds.Count > 0, u => u.Tags!.Any(t => input.TagIds!.Contains(t.Id)))
+            .OrderByDescending(u => u.CreationTime)
             .Count(out var total)
             .Page(input.Current, input.PageSize)
-            .ToListAsync((u, d, p, e, o) => new UserListOutput
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                Avatar = u.Avatar,
-                NickName = u.NickName,
-                IsEnabled = u.IsEnabled,
-                Phone = u.Phone,
-                Email = u.Email,
-                DepartmentId = u.DepartmentId,
-                DepartmentName = d.Name,
-                PositionId = u.PositionId,
-                PositionName = p.GroupName,
-                EmployeeId = u.EmployeeId,
-                EmployeeName = e.Name,
-                OrganizationUnitId = u.OrganizationUnitId,
-                Description = u.Description,
-                OrganizationUnitName = o.Name
+            .ToListAsync();
 
-            });
-
-        // 为每个用户加载标签信息
-        if (rows.Count > 0)
-        {
-            var userIds = rows.Select(r => r.Id).ToList();
-            var userTags = await userTagRepository.Select
-                .From<UserTag>((ut, t) => ut.InnerJoin(ut1 => ut1.TagId == t.Id))
-                .Where((ut, t) => userIds.Contains(ut.UserId))
-                .ToListAsync((ut, t) => new { ut.UserId, TagId = t.Id, TagName = t.Name, TagColor = t.Color });
-
-            foreach (var row in rows)
-            {
-                row.Tags = userTags
-                    .Where(ut => ut.UserId == row.Id)
-                    .Select(ut => new UserTagInfo
-                    {
-                        Id = ut.TagId,
-                        Name = ut.TagName,
-                        Color = ut.TagColor
-                    })
-                    .ToList();
-            }
-        }
-
-        return new PagedResult<UserListOutput>(total, rows);
+        var output = ObjectMapper.Map<List<User>, List<UserListOutput>>(items);
+        return new PagedResult<UserListOutput>(total, output);
     }
 
     /// <summary>

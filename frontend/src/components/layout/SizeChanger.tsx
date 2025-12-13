@@ -44,7 +44,9 @@ function SizeChanger() {
 
     return (
         <Dropdown
-            overlayClassName="w-32"
+            classNames={{
+                root: 'w-32',
+            }}
             menu={{
                 items: sizeItems,
                 selectable: true,

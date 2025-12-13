@@ -202,10 +202,10 @@ public class RegionAppService : BasisAppService, IRegionAppService
 
         if (cities.Length > 0 && cities[0].Districts != null)
         {
-            logger.LogDebug("省份 {province} 有 {count} 个市", provinceEntity.Name, cities[0].Districts.Length);
+            logger.LogDebug("省份 {province} 有 {count} 个市", provinceEntity.Name, cities[0].Districts!.Length);
             var cityIndex = 0;
 
-            foreach (var city in cities[0].Districts)
+            foreach (var city in cities[0].Districts!)
             {
                 cityIndex++;
                 logger.LogDebug("处理市: {city} (AdCode: {adCode})", city.Name, city.AdCode);
@@ -334,7 +334,7 @@ public class RegionAppService : BasisAppService, IRegionAppService
         if (districtStreets.Length > 0 && districtStreets[0].Districts != null)
         {
             var streetIndex = 0;
-            foreach (var streetItem in districtStreets[0].Districts)
+            foreach (var streetItem in districtStreets[0].Districts!)
             {
                 streetIndex++;
                 var streetEntity = new Street

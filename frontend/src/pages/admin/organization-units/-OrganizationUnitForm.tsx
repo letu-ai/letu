@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, Modal, TreeSelect, Alert } from 'antd';
+import { Form, Input, InputNumber, Modal, TreeSelect } from 'antd';
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef, useCallback } from 'react';
 import {
     addOrganizationUnit,
@@ -37,18 +37,14 @@ const OrganizationUnitForm = forwardRef<OrganizationUnitModalRef, ModalProps>((p
 
     // 检查高德地图是否启用
     const [amapEnabled, setAmapEnabled] = useState<boolean>(false);
-    const [amapLoading, setAmapLoading] = useState<boolean>(true);
 
     useAsyncEffect(async () => {
         try {
-            setAmapLoading(true);
             const enabled = await getAmapEnabled();
             setAmapEnabled(enabled);
-        } catch (error) {
+        } catch(error) {
             console.error('获取高德地图启用状态失败:', error);
             setAmapEnabled(false);
-        } finally {
-            setAmapLoading(false);
         }
     }, []);
 
@@ -56,10 +52,6 @@ const OrganizationUnitForm = forwardRef<OrganizationUnitModalRef, ModalProps>((p
     const [mapCenter, setMapCenter] = useState<IMapLocation | undefined>();
     const [cityLimit, setCityLimit] = useState<string>("");
     const mapRef = useRef<AMap.Map | null>(null);
-
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
 
     useEffect(() => {
         if (!isOpenModal) return;
@@ -113,6 +105,10 @@ const OrganizationUnitForm = forwardRef<OrganizationUnitModalRef, ModalProps>((p
             setCityLimit("");
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

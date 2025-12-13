@@ -8,7 +8,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
         >
             <Alert
                 type="error"
-                message="页面加载出错了，请联系管理员！"
+                title="页面加载出错了，请联系管理员！"
                 description={error.message}
                 showIcon
                 action={

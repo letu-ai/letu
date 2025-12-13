@@ -1,12 +1,11 @@
-﻿using Letu.Basis.Admin.PermissionManagement.Identity;
+﻿using Letu.Basis.Admin.Loggings;
+using Letu.Basis.Admin.PermissionManagement.Identity;
 using Letu.Basis.Filters;
 using Letu.Basis.Localization;
 using Letu.Basis.Permissions;
 using Letu.Core.Helpers;
 using Letu.Core.MultiTenancy;
-using Letu.Job;
 using Letu.Logging;
-using Letu.ObjectStorage;
 using Letu.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
@@ -17,6 +16,7 @@ using Volo.Abp.Authorization;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.BackgroundWorkers;
 using Volo.Abp.Data;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.Emailing;
@@ -52,9 +52,7 @@ namespace Letu.Basis;
     typeof(AbpEmailingModule),
     typeof(AbpTimingModule),
     typeof(LetuRepositoryModule),
-    typeof(LetuLoggingModule),
-    typeof(LetuObjectStorageModule),
-    typeof(LetuJobModule)
+    typeof(LetuLoggingModule)
 )]
 public class LetuBasisModule : AbpModule
 {
@@ -68,6 +66,7 @@ public class LetuBasisModule : AbpModule
         ConfigureFeatureManagement();
         ConfigureLocalization();
         ConfigureMultiTenancy();
+        ConfigureOss(configuration);
 
         services.AddControllers()
             .AddApplicationPart(typeof(LetuBasisModule).Assembly); // 添加外部程序集
@@ -83,16 +82,13 @@ public class LetuBasisModule : AbpModule
         });
 
 
-        // services.AddSingleton<IAuthorizationMiddlewareResultHandler, IdentityMiddlewareResultHandler>();
-
-        services.AddHostedService<PreparationHostService>();
-
         // 配置高德地图 HttpClient
         services.AddHttpClient("amap", client =>
         {
             client.BaseAddress = new Uri("https://restapi.amap.com");
             client.Timeout = TimeSpan.FromSeconds(30);
         });
+
 
         SnowflakeHelper.Init(short.Parse(configuration["Snowflake:WorkerId"]!), short.Parse(configuration["Snowflake:DataCenterId"]!));
     }
@@ -161,16 +157,22 @@ public class LetuBasisModule : AbpModule
         });
     }
 
-    //private void ConfigureDataSeed(IServiceCollection services)
-    //{
-    //    services.AddIdentityCore<IdentityUser>(setupAction)
-    //     .AddRoles<IdentityRole>()
-    //     .AddClaimsPrincipalFactory<AbpUserClaimsPrincipalFactory>();
-    //}
+    private void ConfigureOss(IConfiguration configuration)
+    {
+        Configure<OssOptions>(configuration.GetSection("Oss"));
+    }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         SeedBasisData(context);
+    }
+
+    public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
+    {
+        // 注册后台工作者
+        await context.AddBackgroundWorkerAsync<LogCleanupWorker>();
+
+        await base.OnApplicationInitializationAsync(context);
     }
 
     private static void SeedBasisData(ApplicationInitializationContext context)

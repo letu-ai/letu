@@ -213,69 +213,44 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
             throw HttpFriendlyException.BadRequest("token刷新请求过于频繁，请稍后重试");
         }
 
-        // // 创建安全日志记录
-        // var securityLog = new SecurityLog
-        // {
-        //     IsSuccess = true,
-        //     Ip = RequestUtils.GetIp(_httpContext),
-        //     OperationMsg = "刷新令牌成功",
-        //     UserName = "", // 稍后填充
-        //     SessionId = sessionId
-        // };
-
-        try
+        // 2. 直接用 RefreshToken 作为键验证缓存
+        var tokenValue = await refreshTokenCache.GetAsync(refreshToken);
+        if (tokenValue == null)
         {
-            // 2. 直接用 RefreshToken 作为键验证缓存
-            var tokenValue = await refreshTokenCache.GetAsync(refreshToken);
-            if (tokenValue == null)
-            {
-                throw HttpFriendlyException.BadRequest("刷新token已过期或无效");
-            }
-
-            // 3. 验证会话是否还有效（可能被管理员强制下线）
-            var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
-            var sessionToken = await refreshTokenCache.GetAsync(sessionKey);
-            if (sessionToken != refreshToken)
-            {
-                throw HttpFriendlyException.BadRequest("会话已被终止");
-            }
-
-            // 4. 获取用户信息
-            var user = await _userRepository.Where(x => x.Id == userId).FirstAsync();
-            if (user == null)
-                throw HttpFriendlyException.NotFound("用户不存在");
-
-            // securityLog.UserName = user.UserName;
-
-            // 5. 创建用户声明和生成令牌
-            var claims = await CreateUserClaims(user, sessionId);
-            var token = CreateToken(claims, userId, sessionId);
-
-            // 6. 保存用户登录信息到缓存
-            await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
-
-            // 7. 更新 Cookie 中的 JWT Token
-            CreateCookie(token.Token, token.ExpiresAt);
-
-            return new UserTokenOutput
-            {
-                AccessToken = token.Token,
-                RefreshToken = token.RefreshToken,
-                ExpiredTime = token.ExpiresAt
-            };
+            throw HttpFriendlyException.BadRequest("刷新token已过期或无效");
         }
-        catch (Exception ex)
+
+        // 3. 验证会话是否还有效（可能被管理员强制下线）
+        var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
+        var sessionToken = await refreshTokenCache.GetAsync(sessionKey);
+        if (sessionToken != refreshToken)
         {
-            // securityLog.IsSuccess = false;
-            // securityLog.OperationMsg = ex.Message;
-            throw;
+            throw HttpFriendlyException.BadRequest("会话已被终止");
         }
-        finally
+
+        // 4. 获取用户信息
+        var user = await _userRepository.Where(x => x.Id == userId).FirstAsync();
+        if (user == null)
+            throw HttpFriendlyException.NotFound("用户不存在");
+
+        // securityLog.UserName = user.UserName;
+
+        // 5. 创建用户声明和生成令牌
+        var claims = await CreateUserClaims(user, sessionId);
+        var token = CreateToken(claims, userId, sessionId);
+
+        // 6. 保存用户登录信息到缓存
+        await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
+
+        // 7. 更新 Cookie 中的 JWT Token
+        CreateCookie(token.Token, token.ExpiresAt);
+
+        return new UserTokenOutput
         {
-            // securityLog.Address = RequestUtils.ResolveAddress(securityLog.Ip);
-            // securityLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
-            // await localEventBus.PublishAsync(securityLog);
-        }
+            AccessToken = token.Token,
+            RefreshToken = token.RefreshToken,
+            ExpiredTime = token.ExpiresAt
+        };
     }
 
 

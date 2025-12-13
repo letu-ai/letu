@@ -57,7 +57,7 @@ function IntegrationSettings() {
             await setIntegrationEnableStatus(serviceName, enabled);
             setEnableStatus(prev => ({ ...prev, [serviceName]: enabled }));
             message.success(enabled ? '服务已启用' : '服务已禁用');
-        } catch (error) {
+        } catch {
             message.error('操作失败，请稍后重试');
         }
     };
@@ -80,7 +80,7 @@ function IntegrationSettings() {
             updateState(serviceName, { saving: true });
             await updateSettingValues(serviceName, config);
             message.success('配置保存成功');
-        } catch (error) {
+        } catch {
             message.error('保存配置失败，请稍后重试');
             updateState(serviceName, { isError: true });
         }
@@ -104,7 +104,7 @@ function IntegrationSettings() {
                 <div className="space-y-4">
                     <h2 className="text-xl font-semibold">地图服务</h2>
                     <IntegrationCard
-                        icon={<img src="/images/logos/amap.png" className="w-24" />}
+                        icon={<img title="高德地图" src="/images/logos/amap.png" className="w-24" />}
                         title="高德地图"
                         description="管理您的地图服务集成，配置 API 密钥"
                         enabled={enableStatus['amap'] || false}
@@ -127,7 +127,7 @@ function IntegrationSettings() {
                 <div className="space-y-4">
                     <h2 className="text-xl font-semibold">AI 服务</h2>
                     <IntegrationCard
-                        icon={<img src="/images/logos/ragflow.png" className="w-24" />}
+                        icon={<img title="RagFlow" src="/images/logos/ragflow.png" className="w-24" />}
                         title="RagFlow"
                         description="管理RagFlow AI服务集成"
                         enabled={enableStatus['ragflow'] || false}
@@ -146,7 +146,7 @@ function IntegrationSettings() {
                     </IntegrationCard>
 
                     <IntegrationCard
-                        icon={<img src="/images/logos/fastgpt.svg" className="w-24" />}
+                        icon={<img title="FastGPT" src="/images/logos/fastgpt.svg" className="w-24" />}
                         title="FastGPT"
                         description="管理FastGPT AI服务集成"
                         enabled={enableStatus['fastgpt'] || false}

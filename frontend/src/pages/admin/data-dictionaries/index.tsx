@@ -134,7 +134,7 @@ function DictList() {
                 deleteDictionaries(ids as string[]).then(() => {
                     message.success('删除成功');
                     tableRef?.current?.reload();
-                }).catch((error) => {
+                }).catch(() => {
                     // 后端也会验证，如果包含静态数据会返回错误
                 });
             },
@@ -154,7 +154,7 @@ function DictList() {
                     return data;
                 }}
                 searchItems={[
-                    <Form.Item label="关键字" name="keywords">
+                    <Form.Item key="keywords" label="关键字" name="keywords">
                         <Input placeholder="请输入字典名称或者显示名称" />
                     </Form.Item>,
                 ]}

@@ -69,84 +69,57 @@ export interface BusinessLogListDto {
   creationTime: string;
 }
 
-
 /**
- * API访问日志列表
- * @param dto
+ * 获取日志文件列表
  */
-export function getApiAccessLogList(dto: ApiAccessLogQueryDto) {
-  return httpClient.get<ApiAccessLogQueryDto, PagedResult<ApiAccessLogListDto[]>>(
-    '/api/admin/logs/access',
-    {
-      params: dto,
-    },
-  );
+export function getLogFileList(dto: LogFileQueryDto) {
+  return httpClient.get<LogFileQueryDto, PagedResult<ILogFileListOutput>>('/api/admin/logs/system', {
+    params: dto,
+  });
 }
 
 /**
- * 异常日志列表
- * @param dto
+ * 读取日志文件内容（分页）
  */
-export function getExceptionLogList(dto: ExceptionLogQueryDto) {
-  return httpClient.get<ExceptionLogQueryDto, PagedResult<ExceptionLogListDto[]>>(
-    '/api/admin/logs/exception',
-    {
-      params: dto,
-    },
-  );
+export function getLogFileContent(filePath: string, skip: number = 0, take: number = 100) {
+  return httpClient.get<never, LogFileContentDto>('/api/admin/logs/system/content', {
+    params: { filePath, skip, take },
+  });
 }
 
 /**
- * 标记异常日志已处理
- * @param exceptionId
+ * 下载日志文件
  */
-export function handleException(exceptionId: string) {
-  return httpClient.post<string, void>(`/api/admin/logs/exception/${exceptionId}/handled`);
+export function downloadLogFile(filePath: string) {
+  return httpClient.get<never, Blob>('/api/admin/logs/system/download', {
+    params: { filePath },
+    responseType: 'blob',
+  });
 }
 
-export interface ApiAccessLogQueryDto extends PagedResultRequest {
-  userName?: string;
-  path?: string;
+export interface LogFileQueryDto extends PagedResultRequest {
+  month?: string;
 }
 
-export interface ApiAccessLogListDto {
-  id: string;
-  path: string;
-  method: string;
-  ip: string | null;
-  requestTime: string;
-  responseTime: string | null;
-  duration: number | null;
-  userId: string | null;
-  userName: string | null;
-  requestBody: string | null;
-  responseBody: string | null;
-  browser: string | null;
-  queryString: string | null;
-  traceId: string | null;
-  operateType: number[] | null;
-  operateName: string | null;
-}
-
-export interface ExceptionLogListDto {
-  id: string;
-  exceptionType: string;
-  message: string;
-  stackTrace: string;
-  innerException: string | null;
-  requestPath: string | null;
-  requestMethod: string | null;
-  userId: string | null;
-  userName: string | null;
-  ip: string | null;
-  browser: string | null;
-  traceId: string | null;
-  isHandled: boolean;
-  handledTime: string | null;
-  handledBy: string | null;
+export interface ILogFileListOutput {
+  fileName: string;
+  filePath: string;
+  fileSize: number;
   creationTime: string;
+  lastWriteTime: string;
+  isCompressed: boolean;
+  month: string;
 }
 
-export interface ExceptionLogQueryDto extends PagedResultRequest {
-  userName?: string;
+export interface LogFileContentDto {
+  lines: string[];
+  totalLines: number;
+  skip: number;
+  take: number;
+  hasMore: boolean;
+}
+
+export interface CleanupResultDto {
+  compressedCount: number;
+  deletedCount: number;
 }

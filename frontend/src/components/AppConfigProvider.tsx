@@ -84,7 +84,7 @@ interface IAppConfigContext {
 
 const AppConfigContext = createContext<IAppConfigContext | null>(null)
 
-export const AppConfigProvider = ({ config, children }: IAppConfigProviderProps) => {
+export function AppConfigProvider({ config, children }: IAppConfigProviderProps) {
     const [configuration, setConfiguration] = useState<ILetuApplicationConfiguration | null>(config)
     const [isReady, setIsReady] = useState(!!config)
     const { setThemeColor } = useThemeStore()
@@ -200,7 +200,7 @@ export const AppConfigProvider = ({ config, children }: IAppConfigProviderProps)
     )
 }
 
-export const useAppConfig = () => {
+export function useAppConfig() {
     const context = useContext(AppConfigContext)
     if (!context) {
         throw new Error('useAppConfig must be used within a AppConfigProvider')

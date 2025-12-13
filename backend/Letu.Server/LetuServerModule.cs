@@ -1,10 +1,13 @@
-﻿using Letu.Abp;
+﻿using Hangfire;
+using Hangfire.PostgreSql;
+using Letu.Abp;
 using Letu.AI;
 using Letu.Basis;
 using Letu.Basis.Middlewares;
 using Letu.Core.Identity.Jwt;
 using Letu.Core.JsonConverters;
 using Letu.Core.MultiTenancy;
+using Letu.Mqtt;
 using Letu.Server;
 using Letu.Shared.Consts;
 using Medallion.Threading;
@@ -12,13 +15,16 @@ using Medallion.Threading.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading.RateLimiting;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
@@ -35,6 +41,7 @@ using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
+using Volo.Abp.BackgroundWorkers.Hangfire;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 
@@ -52,8 +59,10 @@ namespace Letu;
     typeof(AbpDistributedLockingModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpBlobStoringFileSystemModule),
+    typeof(AbpBackgroundWorkersHangfireModule),
     typeof(LetuAbpFreeSqlModule),
     typeof(LetuBasisModule),
+    typeof(LetuMqttModule),
     typeof(LetuAIModule)
 )]
 public class LetuServerModule : AbpModule
@@ -67,12 +76,15 @@ public class LetuServerModule : AbpModule
         ConfigureDistributedLock(services, configuration);
         ConfigureAuthentication(services, configuration);
         ConfigureCorsOrigins(services, configuration);
+        ConfigureForwardedHeaders(services, configuration);
         ConfigureAntiForgery();
         ConfigureRateLimiter(services, configuration);
         ConfigureSwagger(services, configuration);
         ConfigureJsonOptions(services, configuration);
         ConfigureBlobStoring();
         ConfigureDynamicClaims();
+        ConfigureHangfire(context, configuration);
+        ConfigureKestrelEndpoints(services, configuration);
     }
 
     private void ConfigureDistributedLock(IServiceCollection services, IConfiguration configuration)
@@ -158,6 +170,14 @@ public class LetuServerModule : AbpModule
         });
     }
 
+    private void ConfigureForwardedHeaders(IServiceCollection services, IConfiguration configuration)
+    {
+        // 从配置文件绑定转发头配置（无需硬编码 IP）
+        services.Configure<ForwardedHeadersOptions>(
+            configuration.GetSection("ForwardedHeaders")
+        );
+    }
+
     private void ConfigureAntiForgery()
     {
         Configure<AbpAntiForgeryOptions>(options =>
@@ -235,13 +255,16 @@ public class LetuServerModule : AbpModule
 
     private void ConfigureJsonOptions(IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<JsonOptions>(options =>
-        {
-            options.JsonSerializerOptions.Converters.Add(new StringNullableJsonConverter());
-            options.JsonSerializerOptions.Converters.Add(new StringJsonConverter());
-            options.JsonSerializerOptions.Converters.Add(new DateTimeNullableJsonConverter());
-            options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
-        });
+        // TODO: 暂时去掉全局注册转换器。遇到asp.net core action参数DateTime类型使用了自定义转换时
+        // 因为这里的转换器失败导致无法接收请求参数的问题。
+        // 2025年12月3日
+        //services.Configure<JsonOptions>(options =>
+        //{
+        //    options.JsonSerializerOptions.Converters.Add(new StringNullableJsonConverter());
+        //    options.JsonSerializerOptions.Converters.Add(new StringJsonConverter());
+        //    options.JsonSerializerOptions.Converters.Add(new DateTimeNullableJsonConverter());
+        //    options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
+        //});
     }
 
     private void ConfigureBlobStoring()
@@ -264,6 +287,27 @@ public class LetuServerModule : AbpModule
         {
             options.IsDynamicClaimsEnabled = true; //set it "true" to enable "Dynamic Claims" or "false" to disable it.
         });
+    }
+    private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
+    {
+        context.Services.AddHangfire(config =>
+        {
+            var connectionString = configuration.GetConnectionString("Default");
+            config.UsePostgreSqlStorage(c =>
+                c.UseNpgsqlConnection(connectionString));
+        });
+    }
+
+    private void ConfigureKestrelEndpoints(IServiceCollection services, IConfiguration configuration)
+    {
+        // 容器环境运行时禁用 HTTPS 重定向
+        if (services.GetHostingEnvironment().IsEnvironment("Docker"))
+        {
+            Configure<HttpsRedirectionOptions>(options =>
+            {
+                options.HttpsPort = null;
+            });
+        }
     }
 
     public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
@@ -318,6 +362,7 @@ public class LetuServerModule : AbpModule
             });
 
             // 处理其他请求
+            endpoints.MapFallbackToFile("/ai/{*any}", "ai.html");
             endpoints.MapFallbackToFile("index.html");
         });
 

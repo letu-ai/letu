@@ -196,7 +196,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
             if (response.Districts.Length > 0 && response.Districts[0].Districts != null)
             {
                 logger.LogInformation("行政区域 {adCode} 获取到 {count} 个子级区域",
-                    adCode, response.Districts[0].Districts.Length);
+                    adCode, response.Districts[0].Districts!.Length);
             }
             else
             {
@@ -264,7 +264,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
             return [];
         }
 
-        return response.Pois;
+        return response.Pois ?? [];
     }
 
     public async Task<AmapReGeoCode> GetReGeoCodeAsync(string location)
@@ -299,7 +299,7 @@ public class AmapAppService : BasisAppService, IAmapAppService
         }
         catch (HttpRequestException ex)
         {
-            throw new UserFriendlyException("调用高德地图服务失败，请检查网络连接");
+            throw new UserFriendlyException("调用高德地图服务失败，请检查网络连接", details: ex.Message);
         }
         catch (JsonException ex)
         {

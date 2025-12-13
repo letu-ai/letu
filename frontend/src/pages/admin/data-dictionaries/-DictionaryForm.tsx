@@ -15,11 +15,7 @@ const DictTypeForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [form] = Form.useForm();
     const [row, setRow] = useState<IDictionaryOutput | null>();
     const { message } = App.useApp();
-
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
+    
     const openModal = (row?: IDictionaryOutput) => {
         setIsOpenModal(true);
         if (row) {
@@ -31,6 +27,10 @@ const DictTypeForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.setFieldValue('isEnabled', true);
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

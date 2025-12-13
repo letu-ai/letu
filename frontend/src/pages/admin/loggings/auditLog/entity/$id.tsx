@@ -82,8 +82,8 @@ function EntityChangeLogDetails() {
             key: 'originalValue',
             width: '35%',
             render: (text) => (
-                <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {text === undefined || text === null ? <span style={{ color: '#999999' }}>空值</span> : text}
+                <div className="whitespace-pre-wrap break-words">
+                    {text === undefined || text === null ? <span className="text-gray-500">空值</span> : text}
                 </div>
             ),
         },
@@ -93,8 +93,8 @@ function EntityChangeLogDetails() {
             key: 'newValue',
             width: '35%',
             render: (text) => (
-                <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {text === undefined || text === null ? <span style={{ color: '#999999' }}>空值</span> : text}
+                <div className="whitespace-pre-wrap break-words">
+                    {text === undefined || text === null ? <span className="text-gray-500">空值</span> : text}
                 </div>
             ),
         },
@@ -118,14 +118,14 @@ function EntityChangeLogDetails() {
                             <Descriptions.Item label="实体类型">
                                 {getEntityTypeDisplayName(details.entityTypeFullName)}
                                 <div>
-                                    <small style={{ color: '#666666' }}>{details.entityTypeFullName}</small>
+                                    <small className="text-gray-500">{details.entityTypeFullName}</small>
                                 </div>
                             </Descriptions.Item>
                             <Descriptions.Item label="实体ID">{details.entityId}</Descriptions.Item>
                             <Descriptions.Item label="操作用户" span={2}>{details.userName}</Descriptions.Item>
                         </Descriptions>
 
-                        <Divider orientation="left">属性变更</Divider>
+                        <Divider orientation="horizontal">属性变更</Divider>
                         <Table
                             columns={propertyColumns}
                             dataSource={details.propertyChanges.map(p => ({

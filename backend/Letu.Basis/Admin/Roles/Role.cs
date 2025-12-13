@@ -1,5 +1,4 @@
 using FreeSql.DataAnnotations;
-using Letu.Basis.Admin.Menus;
 using Letu.Basis.Admin.Users;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -14,13 +13,13 @@ namespace Letu.Basis.Admin.Roles
     [Table(Name = "sys_role")]
     public class Role : FullAuditedEntity<Guid>, IMultiTenant
     {
-        
+
         /// <summary>
         /// 租户ID
         /// </summary>
         [Column(IsNullable = true, StringLength = 18)]
         public Guid? TenantId { get; set; }
-        
+
         /// <summary>
         /// 角色名
         /// </summary>
@@ -51,11 +50,9 @@ namespace Letu.Basis.Admin.Roles
         /// </summary>
         public virtual bool IsPublic { get; set; }
 
-        /// <summary>
-        /// 用户角色
-        /// </summary>
-        public virtual ICollection<UserInRole>? Users { get; set; }
 
+        [Navigate(ManyToMany = typeof(UserInRole))]
+        public virtual ICollection<User>? Users { get; set; }
 
         /// <summary>
         /// 是否启用

@@ -1,8 +1,8 @@
-using Letu.Basis.Localization;
+using Letu.AI.Localization;
 using Volo.Abp.Features;
 using Volo.Abp.Localization;
 
-namespace Letu.Basis.Features
+namespace Letu.AI.Features
 {
     /// <summary>
     /// 

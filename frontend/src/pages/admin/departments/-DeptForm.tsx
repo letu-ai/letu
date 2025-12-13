@@ -19,22 +19,18 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
   const [treeData, setTreeData] = useState<DeptListDto[]>([]);
   const { message } = useApp();
 
-  useImperativeHandle(ref, () => ({
-    openModal,
-  }));
-
-
-  useEffect(() => {
-    if (isOpenModal) {
-      fetchTreeData();
-    }
-  }, [isOpenModal]);
 
   const fetchTreeData = (departmentName?: string) => {
     getDeptList({ name: departmentName }).then((data) => {
       setTreeData(data);
     });
   };
+
+  useEffect(() => {
+    if (isOpenModal) {
+      fetchTreeData();
+    }
+  }, [isOpenModal]);
 
   const openModal = (row?: DeptListDto) => {
     setIsOpenModal(true);
@@ -47,6 +43,10 @@ const DeptForm = forwardRef<DeptModalRef, ModalProps>((props, ref) => {
       form.setFieldValue('status', 1);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    openModal,
+  }));
 
   const onCancel = () => {
     form.resetFields();

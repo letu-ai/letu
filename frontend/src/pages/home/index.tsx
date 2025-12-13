@@ -7,7 +7,6 @@ import {
     SettingOutlined,
     SafetyOutlined,
     DatabaseOutlined,
-    ScheduleOutlined,
     FileTextOutlined,
     AppstoreOutlined,
     ApartmentOutlined,
@@ -18,7 +17,7 @@ import {
     ArrowDownOutlined,
 } from '@ant-design/icons';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export const Route = createFileRoute('/home/')({
     component: HomePage
@@ -110,7 +109,6 @@ const quickActions = [
         color: 'bg-purple-500',
         items: [
             { name: '通知管理', path: '/admin/notifications', icon: <BellOutlined /> },
-            { name: '定时任务', path: '/admin/scheduled-tasks', icon: <ScheduleOutlined /> },
             { name: '我的通知', path: '/my/notifications', icon: <NotificationOutlined /> },
         ],
     },
@@ -179,7 +177,7 @@ function HomePage() {
                             title="在线用户"
                             value={statisticsData.onlineUsers}
                             prefix={<TeamOutlined />}
-                            valueStyle={{ color: '#52c41a' }}
+                            styles={{content: {color: '#52c41a' }}}
                             suffix={
                                 <span className="text-sm ml-2">
                                     <ArrowDownOutlined className="text-red-500" />
@@ -195,7 +193,7 @@ function HomePage() {
                             title="今日通知"
                             value={statisticsData.todayNotifications}
                             prefix={<BellOutlined />}
-                            valueStyle={{ color: '#faad14' }}
+                            styles={{content: {color: '#faad14' }}}
                         />
                     </Card>
                 </Col>
@@ -205,7 +203,7 @@ function HomePage() {
                             title="待办任务"
                             value={statisticsData.pendingTasks}
                             prefix={<ClockCircleOutlined />}
-                            valueStyle={{ color: '#f5222d' }}
+                            styles={{content: {color: '#f5222d' }}}
                         />
                     </Card>
                 </Col>

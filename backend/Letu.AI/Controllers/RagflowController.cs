@@ -4,7 +4,7 @@ using Letu.AI.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Letu.Basis.Controllers;
+namespace Letu.AI.Controllers;
 
 [Authorize]
 [ApiController]

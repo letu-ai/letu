@@ -2,7 +2,7 @@
 
 public class ProviderInfoDto
 {
-    public string ProviderName { get; set; }
+    public required string ProviderName { get; set; }
 
-    public string ProviderKey { get; set; }
+    public required string ProviderKey { get; set; }
 }

@@ -29,10 +29,6 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
     requireDigit: getSettingBoolean('Letu.Identity.Password.RequireDigit') || false,
   };
 
-  useImperativeHandle(ref, () => ({
-    openModal,
-  }));
-
   const openModal = (row: UserListOutput) => {
     setCurrentRow(row);
     setIsOpenModal(true);
@@ -42,6 +38,10 @@ const ResetUserPwdForm = forwardRef<ResetUserPwdFormRef, ModalProps>((_, ref) =>
     form.resetFields();
     setIsOpenModal(false);
   };
+
+  useImperativeHandle(ref, () => ({
+    openModal,
+  }));
 
   const onOk = () => {
     form.submit();

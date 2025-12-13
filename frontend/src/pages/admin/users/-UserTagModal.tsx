@@ -18,10 +18,6 @@ const UserTagModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const { message } = useApp();
     const [row, setRow] = useState<UserTagListOutput | null>();
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     const openModal = (row?: UserTagListOutput) => {
         setIsOpenModal(true);
         if (row) {
@@ -36,6 +32,10 @@ const UserTagModal = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.setFieldsValue({ color: '#1890ff' });
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

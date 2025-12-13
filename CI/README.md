@@ -27,7 +27,7 @@
 # 使用 Docker 直接运行
 docker run -d `
   --name letu `
-  -p 5000:5000 `
+  -p 5050:5050 `
   -e ConnectionStrings__Default="Host=localhost;Port=5432;Database=letu;User ID=postgres;Password=yourpassword;" `
   -e Redis__Configuration="127.0.0.1:6379" `
   letu:latest
@@ -143,7 +143,7 @@ Redis__Configuration="127.0.0.1:6379"
 
 ```powershell
 docker run -d `
-  -p 5000:5000 `
+  -p 5050:5050 `
   -e ConnectionStrings__Default="Host=db;Port=5432;Database=letu;User ID=postgres;Password=pass;" `
   -e Redis__Configuration="redis:6379" `
   letu:latest
@@ -156,7 +156,7 @@ docker run -d `
 3. 运行容器时指定 env 文件：
 
 ```bash
-docker run -d -p 5000:5000 --env-file CI/.env letu:latest
+docker run -d -p 5050:5050 --env-file CI/.env letu:latest
 ```
 
 #### 方法 3：使用 docker-compose
@@ -223,7 +223,7 @@ CI/data/
    - 使用 `mcr.microsoft.com/dotnet/aspnet:9.0` 基础镜像
    - 复制发布文件到容器
    - 设置环境变量和入口点
-   - 暴露 5000 端口
+   - 暴露 5050 端口
 
 ## 故障排查
 
@@ -258,8 +258,8 @@ CI/data/
    - 如果使用 Docker 网络，使用服务名称而非 localhost
 
 3. **端口冲突**
-   - 检查 5000 端口是否被占用
-   - 修改端口映射：`-p 8080:5000`
+   - 检查 5050 端口是否被占用
+   - 修改端口映射：`-p 8080:5050`
 
 ## 生产部署建议
 

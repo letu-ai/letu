@@ -1,8 +1,11 @@
-﻿namespace Letu.Basis.Admin.PermissionManagement.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Letu.Basis.Admin.PermissionManagement.Dtos;
 
 public class UpdatePermissionDto
 {
-    public string Name { get; set; }
+    [Required]
+    public required string Name { get; set; }
 
     public bool IsGranted { get; set; }
 }

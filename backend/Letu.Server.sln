@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34728.123
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{921ECD09-64BF-4A09-B45E-303C199761C4}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,10 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Basis", "Letu.Basis\Le
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Repository", "Letu.Repository\Letu.Repository.csproj", "{979A8DFF-BAE5-49D7-A6F4-335974873E31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.ObjectStorage", "Letu.ObjectStorage\Letu.ObjectStorage.csproj", "{5A5DDF67-7FDD-4801-BF74-432B8DDF33F3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Job", "Letu.Job\Letu.Job.csproj", "{5B435F27-8148-4F3D-8D27-01D199178C08}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Server", "Letu.Server\Letu.Server.csproj", "{3ABB0623-C0CD-053B-09AC-D7FC8EFD92E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Logging", "Letu.Logging\Letu.Logging.csproj", "{3322337C-3A71-2864-2BB5-2FE660F222B5}"
@@ -28,6 +24,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Abp.FreeSql", "Letu.Abp.FreeSql\Letu.Abp.FreeSql.csproj", "{EA4F17E3-ED63-94ED-CC38-5E62DD3E80C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.AI", "Letu.AI\Letu.AI.csproj", "{AB9D9D6B-1D41-E269-463B-E405BAAD268B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.Mqtt", "Letu.Mqtt\Letu.Mqtt.csproj", "{EAFA1969-5234-4E92-69E8-0C984B4099A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Letu.AI.Abstractions", "Letu.AI.Abstractions\Letu.AI.Abstractions.csproj", "{440F1368-7A2D-5502-CB2C-8D598E41269E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,14 +51,6 @@ Global
 		{979A8DFF-BAE5-49D7-A6F4-335974873E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{979A8DFF-BAE5-49D7-A6F4-335974873E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{979A8DFF-BAE5-49D7-A6F4-335974873E31}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A5DDF67-7FDD-4801-BF74-432B8DDF33F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A5DDF67-7FDD-4801-BF74-432B8DDF33F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5A5DDF67-7FDD-4801-BF74-432B8DDF33F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5A5DDF67-7FDD-4801-BF74-432B8DDF33F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B435F27-8148-4F3D-8D27-01D199178C08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B435F27-8148-4F3D-8D27-01D199178C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B435F27-8148-4F3D-8D27-01D199178C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B435F27-8148-4F3D-8D27-01D199178C08}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3ABB0623-C0CD-053B-09AC-D7FC8EFD92E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3ABB0623-C0CD-053B-09AC-D7FC8EFD92E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3ABB0623-C0CD-053B-09AC-D7FC8EFD92E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,6 +67,14 @@ Global
 		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB9D9D6B-1D41-E269-463B-E405BAAD268B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAFA1969-5234-4E92-69E8-0C984B4099A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAFA1969-5234-4E92-69E8-0C984B4099A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAFA1969-5234-4E92-69E8-0C984B4099A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAFA1969-5234-4E92-69E8-0C984B4099A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{440F1368-7A2D-5502-CB2C-8D598E41269E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{440F1368-7A2D-5502-CB2C-8D598E41269E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{440F1368-7A2D-5502-CB2C-8D598E41269E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{440F1368-7A2D-5502-CB2C-8D598E41269E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

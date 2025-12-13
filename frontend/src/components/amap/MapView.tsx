@@ -230,7 +230,7 @@ function MapView({
         // 启用聚合
         if (enableCluster && markerInstances.length > 0) {
             // 动态加载MarkerCluster插件
-            //@ts-ignore 高德地图的Typescript定义不完整
+            // @ts-expect-error 高德地图的Typescript定义不完整
             map.plugin(["AMap.MarkerCluster"], () => {
                 // 准备聚合数据
                 const points = markerData.map(item => ({

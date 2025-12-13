@@ -86,7 +86,7 @@ function DictionaryDetails() {
                             onClick={() => {
                                 const row = record as IDictionaryItemOutput;
                                 row.id = undefined;
-                                modalRef?.current?.openModal(record);
+                                modalRef?.current?.openModal(row);
                             }}
                         >
                             复制
@@ -127,7 +127,7 @@ function DictionaryDetails() {
                     return data;
                 }}
                 searchItems={[
-                    <Form.Item label="关键字" name="keywords">
+                    <Form.Item key="keywords" label="关键字" name="keywords">
                         <Input placeholder="搜索字典项名称或者值" />
                     </Form.Item>,
                 ]}

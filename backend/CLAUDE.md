@@ -64,7 +64,7 @@ dotnet run --environment Development
 ### 连接字符串和服务配置
 - **数据库**: PostgreSQL (appsettings.json 中的 ConnectionStrings:Default)
 - **Redis**: 127.0.0.1:6379
-- **Web 端点**: HTTP(5000) / HTTPS(5001)
+- **Web 端点**: HTTP(5050) / HTTPS(5001)
 - **MQTT 端口**: 1883
 
 ### 关键功能模块

@@ -32,10 +32,6 @@ const MenuItemForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const { message } = useApp();
     const isEdit = row?.id !== undefined;
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
     const fetchMenuOptions = (appName: string) => {
         getMenuOptions(appName, true).then((data) => {
             setTreeData(data);
@@ -68,6 +64,10 @@ const MenuItemForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             });
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

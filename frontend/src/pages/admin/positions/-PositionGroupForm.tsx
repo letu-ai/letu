@@ -1,5 +1,5 @@
 import { Form, Input, InputNumber, Modal, TreeSelect } from 'antd';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import {
     addPositionGroup,
     getPositionGroupList,
@@ -9,6 +9,7 @@ import {
 } from './-service';
 import useApp from 'antd/es/app/useApp';
 import TextArea from 'antd/es/input/TextArea';
+import { useAsyncEffect } from 'ahooks';
 
 interface ModalProps {
     refresh?: () => void;
@@ -25,20 +26,16 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [treeData, setTreeData] = useState<PositionGroupListDto[]>([]);
     const { message } = useApp();
 
-    useImperativeHandle(ref, () => ({
-        openModal,
-    }));
-
-    useEffect(() => {
-        if (isOpenModal) {
-            fetchTreeData();
-        }
-    }, [isOpenModal]);
-
     const fetchTreeData = async (groupName?: string) => {
         const data = await getPositionGroupList({ groupName });
         setTreeData(data);
     };
+
+    useAsyncEffect(async () => {
+        if (isOpenModal) {
+            await fetchTreeData();
+        }
+    }, [isOpenModal]);
 
     const openModal = (row?: PositionGroupDto) => {
         setIsOpenModal(true);
@@ -50,6 +47,10 @@ const RoleForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.resetFields();
         }
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal,
+    }));
 
     const onCancel = () => {
         form.resetFields();

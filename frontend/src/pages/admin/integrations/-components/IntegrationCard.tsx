@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Card, Badge, Switch } from 'antd';
 import { CaretRightOutlined } from '@ant-design/icons';
+import { cn } from '@/lib/utils';
 
 interface IntegrationCardProps {
     icon: React.ReactNode;
@@ -101,8 +102,7 @@ export default function IntegrationCard({
             {/* 只有在首次展开后才渲染子组件，之后通过display控制显示隐藏 */}
             {hasExpandedRef.current && (
                 <div
-                    className="border-t border-gray-100"
-                    style={{ display: isOpen ? 'block' : 'none' }}
+                    className={cn("border-t border-gray-100", isOpen ? 'block' : 'none')}
                 >
                     <div className="pt-4 px-6 pb-4">
                         {children}

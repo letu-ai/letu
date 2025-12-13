@@ -27,7 +27,6 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         var settingGroup = context.AddGroup(BasisPermissions.SettingGroupName, L("Permission:Admin.Setting"));
         DefineSettingManagement(settingGroup);
         DefineFeatureManagement(settingGroup);
-        DefineScheduledTasks(settingGroup);
         DefineLoggingManagement(settingGroup);
         DefineIntegrationManagement(settingGroup);
 
@@ -150,16 +149,6 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         permission.AddChild(BasisPermissions.Notification.Delete, L("Permission:Delete"));
     }
 
-    // 定时任务
-    public void DefineScheduledTasks(PermissionGroupDefinition group)
-    {
-        var permission = group.AddPermission(BasisPermissions.ScheduledTask.Default, L("Permission:ScheduledTaskManagement"), MultiTenancySides.Host);
-        permission.AddChild(BasisPermissions.ScheduledTask.Create, L("Permission:Create"));
-        permission.AddChild(BasisPermissions.ScheduledTask.Update, L("Permission:Edit"));
-        permission.AddChild(BasisPermissions.ScheduledTask.Delete, L("Permission:Delete"));
-        permission.AddChild(BasisPermissions.ScheduledTask.Log, L("Permission:Log"));
-    }
-
     // 参数管理
     public void DefineSettingManagement(PermissionGroupDefinition group)
     {
@@ -173,8 +162,8 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
     // 功能管理
     public void DefineFeatureManagement(PermissionGroupDefinition group)
     {
-        group.AddPermission(BasisPermissions.Feature.Default, L("Permission:FeatureManagement"), multiTenancySide: MultiTenancySides.Host);
-        group.AddPermission(BasisPermissions.Feature.ManageHostFeatures,
+        var permission = group.AddPermission(BasisPermissions.Feature.Default, L("Permission:FeatureManagement"), multiTenancySide: MultiTenancySides.Host);
+        permission.AddChild(BasisPermissions.Feature.ManageHostFeatures,
             L("Permission:ManageHostFeatures"),
             multiTenancySide: MultiTenancySides.Host);
     }
@@ -182,13 +171,12 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
     // 日志管理
     public void DefineLoggingManagement(PermissionGroupDefinition group)
     {
-        group.AddPermission(BasisPermissions.Logging.Default, L("Permission:LoggingManagement"));
-        group.AddPermission(BasisPermissions.Logging.OnlineUser, L("Permission:OnlineUser"));
-        group.AddPermission(BasisPermissions.Logging.ScheduledTask, L("Permission:ScheduledTask"));
-        group.AddPermission(BasisPermissions.Logging.Integration, L("Permission:Integration"));
-        group.AddPermission(BasisPermissions.Logging.SecurityLog, L("Permission:SecurityLog"));
-        group.AddPermission(BasisPermissions.Logging.BusinessLog, L("Permission:BusinessLog"));
-        group.AddPermission(BasisPermissions.Logging.AuditLog, L("Permission:AuditLog"));
+        var permission = group.AddPermission(BasisPermissions.Logging.Default, L("Permission:LoggingManagement"));
+        permission.AddChild(BasisPermissions.Logging.OnlineUser, L("Permission:OnlineUser"));
+        permission.AddChild(BasisPermissions.Logging.SecurityLog, L("Permission:SecurityLog"));
+        permission.AddChild(BasisPermissions.Logging.BusinessLog, L("Permission:BusinessLog"));
+        permission.AddChild(BasisPermissions.Logging.AuditLog, L("Permission:AuditLog"));
+        permission.AddChild(BasisPermissions.Logging.SystemLog, L("Permission:SystemLog"));
     }
 
     // 租户管理

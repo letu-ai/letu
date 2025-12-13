@@ -1,4 +1,4 @@
-﻿namespace Letu.Basis.Features;
+﻿namespace Letu.AI.Features;
 
 public static class AIFeatures
 {

@@ -90,7 +90,7 @@ pnpm preview
 
 **Key Configuration:**
 - Multi-tenancy: Supported but disabled by default
-- Default ports: HTTP(5000), HTTPS(5001), MQTT(1883)
+- Default ports: HTTP(5050), HTTPS(5001), MQTT(1883)
 - Redis: `127.0.0.1:6379`
 
 ### Frontend Architecture (React 18)

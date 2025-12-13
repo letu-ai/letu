@@ -7,7 +7,7 @@ import type { PagedResult, PagedResultRequest } from '@/types/api';
  */
 export function getRequestLogList(dto: RequestLogQueryDto) {
   return httpClient.get<RequestLogQueryDto, PagedResult<RequestLogDto[]>>(
-    '/api/admin/auditlog',
+    '/api/admin/logs/audit',
     {
       params: dto,
     },
@@ -20,7 +20,7 @@ export function getRequestLogList(dto: RequestLogQueryDto) {
  */
 export function getRequestLogDetails(id: string) {
   return httpClient.get<null, RequestLogDto>(
-    `/api/admin/auditlog/${id}`,
+    `/api/admin/logs/audit/${id}`,
   );
 }
 
@@ -30,7 +30,7 @@ export function getRequestLogDetails(id: string) {
  */
 export function getEntityChangeLogList(dto: EntityChangeLogQueryDto) {
   return httpClient.get<EntityChangeLogQueryDto, PagedResult<EntityChangeLogDto[]>>(
-    '/api/admin/auditlog/entity-changes',
+    '/api/admin/logs/audit/entity-changes',
     {
       params: dto,
     },
@@ -43,7 +43,7 @@ export function getEntityChangeLogList(dto: EntityChangeLogQueryDto) {
  */
 export function getEntityChangeLogDetails(id: string) {
   return httpClient.get<null, EntityChangeLogDto>(
-    `/api/admin/auditlog/entity-changes/${id}`,
+    `/api/admin/logs/audit/entity-changes/${id}`,
   );
 }
 

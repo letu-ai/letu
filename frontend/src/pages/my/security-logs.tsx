@@ -137,17 +137,17 @@ function SecurityLogsPage() {
                             value={stats.recentLoginIp || '暂无'}
                             prefix={<EnvironmentOutlined />}
                             loading={loadingStats}
-                            valueStyle={{ fontSize: '16px' }}
+                            classNames={{ content: 'text-sm' }}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} lg={6}>
                     <Card>
                         <Statistic
+                            classNames={{ content: stats.abnormalLoginCount > 0 ? 'text-red-500' : 'text-green-500' }}
                             title="异常登录"
                             value={stats.abnormalLoginCount}
                             prefix={<SafetyOutlined />}
-                            valueStyle={{ color: stats.abnormalLoginCount > 0 ? '#f5222d' : '#3f8600' }}
                             loading={loadingStats}
                         />
                     </Card>
@@ -180,7 +180,7 @@ function SecurityLogsPage() {
                     }
                 }}
                 searchItems={[
-                    <Form.Item label="登录时间" name="dateRange">
+                    <Form.Item key="dateRange" label="登录时间" name="dateRange">
                         <RangePicker
                             placeholder={['开始日期', '结束日期']}
                             onChange={(dates) => {
@@ -190,7 +190,7 @@ function SecurityLogsPage() {
                             }}
                         />
                     </Form.Item>,
-                    <Form.Item label="登录状态" name="isSuccess">
+                    <Form.Item key="isSuccess" label="登录状态" name="isSuccess">
                         <Select
                             allowClear
                             placeholder="请选择登录状态"
@@ -201,7 +201,7 @@ function SecurityLogsPage() {
                             ]}
                         />
                     </Form.Item>,
-                    <Form.Item label="IP地址" name="ip">
+                    <Form.Item key="ip" label="IP地址" name="ip">
                         <Select
                             mode="tags"
                             placeholder="输入IP地址"

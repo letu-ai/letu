@@ -130,7 +130,7 @@ const getHttpStatusError = (status: number): IResponseError => {
 }
 
 // 综合错误信息处理
-const getErrorInfo = async (error: AxiosError): Promise<IResponseError> => {
+export const getErrorInfo = async (error: AxiosError): Promise<IResponseError> => {
     let errorInfo: IResponseError = {
         message: '异常错误，请联系管理员',
         jumpLogin: false

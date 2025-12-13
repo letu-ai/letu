@@ -14,7 +14,7 @@ public class BusinessLogAppService : BasisAppService, IBusinessLogAppService
         logRepository = logRecordRepository;
     }
 
-    public async Task<PagedResult<BusinessLogListDto>> GetBusinessLogListAsync(BusinessLogQueryDto dto)
+    public async Task<PagedResult<BusinessLogListOutput>> GetBusinessLogListAsync(BusinessLogListInput dto)
     {
         var list = await logRepository.WhereIf(!string.IsNullOrEmpty(dto.Type), x => x.Type == dto.Type)
             .WhereIf(!string.IsNullOrEmpty(dto.SubType), x => x.SubType != null && x.SubType.Contains(dto.SubType!))
@@ -23,8 +23,8 @@ public class BusinessLogAppService : BasisAppService, IBusinessLogAppService
             .OrderByDescending(x => x.CreationTime)
             .Count(out long count)
             .Page(dto.Current, dto.PageSize)
-            .ToListAsync<BusinessLogListDto>();
-        return new PagedResult<BusinessLogListDto>(dto, count, list);
+            .ToListAsync<BusinessLogListOutput>();
+        return new PagedResult<BusinessLogListOutput>(dto, count, list);
     }
 
     public Task<List<SelectOption>> GetBusinessTypeOptionsAsync(string? type)
@@ -32,6 +32,6 @@ public class BusinessLogAppService : BasisAppService, IBusinessLogAppService
         return logRepository.WhereIf(!string.IsNullOrEmpty(type), x => x.Type != null && x.Type.Contains(type!))
             .GroupBy(x => x.Type)
             .OrderBy(x => x.Key)
-            .ToListAsync(x => new SelectOption { Label = x.Key, Value = x.Key });
+            .ToListAsync(x => new SelectOption { Label = x.Key!, Value = x.Key! });
     }
 }

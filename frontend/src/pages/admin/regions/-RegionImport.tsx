@@ -126,10 +126,10 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
             maskClosable={false}
             destroyOnHidden
         >
-            <Space direction="vertical" style={{ width: "100%" }} size="large">
+            <Space orientation="vertical" className="w-full" size="large">
                 {/* 警告信息 */}
                 <Alert
-                    message="重要提示"
+                    title="重要提示"
                     description={
                         <div>
                             <p>⚠️ 此操作将<strong>清空所有现有行政区域数据</strong></p>
@@ -145,8 +145,8 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
                 {/* 导入选项区域 */}
                 {!loading && (
                     <div>
-                        <div style={{ marginBottom: 16 }}>
-                            <Space direction="vertical" className="w-full">
+                        <div className="mb-4">
+                            <Space orientation="vertical" className="w-full">
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <Text strong>导入街道数据</Text>
@@ -180,16 +180,9 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
                 {!loading && (
                     <div>
                         <Text>请复制下方文字并粘贴到输入框中以确认操作：</Text>
-                        <div style={{ 
-                            background: "#f5f5f5", 
-                            padding: "10px 12px", 
-                            borderRadius: 4,
-                            marginTop: 8,
-                            marginBottom: 12,
-                            userSelect: "all",
-                            cursor: "text",
-                            fontFamily: "monospace"
-                        }}>
+                        <div
+                         className="bg-gray-100 p-2 rounded-md mb-4 mt-2 user-select-all cursor-text font-mono text-sm"
+                         >
                             <Text code copyable>已知道会清除现有行政区域</Text>
                         </div>
                         
@@ -214,7 +207,7 @@ const RegionImport = forwardRef<ImportModalRef, RegionImportProps>((props, ref) 
                                 "100%": "#87d068",
                             }}
                         />
-                        <div style={{ marginTop: 12, textAlign: "center" }}>
+                        <div className="mt-3 text-center">
                             {currentProvince && (
                                 <Text type="secondary">
                                     正在导入：<Text strong>{currentProvince}</Text>

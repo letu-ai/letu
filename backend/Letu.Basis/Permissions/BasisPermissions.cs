@@ -207,27 +207,14 @@ public static class BasisPermissions
         public const string ManageHostFeatures = SettingGroupName + ".ManageHostFeatures";
     }
 
-    public static class ScheduledTask
-    {
-        /// <summary>
-        /// 定时任务管理
-        /// </summary>
-        public const string Default = SettingGroupName + ".ScheduledTask";
-        public const string Create = Default + ".Create";
-        public const string Update = Default + ".Update";
-        public const string Delete = Default + ".Delete";
-        public const string Log = Default + ".Log";
-    }
-
     public static class Logging
     {
         public const string Default = SettingGroupName + ".Logging";
         public const string OnlineUser = Default + ".OnlineUser";
-        public const string ScheduledTask = Default + ".ScheduledTask";
-        public const string Integration = Default + ".Integration";
         public const string SecurityLog = Default + ".SecurityLog";
         public const string BusinessLog = Default + ".BusinessLog";
         public const string AuditLog = Default + ".AuditLog";
+        public const string SystemLog = Default + ".SystemLog";
     }   
 
     // 第三方集成管理

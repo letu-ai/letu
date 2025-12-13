@@ -134,10 +134,10 @@ function RouteComponent() {
             <Row gutter={[16, 16]}>
                 {/* 左侧控制面板 */}
                 <Col xs={24} lg={8}>
-                    <Space direction="vertical" className="w-full" size="middle">
+                    <Space orientation="vertical" className="w-full" size="middle">
                         {/* 标记管理 */}
                         <Card title="标记管理" size="small">
-                            <Space direction="vertical" className="w-full">
+                            <Space orientation="vertical" className="w-full">
                                 <Button
                                     type="primary"
                                     icon={<EnvironmentOutlined />}
@@ -176,7 +176,7 @@ function RouteComponent() {
 
                         {/* 聚合设置 */}
                         <Card title="聚合设置" size="small">
-                            <Space direction="vertical" className="w-full">
+                            <Space orientation="vertical" className="w-full">
                                 <div className="flex justify-between items-center">
                                     <Text>启用聚合</Text>
                                     <Switch
@@ -206,7 +206,7 @@ function RouteComponent() {
 
                         {/* 添加新标记 */}
                         <Card title="添加新标记" size="small">
-                            <Space direction="vertical" className="w-full">
+                            <Space orientation="vertical" className="w-full">
                                 <Input
                                     placeholder="标记名称"
                                     value={newMarker.title}
@@ -249,7 +249,7 @@ function RouteComponent() {
                                     />
                                 }
                             >
-                                <Space direction="vertical" className="w-full">
+                                <Space orientation="vertical" className="w-full">
                                     <div>
                                         <Text strong>{selectedMarker.title}</Text>
                                     </div>

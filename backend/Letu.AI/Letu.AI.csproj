@@ -10,5 +10,12 @@
 	  <ProjectReference Include="..\Letu.Basis\Letu.Basis.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="PdfPig" />
+		<PackageReference Include="EPPlus" />
+		<PackageReference Include="DocumentFormat.OpenXml" />
+		<PackageReference Include="OpenAI" />
+		<PackageReference Include="SixLabors.ImageSharp" />
+	</ItemGroup>
 
 </Project>

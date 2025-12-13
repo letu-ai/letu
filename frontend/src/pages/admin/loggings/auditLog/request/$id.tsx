@@ -100,9 +100,9 @@ function RequestLogDetails() {
             
             {details.exceptions && (
               <>
-                <Divider orientation="left">异常信息</Divider>
-                <Card type="inner" title="异常详情" bordered={false}>
-                  <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                <Divider orientation="horizontal">异常信息</Divider>
+                <Card type="inner" title="异常详情" variant="borderless">
+                  <pre className="whitespace-pre-wrap break-words">
                     {details.exceptions}
                   </pre>
                 </Card>

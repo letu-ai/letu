@@ -216,10 +216,10 @@ function MenuTable() {
                     };
                 }}
                 searchItems={[
-                    <Form.Item label="菜单名称" name="title">
+                    <Form.Item key="title" label="菜单名称" name="title">
                         <Input placeholder="请输入菜单名称" />
                     </Form.Item>,
-                    <Form.Item label="菜单路由" name="path">
+                    <Form.Item key="path" label="菜单路由" name="path">
                         <Input placeholder="请输入菜单路由" />
                     </Form.Item>,
                 ]}

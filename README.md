@@ -75,7 +75,6 @@
   * 数据字典
   * 配置管理
   * 租户管理
-  * 定时任务
   * 登录日志
   * 业务日志
 * 系统监控
@@ -143,7 +142,7 @@
     //对象存储路径
     "Bucket": "D:\\Oss",
     //对象存储域名
-    "Domain": "http://localhost:5000/",
+    "Domain": "http://localhost:5050/",
     //阿里云OSS配置
     "Aliyun": {
       "AccessKey": "", 
