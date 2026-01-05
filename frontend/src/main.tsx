@@ -6,6 +6,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 import App from './App';
+import { tokenRefreshManager } from '@/utils/tokenRefreshManager';
 
 // // 屏蔽Ant Design 组件的findDOMNode警告
 // // 保存原始 console.error
@@ -31,6 +32,12 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
 }
+
+// 监听 token 刷新成功事件，自动重新获取页面数据
+tokenRefreshManager.onTokenRefreshed(() => {
+    console.log('Token 已刷新，正在重新获取页面数据...');
+    router.invalidate();
+});
 
 // Render the app
 const rootElement = document.getElementById('root')!

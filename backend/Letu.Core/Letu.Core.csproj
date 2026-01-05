@@ -21,7 +21,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-		<PackageReference Include="UAParser" />
 		<PackageReference Include="IP2Region.Net" />
 	</ItemGroup>
 </Project>

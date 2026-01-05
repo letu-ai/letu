@@ -5,7 +5,6 @@ using Letu.AI;
 using Letu.Basis;
 using Letu.Basis.Middlewares;
 using Letu.Core.Identity.Jwt;
-using Letu.Core.JsonConverters;
 using Letu.Core.MultiTenancy;
 using Letu.Mqtt;
 using Letu.Server;
@@ -16,15 +15,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.Threading.RateLimiting;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
@@ -44,6 +40,7 @@ using Volo.Abp.EventBus;
 using Volo.Abp.BackgroundWorkers.Hangfire;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
+using Letu.Basis.UserSessions;
 
 namespace Letu;
 
@@ -324,6 +321,12 @@ public class LetuServerModule : AbpModule
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Letu API V1");
             });
         }
+        
+        //处理ngnix代理的问题
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
+        });
 
         //TODO: 生产环境可以去掉
         app.UseMiddleware<DemonstrationModeMiddleware>();
@@ -331,11 +334,6 @@ public class LetuServerModule : AbpModule
         app.UseRateLimiter(); // 启用限流中间件
 
         app.UseRouting();
-        //处理ngnix代理的问题
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
-        });
 
         // 在CNB云原生开发环境中使用CNB的跨域策略。
         if (env.IsDevelopment() && configuration["CNB_VSCODE_PROXY_URI"] != null)
@@ -343,12 +341,14 @@ public class LetuServerModule : AbpModule
 
         app.UseCors();
         app.UseAuthentication();
+
         if (MultiTenancyConsts.IsEnabled)
         {
             app.UseMultiTenancy();
         }
         app.UseUnitOfWork();
         app.UseDynamicClaims();
+        app.UseMiddleware<UserSessionActivityMiddleware>(); // 记录用户会话活动时间
         app.UseAuthorization();
 
         app.UseConfiguredEndpoints(endpoints =>

@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 
 interface IEmployeeFormProps {
     refresh?: () => void;
-    ref: React.RefObject<IEmployeeFormRef>;
+    ref: React.RefObject<IEmployeeFormRef | null>;
 }
 
 export interface IEmployeeFormRef {

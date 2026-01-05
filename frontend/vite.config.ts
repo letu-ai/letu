@@ -34,12 +34,18 @@ export default defineConfig({
         },
     },
     build: {
+        sourcemap: false, // 生产环境禁用 sourcemap
+        minify: 'esbuild', // 启用代码压缩
         rollupOptions: {
             input: {
                 admin: path.resolve(__dirname, 'index.html'),
                 ai: path.resolve(__dirname, 'ai.html'),
             },
         },
+    },
+    // 开发环境下的 sourcemap 配置（仅用于开发调试）
+    esbuild: {
+        sourcemap: true, // 开发环境启用 sourcemap 便于调试
     },
     server: {
         host: '0.0.0.0',
@@ -49,5 +55,5 @@ export default defineConfig({
             overlay: false,
         },
         allowedHosts: true,
-    },
+    }
 });

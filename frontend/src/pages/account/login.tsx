@@ -3,7 +3,6 @@ import { UserOutlined, LockOutlined, MobileOutlined, MailOutlined } from '@ant-d
 import './style/login.scss';
 import { sendLoginSmsCode, loginByPassword, loginBySms, type IPasswordLoginInput, type ISmsLoginInput } from './-service';
 import { useState, useEffect, useMemo } from 'react';
-import LoginBg from '@/assets/login-bg.png';
 import { setToken, setRememberMe, getRememberMe, getSavedUserName } from '@/utils/authUtils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useAppConfig } from '@/components/AppConfigProvider';
@@ -84,7 +83,6 @@ function LoginPage() {
                 // 根据记住我选项保存token
                 const rememberMe = activeTab === 'password' ? values.remember : false;
                 setToken(result, rememberMe);
-
             }
 
             // 登录成功后跳转到返回URL或首页
@@ -130,7 +128,7 @@ function LoginPage() {
                 <Card className="login-card" variant="borderless">
                     <div className="login-layout">
                         {/* 左侧背景图 */}
-                        <div className="login-bg-side" style={{ backgroundImage: `url(${LoginBg})` }}>
+                        <div className="login-bg-side" style={{ backgroundImage: `url("/images/login-bg.png")` }}>
                             <div className="bg-overlay bg-primary/70">
                                 <h2>欢迎使用{logoText}</h2>
                                 <p>{description}</p>

@@ -31,6 +31,7 @@ export interface IResponseError {
     jumpLogin?: boolean;
     jumpTenantError?: boolean;
     showGlobalErrorMessage?: boolean;
+    isSessionExpired?: boolean;  // 表示会话已过期，可以不用全局显示错误信息。
     code?: string;
     details?: string | string[];
     data?: any;
@@ -186,6 +187,7 @@ const instance = axios.create(defaultConfig);
 let errorHandler: (error: IResponseError) => void = () => { };
 let isRefreshing = false;
 let requests: Array<() => void> = [];
+let isSessionExpired = false;
 
 // 请求拦截器：在发送请求之前，从存储获取 token 并添加到请求头
 instance.interceptors.request.use(
@@ -217,6 +219,8 @@ instance.interceptors.response.use(
         if (status !== 401) {
             const errorInfo = await getErrorInfo(error);
             errorInfo.showGlobalErrorMessage = showGlobalErrorMessage;
+            // 如果会话已过期，标记错误信息
+            errorInfo.isSessionExpired = isSessionExpired;
             errorHandler(errorInfo);
             return Promise.reject(error);
         }
@@ -225,6 +229,8 @@ instance.interceptors.response.use(
         if (!config) {
             const errorInfo = await getErrorInfo(error);
             errorInfo.showGlobalErrorMessage = showGlobalErrorMessage;
+            // 如果会话已过期，标记错误信息
+            errorInfo.isSessionExpired = isSessionExpired;
             errorHandler(errorInfo);
             return Promise.reject(error);
         }
@@ -254,6 +260,9 @@ instance.interceptors.response.use(
                 throw new Error('刷新token失败');
             }
 
+            // 刷新token成功，重置会话过期状态
+            isSessionExpired = false;
+
             // 6. 从存储中获取更新后的 access token
             const updatedToken = getToken();
             if (!updatedToken?.accessToken) {
@@ -274,10 +283,12 @@ instance.interceptors.response.use(
             // 10. 如果刷新 token 也失败了，则执行登出操作
             console.error('刷新token失败，', refreshError);
             requests = []; // 清空队列
+            isSessionExpired = true; // 标记会话已过期
             const errorInfo: IResponseError = {
                 message: '登录已过期，请重新登录',
                 jumpLogin: true,
-                showGlobalErrorMessage: showGlobalErrorMessage
+                showGlobalErrorMessage: showGlobalErrorMessage,
+                isSessionExpired: true
             };
             errorHandler(errorInfo);
             return Promise.reject(refreshError);
@@ -291,6 +302,11 @@ instance.interceptors.response.use(
 const httpClient = {
     setErrorHandler: (handler: (error: IResponseError) => void) => {
         errorHandler = handler;
+    },
+
+    /** 重置会话过期状态，登录成功后调用 */
+    resetSessionExpired: () => {
+        isSessionExpired = false;
     },
     get: <TRequest = any, TResponse = any>(url: string, config?: IHttpClientConfig): Promise<TResponse> => {
         return instance.get<TRequest, TResponse>(url, config);

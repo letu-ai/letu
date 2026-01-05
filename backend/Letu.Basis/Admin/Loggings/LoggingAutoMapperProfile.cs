@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 
-namespace Letu.Basis.Admin.Loggings
+namespace Letu.Basis.Admin.Loggings;
+
+public class LoggingAutoMapperProfile : Profile
 {
-    public class LoggingAutoMapperProfile : Profile
+    public LoggingAutoMapperProfile()
     {
-        public LoggingAutoMapperProfile()
-        {
-        }
     }
 }

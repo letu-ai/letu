@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+
+## c# DTO对象命名规范
+
+- 列表查询输入参数 xxxListInput.cs
+- 列表输出 xxxListOutput.cs
+- 完整的详情输出 xxxOutput.cs
+- 创建输入参数 xxxCreateInput.cs
+- 更新输入参数 xxxUpdateInput.cs , 更新数据ID不放DTO中，放到单独的参数中传入
+- 如果更新和创建参数完全一样 xxxCreateOrUpdateInput.cs

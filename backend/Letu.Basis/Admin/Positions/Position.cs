@@ -4,62 +4,61 @@ using System.Diagnostics.CodeAnalysis;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
-namespace Letu.Basis.Admin.Positions
+namespace Letu.Basis.Admin.Positions;
+
+/// <summary>
+/// 职位表
+/// </summary>
+[Table(Name = "org_position")]
+public class Position : FullAuditedEntity<Guid>, IMultiTenant
 {
     /// <summary>
-    /// 职位表
+    /// 职位编号
     /// </summary>
-    [Table(Name = "org_position")]
-    public class Position : FullAuditedEntity<Guid>, IMultiTenant
-    {
-        /// <summary>
-        /// 职位编号
-        /// </summary>
-        [NotNull]
-        [Required]
-        [StringLength(32)]
-        [Column(IsNullable = false, StringLength = 32)]
-        public string? Code { get; set; }
+    [NotNull]
+    [Required]
+    [StringLength(32)]
+    [Column(IsNullable = false, StringLength = 32)]
+    public string? Code { get; set; }
 
-        /// <summary>
-        /// 职位名称
-        /// </summary>
-        [NotNull]
-        [Required]
-        [StringLength(64)]
-        [Column(IsNullable = false, StringLength = 64)]
-        public string? Name { get; set; }
+    /// <summary>
+    /// 职位名称
+    /// </summary>
+    [NotNull]
+    [Required]
+    [StringLength(64)]
+    [Column(IsNullable = false, StringLength = 64)]
+    public string? Name { get; set; }
 
-        /// <summary>
-        /// 职级
-        /// </summary>
-        [NotNull]
-        [Required]
-        [Range(1, int.MaxValue)]
-        [Column(IsNullable = false)]
-        public int Level { get; set; }
+    /// <summary>
+    /// 职级
+    /// </summary>
+    [NotNull]
+    [Required]
+    [Range(1, int.MaxValue)]
+    [Column(IsNullable = false)]
+    public int Level { get; set; }
 
-        /// <summary>
-        /// 状态：1正常2停用
-        /// </summary>
-        public int Status { get; set; }
+    /// <summary>
+    /// 状态：1正常2停用
+    /// </summary>
+    public int Status { get; set; }
 
-        /// <summary>
-        /// 描述
-        /// </summary>
-        [StringLength(512)]
-        [Column(StringLength = 512)]
-        public string? Description { get; set; }
+    /// <summary>
+    /// 描述
+    /// </summary>
+    [StringLength(512)]
+    [Column(StringLength = 512)]
+    public string? Description { get; set; }
 
-        /// <summary>
-        /// 职位分组
-        /// </summary>
-        public Guid? GroupId { get; set; }
+    /// <summary>
+    /// 职位分组
+    /// </summary>
+    public Guid? GroupId { get; set; }
 
-        /// <summary>
-        /// 租户ID
-        /// </summary>
-        [Column(IsNullable = true, StringLength = 18)]
-        public Guid? TenantId { get; set; }
-    }
+    /// <summary>
+    /// 租户ID
+    /// </summary>
+    [Column(IsNullable = true, StringLength = 18)]
+    public Guid? TenantId { get; set; }
 }

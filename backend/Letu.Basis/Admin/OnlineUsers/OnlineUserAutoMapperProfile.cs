@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 
-namespace Letu.Basis.Admin.OnlineUsers
+namespace Letu.Basis.Admin.OnlineUsers;
+
+public class OnlineUserAutoMapperProfile : Profile
 {
-    public class OnlineUserAutoMapperProfile : Profile
+    public OnlineUserAutoMapperProfile()
     {
-        public OnlineUserAutoMapperProfile()
-        {
-        }
     }
 }

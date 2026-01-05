@@ -1,8 +1,7 @@
-namespace Letu.Core.Applications
+namespace Letu.Core.Applications;
+
+public interface IPagination
 {
-    public interface IPagination
-    {
-        int Current { get; set; }
-        int PageSize { get; set; }
-    }
+    int Current { get; set; }
+    int PageSize { get; set; }
 }

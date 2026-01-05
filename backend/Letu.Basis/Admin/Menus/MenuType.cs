@@ -1,8 +1,7 @@
-namespace Letu.Basis.Admin.Menus
+namespace Letu.Basis.Admin.Menus;
+
+public enum MenuType
 {
-    public enum MenuType
-    {
-        Folder = 1,
-        Menu = 2,
-    }
+    Folder = 1,
+    Menu = 2,
 }

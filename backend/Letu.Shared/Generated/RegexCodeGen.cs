@@ -1,11 +1,10 @@
 ﻿using Letu.Shared.Consts;
 using System.Text.RegularExpressions;
 
-namespace Letu.Shared.Generated
+namespace Letu.Shared.Generated;
+
+public partial class RegexCodeGen
 {
-    public partial class RegexCodeGen
-    {
-        [GeneratedRegex(RegexConsts.Password)]
-        public static partial Regex Password();
-    }
+    [GeneratedRegex(RegexConsts.Password)]
+    public static partial Regex Password();
 }

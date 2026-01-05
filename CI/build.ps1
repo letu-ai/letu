@@ -199,7 +199,7 @@ $BuildDbScriptsDir = Join-Path $BuildAppDir "dbscripts"
 New-Item -Path $BuildDbScriptsDir -ItemType Directory -Force | Out-Null
 
 # 复制数据库初始化SQL文件
-$DbScriptsSource = Join-Path $RootDir "dbscripts\pgsql\table_struct_data.sql"
+$DbScriptsSource = Join-Path $RootDir "dbscripts/pgsql/table_struct_data.sql"
 if (Test-Path $DbScriptsSource) {
     Copy-Item -Path $DbScriptsSource -Destination $BuildDbScriptsDir -Force
     Write-Success "数据库初始化SQL文件复制成功"
@@ -228,7 +228,7 @@ if ($SkipDocker -eq $false) {
         }
 
         Write-Host "构建镜像: $dockerTag"
-        docker build -f "$ScriptDir\Dockerfile" -t $dockerTag $ScriptDir
+        docker build -f "$ScriptDir/Dockerfile" -t $dockerTag $ScriptDir
         if ($LASTEXITCODE -ne 0) {
             throw "Docker 镜像构建失败"
         }

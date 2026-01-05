@@ -38,6 +38,11 @@ const menuItems = [
         label: <Link to="/my/password">修改密码</Link>,
     },
     {
+        key: '/my/active-sessions',
+        icon: <HistoryOutlined />,
+        label: <Link to="/my/active-sessions">活跃会话</Link>,
+    },
+    {
         key: '/my/security-logs',
         icon: <HistoryOutlined />,
         label: <Link to="/my/security-logs">登录日志</Link>,

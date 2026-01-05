@@ -88,6 +88,14 @@ export function AppConfigProvider({ config, children }: IAppConfigProviderProps)
     const [configuration, setConfiguration] = useState<ILetuApplicationConfiguration | null>(config)
     const [isReady, setIsReady] = useState(!!config)
     const { setThemeColor } = useThemeStore()
+
+    // 当外部传入的 config 发生变化时，更新内部状态（例如 Token 刷新后重新获取的数据）
+    useEffect(() => {
+        if (config) {
+            setConfiguration(config);
+            setIsReady(true);
+        }
+    }, [config]);
     
     // 主题初始化逻辑
     useEffect(() => {
@@ -191,7 +199,7 @@ export function AppConfigProvider({ config, children }: IAppConfigProviderProps)
                 return configuration?.multiTenancy.isEnabled || false
             }
         }
-    }, [configuration, isReady])
+    }, [configuration, configuration?.menu.length, isReady])
     
     return (
         <AppConfigContext.Provider value={contextValue}>

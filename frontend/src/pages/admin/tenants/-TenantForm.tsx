@@ -1,8 +1,16 @@
 import { Form, Input, Modal, Switch, DatePicker, Select, Upload, Avatar, App } from 'antd';
 import { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
-import { addTenant, type TenantCreateOrUpdateInput, updateTenant, getEditionOptions, type IEditionOption, type TenantListOutput } from './-service';
+import {
+    addTenant,
+    updateTenant,
+    getEditionOptions,
+    uploadLogo,
+    getLogoUrl,
+    type TenantCreateOrUpdateInput,
+    type IEditionOption,
+    type TenantListOutput,
+} from './-service';
 import { UploadOutlined } from '@ant-design/icons';
-import { uploadFile } from '@/api/oss';
 import dayjs from 'dayjs';
 
 interface ModalProps {
@@ -19,7 +27,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const [row, setRow] = useState<TenantListOutput | null>();
     const { message } = App.useApp();
     const [editionOptions, setEditionOptions] = useState<IEditionOption[]>([]);
-    const [logoUrl, setLogoUrl] = useState<string | null>(null);
+    const [logoFileName, setLogoFileName] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpenModal) {
@@ -37,14 +45,14 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         setIsOpenModal(true);
         if (row) {
             setRow(row);
-            setLogoUrl(row.logo || null);
+            setLogoFileName(row.logo ?? null);
             form.setFieldsValue({
                 ...row,
                 expireDate: row.expireDate ? dayjs(row.expireDate) : undefined
             });
         } else {
             setRow(null);
-            setLogoUrl(null);
+            setLogoFileName(null);
             form.resetFields();
             form.setFieldValue('isActive', true);
         }
@@ -57,7 +65,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
     const onCancel = () => {
         form.resetFields();
         setIsOpenModal(false);
-        setLogoUrl(null);
+        setLogoFileName(null);
     };
 
     const onOk = () => {
@@ -73,7 +81,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         const formattedValues = {
             ...values,
             expireDate: values.expireDate ? dayjs(values.expireDate).format('YYYY-MM-DD HH:mm:ss') : null,
-            logo: logoUrl
+            logo: logoFileName
         };
 
         try {
@@ -98,8 +106,8 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
 
     // Logo上传相关函数
     const beforeUpload = (file: File) => {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) {
+        const isAllowed = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp';
+        if (!isAllowed) {
             message.error('只能上传 JPG/PNG 格式的图片!');
             return false;
         }
@@ -108,7 +116,7 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             message.error('图片大小不能超过 2MB!');
             return false;
         }
-        return isJpgOrPng && isLt2M;
+        return isAllowed && isLt2M;
     };
 
     const handleLogoUpload = async (options: any) => {
@@ -120,8 +128,8 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
         }
 
         try {
-            const logo = await uploadFile(file);
-            setLogoUrl(logo);
+            const logo = await uploadLogo(row?.id || '', file);
+            setLogoFileName(logo);
             onSuccess(logo);
             message.success('Logo上传成功');
         } catch {
@@ -196,19 +204,20 @@ const TenantForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
 
                 <Form.Item label="Logo" name="logo">
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {logoUrl && (
+                    <div className="flex items-center">
+                        {logoFileName && (
                             <Avatar
                                 size={64}
-                                src={logoUrl}
-                                style={{ marginRight: 16 }}
+                                src={getLogoUrl(row?.id || '', logoFileName)}
+                                className="mr-4"
                             />
                         )}
                         <Upload
                             customRequest={handleLogoUpload}
                             showUploadList={false}
+                            accept="image/jpeg,image/png,image/webp"
                         >
-                            <div style={{ cursor: 'pointer', padding: '8px 16px', border: '1px solid #d9d9d9', borderRadius: '6px' }}>
+                            <div className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md">
                                 <UploadOutlined /> 上传Logo
                             </div>
                         </Upload>

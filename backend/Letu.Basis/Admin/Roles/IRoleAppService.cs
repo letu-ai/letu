@@ -1,43 +1,42 @@
 using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Core.Applications;
 
-namespace Letu.Basis.Admin.Roles
+namespace Letu.Basis.Admin.Roles;
+
+public interface IRoleAppService
 {
-    public interface IRoleAppService
-    {
-        /// <summary>
-        /// 新增角色
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<bool> AddRoleAsync(RoleCreateOrUpdateInput dto);
+    /// <summary>
+    /// 新增角色
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<bool> AddRoleAsync(RoleCreateOrUpdateInput dto);
 
-        /// <summary>
-        /// 角色分页列表
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<PagedResult<RoleListOutput>> GetRoleListAsync(RoleListInput dto);
+    /// <summary>
+    /// 角色分页列表
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<PagedResult<RoleListOutput>> GetRoleListAsync(RoleListInput dto);
 
-        /// <summary>
-        /// 修改角色
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<bool> UpdateRoleAsync(Guid id, RoleCreateOrUpdateInput dto);
+    /// <summary>
+    /// 修改角色
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<bool> UpdateRoleAsync(Guid id, RoleCreateOrUpdateInput dto);
 
-        /// <summary>
-        /// 删除角色
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<bool> DeleteRoleAsync(Guid id);
+    /// <summary>
+    /// 删除角色
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<bool> DeleteRoleAsync(Guid id);
 
-        /// <summary>
-        /// 获取角色
-        /// </summary>
-        /// <returns></returns>
-        Task<List<SelectOption>> GetRoleOptionsAsync();
-    }
+    /// <summary>
+    /// 获取角色
+    /// </summary>
+    /// <returns></returns>
+    Task<List<SelectOption>> GetRoleOptionsAsync();
 }

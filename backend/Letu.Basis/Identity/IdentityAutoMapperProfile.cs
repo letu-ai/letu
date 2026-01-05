@@ -1,12 +1,11 @@
 using AutoMapper;
 using Letu.Basis.Identity.Dtos;
 
-namespace Letu.Basis.Identity
+namespace Letu.Basis.Identity;
+
+public class IdentityAutoMapperProfile : Profile
 {
-    public class IdentityAutoMapperProfile : Profile
+    public IdentityAutoMapperProfile()
     {
-        public IdentityAutoMapperProfile()
-        {
-        }
     }
-} 
+}

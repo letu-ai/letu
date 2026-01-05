@@ -71,4 +71,37 @@ public class TenantController : ControllerBase
     {
         await tenantService.DeleteTenantAsync(id);
     }
+
+    /// <summary>
+    /// 获取租户Logo
+    /// </summary>
+    /// <param name="id">租户ID</param>
+    /// <param name="logo">租户Logo</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpGet("{id:guid}/{*logo}")]
+    public async Task<IActionResult> GetTenantLogoAsync(Guid id, string logo, CancellationToken cancellationToken = default)
+    {
+        var (stream, contentType) = await tenantService.GetLogoAsync(id, logo, cancellationToken);
+        if (stream == null)
+        {
+            return NotFound();
+        }
+
+        return File(stream, contentType);
+    }
+
+    /// <summary>
+    /// 上传租户Logo
+    /// </summary>
+    /// <param name="id">租户ID</param>
+    /// <param name="input">租户Logo上传输入</param>
+    /// <returns></returns>
+    [HttpPut("{id:guid}/logo")]
+    [Authorize(BasisPermissions.Tenant.Update)]
+    [RequestSizeLimit(10_000_000)]
+    public async Task<string> UploadTenantLogoAsync(Guid id, TenantLogoUploadInput input)
+    {
+        return await tenantService.UploadLogoAsync(id, input);
+    }
 }

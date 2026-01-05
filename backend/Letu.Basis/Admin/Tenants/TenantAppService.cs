@@ -1,10 +1,15 @@
-﻿using Letu.Basis.Admin.Editions;
+﻿using FreeSql;
+using FreeSql.DataAnnotations;
+using Letu.Basis.Admin.Editions;
 using Letu.Basis.Admin.Tenants.Dtos;
+using Letu.Basis.Oss;
 using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Repository;
-using Volo.Abp;
+using Microsoft.Extensions.Options;
+using System.Reflection;
 using Volo.Abp.Application.Services;
+using Volo.Abp.BlobStoring;
 using Volo.Abp.Data;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.MultiTenancy;
@@ -18,19 +23,28 @@ public class TenantAppService : ApplicationService, ITenantAppService
     private readonly ITenantNormalizer tenantNormalizer;
     private readonly IFreeSqlRepository<Tenant> tenantRepository;
     private readonly IFreeSqlRepository<Edition> _editionRepository;
+    private readonly IBlobContainer<TenantLogoBlobContainer> blobContainer;
+    private readonly IOptions<TenantTableOptions> tenantTableOptions;
+    private readonly IFreeSql freeSql;
 
     public TenantAppService(
         IDistributedEventBus distributedEventBus,
         IDataSeeder dataSeeder,
         ITenantNormalizer tenantNormalizer,
         IFreeSqlRepository<Tenant> tenantRepository,
-        IFreeSqlRepository<Edition> editionRepository)
+        IFreeSqlRepository<Edition> editionRepository,
+        IBlobContainer<TenantLogoBlobContainer> blobContainer,
+        IOptions<TenantTableOptions> tenantTableOptions,
+        IFreeSql freeSql)
     {
         this.distributedEventBus = distributedEventBus;
         this.dataSeeder = dataSeeder;
         this.tenantNormalizer = tenantNormalizer;
         this.tenantRepository = tenantRepository;
         _editionRepository = editionRepository;
+        this.blobContainer = blobContainer;
+        this.tenantTableOptions = tenantTableOptions;
+        this.freeSql = freeSql;
     }
 
     public async Task AddTenantAsync(TenantCreateOrUpdateInput dto)
@@ -58,7 +72,17 @@ public class TenantAppService : ApplicationService, ITenantAppService
         };
         await tenantRepository.InsertAsync(entity);
 
-        
+        // 获取数据库自动生成的 TableSuffix
+        int tableSuffix = entity.TableSuffix;
+
+        if(tableSuffix > 9999)
+        {
+            throw HttpFriendlyException.BadRequest("租户数量超出范围，请联系管理员。");
+        }
+
+        // 创建租户表
+        CreateTenantTables(tableSuffix);
+
         await distributedEventBus.PublishAsync(
             new TenantCreatedEto
             {
@@ -146,5 +170,65 @@ public class TenantAppService : ApplicationService, ITenantAppService
         entity.IsActive = dto.IsActive;
 
         await tenantRepository.UpdateAsync(entity);
+    }
+
+
+    public async Task<(Stream?, string)> GetLogoAsync(Guid id, string? logo, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(logo))
+        {
+            return (null, "");
+        }
+
+        using (CurrentTenant.Change(id))
+        {
+            if (await blobContainer.ExistsAsync(logo, cancellationToken))
+            {
+                var stream = await blobContainer.GetAsync(logo, cancellationToken);
+                return (stream, MimeMapper.GetContentType(logo));
+            }
+            else
+            {
+                return (null, "");
+            }
+        }
+    }
+
+
+    public async Task<string> UploadLogoAsync(Guid id, TenantLogoUploadInput input)
+    {
+        using (CurrentTenant.Change(id))
+        {
+            var fileName = $"logo{Path.GetExtension(input.File.FileName)}";
+            using var stream = input.File.OpenReadStream();
+            await blobContainer.SaveAsync(fileName, stream, overrideExisting: true);
+            return fileName;
+        }
+    }
+
+    /// <summary>
+    /// 创建租户表
+    /// </summary>
+    /// <param name="tableSuffix">表后缀（1-9999）</param>
+    private void CreateTenantTables(int tableSuffix)
+    {
+        var suffix = $"-T{tableSuffix:D4}"; // 格式: -T0001
+
+        foreach (var assembly in tenantTableOptions.Value.EntityAssemblies)
+        {
+            var entityTypes = assembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract)
+                .Where(t => typeof(IMultiTenant).IsAssignableFrom(t))
+                .Where(t => t.GetCustomAttribute<TableAttribute>() != null);
+
+            foreach (var entityType in entityTypes)
+            {
+                var tableAttr = entityType.GetCustomAttribute<TableAttribute>()!;
+                var newTableName = tableAttr.Name + suffix;
+
+                freeSql.CodeFirst.SyncStructure(entityType, newTableName);
+                Logger.LogInformation("创建租户表：{newTableName}", newTableName);
+            }
+        }
     }
 }

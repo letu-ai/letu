@@ -1,7 +1,7 @@
-using Letu.Basis.Admin.Loggings;
 using Letu.Basis.Admin.Users;
 using Letu.Basis.Identity.Dtos;
 using Letu.Basis.Settings;
+using Letu.Basis.UserSessions;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Core.Identity.Jwt;
 using Letu.Core.Utils;
@@ -14,7 +14,6 @@ using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.DistributedLocking;
 using Volo.Abp.EventBus.Local;
-using Volo.Abp.Guids;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Settings;
 using Volo.Abp.Users;
@@ -23,42 +22,36 @@ namespace Letu.Basis.Identity;
 
 public class IdentityAppService : BasisAppService, IIdentityAppService
 {
-    private readonly IGuidGenerator guidGenerator;
     private readonly JwtOptions jwtOptions;
-    private readonly IFreeSqlRepository<User> _userRepository;
+    private readonly IFreeSqlRepository<User> userRepository;
     private readonly ILocalEventBus localEventBus;
-    private readonly HttpContext _httpContext;
+    private readonly HttpContext httpContext;
     private readonly IJwtAccessTokenProvider jwtAccessTokenProvider;
-    private readonly IDistributedCache<string> accessTokenCache;
-    private readonly IDistributedCache<string> refreshTokenCache;
-    private readonly IDistributedCache<HashSet<string>> _userSessionIdsCache;
-    private readonly IUserRoleFinder _userRoleFinder;
+    private readonly IDistributedCache<string> sessionIdCache;
+    private readonly IUserRoleFinder userRoleFinder;
     private readonly IAbpDistributedLock distributedLock;
+    private readonly IFreeSqlRepository<UserSession> sessionRepository;
 
     public IdentityAppService(
-        IGuidGenerator guidGenerator,
         IFreeSqlRepository<User> userRepository,
         ILocalEventBus localEventBus,
         IHttpContextAccessor httpContextAccessor,
         IOptions<JwtOptions> jwtOptions,
         IJwtAccessTokenProvider jwtAccessTokenProvider,
-        IDistributedCache<string> accessTokenCache,
-        IDistributedCache<string> refreshTokenCache,
-        IDistributedCache<HashSet<string>> userSessionIdsCache,
+        IDistributedCache<string> sessionIdCache,
         IUserRoleFinder userRoleFinder,
-        IAbpDistributedLock distributedLock)
+        IAbpDistributedLock distributedLock,
+        IFreeSqlRepository<UserSession> sessionRepository)
     {
-        this.guidGenerator = guidGenerator;
         this.jwtOptions = jwtOptions.Value;
         this.jwtAccessTokenProvider = jwtAccessTokenProvider;
-        _userRepository = userRepository;
+        this.userRepository = userRepository;
         this.localEventBus = localEventBus;
-        _httpContext = httpContextAccessor.HttpContext!;
-        this.accessTokenCache = accessTokenCache;
-        this.refreshTokenCache = refreshTokenCache;
-        _userSessionIdsCache = userSessionIdsCache;
-        _userRoleFinder = userRoleFinder;
+        httpContext = httpContextAccessor.HttpContext!;
+        this.sessionIdCache = sessionIdCache;
+        this.userRoleFinder = userRoleFinder;
         this.distributedLock = distributedLock;
+        this.sessionRepository = sessionRepository;
     }
 
     public async Task<UserTokenOutput> LoginAsync(LoginInput input)
@@ -67,14 +60,14 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         var loginLog = new SecurityLog
         {
             IsSuccess = true,
-            Ip = RequestUtils.GetIp(_httpContext),
+            Ip = RequestUtils.GetIp(httpContext),
             OperationMsg = "登录成功",
             UserName = input.UserName
         };
 
         try
         {
-            var user = await _userRepository.Where(x => x.UserName.Equals(input.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsEnabled)
+            var user = await userRepository.Where(x => x.UserName.Equals(input.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsEnabled)
                 .FirstAsync();
 
             if (user == null)
@@ -85,16 +78,23 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
                 throw HttpFriendlyException.BadRequest("账号或密码错误。")
                     .WithData("UserName", input.UserName);
 
-            var sessionId = guidGenerator.Create().ToString("N");
+            // 处理多设备登录控制
+            if (await SettingProvider.GetAsync<bool>(IdentitySettingNames.SignIn.AllowMultipleLogin) != true)
+            {
+                await RemoveOtherSessionsAsync(user.Id, input.ClientType);
+            }
 
-            var claims = await CreateUserClaims(user, sessionId);
-            var token = CreateToken(claims, user.Id, sessionId);
+            var session = await CreateUserSessionAsync(user.Id, LoginChannel.Account, input);
+            await CacheUserSessionIdAsync(session);
+
+            var claims = await CreateUserClaims(user, session);
+            var token = CreateToken(claims);
+            token.RefreshToken = session.RefreshToken;
+
             CreateCookie(token.Token, token.ExpiresAt); // 设置 JWT Token 到 Cookie 中，用于图片等资源的认证
 
-
-            loginLog.SessionId = sessionId;
-            // 保存用户登录信息到缓存
-            await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
+            // 更新loginLog的SessionId为数据库生成的Id
+            loginLog.SessionId = session.Id.ToString();
 
             return new UserTokenOutput
             {
@@ -112,7 +112,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         finally
         {
             loginLog.Address = RequestUtils.ResolveAddress(loginLog.Ip);
-            loginLog.Browser = RequestUtils.ResolveBrowser(RequestUtils.GetUserAgent(_httpContext));
+            loginLog.Browser = input.DeviceName;
 
             await localEventBus.PublishAsync(loginLog);
         }
@@ -135,7 +135,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         await localEventBus.PublishAsync(new SecurityLog
         {
             IsSuccess = true,
-            Ip = RequestUtils.GetIp(_httpContext),
+            Ip = RequestUtils.GetIp(httpContext),
             OperationMsg = "注销成功",
             UserName = CurrentUser.UserName
         });
@@ -151,98 +151,69 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
     // TODO：添加权限验证，确保只有管理员可以调用此方法
     public async Task LogoutAsync(Guid userId, string sessionId)
     {
-        // 获取该会话的 RefreshToken
-        var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
-        var refreshToken = await refreshTokenCache.GetAsync(sessionKey);
+        var sessionIdGuid = Guid.Parse(sessionId);
 
-        // 删除所有相关缓存
-        if (!string.IsNullOrEmpty(refreshToken))
+        // 1. 标记数据库会话为KickedOut
+        var session = await sessionRepository.OneAsync(x => x.UserId == userId && x.Id == sessionIdGuid);
+        if (session != null)
         {
-            // 删除 RefreshToken 本身的缓存记录
-            await refreshTokenCache.RemoveAsync(refreshToken);
+            session.Status = SessionStatus.KickedOut;
+            await sessionRepository.UpdateAsync(session);
         }
 
-        // 删除会话映射和 AccessToken
-        await refreshTokenCache.RemoveAsync(sessionKey);
-        await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId));
+        // 2. 清除Redis缓存
+        await sessionIdCache.RemoveAsync(IdentityCacheKeys.CalcUserSessionIdKey(sessionId));
     }
-
-
-    /// <summary>
-    /// 验证Token是否有效
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="sessionId"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public async Task<bool> ValidateTokenAsync(string userId, string sessionId, string token)
-    {
-        string key = IdentityCacheKeys.CalcAccessTokenKey(userId, sessionId);
-        var existToken = await accessTokenCache.GetAsync(key);
-        return existToken == token;
-    }
-
 
     public async Task<UserTokenOutput> RefreshTokenAsync(string refreshToken)
     {
-        // 1. 解析 RefreshToken 获取 userId 和 sessionId
-        var parts = refreshToken.Split('.');
-        if (parts.Length != 3)
+        // 1. 从数据库查询RefreshToken对应的会话
+        var session = await sessionRepository.OneAsync(x => x.RefreshToken == refreshToken);
+        if (session == null)
         {
-            throw HttpFriendlyException.BadRequest("刷新token格式错误");
+            throw HttpFriendlyException.BadRequest("刷新token无效或已过期");
         }
 
-        var randomPart = parts[0];
-        Guid userId;
-        string sessionId;
-
-        try
-        {
-            userId = Guid.Parse(parts[1]);
-            sessionId = parts[2];
-        }
-        catch
-        {
-            throw HttpFriendlyException.BadRequest("刷新token格式错误");
-        }
-
-        // 使用分布式锁防止并发刷新token
-        await using var handle = await distributedLock.TryAcquireAsync($"refresh_token:{userId}:{sessionId}", TimeSpan.FromSeconds(10));
+        // 2. 使用分布式锁
+        await using var handle = await distributedLock.TryAcquireAsync($"refresh_token:{refreshToken}", TimeSpan.FromSeconds(10));
         if (handle == null)
-        {
             throw HttpFriendlyException.BadRequest("token刷新请求过于频繁，请稍后重试");
-        }
 
-        // 2. 直接用 RefreshToken 作为键验证缓存
-        var tokenValue = await refreshTokenCache.GetAsync(refreshToken);
-        if (tokenValue == null)
+        // 3. 验证会话状态
+        if (session.Status != SessionStatus.Active)
         {
-            throw HttpFriendlyException.BadRequest("刷新token已过期或无效");
+            var statusMsg = session.Status switch
+            {
+                SessionStatus.Inactive => "会话已注销",
+                SessionStatus.Expired => "会话已过期",
+                SessionStatus.KickedOut => "会话已被强制下线",
+                _ => "会话状态异常"
+            };
+            throw HttpFriendlyException.BadRequest(statusMsg);
         }
 
-        // 3. 验证会话是否还有效（可能被管理员强制下线）
-        var sessionKey = IdentityCacheKeys.CalcRefreshTokenKey(userId, sessionId);
-        var sessionToken = await refreshTokenCache.GetAsync(sessionKey);
-        if (sessionToken != refreshToken)
+        // 4. 验证是否过期
+        if (session.ExpireTime.HasValue && session.ExpireTime < Clock.Now)
         {
-            throw HttpFriendlyException.BadRequest("会话已被终止");
+            session.Status = SessionStatus.Expired;
+            await sessionRepository.UpdateAsync(session);
+            throw HttpFriendlyException.BadRequest("会话已过期");
         }
 
-        // 4. 获取用户信息
-        var user = await _userRepository.Where(x => x.Id == userId).FirstAsync();
-        if (user == null)
-            throw HttpFriendlyException.NotFound("用户不存在");
+        // 5. 获取用户信息
+        var user = await userRepository.OneAsync(x => x.Id == session.UserId)
+            ?? throw HttpFriendlyException.NotFound("用户不存在");
 
-        // securityLog.UserName = user.UserName;
+        // 6. 更新数据库会话
+        session = await RefreshUserSessionAsync(session);
+        await CacheUserSessionIdAsync(session);
 
-        // 5. 创建用户声明和生成令牌
-        var claims = await CreateUserClaims(user, sessionId);
-        var token = CreateToken(claims, userId, sessionId);
+        // 7. 创建新Token
+        var claims = await CreateUserClaims(user, session);
+        var token = CreateToken(claims);
+        token.RefreshToken = session.RefreshToken;
 
-        // 6. 保存用户登录信息到缓存
-        await SaveUserLoginInfoToCacheAsync(user, token, sessionId);
-
-        // 7. 更新 Cookie 中的 JWT Token
+        // 9. 更新Cookie
         CreateCookie(token.Token, token.ExpiresAt);
 
         return new UserTokenOutput
@@ -253,93 +224,81 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         };
     }
 
-
     /// <summary>
-    /// 保存用户登录信息到缓存
+    /// 保存用户登录信息到Redis
     /// </summary>
-    /// <param name="user">用户</param>
-    /// <param name="token">令牌信息</param>
-    /// <param name="sessionId"></param>
-    /// <returns></returns>
-    private async Task SaveUserLoginInfoToCacheAsync(User user, JwtAccessToken token, string sessionId)
+    private async Task CacheUserSessionIdAsync(UserSession session)
     {
-        if (await SettingProvider.GetAsync<bool>(IdentitySettingNames.SignIn.AllowMultipleLogin) != true)
-        {
-            // 移除当前用户的其它登录会话
-            var existsSessionIds = await _userSessionIdsCache.GetAsync(IdentityCacheKeys.CalcUserSessionIdKey(user.Id));
-            if (existsSessionIds != null)
-            {
-                foreach (var sid in existsSessionIds)
-                {
-                    // 获取旧的 RefreshToken
-                    var oldRefreshToken = await refreshTokenCache.GetAsync(IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sid));
-                    if (!string.IsNullOrEmpty(oldRefreshToken))
-                    {
-                        // 删除 RefreshToken 本身的缓存记录
-                        await refreshTokenCache.RemoveAsync(oldRefreshToken);
-                    }
-
-                    await accessTokenCache.RemoveAsync(IdentityCacheKeys.CalcAccessTokenKey(user.Id, sid));
-                    await refreshTokenCache.RemoveAsync(IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sid));
-                }
-                await _userSessionIdsCache.RemoveAsync(IdentityCacheKeys.CalcUserSessionIdKey(user.Id));
-            }
-        }
-
         var accessTokenExpired = TimeSpan.FromSeconds(jwtOptions.Issuance.ExpirySeconds);
-        var refreshTokenExpired = TimeSpan.FromDays(Convert.ToInt32(await SettingProvider.GetAsync<int>(IdentitySettingNames.SignIn.RememberMeDurationDays)));
 
-        // 获取现有会话ID集合或创建新集合
-        var userSessionIds = await _userSessionIdsCache.GetAsync(
-            IdentityCacheKeys.CalcUserSessionIdKey(user.Id)) ?? new HashSet<string>();
-
-        // 添加当前会话ID
-        userSessionIds.Add(sessionId);
-
-        // 用户会话ID集合的过期时间应该与RefreshToken一致，以保证会话管理的连续性
-        await _userSessionIdsCache.SetAsync(
-            IdentityCacheKeys.CalcUserSessionIdKey(user.Id),
-            userSessionIds,
-            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = refreshTokenExpired }
-        );
-
-        await accessTokenCache.SetAsync(
-            IdentityCacheKeys.CalcAccessTokenKey(user.Id, sessionId),
-            token.Token,
+        // Redis缓存AccessToken(性能考虑)
+        await sessionIdCache.SetAsync(
+            IdentityCacheKeys.CalcUserSessionIdKey(session.Id),
+            session.UserId.ToString(),
             new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = accessTokenExpired }
         );
-
-        if (token.RefreshToken != null)
-        {
-            // 双向映射：
-            // 1. RefreshToken 本身作为键，值为 "valid"（用于验证 token 有效性）
-            await refreshTokenCache.SetAsync(
-                token.RefreshToken,
-                "valid",
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = refreshTokenExpired
-                }
-            );
-
-            // 2. userId:sessionId 作为键，值为 RefreshToken（用于会话管理）
-            await refreshTokenCache.SetAsync(
-                IdentityCacheKeys.CalcRefreshTokenKey(user.Id, sessionId),
-                token.RefreshToken,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = refreshTokenExpired
-                }
-            );
-        }
     }
 
-    private async Task<List<Claim>> CreateUserClaims(User user, string sessionId)
+    private async Task<UserSession> CreateUserSessionAsync(Guid userId, LoginChannel loginChannel, LoginInput input)
+    {
+        var rememberMeDays = await SettingProvider.GetAsync<int>(IdentitySettingNames.SignIn.RememberMeDurationDays);
+        var expireTime = Clock.Now.AddDays(rememberMeDays);
+
+        var session = new UserSession
+        {
+            UserId = userId,
+            ClientType = input.ClientType,
+            IpAddress = RequestUtils.GetIp(httpContext),
+            Geo = RequestUtils.ResolveAddress(RequestUtils.GetIp(httpContext)),
+            UserAgent = RequestUtils.GetUserAgent(httpContext),
+            AppVersion = input.AppVersion,
+            DeviceId = input.DeviceId,
+            DeviceName = input.DeviceName,
+            RefreshToken = Guid.NewGuid().ToString("N"),
+            LoginChannel = loginChannel,
+            LastActiveTime = Clock.Now,
+            ExpireTime = expireTime,
+            Status = SessionStatus.Active
+        };
+
+        return await sessionRepository.InsertAsync(session);
+    }
+
+    private async Task<UserSession> RefreshUserSessionAsync(UserSession session)
+    {
+        session.RefreshToken = Guid.NewGuid().ToString("N");
+        session.LastActiveTime = Clock.Now;
+        session.ExpireTime = Clock.Now.AddDays(await SettingProvider.GetAsync<int>(IdentitySettingNames.SignIn.RememberMeDurationDays));
+        await sessionRepository.UpdateAsync(session);
+        return session;
+    }
+
+    /// <summary>
+    /// 踢出相同类型其他客户端的会话(当不允许多设备登录时)
+    /// </summary>
+    private async Task RemoveOtherSessionsAsync(Guid userId, ClientType clientType)
+    {
+        var activeSessions = await sessionRepository
+            .Where(s => s.UserId == userId && s.ClientType == clientType && s.Status == SessionStatus.Active)
+            .ToListAsync();
+
+        foreach (var session in activeSessions)
+        {
+            // 标记为被踢下线
+            session.Status = SessionStatus.KickedOut;
+
+            // 清除Redis缓存
+            await sessionIdCache.RemoveAsync(IdentityCacheKeys.CalcUserSessionIdKey(session.Id));
+        }
+        await sessionRepository.UpdateAsync(activeSessions);
+    }
+
+    private async Task<List<Claim>> CreateUserClaims(User user, UserSession session)
     {
         var claims = new List<Claim> {
             new(AbpClaimTypes.UserId, user.Id.ToString()),
             new(AbpClaimTypes.UserName, user.UserName),
-            new(AbpClaimTypes.SessionId, sessionId),
+            new(AbpClaimTypes.SessionId, session.Id.ToString("N")),
         };
 
         if (user.TenantId.HasValue)
@@ -353,7 +312,7 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         }
 
         // 获取用户角色并添加到claims中
-        var roleNames = await _userRoleFinder.GetRoleNamesAsync(user.Id);
+        var roleNames = await userRoleFinder.GetRoleNamesAsync(user.Id);
         foreach (var roleName in roleNames)
         {
             claims.Add(new Claim(ClaimTypes.Role, roleName));
@@ -362,12 +321,9 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         return claims;
     }
 
-    private JwtAccessToken CreateToken(List<Claim> claims, Guid userId, string sessionId)
+    private JwtAccessToken CreateToken(List<Claim> claims)
     {
         var token = jwtAccessTokenProvider.CreateToken(claims, jwtOptions.Issuance.ExpirySeconds);
-        // 生成格式化的 RefreshToken: <random>.<userId>.<sessionId>
-        var randomToken = guidGenerator.Create().ToString("N").ToLower();
-        token.RefreshToken = $"{randomToken}.{userId}.{sessionId}";
         return token;
     }
 
@@ -381,13 +337,13 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,            // 防止 XSS 攻击，JavaScript 无法访问
-            Secure = _httpContext.Request.IsHttps,    // HTTPS 下设置 Secure
+            Secure = httpContext.Request.IsHttps,    // HTTPS 下设置 Secure
             SameSite = SameSiteMode.Lax,              // 防止 CSRF 攻击
             Path = "/",                 // Cookie 路径
             Expires = expiredTime       // 与 JWT 相同的过期时间
         };
 
-        _httpContext.Response.Cookies.Append("jwt-token", token, cookieOptions);
+        httpContext.Response.Cookies.Append("jwt-token", token, cookieOptions);
     }
 
     /// <summary>
@@ -395,11 +351,11 @@ public class IdentityAppService : BasisAppService, IIdentityAppService
     /// </summary>
     private void ClearJwtCookie()
     {
-        _httpContext.Response.Cookies.Delete("jwt-token", new CookieOptions
+        httpContext.Response.Cookies.Delete("jwt-token", new CookieOptions
         {
             Path = "/",
             HttpOnly = true,
-            Secure = _httpContext.Request.IsHttps,
+            Secure = httpContext.Request.IsHttps,
             SameSite = SameSiteMode.Lax
         });
     }

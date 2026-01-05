@@ -24,6 +24,7 @@ export function loginByPassword(input: IPasswordLoginInput) {
     const config = buildTenantHeaders();
     config.anonymous = true;
     config.withCredentials = true; //确保登录成功后设置的cookie能被浏览器正确接收
+    input.clientType = "Web";
 
     return httpClient.post<IPasswordLoginInput, IUserTokenOutput>('/api/identity/login', input, config);
 }
@@ -73,6 +74,7 @@ export function refreshToken(refreshToken: string) {
 export function getLoginSettings() {
     const config = buildTenantHeaders() as IHttpClientConfig;
     config.anonymous = true; // 匿名请求，不需要token认证
+    config.withCredentials = true; 
     return httpClient.get<ILoginSettingsOutput>('/api/account/login-settings', config);
 }
 
@@ -118,10 +120,16 @@ export interface ISwitchTenantOutput {
     tenantId?: string;
 }
 
+
+export type ClientType = "Web" | "PC" | "Android" | "IOS" | "WechatMiniProgram" | "HarmonyOS" | "Other";
+export type LoginChannel = "Account" | "SMS" | "ThirdParty";
+
 export interface IPasswordLoginInput {
     userName: string;
     password: string;
     rememberMe: boolean;
+    clientType: ClientType;
+    appVersion: string;
 }
 
 export interface ISmsLoginInput {

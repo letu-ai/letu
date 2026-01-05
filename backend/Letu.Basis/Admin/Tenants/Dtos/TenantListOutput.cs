@@ -68,4 +68,9 @@ public class TenantListOutput
     /// 有效状态
     /// </summary>
     public bool IsActive { get; set; }
+
+    /// <summary>
+    /// 表后缀标识 (4位数字)
+    /// </summary>
+    public required int TableSuffix { get; set; }
 }

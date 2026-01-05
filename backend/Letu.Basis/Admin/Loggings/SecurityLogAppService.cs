@@ -3,30 +3,29 @@ using Letu.Core.Applications;
 using Letu.Logging.SecurtyLogs;
 using Letu.Repository;
 
-namespace Letu.Basis.Admin.Loggings
+namespace Letu.Basis.Admin.Loggings;
+
+public class SecurityLogAppService : BasisAppService, ISecurityLogAppService
 {
-    public class SecurityLogAppService : BasisAppService, ISecurityLogAppService
+    private readonly IFreeSqlRepository<SecurityLog> securityLogRepository;
+
+    public SecurityLogAppService(IFreeSqlRepository<SecurityLog> securityLogRepository)
     {
-        private readonly IFreeSqlRepository<SecurityLog> securityLogRepository;
+        this.securityLogRepository = securityLogRepository;
+    }
 
-        public SecurityLogAppService(IFreeSqlRepository<SecurityLog> securityLogRepository)
-        {
-            this.securityLogRepository = securityLogRepository;
-        }
+    public async Task<PagedResult<SecurityLogListOutput>> GetSecurityLogListAsync(SecurityLogListInput dto)
+    {
+        var rows = await securityLogRepository.Select
+            .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
+            .WhereIf(dto.Status == 1, x => x.IsSuccess)
+            .WhereIf(dto.Status == 2, x => !x.IsSuccess)
+            .WhereIf(!string.IsNullOrEmpty(dto.Address), x => x.Address != null && x.Address.Contains(dto.Address!))
+            .OrderByDescending(x => x.CreationTime)
+            .Count(out var total)
+            .Page(dto.Current, dto.PageSize)
+            .ToListAsync<SecurityLogListOutput>();
 
-        public async Task<PagedResult<SecurityLogListOutput>> GetSecurityLogListAsync(SecurityLogListInput dto)
-        {
-            var rows = await securityLogRepository.Select
-                .WhereIf(!string.IsNullOrEmpty(dto.UserName), x => x.UserName.Contains(dto.UserName!))
-                .WhereIf(dto.Status == 1, x => x.IsSuccess)
-                .WhereIf(dto.Status == 2, x => !x.IsSuccess)
-                .WhereIf(!string.IsNullOrEmpty(dto.Address), x => x.Address != null && x.Address.Contains(dto.Address!))
-                .OrderByDescending(x => x.CreationTime)
-                .Count(out var total)
-                .Page(dto.Current, dto.PageSize)
-                .ToListAsync<SecurityLogListOutput>();
-
-            return new PagedResult<SecurityLogListOutput>(total, rows);
-        }
+        return new PagedResult<SecurityLogListOutput>(total, rows);
     }
 }

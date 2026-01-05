@@ -7,77 +7,76 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace Letu.Basis.Controllers.Admin
+namespace Letu.Basis.Controllers.Admin;
+
+[Authorize(BasisPermissions.MenuItem.Default)]
+[ApiController]
+[Route("api/admin/menus")]
+public class MenuItemController : ControllerBase
 {
-    [Authorize(BasisPermissions.MenuItem.Default)]
-    [ApiController]
-    [Route("api/admin/menus")]
-    public class MenuItemController : ControllerBase
+    private readonly IMenuItemAppService _menuService;
+
+    public MenuItemController(IMenuItemAppService menuService)
     {
-        private readonly IMenuItemAppService _menuService;
+        _menuService = menuService;
+    }
 
-        public MenuItemController(IMenuItemAppService menuService)
-        {
-            _menuService = menuService;
-        }
+    /// <summary>
+    /// 新增菜单
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(BasisPermissions.MenuItem.Create)]
+    [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
+    public async Task AddMenuAsync([FromBody] MenuItemCreateOrUpdateInput dto)
+    {
+        await _menuService.AddMenuAsync(dto);
+    }
 
-        /// <summary>
-        /// 新增菜单
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Authorize(BasisPermissions.MenuItem.Create)]
-        [EnableRateLimiting(RateLimiterConsts.DebouncePolicy)]
-        public async Task AddMenuAsync([FromBody] MenuItemCreateOrUpdateInput dto)
-        {
-            await _menuService.AddMenuAsync(dto);
-        }
+    /// <summary>
+    /// 菜单树形列表
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<List<MenuItemListOutput>> GetMenuListAsync([FromQuery] MenuItemListInput dto)
+    {
+        return await _menuService.GetMenuListAsync(dto);
+    }
 
-        /// <summary>
-        /// 菜单树形列表
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<MenuItemListOutput>> GetMenuListAsync([FromQuery] MenuItemListInput dto)
-        {
-            return await _menuService.GetMenuListAsync(dto);
-        }
+    /// <summary>
+    /// 修改菜单
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPut("{id}")]
+    [Authorize(BasisPermissions.MenuItem.Update)]
+    public async Task UpdateMenuAsync(Guid id, [FromBody] MenuItemCreateOrUpdateInput input)
+    {
+        await _menuService.UpdateMenuAsync(id, input);
+    }
 
-        /// <summary>
-        /// 修改菜单
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [HttpPut("{id}")]
-        [Authorize(BasisPermissions.MenuItem.Update)]
-        public async Task UpdateMenuAsync(Guid id, [FromBody] MenuItemCreateOrUpdateInput input)
-        {
-            await _menuService.UpdateMenuAsync(id, input);
-        }
+    /// <summary>
+    /// 删除菜单
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    [Authorize(BasisPermissions.MenuItem.Delete)]
+    public async Task DeleteMenusAsync([FromBody] Guid[] ids)
+    {
+        await _menuService.DeleteMenusAsync(ids);
+    }
 
-        /// <summary>
-        /// 删除菜单
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        [Authorize(BasisPermissions.MenuItem.Delete)]
-        public async Task DeleteMenusAsync([FromBody] Guid[] ids)
-        {
-            await _menuService.DeleteMenusAsync(ids);
-        }
-
-        /// <summary>
-        /// 获取菜单组成的选项树
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("{applicationName}/tree-options")]
-        public async Task<List<MenuTreeSelectOption>> GetMenuOptionsAsync(bool onlyFolder, string applicationName)
-        {
-            return await _menuService.GetMenuOptionsAsync(onlyFolder, applicationName);
-        }
+    /// <summary>
+    /// 获取菜单组成的选项树
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("{applicationName}/tree-options")]
+    public async Task<List<MenuTreeSelectOption>> GetMenuOptionsAsync(bool onlyFolder, string applicationName)
+    {
+        return await _menuService.GetMenuOptionsAsync(onlyFolder, applicationName);
     }
 }

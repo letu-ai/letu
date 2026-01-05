@@ -360,27 +360,51 @@ public class UserAppService : BasisAppService, IUserAppService
             return new UserExtraInfo();
         }
 
-        var extraInfo = await userRepository.Select
-            .From<OrganizationUnit, Department, PositionGroup>((u, o, d, p) => u
-                .LeftJoin(u1 => u1.OrganizationUnitId == o.Id)
-                .LeftJoin(u1 => u1.DepartmentId == d.Id)
-                .LeftJoin(u1 => u1.PositionId == p.Id))
-            .Where((u, o, d, p) => u.Id == CurrentUser.Id)
-            .FirstAsync((u, o, d, p) => new UserExtraInfo
-            {
-                OrganizationUnitId = u.OrganizationUnitId,
-                OrganizationUnitName = o.Name,
-                DepartmentId = u.DepartmentId,
-                DepartmentName = d.Name,
-                PositionId = u.PositionId,
-                PositionName = p.GroupName
-            });
+        // var extraInfo = await userRepository.Select
+        //     .From<OrganizationUnit, Department, PositionGroup>((u, o, d, p) => u
+        //         .LeftJoin(u1 => u1.OrganizationUnitId == o.Id)
+        //         .LeftJoin(u1 => u1.DepartmentId == d.Id)
+        //         .LeftJoin(u1 => u1.PositionId == p.Id))
+        //     .Where((u, o, d, p) => u.Id == CurrentUser.Id)
+        //     .FirstAsync((u, o, d, p) => new UserExtraInfo
+        //     {
+        //         OrganizationUnitId = u.OrganizationUnitId,
+        //         OrganizationUnitName = o.Name,
+        //         DepartmentId = u.DepartmentId,
+        //         DepartmentName = d.Name,
+        //         PositionId = u.PositionId,
+        //         PositionName = p.GroupName
+        //     });
 
-        // 查询用户标签名称
-        extraInfo.Tags = await userTagRepository.Select
-            .From<UserTag>((ut, t) => ut.InnerJoin(ut1 => ut1.TagId == t.Id))
-            .Where((ut, t) => ut.UserId == CurrentUser.Id)
-            .ToListAsync((ut, t) => new UserTagInfo { Id = t.Id, Name = t.Name, Color = t.Color });
+        // // 查询用户标签名称
+        // extraInfo.Tags = await userTagRepository.Select
+        //     .From<UserTag>((ut, t) => ut.InnerJoin(ut1 => ut1.TagId == t.Id))
+        //     .Where((ut, t) => ut.UserId == CurrentUser.Id)
+        //     .ToListAsync((ut, t) => new UserTagInfo { Id = t.Id, Name = t.Name, Color = t.Color });
+
+        var user = await userRepository.Select
+            .Include(x => x.OrganizationUnit)
+            .Include(x => x.Department)
+            .Include(x => x.Position)
+            .IncludeMany(x => x.Tags)
+            .Where(x => x.Id == CurrentUser.Id)
+            .FirstAsync();
+
+        if (user == null)
+        {
+            return new UserExtraInfo();
+        }
+
+        var extraInfo = new UserExtraInfo
+        {
+            OrganizationUnitId = user.OrganizationUnitId,
+            OrganizationUnitName = user.OrganizationUnit?.Name,
+            DepartmentId = user.DepartmentId,
+            DepartmentName = user.Department?.Name,
+            PositionId = user.PositionId,
+            PositionName = user.Position?.Name,
+            Tags = user.Tags == null ? null : user.Tags.Select(t => new UserTagInfo { Id = t.Id, Name = t.Name, Color = t.Color }).ToList()
+        };
 
         return extraInfo;
     }

@@ -123,7 +123,7 @@ public class IdentityDataSeedContributor : IDataSeedContributor, ITransientDepen
 
             // 创建用户角色关联
             var userRole = new UserInRole
-            {
+            {                        
                 UserId = adminUser.Id,
                 RoleId = adminRole.Id,
                 TenantId = tenantId,

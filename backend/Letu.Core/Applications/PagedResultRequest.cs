@@ -1,8 +1,7 @@
-namespace Letu.Core.Applications
+namespace Letu.Core.Applications;
+
+public class PagedResultRequest : IPagination
 {
-    public class PagedResultRequest : IPagination
-    {
-        public int PageSize { get; set; }
-        public int Current { get; set; }
-    }
+    public int PageSize { get; set; }
+    public int Current { get; set; }
 }

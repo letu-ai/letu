@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Space, Form, Input, Button, Tag, Avatar, Select } from 'antd';
 import { useRef, useState } from 'react';
 import { PlusOutlined, ExclamationCircleFilled, EditOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
-import { deleteTenant, getTenantList, type TenantListOutput } from './-service';
+import { deleteTenant, getLogoUrl, getTenantList, type TenantListOutput } from './-service';
 import TenantForm, { type ModalRef } from './-TenantForm';
 import FeatureEditor from '@/pages/admin/-components/FeatureEditor';
 import SmartTable from '@/components/SmartTable';
@@ -30,10 +30,10 @@ function Tenant() {
             key: 'name',
             render: (name: string, record: TenantListOutput) => {
                 return (
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div className="flex items-center">
                         {record.logo ?
-                            <Avatar src={record.logo} style={{ marginRight: 12 }} /> :
-                            <Avatar style={{ marginRight: 12 }}>T</Avatar>}
+                            <Avatar src={getLogoUrl(record.id, record.logo)} className="mr-4"  /> :
+                            <Avatar className="mr-4">T</Avatar>}
                         <span>{name}</span>
                     </div>
                 );
@@ -69,6 +69,12 @@ function Tenant() {
             dataIndex: 'expireDate',
             key: 'expireDate',
             render: (text: string) => text || '-'
+        },
+        {
+            title: '表后缀',
+            dataIndex: 'tableSuffix',
+            key: 'tableSuffix',
+            render: (text: number) => text ? text.toString().padStart(4, '0') : '-'
         },
         {
             title: '操作',

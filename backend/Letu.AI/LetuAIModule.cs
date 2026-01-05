@@ -1,5 +1,6 @@
 ﻿using Letu.AI.Localization;
 using Letu.Basis;
+using Letu.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Localization;
@@ -20,6 +21,7 @@ public class LetuAIModule : AbpModule
 
         ConfigureAutoMapper(services);
         ConfigureLocalization();
+        ConfigureTenantTableOptions();
 
         // 注册服务
         services.AddHttpClient();
@@ -54,6 +56,14 @@ public class LetuAIModule : AbpModule
             options.Resources
                 .Add<AIResource>("zh-Hans")
                 .AddVirtualJson("/Letu/AI/Localization/Resources");
+        });
+    }
+
+    private void ConfigureTenantTableOptions()
+    {
+        Configure<TenantTableOptions>(options =>
+        {
+            options.AddAssembly(typeof(LetuAIModule).Assembly);
         });
     }
 }

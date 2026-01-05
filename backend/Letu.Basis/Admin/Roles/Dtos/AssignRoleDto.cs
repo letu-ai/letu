@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Letu.Basis.Admin.Roles.Dtos
+namespace Letu.Basis.Admin.Roles.Dtos;
+
+public class AssignRoleDto
 {
-    public class AssignRoleDto
-    {
-        /// <summary>
-        /// 角色ID
-        /// </summary>
-        public Guid[]? RoleIds { get; set; }
-    }
+    /// <summary>
+    /// 角色ID
+    /// </summary>
+    public Guid[]? RoleIds { get; set; }
 }

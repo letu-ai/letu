@@ -3,11 +3,13 @@ using Letu.Basis.Admin.PermissionManagement.Identity;
 using Letu.Basis.Filters;
 using Letu.Basis.Localization;
 using Letu.Basis.Permissions;
+using Letu.Basis.UserSessions;
 using Letu.Core.Helpers;
 using Letu.Core.MultiTenancy;
 using Letu.Logging;
 using Letu.Repository;
 using Microsoft.AspNetCore.Mvc;
+using UAParser.Extensions;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -67,6 +69,9 @@ public class LetuBasisModule : AbpModule
         ConfigureLocalization();
         ConfigureMultiTenancy();
         ConfigureOss(configuration);
+        ConfigureTenantTableOptions();
+
+        services.AddUserAgentParser();
 
         services.AddControllers()
             .AddApplicationPart(typeof(LetuBasisModule).Assembly); // 添加外部程序集
@@ -91,6 +96,7 @@ public class LetuBasisModule : AbpModule
 
 
         SnowflakeHelper.Init(short.Parse(configuration["Snowflake:WorkerId"]!), short.Parse(configuration["Snowflake:DataCenterId"]!));
+
     }
 
     private void ConfigureAutoMapper(IServiceCollection services)
@@ -162,6 +168,14 @@ public class LetuBasisModule : AbpModule
         Configure<OssOptions>(configuration.GetSection("Oss"));
     }
 
+    private void ConfigureTenantTableOptions()
+    {
+        Configure<TenantTableOptions>(options =>
+        {
+            options.AddAssembly(typeof(LetuBasisModule).Assembly);
+        });
+    }
+
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         SeedBasisData(context);
@@ -171,6 +185,8 @@ public class LetuBasisModule : AbpModule
     {
         // 注册后台工作者
         await context.AddBackgroundWorkerAsync<LogCleanupWorker>();
+        await context.AddBackgroundWorkerAsync<UserSessionCleanupWorker>();
+        await context.AddBackgroundWorkerAsync<UserSessionActivityUpdateWorker>();
 
         await base.OnApplicationInitializationAsync(context);
     }

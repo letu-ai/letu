@@ -4,6 +4,10 @@ import { getApiBaseUrl } from '@/utils/urlUtils';
 // 使用闭包存储刷新状态，实现防并发
 let refreshTokenPromise: Promise<boolean> | null = null;
 
+// 定义回调类型
+type RefreshSuccessCallback = () => void;
+const refreshSuccessCallbacks: Set<RefreshSuccessCallback> = new Set();
+
 /**
  * 执行实际的token刷新请求
  */
@@ -32,6 +36,8 @@ async function performTokenRefresh(refreshTokenValue: string): Promise<boolean> 
                     data.refreshToken,
                     data.expiredTime
                 );
+                // 触发刷新成功回调
+                refreshSuccessCallbacks.forEach(cb => cb());
                 return true;
             } else {
                 console.warn('刷新token响应缺少数据');
@@ -76,5 +82,14 @@ export async function refreshToken(): Promise<boolean> {
 
 // 导出对象以保持向后兼容
 export const tokenRefreshManager = {
-    refreshToken
+    refreshToken,
+    /**
+     * 订阅 token 刷新成功事件
+     * @param cb 回调函数
+     * @returns 取消订阅的函数
+     */
+    onTokenRefreshed: (cb: RefreshSuccessCallback) => {
+        refreshSuccessCallbacks.add(cb);
+        return () => refreshSuccessCallbacks.delete(cb);
+    }
 };

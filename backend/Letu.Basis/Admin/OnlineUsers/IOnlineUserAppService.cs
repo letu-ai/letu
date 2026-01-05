@@ -1,10 +1,9 @@
 ﻿using Letu.Basis.Admin.OnlineUsers.Dtos;
 using Letu.Core.Applications;
 
-namespace Letu.Basis.Admin.OnlineUsers
+namespace Letu.Basis.Admin.OnlineUsers;
+
+public interface IOnlineUserAppService
 {
-    public interface IOnlineUserAppService
-    {
-        Task<PagedResult<OnlineUserResultDto>> GetOnlineUserListAsync(OnlineUserSearchDto dto);
-    }
+    Task<PagedResult<OnlineUserListOutput>> GetOnlineUserListAsync(OnlineUserListInput dto);
 }

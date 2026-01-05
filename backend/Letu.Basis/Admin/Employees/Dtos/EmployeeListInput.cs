@@ -1,17 +1,16 @@
 using Letu.Core.Applications;
 
-namespace Letu.Basis.Admin.Employees.Dtos
-{
-    public class EmployeeListInput : PagedResultRequest
-    {
-        /// <summary>
-        /// 姓名/手机号/工号
-        /// </summary>
-        public string? Keyword { get; set; }
+namespace Letu.Basis.Admin.Employees.Dtos;
 
-        /// <summary>
-        /// 部门ID
-        /// </summary>
-        public Guid? DepartmentId { get; set; }
-    }
+public class EmployeeListInput : PagedResultRequest
+{
+    /// <summary>
+    /// 姓名/手机号/工号
+    /// </summary>
+    public string? Keyword { get; set; }
+
+    /// <summary>
+    /// 部门ID
+    /// </summary>
+    public Guid? DepartmentId { get; set; }
 }

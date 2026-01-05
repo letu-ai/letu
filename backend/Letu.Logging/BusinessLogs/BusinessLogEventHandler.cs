@@ -1,4 +1,5 @@
 ﻿using Letu.Core.Utils;
+using UAParser.Interfaces;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EventBus;
 
@@ -7,10 +8,12 @@ namespace Letu.Logging.BusinessLogs;
 public class BusinessLogEventHandler : ILocalEventHandler<BusinessLogEto>, ITransientDependency
 {
     private readonly IFreeSql freeSql;
+    private readonly IUserAgentParser uaParser;
 
-    public BusinessLogEventHandler(IFreeSql freeSql)
+    public BusinessLogEventHandler(IFreeSql freeSql, IUserAgentParser uaParser)
     {
         this.freeSql = freeSql;
+        this.uaParser = uaParser;
     }
 
     public async Task HandleEventAsync(BusinessLogEto message)
@@ -22,7 +25,7 @@ public class BusinessLogEventHandler : ILocalEventHandler<BusinessLogEto>, ITran
             BizNo = message.EntityId,
             Content = message.Content,
             Ip = message.Ip,
-            Browser = RequestUtils.ResolveBrowser(message.UserAgent),
+            Browser = uaParser.ClientInfo.Browser.ToString(),
             UserId = message.UserId,
             UserName = message.UserName,
             TraceId = message.TraceId,

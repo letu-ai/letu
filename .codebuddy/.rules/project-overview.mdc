@@ -49,8 +49,7 @@ alwaysApply: true
 │       ├── store/        # 状态管理
 │       └── utils/        # 工具函数
 ├── docs/                 # 项目文档
-├── dbscripts/            # 数据库脚本
-└── oss/                  # 模拟对象存储的静态文件
+└── dbscripts/            # 数据库脚本
 ```
 
 ## 3. 开发规范

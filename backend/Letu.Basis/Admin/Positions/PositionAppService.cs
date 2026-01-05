@@ -11,257 +11,256 @@ using Letu.Core.Applications;
 using Letu.Core.AspNetCore.Mvc;
 using Letu.Logging.BusinessLogs;
 
-namespace Letu.Basis.Admin.Positions
+namespace Letu.Basis.Admin.Positions;
+
+public class PositionAppService : BasisAppService, IPositionAppService
 {
-    public class PositionAppService : BasisAppService, IPositionAppService
+    private readonly IFreeSqlRepository<Position> _positionRepository;
+    private readonly IFreeSqlRepository<PositionGroup> _positionGroupRepository;
+    private readonly IFreeSqlRepository<Employee> _employeeRepository;
+    private readonly IFreeSqlRepository<User> _userRepository;
+
+    public PositionAppService(IFreeSqlRepository<Position> positionRepository, IFreeSqlRepository<PositionGroup> positionGroupRepository
+        , IFreeSqlRepository<Employee> employeeRepository, IFreeSqlRepository<User> userRepository)
     {
-        private readonly IFreeSqlRepository<Position> _positionRepository;
-        private readonly IFreeSqlRepository<PositionGroup> _positionGroupRepository;
-        private readonly IFreeSqlRepository<Employee> _employeeRepository;
-        private readonly IFreeSqlRepository<User> _userRepository;
+        _positionRepository = positionRepository;
+        _positionGroupRepository = positionGroupRepository;
+        _employeeRepository = employeeRepository;
+        _userRepository = userRepository;
+    }
 
-        public PositionAppService(IFreeSqlRepository<Position> positionRepository, IFreeSqlRepository<PositionGroup> positionGroupRepository
-            , IFreeSqlRepository<Employee> employeeRepository, IFreeSqlRepository<User> userRepository)
+    [BusinessLog("职位管理", BusinessOperateType.Create, "创建职位分组{{Name}}")]
+    public async Task<bool> AddPositionGroupAsync(PositionGroupCreateOrUpdateInput dto)
+    {
+        var entity = ObjectMapper.Map<PositionGroupCreateOrUpdateInput, PositionGroup>(dto);
+        entity.ParentId = dto.ParentId;
+        if (entity.ParentId.HasValue)
         {
-            _positionRepository = positionRepository;
-            _positionGroupRepository = positionGroupRepository;
-            _employeeRepository = employeeRepository;
-            _userRepository = userRepository;
+            var all = await _positionGroupRepository.Select.ToListAsync();
+            entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
         }
 
-        [BusinessLog("职位管理", BusinessOperateType.Create, "创建职位分组{{Name}}")]
-        public async Task<bool> AddPositionGroupAsync(PositionGroupCreateOrUpdateInput dto)
+        entity = await _positionGroupRepository.InsertAsync(entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
+        BusinessLogManager.Current?.AddEntityId(entity.Id);
+
+        return true;
+    }
+
+    public string GetParentIds(List<PositionGroup> all, Guid id)
+    {
+        var parentId = all.Find(x => x.Id == id)?.ParentId;
+        if (parentId == null) return id.ToString();
+        return GetParentIds(all, parentId.Value) + "," + id;
+    }
+
+    [BusinessLog("职位管理", BusinessOperateType.Delete, "删除职位分组{{Name}}")]
+    public async Task<bool> DeletePositionGroupAsync(Guid id)
+    {
+        var hasPositions = await _positionRepository.Select.AnyAsync(x => x.GroupId == id);
+        if (hasPositions)
         {
-            var entity = ObjectMapper.Map<PositionGroupCreateOrUpdateInput, PositionGroup>(dto);
-            entity.ParentId = dto.ParentId;
-            if (entity.ParentId.HasValue)
+            throw HttpFriendlyException.BadRequest("分组下有职位，不能删除");
+        }
+        var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
+        await _positionGroupRepository.DeleteAsync(entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
+        BusinessLogManager.Current?.AddEntityId(id);
+
+        return true;
+    }
+
+    public async Task<List<PositionGroupListOutput>> GetPositionGroupListAsync(PositionGroupListInput dto)
+    {
+        var rawTree = await _positionGroupRepository.Select
+            .WhereIf(!string.IsNullOrEmpty(dto.GroupName), x => x.GroupName.Contains(dto.GroupName!))
+            .OrderBy(x => x.Sort)
+            .ToTreeListAsync();
+
+        return ObjectMapper.Map<List<PositionGroup>, List<PositionGroupListOutput>>(rawTree);
+    }
+
+    [BusinessLog("职位管理", BusinessOperateType.Update, "更新职位分组{{Name}}")]
+    public async Task<bool> UpdatePositionGroupAsync(Guid id, PositionGroupCreateOrUpdateInput dto)
+    {
+        var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
+        if (dto.ParentId == entity.Id)
+        {
+            throw HttpFriendlyException.BadRequest("不能选择自己为父级");
+        }
+
+        entity.GroupName = dto.GroupName;
+        entity.Remark = dto.Remark;
+        entity.ParentId = dto.ParentId;
+        entity.Sort = dto.Sort;
+        if (entity.ParentId.HasValue)
+        {
+            var all = await _positionGroupRepository.Select.ToListAsync();
+            entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
+        }
+        await _positionGroupRepository.UpdateAsync(entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
+        BusinessLogManager.Current?.AddEntityId(id);
+
+        return true;
+    }
+
+    private async Task<List<PosistionLayerNames>> GetPosistionGroupNameAsync(List<Guid> ids)
+    {
+        var positions = await _positionRepository.Where(x => ids.Contains(x.Id)).ToListAsync(x => new { x.Id, x.GroupId });
+        var groups = await _positionGroupRepository.Select.ToListAsync();
+        var list = new List<PosistionLayerNames>();
+
+        foreach (var item in positions)
+        {
+            var single = new PosistionLayerNames
             {
-                var all = await _positionGroupRepository.Select.ToListAsync();
-                entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
-            }
-
-            entity = await _positionGroupRepository.InsertAsync(entity);
-            BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
-            BusinessLogManager.Current?.AddEntityId(entity.Id);
-
-            return true;
-        }
-
-        public string GetParentIds(List<PositionGroup> all, Guid id)
-        {
-            var parentId = all.Find(x => x.Id == id)?.ParentId;
-            if (parentId == null) return id.ToString();
-            return GetParentIds(all, parentId.Value) + "," + id;
-        }
-
-        [BusinessLog("职位管理", BusinessOperateType.Delete, "删除职位分组{{Name}}")]
-        public async Task<bool> DeletePositionGroupAsync(Guid id)
-        {
-            var hasPositions = await _positionRepository.Select.AnyAsync(x => x.GroupId == id);
-            if (hasPositions)
+                Id = item.Id
+            };
+            var allGroups = groups.Where(x => x.Id == item.GroupId).Select(x => x.ParentIds + "," + x.Id);
+            foreach (var groupIds in allGroups)
             {
-                throw HttpFriendlyException.BadRequest("分组下有职位，不能删除");
-            }
-            var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
-            await _positionGroupRepository.DeleteAsync(entity);
-            BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
-            BusinessLogManager.Current?.AddEntityId(id);
-
-            return true;
-        }
-
-        public async Task<List<PositionGroupListOutput>> GetPositionGroupListAsync(PositionGroupListInput dto)
-        {
-            var rawTree = await _positionGroupRepository.Select
-                .WhereIf(!string.IsNullOrEmpty(dto.GroupName), x => x.GroupName.Contains(dto.GroupName!))
-                .OrderBy(x => x.Sort)
-                .ToTreeListAsync();
-
-            return ObjectMapper.Map<List<PositionGroup>, List<PositionGroupListOutput>>(rawTree);
-        }
-
-        [BusinessLog("职位管理", BusinessOperateType.Update, "更新职位分组{{Name}}")]
-        public async Task<bool> UpdatePositionGroupAsync(Guid id, PositionGroupCreateOrUpdateInput dto)
-        {
-            var entity = await _positionGroupRepository.Where(x => x.Id == id).FirstAsync();
-            if (dto.ParentId == entity.Id)
-            {
-                throw HttpFriendlyException.BadRequest("不能选择自己为父级");
-            }
-
-            entity.GroupName = dto.GroupName;
-            entity.Remark = dto.Remark;
-            entity.ParentId = dto.ParentId;
-            entity.Sort = dto.Sort;
-            if (entity.ParentId.HasValue)
-            {
-                var all = await _positionGroupRepository.Select.ToListAsync();
-                entity.ParentIds = GetParentIds(all, entity.ParentId.Value);
-            }
-            await _positionGroupRepository.UpdateAsync(entity);
-            BusinessLogManager.Current?.AddVariable("Name", entity.GroupName);
-            BusinessLogManager.Current?.AddEntityId(id);
-
-            return true;
-        }
-
-        private async Task<List<PosistionLayerNames>> GetPosistionGroupNameAsync(List<Guid> ids)
-        {
-            var positions = await _positionRepository.Where(x => ids.Contains(x.Id)).ToListAsync(x => new { x.Id, x.GroupId });
-            var groups = await _positionGroupRepository.Select.ToListAsync();
-            var list = new List<PosistionLayerNames>();
-
-            foreach (var item in positions)
-            {
-                var single = new PosistionLayerNames
+                foreach (var groupId in groupIds.Split(","))
                 {
-                    Id = item.Id
-                };
-                var allGroups = groups.Where(x => x.Id == item.GroupId).Select(x => x.ParentIds + "," + x.Id);
-                foreach (var groupIds in allGroups)
+                    single.LayerName += groups.Find(x => x.Id.ToString() == groupId)?.GroupName + "/";
+                }
+            }
+            single.LayerName = single.LayerName?.Trim('/');
+
+            list.Add(single);
+        }
+
+        return list;
+    }
+
+    [BusinessLog("职位管理", BusinessOperateType.Create, "创建职位{{Name}}")]
+    public async Task<bool> AddPositionAsync(PositionCreateOrUpdateInput dto)
+    {
+        if (_positionRepository.Select.Any(x => x.Code.ToLower() == dto.Code!.ToLower()))
+        {
+            throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
+        }
+        var entity = ObjectMapper.Map<PositionCreateOrUpdateInput, Position>(dto);
+        entity = await _positionRepository.InsertAsync(entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+        BusinessLogManager.Current?.AddEntityId(entity.Id);
+
+        return true;
+    }
+
+    [BusinessLog("职位管理", BusinessOperateType.Delete, "删除职位{{Name}}")]
+    public async Task<bool> DeletePositionAsync(Guid id)
+    {
+        var hasUsers = await _userRepository.Select.AnyAsync(x => x.PositionId == id);
+        if (hasUsers) throw HttpFriendlyException.BadRequest("职位正在使用，不能删除");
+        var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync();
+        await _positionRepository.DeleteAsync(entity);
+        BusinessLogManager.Current?.AddVariable("Name", entity.Name);
+        BusinessLogManager.Current?.AddEntityId(id);
+
+        return true;
+    }
+
+    public async Task<PagedResult<PositionListOutput>> GetPositionListAsync(PositionListInput dto)
+    {
+        var rows = await _positionRepository.Select
+            .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!) || x.Code.Contains(dto.Keyword!))
+            .WhereIf(dto.Level > 0, x => x.Level == dto.Level)
+            .WhereIf(dto.Status > 0, x => x.Status == dto.Status)
+            .WhereIf(dto.GroupId.HasValue, x => x.GroupId == dto.GroupId)
+            .OrderBy(x => x.Level)
+            .OrderBy(x => x.CreationTime)
+            .Count(out var total)
+            .Page(dto.Current, dto.PageSize)
+            .ToListAsync();
+        var ids = rows.Select(x => x.Id).ToList();
+        var list = ObjectMapper.Map<List<Position>, List<PositionListOutput>>(rows);
+        var names = await GetPosistionGroupNameAsync(ids);
+        foreach (var item in list)
+        {
+            var tmp = names.FirstOrDefault(x => x.Id == item.Id);
+            item.LayerName = tmp?.LayerName;
+        }
+        return new PagedResult<PositionListOutput>(total, list);
+    }
+
+    public async Task<bool> UpdatePositionAsync(Guid id, PositionCreateOrUpdateInput dto)
+    {
+        var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync()
+            ?? throw HttpFriendlyException.NotFound("数据不存在");
+        string code = dto.Code!.ToLower();
+        if (entity.Code.ToLower() != code && _positionRepository.Select.Any(x => x.Code.ToLower() == code))
+        {
+            throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
+        }
+
+        entity.Name = dto.Name;
+        entity.Code = dto.Code;
+        entity.Level = dto.Level;
+        entity.Status = dto.Status;
+        entity.Description = dto.Description;
+        entity.GroupId = dto.GroupId;
+        await _positionRepository.UpdateAsync(entity);
+        return true;
+    }
+
+    public async Task<List<TreeSelectOption>> GetPositionTreeOptionAsync()
+    {
+        var groups = await _positionGroupRepository.Select.ToListAsync();
+        var positions = await _positionRepository.Select.ToListAsync();
+        var topGroups = groups.Where(x => !x.ParentId.HasValue).ToList();
+        var list = new List<TreeSelectOption>();
+        List<TreeSelectOption> GetChildren(string id)
+        {
+            var items = groups.Where(x => x.ParentId.ToString() == id);
+            var children = new List<TreeSelectOption>();
+            if (items.Any())
+            {
+                foreach (var item in items)
                 {
-                    foreach (var groupId in groupIds.Split(","))
+                    var t = new TreeSelectOption()
                     {
-                        single.LayerName += groups.Find(x => x.Id.ToString() == groupId)?.GroupName + "/";
+                        Key = item.Id.ToString(),
+                        Title = item.GroupName,
+                        Value = item.Id.ToString()
+                    };
+                    t.Children = GetChildren(t.Value);
+                    children.Add(t);
+                    //最底级查职位
+                    if (t.Children.Count == 0)
+                    {
+                        t.Children = positions.Where(x => x.GroupId.ToString() == t.Value).Select(x => new TreeSelectOption
+                        {
+                            Key = x.Id.ToString(),
+                            Title = x.Name,
+                            Value = x.Id.ToString()
+                        }).ToList();
                     }
                 }
-                single.LayerName = single.LayerName?.Trim('/');
-
-                list.Add(single);
             }
-
-            return list;
-        }
-
-        [BusinessLog("职位管理", BusinessOperateType.Create, "创建职位{{Name}}")]
-        public async Task<bool> AddPositionAsync(PositionCreateOrUpdateInput dto)
-        {
-            if (_positionRepository.Select.Any(x => x.Code.ToLower() == dto.Code!.ToLower()))
+            else
             {
-                throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
-            }
-            var entity = ObjectMapper.Map<PositionCreateOrUpdateInput, Position>(dto);
-            entity = await _positionRepository.InsertAsync(entity);
-            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddEntityId(entity.Id);
-
-            return true;
-        }
-
-        [BusinessLog("职位管理", BusinessOperateType.Delete, "删除职位{{Name}}")]
-        public async Task<bool> DeletePositionAsync(Guid id)
-        {
-            var hasUsers = await _userRepository.Select.AnyAsync(x => x.PositionId == id);
-            if (hasUsers) throw HttpFriendlyException.BadRequest("职位正在使用，不能删除");
-            var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync();
-            await _positionRepository.DeleteAsync(entity);
-            BusinessLogManager.Current?.AddVariable("Name", entity.Name);
-            BusinessLogManager.Current?.AddEntityId(id);
-
-            return true;
-        }
-
-        public async Task<PagedResult<PositionListOutput>> GetPositionListAsync(PositionListInput dto)
-        {
-            var rows = await _positionRepository.Select
-                .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.Name.Contains(dto.Keyword!) || x.Code.Contains(dto.Keyword!))
-                .WhereIf(dto.Level > 0, x => x.Level == dto.Level)
-                .WhereIf(dto.Status > 0, x => x.Status == dto.Status)
-                .WhereIf(dto.GroupId.HasValue, x => x.GroupId == dto.GroupId)
-                .OrderBy(x => x.Level)
-                .OrderBy(x => x.CreationTime)
-                .Count(out var total)
-                .Page(dto.Current, dto.PageSize)
-                .ToListAsync();
-            var ids = rows.Select(x => x.Id).ToList();
-            var list = ObjectMapper.Map<List<Position>, List<PositionListOutput>>(rows);
-            var names = await GetPosistionGroupNameAsync(ids);
-            foreach (var item in list)
-            {
-                var tmp = names.FirstOrDefault(x => x.Id == item.Id);
-                item.LayerName = tmp?.LayerName;
-            }
-            return new PagedResult<PositionListOutput>(total, list);
-        }
-
-        public async Task<bool> UpdatePositionAsync(Guid id, PositionCreateOrUpdateInput dto)
-        {
-            var entity = await _positionRepository.Where(x => x.Id == id).FirstAsync()
-                ?? throw HttpFriendlyException.NotFound("数据不存在");
-            string code = dto.Code!.ToLower();
-            if (entity.Code.ToLower() != code && _positionRepository.Select.Any(x => x.Code.ToLower() == code))
-            {
-                throw HttpFriendlyException.BadRequest($"职位编号{dto.Code}已存在");
-            }
-
-            entity.Name = dto.Name;
-            entity.Code = dto.Code;
-            entity.Level = dto.Level;
-            entity.Status = dto.Status;
-            entity.Description = dto.Description;
-            entity.GroupId = dto.GroupId;
-            await _positionRepository.UpdateAsync(entity);
-            return true;
-        }
-
-        public async Task<List<TreeSelectOption>> GetPositionTreeOptionAsync()
-        {
-            var groups = await _positionGroupRepository.Select.ToListAsync();
-            var positions = await _positionRepository.Select.ToListAsync();
-            var topGroups = groups.Where(x => !x.ParentId.HasValue).ToList();
-            var list = new List<TreeSelectOption>();
-            List<TreeSelectOption> GetChildren(string id)
-            {
-                var items = groups.Where(x => x.ParentId.ToString() == id);
-                var children = new List<TreeSelectOption>();
-                if (items.Any())
+                children = positions.Where(x => x.GroupId.ToString() == id).Select(x => new TreeSelectOption
                 {
-                    foreach (var item in items)
-                    {
-                        var t = new TreeSelectOption()
-                        {
-                            Key = item.Id.ToString(),
-                            Title = item.GroupName,
-                            Value = item.Id.ToString()
-                        };
-                        t.Children = GetChildren(t.Value);
-                        children.Add(t);
-                        //最底级查职位
-                        if (t.Children.Count == 0)
-                        {
-                            t.Children = positions.Where(x => x.GroupId.ToString() == t.Value).Select(x => new TreeSelectOption
-                            {
-                                Key = x.Id.ToString(),
-                                Title = x.Name,
-                                Value = x.Id.ToString()
-                            }).ToList();
-                        }
-                    }
-                }
-                else
-                {
-                    children = positions.Where(x => x.GroupId.ToString() == id).Select(x => new TreeSelectOption
-                    {
-                        Key = x.Id.ToString(),
-                        Title = x.Name,
-                        Value = x.Id.ToString()
-                    }).ToList();
-                }
-                return children;
+                    Key = x.Id.ToString(),
+                    Title = x.Name,
+                    Value = x.Id.ToString()
+                }).ToList();
             }
-
-            foreach (var group in topGroups)
-            {
-                var t = new TreeSelectOption()
-                {
-                    Key = group.Id.ToString(),
-                    Title = group.GroupName,
-                    Value = group.Id.ToString()
-                };
-                t.Children = GetChildren(t.Value);
-                list.Add(t);
-            }
-            return list;
+            return children;
         }
+
+        foreach (var group in topGroups)
+        {
+            var t = new TreeSelectOption()
+            {
+                Key = group.Id.ToString(),
+                Title = group.GroupName,
+                Value = group.Id.ToString()
+            };
+            t.Children = GetChildren(t.Value);
+            list.Add(t);
+        }
+        return list;
     }
 }

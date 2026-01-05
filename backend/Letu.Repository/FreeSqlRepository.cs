@@ -8,9 +8,8 @@ namespace Letu.Repository;
 public class FreeSqlRepository<TEntity> : FreeSqlBasicRepositoryBase<TEntity>, IFreeSqlRepository<TEntity>
     where TEntity : class, IEntity
 {
-    public FreeSqlRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant) : base(uowManger.Orm)
+    public FreeSqlRepository(UnitOfWorkManager uowManger, ICurrentTenant tenant) : base(uowManger.Orm)
     {
-        TenantManager.Current = currentTenant.Id;
     }
 
     public Task<TEntity> OneAsync(Expression<Func<TEntity, bool>> expression)
@@ -27,9 +26,8 @@ public class FreeSqlRepository<TEntity> : FreeSqlBasicRepositoryBase<TEntity>, I
 public class FreeSqlRepository<TEntity, TKey> : FreeSqlBasicRepositoryBase<TEntity, TKey>, IFreeSqlRepository<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
 {
-    public FreeSqlRepository(UnitOfWorkManager uowManger, ICurrentTenant currentTenant) : base(uowManger.Orm)
+    public FreeSqlRepository(UnitOfWorkManager uowManger, ICurrentTenant tenant) : base(uowManger.Orm)
     {
-        TenantManager.Current = currentTenant.Id;
     }
 
     public int Delete(TKey id)

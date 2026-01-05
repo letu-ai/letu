@@ -114,6 +114,7 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         {
             Name = "organization-unit-category",
             DisplayName = "机构种类",
+            Remark = "机构的大类别，如：公司机构、客户机构等",
             IsEnabled = true,
             IsStatic = true
         });
@@ -142,6 +143,7 @@ public class DataDictionaryDataSeedContributor : IDataSeedContributor, ITransien
         {
             Name = "organization-unit-type",
             DisplayName = "机构类型",
+            Remark = "机构的细类别，如：集团公司、子公司、分公司等",
             IsEnabled = true,
             IsStatic = true
         });

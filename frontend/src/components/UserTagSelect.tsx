@@ -58,7 +58,7 @@ const UserTagSelect: React.FC<UserTagSelectProps> = ({
           </Tag>
         );
       }}
-      dropdownRender={(menu) => (
+      popupRender={(menu) => (
         <div className="relative">
           {menu}
           {showRefresh && (

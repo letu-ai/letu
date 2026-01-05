@@ -45,6 +45,8 @@
 		<PackageReference Include="Volo.Abp.BlobStoring" />
 
 		<PackageReference Include="DistributedLock.Redis" />
+		<PackageReference Include="UAParser.Core" />
+		
 	</ItemGroup>
 
 	<ItemGroup>

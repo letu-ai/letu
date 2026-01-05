@@ -2,82 +2,81 @@ using Letu.Basis.Admin.Roles.Dtos;
 using Letu.Basis.Admin.Users.Dtos;
 using Letu.Core.Applications;
 
-namespace Letu.Basis.Admin.Users
+namespace Letu.Basis.Admin.Users;
+
+public interface IUserAppService
 {
-    public interface IUserAppService
-    {
-        /// <summary>
-        /// 新增用户
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        Task<Guid> AddUserAsync(UserCreateInput input);
+    /// <summary>
+    /// 新增用户
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task<Guid> AddUserAsync(UserCreateInput input);
 
-        Task<Guid> UpdateUserAsync(Guid id, UserUpdateInput input);
+    Task<Guid> UpdateUserAsync(Guid id, UserUpdateInput input);
 
-        /// <summary>
-        /// 用户分页列表
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto);
+    /// <summary>
+    /// 用户分页列表
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<PagedResult<UserListOutput>> GetUserListAsync(UserListInput dto);
 
-        /// <summary>
-        /// 获取用户头像
-        /// </summary>
-        /// <param name="avatar"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<(Stream?, string)> GetAvatarAsync(string? avatar, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// 获取用户头像
+    /// </summary>
+    /// <param name="avatar"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<(Stream?, string)> GetAvatarAsync(string? avatar, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// 删除用户
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<bool> DeleteUserAsync(Guid id);
+    /// <summary>
+    /// 删除用户
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<bool> DeleteUserAsync(Guid id);
 
-        /// <summary>
-        /// 分配角色
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        Task<bool> AssignRoleAsync(Guid userId, AssignRoleDto input);
+    /// <summary>
+    /// 分配角色
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task<bool> AssignRoleAsync(Guid userId, AssignRoleDto input);
 
-        /// <summary>
-        /// 切换用户启用状态
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<bool> SwitchUserEnabledStatusAsync(Guid id);
+    /// <summary>
+    /// 切换用户启用状态
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<bool> SwitchUserEnabledStatusAsync(Guid id);
 
-        /// <summary>
-        /// 获取指定用户角色
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <returns></returns>
-        Task<Guid[]> GetUserRoleIdsAsync(Guid uid);
+    /// <summary>
+    /// 获取指定用户角色
+    /// </summary>
+    /// <param name="uid"></param>
+    /// <returns></returns>
+    Task<Guid[]> GetUserRoleIdsAsync(Guid uid);
 
-        /// <summary>
-        /// 重置用户密码
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task ResetUserPasswordAsync(ResetUserPwdDto dto);
+    /// <summary>
+    /// 重置用户密码
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task ResetUserPasswordAsync(ResetUserPwdDto dto);
 
-        /// <summary>
-        /// 用户简单信息查询
-        /// </summary>
-        /// <param name="keyword">账号/昵称</param>
-        /// <returns></returns>
-        Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword);
-        Task<List<SelectOption>> GetUserSelectOptionsByIdsAsync(List<Guid> userIds);
+    /// <summary>
+    /// 用户简单信息查询
+    /// </summary>
+    /// <param name="keyword">账号/昵称</param>
+    /// <returns></returns>
+    Task<List<SelectOption>> GetUserSelectOptionsAsync(string? keyword);
+    Task<List<SelectOption>> GetUserSelectOptionsByIdsAsync(List<Guid> userIds);
 
-        /// <summary>
-        /// 获取用户扩展信息
-        /// </summary>
-        /// <returns></returns>
-        Task<UserExtraInfo> GetUserExtraInfoAsync();
-    }
+    /// <summary>
+    /// 获取用户扩展信息
+    /// </summary>
+    /// <returns></returns>
+    Task<UserExtraInfo> GetUserExtraInfoAsync();
 }

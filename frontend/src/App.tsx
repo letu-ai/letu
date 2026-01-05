@@ -84,10 +84,16 @@ function InnerApp({ children }: IAppProps) {
                 return
             }
 
+            // 如果会话已过期，不显示全局错误消息
+            if (errorInfo.isSessionExpired && !errorInfo.jumpLogin) {
+                return;
+            }
+
             if (errorInfo.showGlobalErrorMessage || errorInfo.jumpLogin) {
                 message.error(<ResponseErrorMessage error={errorInfo} />, 3, () => {
                     if (errorInfo.jumpLogin && window.location.pathname !== StaticRoutes.login) {
                         window.location.href = StaticRoutes.logout; //去注销登页面清除登录信息
+                        httpClient.resetSessionExpired();
                     }
                 });
             }

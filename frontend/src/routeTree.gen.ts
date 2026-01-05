@@ -19,6 +19,7 @@ import { Route as HomeIndexRouteImport } from './pages/home/index'
 import { Route as MySecurityLogsRouteImport } from './pages/my/security-logs'
 import { Route as MyProfileRouteImport } from './pages/my/profile'
 import { Route as MyPasswordRouteImport } from './pages/my/password'
+import { Route as MyActiveSessionsRouteImport } from './pages/my/active-sessions'
 import { Route as AccountTenantErrorRouteImport } from './pages/account/tenant-error'
 import { Route as AccountLogoutRouteImport } from './pages/account/logout'
 import { Route as AccountLoginRouteImport } from './pages/account/login'
@@ -117,6 +118,11 @@ const MyProfileRoute = MyProfileRouteImport.update({
 const MyPasswordRoute = MyPasswordRouteImport.update({
   id: '/password',
   path: '/password',
+  getParentRoute: () => MyRouteRoute,
+} as any)
+const MyActiveSessionsRoute = MyActiveSessionsRouteImport.update({
+  id: '/active-sessions',
+  path: '/active-sessions',
   getParentRoute: () => MyRouteRoute,
 } as any)
 const AccountTenantErrorRoute = AccountTenantErrorRouteImport.update({
@@ -387,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
   '/account/tenant-error': typeof AccountTenantErrorRoute
+  '/my/active-sessions': typeof MyActiveSessionsRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
@@ -446,6 +453,7 @@ export interface FileRoutesByTo {
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
   '/account/tenant-error': typeof AccountTenantErrorRoute
+  '/my/active-sessions': typeof MyActiveSessionsRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
@@ -508,6 +516,7 @@ export interface FileRoutesById {
   '/account/login': typeof AccountLoginRoute
   '/account/logout': typeof AccountLogoutRoute
   '/account/tenant-error': typeof AccountTenantErrorRoute
+  '/my/active-sessions': typeof MyActiveSessionsRoute
   '/my/password': typeof MyPasswordRoute
   '/my/profile': typeof MyProfileRoute
   '/my/security-logs': typeof MySecurityLogsRoute
@@ -571,6 +580,7 @@ export interface FileRouteTypes {
     | '/account/login'
     | '/account/logout'
     | '/account/tenant-error'
+    | '/my/active-sessions'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
@@ -630,6 +640,7 @@ export interface FileRouteTypes {
     | '/account/login'
     | '/account/logout'
     | '/account/tenant-error'
+    | '/my/active-sessions'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
@@ -691,6 +702,7 @@ export interface FileRouteTypes {
     | '/account/login'
     | '/account/logout'
     | '/account/tenant-error'
+    | '/my/active-sessions'
     | '/my/password'
     | '/my/profile'
     | '/my/security-logs'
@@ -821,6 +833,13 @@ declare module '@tanstack/react-router' {
       path: '/password'
       fullPath: '/my/password'
       preLoaderRoute: typeof MyPasswordRouteImport
+      parentRoute: typeof MyRouteRoute
+    }
+    '/my/active-sessions': {
+      id: '/my/active-sessions'
+      path: '/active-sessions'
+      fullPath: '/my/active-sessions'
+      preLoaderRoute: typeof MyActiveSessionsRouteImport
       parentRoute: typeof MyRouteRoute
     }
     '/account/tenant-error': {
@@ -1328,6 +1347,7 @@ const HomeRouteRouteWithChildren = HomeRouteRoute._addFileChildren(
 )
 
 interface MyRouteRouteChildren {
+  MyActiveSessionsRoute: typeof MyActiveSessionsRoute
   MyPasswordRoute: typeof MyPasswordRoute
   MyProfileRoute: typeof MyProfileRoute
   MySecurityLogsRoute: typeof MySecurityLogsRoute
@@ -1336,6 +1356,7 @@ interface MyRouteRouteChildren {
 }
 
 const MyRouteRouteChildren: MyRouteRouteChildren = {
+  MyActiveSessionsRoute: MyActiveSessionsRoute,
   MyPasswordRoute: MyPasswordRoute,
   MyProfileRoute: MyProfileRoute,
   MySecurityLogsRoute: MySecurityLogsRoute,

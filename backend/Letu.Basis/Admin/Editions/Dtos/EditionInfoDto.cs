@@ -1,20 +1,19 @@
-namespace Letu.Basis.Admin.Editions.Dtos
+namespace Letu.Basis.Admin.Editions.Dtos;
+
+public class EditionInfoDto
 {
-    public class EditionInfoDto
-    {
-        /// <summary>
-        /// ID
-        /// </summary>
-        public Guid Id { get; set; }
+    /// <summary>
+    /// ID
+    /// </summary>
+    public Guid Id { get; set; }
 
-        /// <summary>
-        /// 版本名称
-        /// </summary>
-        public required string Name { get; set; }
+    /// <summary>
+    /// 版本名称
+    /// </summary>
+    public required string Name { get; set; }
 
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public string? Description { get; set; }
-    }
-} 
+    /// <summary>
+    /// 描述
+    /// </summary>
+    public string? Description { get; set; }
+}

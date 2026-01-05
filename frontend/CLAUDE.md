@@ -11,13 +11,13 @@ Letu AI 是基于风汐管理系统改进的企业级通用Web框架，采用前
 ## 前端技术栈
 
 ### 核心框架
-- **React 18.3.1** + **TypeScript 5.9** (strict mode)
-- **Vite 6.3** - 构建工具，支持多应用打包 (admin + ai)
+- **React 19** + **TypeScript 5.9** (strict mode)
+- **Vite 7** - 构建工具，支持多应用打包 (admin + ai)
 - **TanStack Router 1.131** - 基于文件系统的类型安全路由
 - **TanStack Query 5.81** - 服务端状态管理和缓存
 
 ### UI 框架
-- **Ant Design 5.25** - 企业级UI组件库（主要用于管理后台）
+- **Ant Design 6** - 企业级UI组件库（主要用于管理后台）
 - **Shadcn UI + Radix UI** - 组件库（20+组件，用于AI模块）
 - **TailwindCSS 4.1** - 原子化CSS框架
 - **Lucide React** - 图标库
@@ -38,9 +38,6 @@ Letu AI 是基于风汐管理系统改进的企业级通用Web框架，采用前
 ```
 frontend/
 ├── src/
-│   ├── api/                    # API集成
-│   │   ├── mqtt.ts            # MQTT实时通信
-│   │   └── oss/               # 对象存储服务
 │   ├── application/           # 应用层配置
 │   │   ├── layoutStore.ts     # 布局状态（Zustand）
 │   │   ├── themeStore.ts      # 主题配置

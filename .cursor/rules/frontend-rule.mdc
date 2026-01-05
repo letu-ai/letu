@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+## typescript 
+
+- interface的名称前面加'I'前缀
+- 字符串使用双引号

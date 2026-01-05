@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\common.props" />
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.AspNetCore" />
+		<PackageReference Include="MQTTnet.AspNetCore" />
+	</ItemGroup>
+</Project>
