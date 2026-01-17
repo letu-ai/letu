@@ -1,4 +1,4 @@
-import { Form, Input, Modal, Select, DatePicker, Radio, Space, Button } from "antd";
+import { Form, Input, Modal, Select, DatePicker, Radio, Space, Button, Switch } from "antd";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import {
     createNotification,
@@ -8,8 +8,10 @@ import {
     NotificationType,
     NotificationPriority,
     NotificationStatus,
+    TargetPlatform,
     NOTIFICATION_TYPE_OPTIONS,
     NOTIFICATION_PRIORITY_OPTIONS,
+    TARGET_PLATFORM_PRESET_OPTIONS,
 } from "./-service";
 import RecipientSelector from "@/components/RecipientSelector";
 import type { RecipientValue } from "@/components/RecipientSelector/types";
@@ -47,9 +49,12 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 title: row.title,
                 content: row.content,
                 notificationType: row.notificationType,
+                subType: row.subType,
                 priority: row.priority,
                 expireTime: row.expireTime ? dayjs(row.expireTime) : undefined,
                 recipient: recipientValue,
+                showInList: row.showInList,
+                targetPlatform: row.targetPlatform,
             });
         } else {
             // 新建模式 - 重置表单并设置默认值
@@ -57,6 +62,8 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
             form.setFieldsValue({
                 notificationType: NotificationType.OTHER,
                 priority: NotificationPriority.NORMAL,
+                showInList: true,
+                targetPlatform: TargetPlatform.ALL,
             });
         }
     };
@@ -94,10 +101,13 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 title: values.title,
                 content: values.content,
                 notificationType: values.notificationType,
+                subType: values.subType,
                 sendScopeType: recipientValue.sendScopeType,
                 sendScopeValue: recipientValue.sendScopeValue,
                 priority: values.priority,
                 expireTime: values.expireTime ? values.expireTime.format("YYYY-MM-DD HH:mm:ss") : undefined,
+                showInList: values.showInList ?? true,
+                targetPlatform: values.targetPlatform ?? TargetPlatform.ALL,
                 isPublish: submitType === "publish",
             };
 
@@ -169,11 +179,36 @@ const NotificationForm = forwardRef<ModalRef, ModalProps>((props, ref) => {
                 </Form.Item>
 
                 <Form.Item
+                    label="子类型"
+                    name="subType"
+                    tooltip="业务模块自定义的子类型标识，如 intercom_request、order_paid 等"
+                >
+                    <Input placeholder="可选，业务自定义子类型标识" maxLength={64} />
+                </Form.Item>
+
+                <Form.Item
                     label="优先级"
                     name="priority"
                     rules={[{ required: true, message: "请选择优先级" }]}
                 >
                     <Radio.Group options={NOTIFICATION_PRIORITY_OPTIONS} />
+                </Form.Item>
+
+                <Form.Item
+                    label="目标平台"
+                    name="targetPlatform"
+                    rules={[{ required: true, message: "请选择目标平台" }]}
+                >
+                    <Select placeholder="请选择目标平台" options={TARGET_PLATFORM_PRESET_OPTIONS} />
+                </Form.Item>
+
+                <Form.Item
+                    label="显示在列表"
+                    name="showInList"
+                    valuePropName="checked"
+                    tooltip="关闭后，通知仅推送但不在用户通知列表中显示"
+                >
+                    <Switch checkedChildren="显示" unCheckedChildren="隐藏" />
                 </Form.Item>
 
                 <Form.Item

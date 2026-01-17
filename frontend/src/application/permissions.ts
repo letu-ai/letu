@@ -26,6 +26,12 @@ export class BasisPermissions {
         Default: `${BasisPermissions.BaseDataGroupName}.UserLookup`,
     } as const;
 
+    // 用户设备管理权限
+    public static readonly UserDevice = {
+        /** 用户设备管理 */
+        Default: `${BasisPermissions.BaseDataGroupName}.UserDevice`,
+    } as const;
+
     // 角色管理权限
     public static readonly Role = {
         /** 角色管理 */
@@ -206,6 +212,7 @@ export class BasisPermissions {
         extractPermissions({
             User: this.User,
             UserLookup: this.UserLookup,
+            UserDevice: this.UserDevice,
             Role: this.Role,
             ClientApp: this.ClientApp,
             Department: this.Department,
@@ -226,6 +233,7 @@ export class BasisPermissions {
 // 权限类型定义
 export type UserPermissions = typeof BasisPermissions.User;
 export type UserLookupPermissions = typeof BasisPermissions.UserLookup;
+export type UserDevicePermissions = typeof BasisPermissions.UserDevice;
 export type RolePermissions = typeof BasisPermissions.Role;
 export type ClientAppPermissions = typeof BasisPermissions.ClientApp;
 export type DepartmentPermissions = typeof BasisPermissions.Department;
@@ -239,9 +247,10 @@ export type TenantPermissions = typeof BasisPermissions.Tenant;
 export type EditionPermissions = typeof BasisPermissions.Edition;
 
 // 所有权限的联合类型
-export type AllPermissionKeys = 
+export type AllPermissionKeys =
     | keyof UserPermissions
     | keyof UserLookupPermissions
+    | keyof UserDevicePermissions
     | keyof RolePermissions
     | keyof ClientAppPermissions
     | keyof DepartmentPermissions

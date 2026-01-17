@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="..\common.props" />
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Letu.Basis\Letu.Basis.csproj" />
+	  <ProjectReference Include="..\Letu.MobilePush\Letu.MobilePush.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AlibabaCloud.SDK.Push20160801" />
+	</ItemGroup>
+</Project>

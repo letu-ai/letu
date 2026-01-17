@@ -85,10 +85,12 @@ export interface NotificationDto {
     title: string;
     content?: string;
     notificationType: NotificationType;
+    subType?: string;
     sendScopeType: SendScopeType;
     sendScopeValue?: string;
     priority: NotificationPriority;
     expireTime?: string;
+    targetPlatform: TargetPlatform;
     isPublish: boolean;
 }
 
@@ -97,12 +99,14 @@ export interface NotificationResultDto {
     title: string;
     content?: string;
     notificationType: NotificationType;
+    subType?: string;
     sendScopeType: SendScopeType;
     sendScopeValue?: string;
     status: NotificationStatus;
     publishTime?: string;
     expireTime?: string;
     priority: NotificationPriority;
+    targetPlatform: TargetPlatform;
     senderId: string;
     senderName?: string;
     creationTime: string;
@@ -129,15 +133,17 @@ export interface NotificationRecipientDto {
     isRead: boolean;
     readTime?: string;
     creationTime: string;
+    pushStatus: PushStatus;
+    retryCount: number;
+    pushErrorMessage?: string;
 }
 
 // 枚举类型
 
 export const NotificationType = {
     SYSTEM_ANNOUNCEMENT: 1, // 系统公告
-    TASK_REMINDER: 2,       // 任务提醒
-    APPROVAL_NOTICE: 3,     // 审批通知
-    OTHER: 4,               // 其他
+    BUSINESS_NOTIFICATION: 2, // 业务通知
+    SYSTEM_NOTIFICATION: 3, // 系统通知
 } as const;
 
 export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
@@ -148,9 +154,23 @@ export const SendScopeType = {
     BY_DEPARTMENT: 3,       // 按部门
     BY_POSITION: 4,         // 按职位
     ALL_EMPLOYEES: 5,       // 全体员工
+    SPECIFIC_DEVICES: 6,    // 指定设备
+    BY_CLIENT_TYPE: 7,      // 按客户端类型
 } as const;
 
 export type SendScopeType = typeof SendScopeType[keyof typeof SendScopeType];
+
+export const TargetPlatform = {
+    NONE: 0,
+    WEB: 1,
+    ANDROID: 2,
+    IOS: 4,
+    HARMONYOS: 8,
+    MOBILE: 14,             // Android | iOS | HarmonyOS
+    ALL: 15,                // Web | Mobile
+} as const;
+
+export type TargetPlatform = typeof TargetPlatform[keyof typeof TargetPlatform];
 
 export const NotificationStatus = {
     DRAFT: 1,               // 草稿
@@ -168,13 +188,22 @@ export const NotificationPriority = {
 
 export type NotificationPriority = typeof NotificationPriority[keyof typeof NotificationPriority];
 
+export const PushStatus = {
+    PENDING: 0,             // 待推送
+    SUCCESS: 1,             // 推送成功
+    FAILED: 2,              // 推送失败（等待重试）
+    SKIPPED: 3,             // 跳过（无目标设备等）
+    EXPIRED: 4,             // 过期（超过有效期或最大重试次数）
+} as const;
+
+export type PushStatus = typeof PushStatus[keyof typeof PushStatus];
+
 // 常量定义
 
 export const NOTIFICATION_TYPE_OPTIONS = [
     { label: "系统公告", value: NotificationType.SYSTEM_ANNOUNCEMENT },
-    { label: "任务提醒", value: NotificationType.TASK_REMINDER },
-    { label: "审批通知", value: NotificationType.APPROVAL_NOTICE },
-    { label: "其他", value: NotificationType.OTHER },
+    { label: "业务通知", value: NotificationType.BUSINESS_NOTIFICATION },
+    { label: "系统通知", value: NotificationType.SYSTEM_NOTIFICATION },
 ];
 
 export const NOTIFICATION_STATUS_OPTIONS = [
@@ -195,4 +224,19 @@ export const SEND_SCOPE_TYPE_OPTIONS = [
     { label: "按部门", value: SendScopeType.BY_DEPARTMENT },
     { label: "按职位", value: SendScopeType.BY_POSITION },
     { label: "全体员工", value: SendScopeType.ALL_EMPLOYEES },
+    { label: "指定设备", value: SendScopeType.SPECIFIC_DEVICES },
+    { label: "按客户端类型", value: SendScopeType.BY_CLIENT_TYPE },
+];
+
+export const TARGET_PLATFORM_OPTIONS = [
+    { label: "Web端", value: TargetPlatform.WEB },
+    { label: "Android", value: TargetPlatform.ANDROID },
+    { label: "iOS", value: TargetPlatform.IOS },
+    { label: "鸿蒙", value: TargetPlatform.HARMONYOS },
+];
+
+export const TARGET_PLATFORM_PRESET_OPTIONS = [
+    { label: "全部平台", value: TargetPlatform.ALL },
+    { label: "仅Web端", value: TargetPlatform.WEB },
+    { label: "仅移动端", value: TargetPlatform.MOBILE },
 ];

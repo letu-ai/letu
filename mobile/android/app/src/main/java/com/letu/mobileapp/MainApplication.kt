@@ -1,4 +1,4 @@
-package com.demo01
+package com.letu.mobileapp
 
 import android.app.Application
 import com.facebook.react.PackageList

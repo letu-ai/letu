@@ -19,6 +19,7 @@
 		<ProjectReference Include="..\Letu.Abp.FreeSql\Letu.Abp.FreeSql.csproj" />
 		<ProjectReference Include="..\Letu.AI\Letu.AI.csproj" />
 		<ProjectReference Include="..\Letu.Basis\Letu.Basis.csproj" />
+		<ProjectReference Include="..\Letu.MobilePush.Aliyun\Letu.MobilePush.Aliyun.csproj" />
 		<ProjectReference Include="..\Letu.Mqtt\Letu.Mqtt.csproj" />
 	</ItemGroup>
 </Project>

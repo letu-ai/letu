@@ -86,9 +86,8 @@ const PriorityTag: React.FC<{ priority: NotificationPriority }> = ({ priority })
 const NotificationTypeTag: React.FC<{ type: NotificationType }> = ({ type }) => {
     const typeConfig = {
         [NotificationType.SYSTEM_ANNOUNCEMENT]: { color: "blue", text: "系统公告" },
-        [NotificationType.TASK_REMINDER]: { color: "green", text: "任务提醒" },
-        [NotificationType.APPROVAL_NOTICE]: { color: "orange", text: "审批通知" },
-        [NotificationType.OTHER]: { color: "default", text: "其他" },
+        [NotificationType.BUSINESS_NOTIFICATION]: { color: "green", text: "业务通知" },
+        [NotificationType.SYSTEM_NOTIFICATION]: { color: "orange", text: "系统通知" },
     } as const;
 
     const config = typeConfig[type];
@@ -107,6 +106,8 @@ const SendScopeText: React.FC<{ type: SendScopeType }> = ({ type }) => {
         [SendScopeType.BY_DEPARTMENT]: "按部门",
         [SendScopeType.BY_POSITION]: "按职位",
         [SendScopeType.ALL_EMPLOYEES]: "全体员工",
+        [SendScopeType.SPECIFIC_DEVICES]: "指定设备",
+        [SendScopeType.BY_CLIENT_TYPE]: "按客户端类型",
     } as const;
 
     const text = scopeConfig[type];

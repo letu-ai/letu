@@ -27,7 +27,7 @@ public class NotificationManagementController : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(BasisPermissions.Notification.Create)]
-    public async Task<Guid> CreateNotificationAsync([FromBody] NotificationDto dto)
+    public async Task<Guid> CreateNotificationAsync([FromBody] NotificationCreateInput dto)
     {
         return await notificationService.CreateNotificationAsync(dto);
     }
@@ -36,7 +36,7 @@ public class NotificationManagementController : ControllerBase
     /// 获取通知列表
     /// </summary>
     [HttpGet]
-    public async Task<PagedResult<NotificationResultDto>> GetNotificationsAsync([FromQuery] NotificationQueryDto dto)
+    public async Task<PagedResult<NotificationListOutput>> GetNotificationsAsync([FromQuery] NotificationListInput dto)
     {
         return await notificationService.GetNotificationListAsync(dto);
     }
@@ -45,7 +45,7 @@ public class NotificationManagementController : ControllerBase
     /// 获取通知详情
     /// </summary>
     [HttpGet("{id}")]
-    public async Task<NotificationResultDto> GetNotificationAsync(Guid id)
+    public async Task<NotificationListOutput> GetNotificationAsync(Guid id)
     {
         return await notificationService.GetNotificationAsync(id);
     }
@@ -55,7 +55,7 @@ public class NotificationManagementController : ControllerBase
     /// </summary>
     [HttpPut("{id}")]
     [Authorize(BasisPermissions.Notification.Update)]
-    public async Task UpdateNotificationAsync(Guid id, [FromBody] NotificationDto dto)
+    public async Task UpdateNotificationAsync(Guid id, [FromBody] NotificationCreateInput dto)
     {
         await notificationService.UpdateNotificationAsync(id, dto);
     }
@@ -104,7 +104,7 @@ public class NotificationManagementController : ControllerBase
     /// 获取通知接收人列表
     /// </summary>
     [HttpGet("{id}/recipients")]
-    public async Task<PagedResult<NotificationRecipientDto>> GetNotificationRecipientsAsync(Guid id, [FromQuery] PagedResultRequest request)
+    public async Task<PagedResult<NotificationRecipientOutput>> GetNotificationRecipientsAsync(Guid id, [FromQuery] PagedResultRequest request)
     {
         return await notificationService.GetNotificationRecipientsAsync(id, request);
     }

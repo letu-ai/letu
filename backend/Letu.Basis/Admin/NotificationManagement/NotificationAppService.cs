@@ -1,10 +1,15 @@
-﻿using Letu.Basis.Admin.Employees;
+using Letu.Basis.Admin.Employees;
 using Letu.Basis.Admin.Users;
+using Letu.Basis.Admin.UserDevices;
+using Letu.Basis.Admin.Departments;
+using Letu.Basis.Admin.Positions;
 using Letu.Basis.Admin.NotificationManagement.Dtos;
+using Letu.Basis.Identity;
+using Letu.Basis.Notifications;
+using Letu.Basis.Notifications.Dtos;
 using Letu.Core.Applications;
 using Letu.Repository;
 using Volo.Abp;
-using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.Uow;
 using Volo.Abp.Users;
 using Letu.Core.AspNetCore.Mvc;
@@ -15,135 +20,120 @@ public class NotificationAppService : BasisAppService, INotificationAppService
 {
     private readonly IFreeSqlRepository<Notification> notificationRepository;
     private readonly IFreeSqlRepository<UserNotification> userNotificationRepository;
-    private readonly IFreeSqlRepository<Employee> employeeRepository;
-    private readonly IFreeSqlRepository<User> userRepository;
     private readonly ICurrentUser currentUser;
-    private readonly IDistributedEventBus distributedEventBus;
+    private readonly INotificationService notificationService;
 
     public NotificationAppService(
         IFreeSqlRepository<Notification> notificationRepository,
         IFreeSqlRepository<UserNotification> userNotificationRepository,
-        IFreeSqlRepository<Employee> employeeRepository,
-        IFreeSqlRepository<User> userRepository,
         ICurrentUser currentUser,
-        IDistributedEventBus distributedEventBus)
+        INotificationService notificationService)
     {
         this.notificationRepository = notificationRepository;
         this.userNotificationRepository = userNotificationRepository;
-        this.employeeRepository = employeeRepository;
-        this.userRepository = userRepository;
         this.currentUser = currentUser;
-        this.distributedEventBus = distributedEventBus;
+        this.notificationService = notificationService;
     }
 
-    public async Task<Guid> CreateNotificationAsync(NotificationDto dto)
+    public async Task<Guid> CreateNotificationAsync(NotificationCreateInput input)
     {
-        var notification = new Notification
+        if (input.IsPublish)
         {
-            Title = dto.Title,
-            Content = dto.Content,
-            NotificationType = dto.NotificationType,
-            SendScopeType = dto.SendScopeType,
-            SendScopeValue = dto.SendScopeValue,
-            Priority = dto.Priority,
-            ExpireTime = dto.ExpireTime,
-            SenderId = CurrentUser.GetId(),
-            Status = dto.IsPublish ? NotificationStatus.Published : NotificationStatus.Draft
-        };
-
-        if (dto.IsPublish)
-        {
-            notification.PublishTime = DateTime.Now;
-        }
-
-        var result = await notificationRepository.InsertAsync(notification);
-
-        if (dto.IsPublish)
-        {
-            await CreateUserNotificationsAsync(result.Id, dto.SendScopeType, dto.SendScopeValue);
-
-            // 发布通知发布事件
-            await distributedEventBus.PublishAsync(new NotificationPublishedEto
+            // 如果立即发布，调用通知服务统一处理
+            return await notificationService.CreateNotificationAsync(new SendNotificationInput
             {
-                NotificationId = result.Id,
-                SendScopeType = dto.SendScopeType,
-                SendScopeValue = dto.SendScopeValue,
-                TenantId = CurrentTenant.Id
+                Sender = input.Sender,
+                Title = input.Title,
+                Content = input.Content,
+                NotificationType = input.NotificationType,
+                SubType = input.SubType,
+                SendScopeType = input.SendScopeType,
+                SendScopeValue = input.SendScopeValue,
+                ExpireTime = input.ExpireTime,
+                Priority = input.Priority,
+                TargetPlatform = input.TargetPlatform
             });
         }
+        else
+        {
+            // 保存为草稿
+            var notification = new Notification
+            {
+                Title = input.Title,
+                Content = input.Content,
+                NotificationType = input.NotificationType,
+                SubType = input.SubType,
+                SendScopeType = input.SendScopeType,
+                SendScopeValue = input.SendScopeValue,
+                Priority = input.Priority,
+                ExpireTime = input.ExpireTime,
+                TargetPlatform = input.TargetPlatform,
+                SenderId = CurrentUser.Id,
+                Sender = input.Sender ?? currentUser.Name ?? currentUser.UserName ?? "System",
+                Status = NotificationStatus.Draft
+            };
 
-        return result.Id;
+            var result = await notificationRepository.InsertAsync(notification);
+            return result.Id;
+        }
     }
 
-    public async Task<PagedResult<NotificationResultDto>> GetNotificationListAsync(NotificationQueryDto dto)
+    public async Task<PagedResult<NotificationListOutput>> GetNotificationListAsync(NotificationListInput input)
     {
-        var query = notificationRepository.Select
-            .From<User>()
-            .LeftJoin((n, sender) => n.SenderId == sender.Id)
-            .WhereIf(!string.IsNullOrEmpty(dto.Title), (n, sender) => n.Title!.Contains(dto.Title!))
-            .WhereIf(dto.NotificationType.HasValue, (n, sender) => n.NotificationType == dto.NotificationType)
-            .WhereIf(dto.Status.HasValue, (n, sender) => n.Status == dto.Status)
-            .WhereIf(dto.SendScopeType.HasValue, (n, sender) => n.SendScopeType == dto.SendScopeType)
-            .WhereIf(dto.Priority.HasValue, (n, sender) => n.Priority == dto.Priority)
-            .WhereIf(dto.StartTime.HasValue, (n, sender) => n.CreationTime >= dto.StartTime)
-            .WhereIf(dto.EndTime.HasValue, (n, sender) => n.CreationTime <= dto.EndTime)
-            .OrderByDescending((n, sender) => n.CreationTime);
-
-        var list = await query
+        var items = await notificationRepository.Select
+            .WhereIf(!string.IsNullOrEmpty(input.Title), x => x.Title!.Contains(input.Title!))
+            .WhereIf(input.NotificationType.HasValue, x => x.NotificationType == input.NotificationType)
+            .WhereIf(input.Status.HasValue, x => x.Status == input.Status)
+            .WhereIf(input.SendScopeType.HasValue, x => x.SendScopeType == input.SendScopeType)
+            .WhereIf(input.Priority.HasValue, x => x.Priority == input.Priority)
+            .WhereIf(input.StartTime.HasValue, x => x.CreationTime >= input.StartTime)
+            .WhereIf(input.EndTime.HasValue, x => x.CreationTime <= input.EndTime)
+            .OrderByDescending(x => x.CreationTime)
             .Count(out var total)
-            .Page(dto.Current, dto.PageSize)
-            .ToListAsync((n, sender) => new NotificationResultDto
+            .Page(input.Current, input.PageSize)
+            .ToListAsync(x => new NotificationListOutput
             {
-                Id = n.Id,
-                Title = n.Title,
-                Content = n.Content,
-                NotificationType = n.NotificationType,
-                SendScopeType = n.SendScopeType,
-                SendScopeValue = n.SendScopeValue,
-                Status = n.Status,
-                PublishTime = n.PublishTime,
-                ExpireTime = n.ExpireTime,
-                Priority = n.Priority,
-                SenderId = n.SenderId,
-                SenderName = sender.NickName ?? sender.UserName,
-                CreationTime = n.CreationTime
+                Id = x.Id,
+                Title = x.Title,
+                Content = x.Content,
+                NotificationType = x.NotificationType,
+                SendScopeType = x.SendScopeType,
+                SendScopeValue = x.SendScopeValue,
+                Status = x.Status,
+                PublishTime = x.PublishTime,
+                ExpireTime = x.ExpireTime,
+                Priority = x.Priority,
+                SenderId = x.SenderId,
+                Sender = x.Sender,
+                ReadCount = x.UserNotifications!.Count(x => x.IsRead),
+                RecipientCount = x.UserNotifications!.Count(),
+                CreationTime = x.CreationTime
             });
 
-        foreach (var item in list)
-        {
-            var stats = await userNotificationRepository.Select
-                .Where(un => un.NotificationId == item.Id)
-                .GroupBy(un => un.IsRead)
-                .ToListAsync(g => new { IsRead = g.Key, Count = g.Count() });
-
-            item.RecipientCount = stats.Sum(s => s.Count);
-            item.ReadCount = stats.Where(s => s.IsRead).Sum(s => s.Count);
-        }
-
-        return new PagedResult<NotificationResultDto>(dto, total, list);
+        return new PagedResult<NotificationListOutput>(input, total, items);
     }
 
-    public async Task<NotificationResultDto> GetNotificationAsync(Guid id)
+    public async Task<NotificationListOutput> GetNotificationAsync(Guid id)
     {
         var notification = await notificationRepository.Select
-            .From<Employee>()
-            .LeftJoin((n, sender) => n.SenderId == sender.Id)
-            .Where((n, sender) => n.Id == id)
-            .FirstAsync((n, sender) => new NotificationResultDto
+            .Where(x => x.Id == id)
+            .FirstAsync(x => new NotificationListOutput
             {
-                Id = n.Id,
-                Title = n.Title,
-                Content = n.Content,
-                NotificationType = n.NotificationType,
-                SendScopeType = n.SendScopeType,
-                SendScopeValue = n.SendScopeValue,
-                Status = n.Status,
-                PublishTime = n.PublishTime,
-                ExpireTime = n.ExpireTime,
-                Priority = n.Priority,
-                SenderId = n.SenderId,
-                SenderName = sender.Name,
-                CreationTime = n.CreationTime
+                Id = x.Id,
+                Title = x.Title,
+                Content = x.Content,
+                NotificationType = x.NotificationType,
+                SendScopeType = x.SendScopeType,
+                SendScopeValue = x.SendScopeValue,
+                Status = x.Status,
+                PublishTime = x.PublishTime,
+                ExpireTime = x.ExpireTime,
+                Priority = x.Priority,
+                SenderId = x.SenderId,
+                Sender = x.Sender,
+                ReadCount = x.UserNotifications!.Count(x => x.IsRead),
+                RecipientCount = x.UserNotifications!.Count(),
+                CreationTime = x.CreationTime
             });
 
         if (notification == null)
@@ -151,18 +141,10 @@ public class NotificationAppService : BasisAppService, INotificationAppService
             throw HttpFriendlyException.NotFound("通知不存在");
         }
 
-        var stats = await userNotificationRepository.Select
-            .Where(un => un.NotificationId == id)
-            .GroupBy(un => un.IsRead)
-            .ToListAsync(g => new { IsRead = g.Key, Count = g.Count() });
-
-        notification.RecipientCount = stats.Sum(s => s.Count);
-        notification.ReadCount = stats.Where(s => s.IsRead).Sum(s => s.Count);
-
         return notification;
     }
 
-    public async Task UpdateNotificationAsync(Guid id, NotificationDto dto)
+    public async Task UpdateNotificationAsync(Guid id, NotificationCreateInput dto)
     {
         var notification = await notificationRepository.Where(x => x.Id == id).FirstAsync();
 
@@ -171,31 +153,41 @@ public class NotificationAppService : BasisAppService, INotificationAppService
             throw HttpFriendlyException.BadRequest("已发布的通知不能修改");
         }
 
-        notification.Title = dto.Title;
-        notification.Content = dto.Content;
-        notification.NotificationType = dto.NotificationType;
-        notification.SendScopeType = dto.SendScopeType;
-        notification.SendScopeValue = dto.SendScopeValue;
-        notification.Priority = dto.Priority;
-        notification.ExpireTime = dto.ExpireTime;
-
         if (dto.IsPublish && notification.Status == NotificationStatus.Draft)
         {
-            notification.Status = NotificationStatus.Published;
-            notification.PublishTime = DateTime.Now;
-            await CreateUserNotificationsAsync(id, dto.SendScopeType, dto.SendScopeValue);
+            // 从草稿变为发布，先删除草稿，再调用通知服务
+            await notificationRepository.DeleteAsync(notification);
 
-            // 发布通知发布事件
-            await distributedEventBus.PublishAsync(new NotificationPublishedEto
+            await notificationService.CreateNotificationAsync(new SendNotificationInput
             {
-                NotificationId = id,
+                Sender = dto.Sender,
+                SenderId = notification.SenderId,
+                Title = dto.Title,
+                Content = dto.Content,
+                NotificationType = dto.NotificationType,
+                SubType = dto.SubType,
                 SendScopeType = dto.SendScopeType,
                 SendScopeValue = dto.SendScopeValue,
-                TenantId = CurrentTenant.Id
+                ExpireTime = dto.ExpireTime,
+                Priority = dto.Priority,
+                TargetPlatform = dto.TargetPlatform
             });
         }
+        else
+        {
+            // 仍然保持草稿状态，只更新字段
+            notification.Title = dto.Title;
+            notification.Content = dto.Content;
+            notification.NotificationType = dto.NotificationType;
+            notification.SubType = dto.SubType;
+            notification.SendScopeType = dto.SendScopeType;
+            notification.SendScopeValue = dto.SendScopeValue;
+            notification.Priority = dto.Priority;
+            notification.ExpireTime = dto.ExpireTime;
+            notification.TargetPlatform = dto.TargetPlatform;
 
-        await notificationRepository.UpdateAsync(notification);
+            await notificationRepository.UpdateAsync(notification);
+        }
     }
 
     public async Task PublishNotificationAsync(Guid id)
@@ -207,19 +199,22 @@ public class NotificationAppService : BasisAppService, INotificationAppService
             throw HttpFriendlyException.BadRequest("只能发布草稿状态的通知");
         }
 
-        notification.Status = NotificationStatus.Published;
-        notification.PublishTime = DateTime.Now;
+        // 删除草稿记录，调用通知服务重新创建并发布
+        await notificationRepository.DeleteAsync(notification);
 
-        await notificationRepository.UpdateAsync(notification);
-        await CreateUserNotificationsAsync(id, notification.SendScopeType, notification.SendScopeValue);
-
-        // 发布通知发布事件
-        await distributedEventBus.PublishAsync(new NotificationPublishedEto
+        await notificationService.CreateNotificationAsync(new SendNotificationInput
         {
-            NotificationId = id,
+            Sender = notification.Sender,
+            SenderId = notification.SenderId,
+            Title = notification.Title,
+            Content = notification.Content,
+            NotificationType = notification.NotificationType,
+            SubType = notification.SubType,
             SendScopeType = notification.SendScopeType,
             SendScopeValue = notification.SendScopeValue,
-            TenantId = CurrentTenant.Id
+            ExpireTime = notification.ExpireTime,
+            Priority = notification.Priority,
+            TargetPlatform = notification.TargetPlatform
         });
     }
 
@@ -236,7 +231,7 @@ public class NotificationAppService : BasisAppService, INotificationAppService
         await notificationRepository.UpdateAsync(notification);
 
         // 删除相关的用户通知记录
-        await userNotificationRepository.DeleteAsync(un => un.NotificationId == id);
+        await userNotificationRepository.DeleteAsync(x => x.NotificationId == id);
     }
 
     public async Task DeleteNotificationAsync(Guid[] ids)
@@ -270,83 +265,33 @@ public class NotificationAppService : BasisAppService, INotificationAppService
         }
     }
 
-    public async Task<PagedResult<NotificationRecipientDto>> GetNotificationRecipientsAsync(Guid notificationId, PagedResultRequest request)
+    public async Task<PagedResult<NotificationRecipientOutput>> GetNotificationRecipientsAsync(Guid notificationId, PagedResultRequest request)
     {
-        var query = userNotificationRepository.Select
-            .From<Employee>()
-            .InnerJoin((un, emp) => un.UserId == emp.Id)
-            .Where((un, emp) => un.NotificationId == notificationId)
-            .OrderByDescending((un, emp) => un.CreationTime);
-
-        var list = await query
+        var list = await userNotificationRepository.Select
+            .Include(x => x.User)
+            .Include(x => x.User!.Employee)
+            .Include(x => x.User!.Department)
+            .Include(x => x.User!.Position)
+            .Where(x => x.NotificationId == notificationId)
+            .OrderByDescending(x => x.CreationTime)
             .Count(out var total)
             .Page(request.Current, request.PageSize)
-            .ToListAsync((un, emp) => new NotificationRecipientDto
+            .ToListAsync(un => new NotificationRecipientOutput
             {
                 Id = un.Id,
                 UserId = un.UserId,
-                UserName = emp.Name,
+                UserName = un.User!.Employee != null ? un.User.Employee.Name : un.User.UserName,
+                DepartmentName = un.User.Department != null ? un.User.Department.Name : null,
+                PositionName = un.User.Position != null ? un.User.Position.Name : null,
                 IsRead = un.IsRead,
                 ReadTime = un.ReadTime,
-                CreationTime = un.CreationTime
+                CreationTime = un.CreationTime,
+                PushStatus = un.PushStatus,
+                RetryCount = un.RetryCount,
+                PushErrorMessage = un.PushErrorMessage
             });
 
-        return new PagedResult<NotificationRecipientDto>(request, total, list);
+        return new PagedResult<NotificationRecipientOutput>(request, total, list);
     }
 
-    private async Task CreateUserNotificationsAsync(Guid notificationId, SendScopeType sendScopeType, string? sendScopeValue)
-    {
-        var targetUserIds = await GetTargetUserIdsAsync(sendScopeType, sendScopeValue);
-
-        var userNotifications = targetUserIds.Select(userId => new UserNotification
-        {
-            NotificationId = notificationId,
-            UserId = userId,
-            IsRead = false
-        }).ToList();
-
-        if (userNotifications.Any())
-        {
-            await userNotificationRepository.InsertAsync(userNotifications);
-        }
-    }
-
-    private async Task<List<Guid>> GetTargetUserIdsAsync(SendScopeType sendScopeType, string? sendScopeValue)
-    {
-        var query = userRepository.Select.Where(u => u.IsEnabled);
-
-        switch (sendScopeType)
-        {
-            case SendScopeType.SpecificUsers:
-                if (!string.IsNullOrEmpty(sendScopeValue))
-                {
-                    var userIds = sendScopeValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                        .Select(Guid.Parse).ToList();
-                    query = query.Where(u => userIds.Contains(u.Id));
-                }
-                break;
-            case SendScopeType.ByRole:
-                break;
-            case SendScopeType.ByDepartment:
-                if (!string.IsNullOrEmpty(sendScopeValue))
-                {
-                    var deptIds = sendScopeValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                        .Select(Guid.Parse).ToList();
-                    query = query.Where(u => u.DepartmentId.HasValue && deptIds.Contains(u.DepartmentId.Value));
-                }
-                break;
-            case SendScopeType.ByPosition:
-                if (!string.IsNullOrEmpty(sendScopeValue))
-                {
-                    var positionIds = sendScopeValue.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                        .Select(Guid.Parse).ToList();
-                    query = query.Where(u => u.PositionId.HasValue && positionIds.Contains(u.PositionId.Value));
-                }
-                break;
-            case SendScopeType.AllUsers:
-                break;
-        }
-
-        return await query.ToListAsync(u => u.Id);
-    }
 }

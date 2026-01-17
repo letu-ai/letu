@@ -25,9 +25,9 @@ function NotificationList() {
         {
             title: '通知内容',
             dataIndex: 'content',
-            render: (content: string, record) => {
+            render: (content: string | null, record) => {
                 return <Link to="/my/notifications/$id" params={{ id: record.id }}>
-                    {content.length > 100 ? content.slice(0, 100) + '...' : content}
+                    {content && content.length > 100 ? content.slice(0, 100) + '...' : content ?? ''}
                 </Link>;
             }
         },

@@ -28,6 +28,7 @@ import { Route as MyNotificationsIndexRouteImport } from './pages/my/notificatio
 import { Route as AiWorkflowsIndexRouteImport } from './pages/ai/workflows/index'
 import { Route as AiFileManagerIndexRouteImport } from './pages/ai/file-manager/index'
 import { Route as AdminUsersIndexRouteImport } from './pages/admin/users/index'
+import { Route as AdminUserDevicesIndexRouteImport } from './pages/admin/user-devices/index'
 import { Route as AdminTenantsIndexRouteImport } from './pages/admin/tenants/index'
 import { Route as AdminSettingsIndexRouteImport } from './pages/admin/settings/index'
 import { Route as AdminRolesIndexRouteImport } from './pages/admin/roles/index'
@@ -54,7 +55,6 @@ import { Route as AdminSettingsFeatureRouteImport } from './pages/admin/settings
 import { Route as AdminSettingsEmailingRouteImport } from './pages/admin/settings/emailing'
 import { Route as AdminSettingsAccountRouteImport } from './pages/admin/settings/account'
 import { Route as AdminPositionsGroupsRouteImport } from './pages/admin/positions/groups'
-import { Route as AdminNotificationsNotificationRouteImport } from './pages/admin/notifications/notification'
 import { Route as AdminNotificationsIdRouteImport } from './pages/admin/notifications/$id'
 import { Route as AdminMenusAppNameRouteImport } from './pages/admin/menus/$appName'
 import { Route as AdminLoggingsSystemRouteImport } from './pages/admin/loggings/system'
@@ -163,6 +163,11 @@ const AiFileManagerIndexRoute = AiFileManagerIndexRouteImport.update({
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminUserDevicesIndexRoute = AdminUserDevicesIndexRouteImport.update({
+  id: '/user-devices/',
+  path: '/user-devices/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminTenantsIndexRoute = AdminTenantsIndexRouteImport.update({
@@ -297,12 +302,6 @@ const AdminPositionsGroupsRoute = AdminPositionsGroupsRouteImport.update({
   path: '/positions/groups',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminNotificationsNotificationRoute =
-  AdminNotificationsNotificationRouteImport.update({
-    id: '/notifications/notification',
-    path: '/notifications/notification',
-    getParentRoute: () => AdminRouteRoute,
-  } as any)
 const AdminNotificationsIdRoute = AdminNotificationsIdRouteImport.update({
   id: '/notifications/$id',
   path: '/notifications/$id',
@@ -406,7 +405,6 @@ export interface FileRoutesByFullPath {
   '/admin/loggings/system': typeof AdminLoggingsSystemRoute
   '/admin/menus/$appName': typeof AdminMenusAppNameRoute
   '/admin/notifications/$id': typeof AdminNotificationsIdRoute
-  '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
@@ -433,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/admin/roles': typeof AdminRolesIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
+  '/admin/user-devices': typeof AdminUserDevicesIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
   '/ai/file-manager': typeof AiFileManagerIndexRoute
   '/ai/workflows': typeof AiWorkflowsIndexRoute
@@ -466,7 +465,6 @@ export interface FileRoutesByTo {
   '/admin/loggings/system': typeof AdminLoggingsSystemRoute
   '/admin/menus/$appName': typeof AdminMenusAppNameRoute
   '/admin/notifications/$id': typeof AdminNotificationsIdRoute
-  '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
@@ -493,6 +491,7 @@ export interface FileRoutesByTo {
   '/admin/roles': typeof AdminRolesIndexRoute
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
+  '/admin/user-devices': typeof AdminUserDevicesIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
   '/ai/file-manager': typeof AiFileManagerIndexRoute
   '/ai/workflows': typeof AiWorkflowsIndexRoute
@@ -529,7 +528,6 @@ export interface FileRoutesById {
   '/admin/loggings/system': typeof AdminLoggingsSystemRoute
   '/admin/menus/$appName': typeof AdminMenusAppNameRoute
   '/admin/notifications/$id': typeof AdminNotificationsIdRoute
-  '/admin/notifications/notification': typeof AdminNotificationsNotificationRoute
   '/admin/positions/groups': typeof AdminPositionsGroupsRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
   '/admin/settings/emailing': typeof AdminSettingsEmailingRoute
@@ -556,6 +554,7 @@ export interface FileRoutesById {
   '/admin/roles/': typeof AdminRolesIndexRoute
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tenants/': typeof AdminTenantsIndexRoute
+  '/admin/user-devices/': typeof AdminUserDevicesIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
   '/ai/file-manager/': typeof AiFileManagerIndexRoute
   '/ai/workflows/': typeof AiWorkflowsIndexRoute
@@ -593,7 +592,6 @@ export interface FileRouteTypes {
     | '/admin/loggings/system'
     | '/admin/menus/$appName'
     | '/admin/notifications/$id'
-    | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
     | '/admin/settings/emailing'
@@ -620,6 +618,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/settings/'
     | '/admin/tenants'
+    | '/admin/user-devices'
     | '/admin/users'
     | '/ai/file-manager'
     | '/ai/workflows'
@@ -653,7 +652,6 @@ export interface FileRouteTypes {
     | '/admin/loggings/system'
     | '/admin/menus/$appName'
     | '/admin/notifications/$id'
-    | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
     | '/admin/settings/emailing'
@@ -680,6 +678,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/tenants'
+    | '/admin/user-devices'
     | '/admin/users'
     | '/ai/file-manager'
     | '/ai/workflows'
@@ -715,7 +714,6 @@ export interface FileRouteTypes {
     | '/admin/loggings/system'
     | '/admin/menus/$appName'
     | '/admin/notifications/$id'
-    | '/admin/notifications/notification'
     | '/admin/positions/groups'
     | '/admin/settings/account'
     | '/admin/settings/emailing'
@@ -742,6 +740,7 @@ export interface FileRouteTypes {
     | '/admin/roles/'
     | '/admin/settings/'
     | '/admin/tenants/'
+    | '/admin/user-devices/'
     | '/admin/users/'
     | '/ai/file-manager/'
     | '/ai/workflows/'
@@ -896,6 +895,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/user-devices/': {
+      id: '/admin/user-devices/'
+      path: '/user-devices'
+      fullPath: '/admin/user-devices'
+      preLoaderRoute: typeof AdminUserDevicesIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/tenants/': {
@@ -1080,13 +1086,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPositionsGroupsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/notifications/notification': {
-      id: '/admin/notifications/notification'
-      path: '/notifications/notification'
-      fullPath: '/admin/notifications/notification'
-      preLoaderRoute: typeof AdminNotificationsNotificationRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/admin/notifications/$id': {
       id: '/admin/notifications/$id'
       path: '/notifications/$id'
@@ -1257,7 +1256,6 @@ interface AdminRouteRouteChildren {
   AdminLoggingsSystemRoute: typeof AdminLoggingsSystemRoute
   AdminMenusAppNameRoute: typeof AdminMenusAppNameRoute
   AdminNotificationsIdRoute: typeof AdminNotificationsIdRoute
-  AdminNotificationsNotificationRoute: typeof AdminNotificationsNotificationRoute
   AdminPositionsGroupsRoute: typeof AdminPositionsGroupsRoute
   AdminDataDictionariesIndexRoute: typeof AdminDataDictionariesIndexRoute
   AdminDepartmentsIndexRoute: typeof AdminDepartmentsIndexRoute
@@ -1272,6 +1270,7 @@ interface AdminRouteRouteChildren {
   AdminRegionsIndexRoute: typeof AdminRegionsIndexRoute
   AdminRolesIndexRoute: typeof AdminRolesIndexRoute
   AdminTenantsIndexRoute: typeof AdminTenantsIndexRoute
+  AdminUserDevicesIndexRoute: typeof AdminUserDevicesIndexRoute
   AdminUsersIndexRoute: typeof AdminUsersIndexRoute
   AdminLoggingsSystemLogViewSplatRoute: typeof AdminLoggingsSystemLogViewSplatRoute
 }
@@ -1286,7 +1285,6 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLoggingsSystemRoute: AdminLoggingsSystemRoute,
   AdminMenusAppNameRoute: AdminMenusAppNameRoute,
   AdminNotificationsIdRoute: AdminNotificationsIdRoute,
-  AdminNotificationsNotificationRoute: AdminNotificationsNotificationRoute,
   AdminPositionsGroupsRoute: AdminPositionsGroupsRoute,
   AdminDataDictionariesIndexRoute: AdminDataDictionariesIndexRoute,
   AdminDepartmentsIndexRoute: AdminDepartmentsIndexRoute,
@@ -1301,6 +1299,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminRegionsIndexRoute: AdminRegionsIndexRoute,
   AdminRolesIndexRoute: AdminRolesIndexRoute,
   AdminTenantsIndexRoute: AdminTenantsIndexRoute,
+  AdminUserDevicesIndexRoute: AdminUserDevicesIndexRoute,
   AdminUsersIndexRoute: AdminUsersIndexRoute,
   AdminLoggingsSystemLogViewSplatRoute: AdminLoggingsSystemLogViewSplatRoute,
 }

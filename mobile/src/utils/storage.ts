@@ -9,6 +9,8 @@ const STORAGE_KEYS = {
   TOKEN_EXPIRED_TIME: '@auth/tokenExpiredTime',
   REMEMBERED_USERNAME: '@auth/rememberedUsername',
   REMEMBER_ME: '@auth/rememberMe',
+  DEVICE_INFO: '@device/info',
+  PUSH_INIT: '@push/init',
 } as const;
 
 export const storage = {
@@ -69,6 +71,20 @@ export const storage = {
       AsyncStorage.removeItem(STORAGE_KEYS.REMEMBERED_USERNAME),
       AsyncStorage.removeItem(STORAGE_KEYS.REMEMBER_ME),
     ]);
+  },
+
+  // JSON存储辅助方法
+  async getJSON<T = any>(key: string): Promise<T | null> {
+    const value = await AsyncStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+  },
+
+  async setJSON(key: string, value: any): Promise<void> {
+    await AsyncStorage.setItem(key, JSON.stringify(value));
+  },
+
+  async removeItem(key: string): Promise<void> {
+    await AsyncStorage.removeItem(key);
   },
 };
 

@@ -5,6 +5,7 @@ import type { ColumnsType } from "antd/es/table";
 import {
   getNotificationRecipients,
   type NotificationRecipientDto,
+  PushStatus,
 } from "./-service";
 import dayjs from "dayjs";
 
@@ -122,6 +123,46 @@ const RecipientModal = forwardRef<RecipientModalRef, RecipientModalProps>(
         ),
       },
       {
+        title: "推送状态",
+        dataIndex: "pushStatus",
+        key: "pushStatus",
+        width: 100,
+        render: (pushStatus: PushStatus) => {
+          const statusConfig = {
+            [PushStatus.PENDING]: { color: "default", text: "待推送" },
+            [PushStatus.SUCCESS]: { color: "success", text: "推送成功" },
+            [PushStatus.FAILED]: { color: "error", text: "推送失败" },
+            [PushStatus.SKIPPED]: { color: "warning", text: "已跳过" },
+            [PushStatus.EXPIRED]: { color: "default", text: "已过期" },
+          } as const;
+
+          const config = statusConfig[pushStatus];
+          if (!config) {
+            return <Tag color="default">未知</Tag>;
+          }
+          return <Tag color={config.color}>{config.text}</Tag>;
+        },
+      },
+      {
+        title: "重试次数",
+        dataIndex: "retryCount",
+        key: "retryCount",
+        width: 80,
+        render: (retryCount: number) => retryCount || 0,
+      },
+      {
+        title: "失败原因",
+        dataIndex: "pushErrorMessage",
+        key: "pushErrorMessage",
+        width: 200,
+        ellipsis: {
+          showTitle: false,
+        },
+        render: (text?: string) => (
+          <span title={text || ""}>{text || "-"}</span>
+        ),
+      },
+      {
         title: "通知时间",
         dataIndex: "creationTime",
         key: "creationTime",
@@ -144,8 +185,8 @@ const RecipientModal = forwardRef<RecipientModalRef, RecipientModalProps>(
         open={isOpen}
         onCancel={() => setIsOpen(false)}
         footer={null}
-        width={1000}
-        destroyOnHidden
+        width={1400}
+        destroyOnClose
       >
         {/* 搜索表单 */}
         <Form

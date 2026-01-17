@@ -8,10 +8,19 @@ import { Home, User } from 'lucide-react-native';
 import HomeScreen from '@/pages/home/HomeScreen';
 import ProfileScreen from '@/pages/profile/ProfileScreen';
 import PasswordScreen from '@/pages/profile/PasswordScreen';
+import NotificationListScreen from '@/pages/notifications/NotificationListScreen';
+import NotificationDetailScreen from '@/pages/notifications/NotificationDetailScreen';
 
+// ========== 类型定义 ==========
 export type MainTabParamList = {
   Home: undefined;
   ProfileStack: undefined;
+};
+
+export type HomeStackParamList = {
+  HomeMain: undefined;
+  NotificationList: undefined;
+  NotificationDetail: { id: string };
 };
 
 export type ProfileStackParamList = {
@@ -19,9 +28,52 @@ export type ProfileStackParamList = {
   Password: undefined;
 };
 
+// ========== Navigator 实例 ==========
 const Tab = createBottomTabNavigator<MainTabParamList>();
+const HomeStack = createStackNavigator<HomeStackParamList>();
 const ProfileStack = createStackNavigator<ProfileStackParamList>();
 
+// ========== HomeStack 导航器 ==========
+function HomeStackNavigator() {
+  return (
+    <HomeStack.Navigator
+      screenOptions={{
+        headerShown: false, // 使用自定义头部
+        headerStyle: {
+          backgroundColor: '#ffffff',
+        },
+        headerTintColor: '#000000',
+        headerTitleStyle: {
+          fontWeight: '600',
+        },
+      }}
+    >
+      <HomeStack.Screen
+        name="HomeMain"
+        component={HomeScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <HomeStack.Screen
+        name="NotificationList"
+        component={NotificationListScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <HomeStack.Screen
+        name="NotificationDetail"
+        component={NotificationDetailScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </HomeStack.Navigator>
+  );
+}
+
+// ========== ProfileStack 导航器 ==========
 function ProfileStackNavigator() {
   return (
     <ProfileStack.Navigator
@@ -54,6 +106,7 @@ function ProfileStackNavigator() {
   );
 }
 
+// ========== 主Tab导航器 ==========
 export default function MainNavigator() {
   return (
     <Tab.Navigator
@@ -70,7 +123,7 @@ export default function MainNavigator() {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStackNavigator}
         options={{
           title: '主页',
           tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
@@ -87,4 +140,3 @@ export default function MainNavigator() {
     </Tab.Navigator>
   );
 }
-

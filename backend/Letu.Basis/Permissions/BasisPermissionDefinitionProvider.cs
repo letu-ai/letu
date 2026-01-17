@@ -13,6 +13,7 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         var baisiGroup = context.AddGroup(BasisPermissions.BaseDataGroupName, L("Permission:Admin.BaseData"));
         DefineRoles(baisiGroup);
         DefineUsers(baisiGroup);
+        DefineUserDevices(baisiGroup);
         DefineClients(baisiGroup);
         DefineMenuItems(baisiGroup);
         DefineOrganizations(baisiGroup);
@@ -36,7 +37,7 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         DefineEditions(saasGroup);
     }
 
-    // 用户   
+    // 用户
     public void DefineUsers(PermissionGroupDefinition group)
     {
         var usersPermission = group.AddPermission(BasisPermissions.User.Default, L("Permission:UserManagement"));
@@ -49,6 +50,12 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
 
         group.AddPermission(BasisPermissions.UserLookup.Default, L("Permission:UserLookup"))
             .WithProviders(ClientPermissionValueProvider.ProviderName);
+    }
+
+    // 用户设备
+    public void DefineUserDevices(PermissionGroupDefinition group)
+    {
+        group.AddPermission(BasisPermissions.UserDevice.Default, L("Permission:UserDeviceManagement"));
     }
 
 
@@ -207,6 +214,7 @@ public class BasisPermissionDefinitionProvider : PermissionDefinitionProvider
         permission.AddChild(BasisPermissions.Integration.Amap, L("Permission:Amap"));
         permission.AddChild(BasisPermissions.Integration.Payment, L("Permission:Payment"));
         permission.AddChild(BasisPermissions.Integration.Sms, L("Permission:Sms"));
+        permission.AddChild(BasisPermissions.Integration.AliyunPush, L("Permission:AliyunPush"));
     }
     private static LocalizableString L(string name)
     {

@@ -29,6 +29,7 @@
     "Permission:Amap": "高德地图",
     "Permission:Payment": "支付网关",
     "Permission:Sms": "短信网关",
+    "Permission:AliyunPush": "阿里云移动推送",
     "Permission:BindUser": "绑定用户",
     "Permission:BindEmployee": "绑定员工",
     "Permission:Log": "日志",
@@ -37,6 +38,7 @@
 
     "Permission:RoleManagement": "角色管理",
     "Permission:UserManagement": "用户管理",
+    "Permission:UserDeviceManagement": "用户设备管理",
     "Permission:ClientManagement": "客户端管理",
     "Permission:MenuItemManagement": "菜单管理",
     "Permission:OrganizationManagement": "机构管理",

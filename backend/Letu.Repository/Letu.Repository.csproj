@@ -7,7 +7,7 @@
 		<PackageReference Include="FreeSql" />
 		<PackageReference Include="FreeSql.DbContext" />
 		<PackageReference Include="FreeSql.Provider.PostgreSQL" />
-		<PackageReference Include="FreeSql.Cloud" />
+		<PackageReference Include="FreeSql.Extensions.JsonMap" />
 		<PackageReference Include="Volo.Abp.Core" />
 		<PackageReference Include="Volo.Abp.Ddd.Domain" />
 		<PackageReference Include="Volo.Abp.MultiTenancy" />

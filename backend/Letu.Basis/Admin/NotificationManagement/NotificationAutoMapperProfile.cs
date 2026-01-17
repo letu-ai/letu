@@ -8,12 +8,12 @@ public class NotificationAutoMapperProfile : Profile
 {
     public NotificationAutoMapperProfile()
     {
-        CreateMap<Notification, NotificationResultDto>()
-            .Ignore(d => d.SenderName)
+        CreateMap<Notification, NotificationListOutput>()
+            .Ignore(d => d.Sender)
             .Ignore(d => d.RecipientCount)
             .Ignore(d => d.ReadCount);
             
-        CreateMap<NotificationDto, Notification>(MemberList.Source)
+        CreateMap<NotificationCreateInput, Notification>(MemberList.Source)
             .ForSourceMember(s => s.IsPublish, opt => opt.DoNotValidate())
             .Ignore(d => d.Id)
             .Ignore(d => d.Status)
@@ -25,7 +25,7 @@ public class NotificationAutoMapperProfile : Profile
             .Ignore(d => d.LastModifierId)
             .Ignore(d => d.TenantId);
 
-        CreateMap<UserNotification, NotificationRecipientDto>()
+        CreateMap<UserNotification, NotificationRecipientOutput>()
             .Ignore(d => d.UserName)
             .Ignore(d => d.DepartmentName)
             .Ignore(d => d.PositionName);

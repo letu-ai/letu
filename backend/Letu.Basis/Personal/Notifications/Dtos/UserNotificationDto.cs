@@ -1,4 +1,5 @@
 ﻿using Letu.Basis.Admin.NotificationManagement;
+using Letu.Basis.Notifications;
 
 namespace Letu.Basis.Personal.Notifications.Dtos;
 
@@ -30,9 +31,19 @@ public class UserNotificationDto
     public NotificationType NotificationType { get; set; }
 
     /// <summary>
+    /// 通知子类型
+    /// </summary>
+    public string? SubType { get; set; }
+
+    /// <summary>
     /// 优先级
     /// </summary>
     public Priority Priority { get; set; }
+
+    /// <summary>
+    /// 扩展数据
+    /// </summary>
+    public string? ExtensionData { get; set; }
 
     /// <summary>
     /// 是否已读

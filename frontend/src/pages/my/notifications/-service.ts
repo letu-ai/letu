@@ -46,6 +46,8 @@ export interface MyNotificationListDto {
   id: string;
   title: string;
   content: string | null;
+  subType: string | null;
+  extensionData: string | null;
   isReaded: boolean;
   creationTime: string;
   readedTime: string;
@@ -65,6 +67,7 @@ export interface UserNotificationNavbarItemDto {
   id: string;
   title: string;
   content: string | null;
+  subType: string | null;
   isReaded: boolean;
   creationTime: string;
 }

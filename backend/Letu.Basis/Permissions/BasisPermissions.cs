@@ -38,6 +38,14 @@ public static class BasisPermissions
         public const string Default = BaseDataGroupName + ".UserLookup";
     }
 
+    public static class UserDevice
+    {
+        /// <summary>
+        /// 用户设备管理
+        /// </summary>
+        public const string Default = BaseDataGroupName + ".UserDevice";
+    }
+
     public static class Role
     {
         /// <summary>
@@ -238,6 +246,11 @@ public static class BasisPermissions
         /// 短信设置
         /// </summary>
         public const string Sms = Default + ".Sms";
+
+        /// <summary>
+        /// 阿里云移动推送设置
+        /// </summary>
+        public const string AliyunPush = Default + ".AliyunPush";
     }
 
     // 租户管理

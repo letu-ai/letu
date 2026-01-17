@@ -5,6 +5,7 @@ import { App } from 'antd'
 import AmapSettingsForm, { type IAmapSettings } from './-components/AmapSettingForm'
 import RagFlowSettingsForm, { type IRagFlowSettings } from './-components/RagFlowSettingForm'
 import FastgptSettingsForm, { type IFastgptSettings } from './-components/FastgptSettingForm'
+import AliyunPushSettingForm, { type IAliyunPushSettings } from './-components/AliyunPushSettingForm'
 import IntegrationCard from './-components/IntegrationCard'
 import { fetchSettingValues, getIntegrationsStatus, setIntegrationEnableStatus, updateSettingValues } from './-service'
 import { useAsyncEffect } from 'ahooks'
@@ -26,7 +27,8 @@ function IntegrationSettings() {
     const [integrations, setIntegrations] = useState<Record<string, IntegrationState>>({
         "amap": { loading: false, saving: false, isError: false, show: false },
         "ragflow": { loading: false, saving: false, isError: false, show: false },
-        "fastgpt": { loading: false, saving: false, isError: false, show: false }
+        "fastgpt": { loading: false, saving: false, isError: false, show: false },
+        "aliyun-push": { loading: false, saving: false, isError: false, show: false }
     });
     const [enableStatus, setEnableStatus] = useState<Record<string, boolean>>({});
 
@@ -38,10 +40,11 @@ function IntegrationSettings() {
         }, {} as Record<string, boolean>));
     }, []);
 
-    // 获取地图服务的状态
+    // 获取各服务的状态
     const amapState = integrations['amap'];
     const ragflowState = integrations['ragflow'];
     const fastgptState = integrations['fastgpt'];
+    const aliyunPushState = integrations['aliyun-push'];
     // 处理展开事件
     const handleExpand = async (serviceName: string) => {
         updateState(serviceName, { show: true });
@@ -161,6 +164,29 @@ function IntegrationSettings() {
                                 return await handleRequest<IFastgptSettings>('fastgpt');
                             }}
                             onSave={(config) => handleSave('fastgpt', config)}
+                        />
+                    </IntegrationCard>
+                </div>
+
+                {/* 推送服务 */}
+                <div className="space-y-4">
+                    <h2 className="text-xl font-semibold">推送服务</h2>
+                    <IntegrationCard
+                        icon={<img title="阿里云移动推送" src="/images/logos/aliyun_emas.svg" className="w-24" />}
+                        title="阿里云移动推送"
+                        description="管理阿里云移动推送服务集成，配置推送相关参数"
+                        enabled={enableStatus['aliyun-push'] || false}
+                        onExpand={() => handleExpand('aliyun-push')}
+                        onEnableChange={(enabled) => handleEnableChange('aliyun-push', enabled)}
+                    >
+                        <AliyunPushSettingForm
+                            loading={aliyunPushState.loading}
+                            saving={aliyunPushState.saving}
+                            isError={aliyunPushState.isError}
+                            onRequest={async () => {
+                                return await handleRequest<IAliyunPushSettings>('aliyun-push');
+                            }}
+                            onSave={(config) => handleSave('aliyun-push', config)}
                         />
                     </IntegrationCard>
                 </div>

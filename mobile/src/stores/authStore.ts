@@ -4,6 +4,9 @@
 import { create } from 'zustand';
 import { storage } from '../utils/storage';
 import type { IUserTokenOutput } from '@/pages/auth/service';
+import { deleteUserDevice } from '@/api/userDevice';
+import { getDeviceInfo } from '@/utils/deviceInfo';
+import { resetPushInitStatus } from '@/lib/aliyun-push';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -48,6 +51,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
+    try {
+      // 删除设备记录（在Token失效前）
+      const deviceInfo = await getDeviceInfo();
+      await deleteUserDevice(deviceInfo.deviceId, deviceInfo.packageName);
+      console.log('设备记录已删除');
+    } catch (error) {
+      console.error('删除设备记录失败:', error);
+      // 删除失败不影响注销流程
+    }
+
+    // 重置推送状态
+    await resetPushInitStatus();
+
     await storage.clearTokens();
     await storage.clearRememberMe();
 

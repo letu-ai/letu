@@ -16,6 +16,8 @@ export const SendScopeType = {
   BY_DEPARTMENT: 3,   // 按部门
   BY_POSITION: 4,     // 按职位
   ALL_USERS: 5,       // 全体用户
+  SPECIFIC_DEVICES: 6,    // 指定设备
+  BY_CLIENT_TYPE: 7,      // 按客户端类型
 } as const;
 
 export type SendScopeType = typeof SendScopeType[keyof typeof SendScopeType]; 

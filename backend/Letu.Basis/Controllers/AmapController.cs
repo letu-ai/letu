@@ -1,6 +1,4 @@
-﻿using Letu.Basis.Admin.Integrations;
-using Letu.Basis.Amaps;
-using Letu.Basis.Permissions;
+﻿using Letu.Basis.Amaps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +11,9 @@ public class AmapController : ControllerBase
 {
     private readonly IAmapAppService amapAppService;
 
-    private readonly Lazy<IIntegrationSettingsStore> integrationSettingsStore;
-
-    public AmapController(IAmapAppService amapAppService, Lazy<IIntegrationSettingsStore> integrationSettingsStore)
+    public AmapController(IAmapAppService amapAppService)
     {
         this.amapAppService = amapAppService;
-        this.integrationSettingsStore = integrationSettingsStore;
     }
 
     /// <summary>
@@ -93,19 +88,5 @@ public class AmapController : ControllerBase
     public async Task<AmapWebConfig> GetWebConfigAsync()
     {
         return await amapAppService.GetWebConfigAsync();
-    }
-
-    [HttpGet("/api/admin/integrations/amap")]
-    [Authorize(BasisPermissions.Integration.Amap)]
-    public async Task<AmapSettings> GetIntegrationSettingsAsync()
-    {
-        return await integrationSettingsStore.Value.GetValuesAsync<AmapSettings>("amap") ?? new();
-    }
-
-    [HttpPost("/api/admin/integrations/amap")]
-    [Authorize(BasisPermissions.Integration.Amap)]
-    public async Task SetIntegrationSettingsAsync(AmapSettings input)
-    {
-        await integrationSettingsStore.Value.SetValuesAsync("amap", input);
     }
 }

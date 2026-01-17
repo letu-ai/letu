@@ -93,6 +93,7 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
         // 为需要权限配置的菜单预先生成 ID
         var organizationUnitMenuId = guidGenerator.Create();
         var userMenuId = guidGenerator.Create();
+        var userDeviceMenuId = guidGenerator.Create();
         var roleMenuId = guidGenerator.Create();
         var departmentMenuId = guidGenerator.Create();
         var positionGroupMenuId = guidGenerator.Create();
@@ -315,6 +316,18 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 Display = true,
                 IsExternal = false,
             },
+            new MenuItem(userDeviceMenuId)
+            {
+                Title = "用户设备",
+                Path = "/admin/user-devices",
+                ApplicationName = "admin",
+                MenuType = MenuType.Menu,
+                ParentId = parentMenus["系统监控"],
+                Permissions = [new () { Permission = BasisPermissions.UserDevice.Default }],
+                Sort = 15,
+                Display = true,
+                IsExternal = false,
+            },
             new MenuItem(securityLogMenuId)
             {
                 Title = "安全日志",
@@ -380,6 +393,11 @@ public class MenuDataSeedContributor : IDataSeedContributor, ITransientDependenc
             {
                 MenuItemId = userMenuId,
                 Permission = BasisPermissions.User.Default,
+            },
+            new MenuItemPermission
+            {
+                MenuItemId = userDeviceMenuId,
+                Permission = BasisPermissions.UserDevice.Default,
             },
             new MenuItemPermission
             {

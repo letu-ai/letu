@@ -32,6 +32,8 @@ public static class FreeSqlFactory
 #endif
             .Build();
 
+        fsql.UseJsonMap();
+
         // 执行所有模块预设的配置Action
         foreach (var configureAction in freeSqlOptions.ConfigureActions)
         {

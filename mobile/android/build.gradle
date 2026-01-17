@@ -8,6 +8,10 @@ allprojects {
         // 默认仓库（确保兼容性）
         google()
         mavenCentral()
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/releases/' }
+        maven { url 'https://developer.huawei.com/repo/' }
+        // 荣耀推送 SDK 仓库
+        maven { url 'https://developer.hihonor.com/repo' }
     }
 }
 

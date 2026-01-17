@@ -41,6 +41,7 @@ using Volo.Abp.BackgroundWorkers.Hangfire;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Letu.Basis.UserSessions;
+using Letu.MobilePush.Aliyun;
 
 namespace Letu;
 
@@ -59,6 +60,7 @@ namespace Letu;
     typeof(AbpBackgroundWorkersHangfireModule),
     typeof(LetuAbpFreeSqlModule),
     typeof(LetuBasisModule),
+    typeof(LetuMobilePushAliyunModule),
     typeof(LetuMqttModule),
     typeof(LetuAIModule)
 )]

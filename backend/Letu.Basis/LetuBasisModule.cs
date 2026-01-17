@@ -2,11 +2,13 @@
 using Letu.Basis.Admin.PermissionManagement.Identity;
 using Letu.Basis.Filters;
 using Letu.Basis.Localization;
+using Letu.Basis.Notifications;
 using Letu.Basis.Permissions;
 using Letu.Basis.UserSessions;
 using Letu.Core.Helpers;
 using Letu.Core.MultiTenancy;
 using Letu.Logging;
+using Letu.MobilePush;
 using Letu.Repository;
 using Microsoft.AspNetCore.Mvc;
 using UAParser.Extensions;
@@ -54,6 +56,7 @@ namespace Letu.Basis;
     typeof(AbpEmailingModule),
     typeof(AbpTimingModule),
     typeof(LetuRepositoryModule),
+    typeof(LetuMobilePushModule),
     typeof(LetuLoggingModule)
 )]
 public class LetuBasisModule : AbpModule
@@ -187,6 +190,7 @@ public class LetuBasisModule : AbpModule
         await context.AddBackgroundWorkerAsync<LogCleanupWorker>();
         await context.AddBackgroundWorkerAsync<UserSessionCleanupWorker>();
         await context.AddBackgroundWorkerAsync<UserSessionActivityUpdateWorker>();
+        await context.AddBackgroundWorkerAsync<NotificationPushRetryWorker>();
 
         await base.OnApplicationInitializationAsync(context);
     }

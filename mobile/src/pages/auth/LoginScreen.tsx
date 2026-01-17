@@ -25,6 +25,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { storage } from '@/utils/storage';
 import { loginByPassword } from '@/pages/auth/service';
 import { Check } from 'lucide-react-native';
+import { onUserLoggedIn } from '@/lib/aliyun-push';
 
 const loginSchema = z.object({
   userName: z.string().min(1, '请输入用户名'),
@@ -88,6 +89,11 @@ export default function LoginScreen() {
       } else {
         await storage.clearRememberMe();
       }
+
+      // 用户登录成功，通知推送服务绑定用户（非阻塞）
+      onUserLoggedIn(data.userName).catch((error) => {
+        console.error('推送用户绑定失败:', error);
+      });
 
       toast.show({
         placement: 'top',
